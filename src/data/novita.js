@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.45.0',
+    voci: {
+      it: [
+        'Corretta l\'icona degli incantesimi (di livello, non trucchetti): ora è il libro 📖 ovunque, non più la bacchetta.',
+        'I riquadri di tiro per colpire/danno e il bottone di eliminazione ora hanno gli stessi angoli arrotondati dei chip a fianco (gittata, tempo, scuola…).',
+      ],
+      en: [
+        'Fixed the spell icon (leveled spells, not cantrips): it\'s now the book 📖 everywhere, no longer the wand.',
+        'The attack/damage roll badges and the delete button now have the same rounded corners as the chips next to them (range, time, school…).',
+      ],
+    },
+  },
+  {
     versione: '4.44.0',
     voci: {
       it: [

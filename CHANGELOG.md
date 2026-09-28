@@ -2,6 +2,25 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.45.0] – 2026-09-28
+
+### Corretto
+- **Icona incantesimi: libro, non bacchetta**: il simbolo per "questo è un
+  incantesimo (non un trucchetto)" era stato allineato nella direzione
+  sbagliata nella v4.43.0 — la richiesta era usare 📖 ovunque, non 🪄.
+  Corretto in Combattimento (riga dell'incantesimo), nel filtro per
+  livello e nel menu "Azione Bonus" di Combattimento; il filtro livello
+  torna a 📖 com'era prima. Le 3 occorrenze di 🪄 rimaste (icona di
+  "correzione automatica applicata" nel Level Up) non sono lo stesso
+  concetto e restano invariate.
+- **Riquadri di tiro per colpire/danno e il bottone × più squadrati dei
+  chip a fianco**: `BadgeTiroColpire`, `BadgeTiroDanno` e
+  `BadgeTiroSalvezza` (condivisi da Combattimento e Incantesimi)
+  ereditavano `border-radius: 6` da `buttonMini`, mentre i chip (gittata,
+  tempo, scuola…) usano `border-radius: 4`. Uniformati a 4 insieme al
+  bottone di eliminazione (× in Combattimento, 🗑 in Incantesimi), che
+  usava lo stesso 6 di base.
+
 ## [4.44.0] – 2026-09-28
 
 ### Aggiunto

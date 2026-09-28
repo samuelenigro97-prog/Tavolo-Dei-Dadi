@@ -758,6 +758,7 @@ export function BadgeTiroColpire({ bonus, colore, onRoll, disabled = false, titl
       style={{
         ...styles.buttonMini,
         padding: '2px 6px',
+        borderRadius: 4,
         fontSize: 11,
         fontWeight: 700,
         color: colore,
@@ -791,6 +792,7 @@ export function BadgeTiroDanno({ danno, tipoDanno, critico = false, onRoll, disa
       style={{
         ...styles.buttonMini,
         padding: '2px 6px',
+        borderRadius: 4,
         fontSize: 11,
         fontWeight: 700,
         color: critico ? '#fff' : C.red,
@@ -825,6 +827,7 @@ export function BadgeTiroSalvezza({ cd, caratteristica, colore, title }) {
       style={{
         ...styles.buttonMini,
         padding: '2px 6px',
+        borderRadius: 4,
         fontSize: 11,
         fontWeight: 700,
         color: colore,

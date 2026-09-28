@@ -1976,7 +1976,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.44.0';
+const APP_VERSION = '4.45.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -8987,7 +8987,7 @@ export default function App() {
                     >
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <span style={{ fontSize: 14 }}>{r.tipo === 'incantesimo' ? '🪄' : r.tipo === 'privilegio' ? '🛡️' : r.tipo === 'talento' ? '⭐' : '⚔️'}</span>
+                          <span style={{ fontSize: 14 }}>{r.tipo === 'incantesimo' ? '📖' : r.tipo === 'privilegio' ? '🛡️' : r.tipo === 'talento' ? '⭐' : '⚔️'}</span>
                           <strong style={{ fontSize: 13, color: C.ink }}>{r.nome}</strong>
                           <span style={{ fontSize: 11, textTransform: 'uppercase', padding: '1px 5px', borderRadius: 4, background: 'rgba(0,0,0,0.06)', color: C.inkDim, fontWeight: 700 }}>
                             {r.tipo}
@@ -15092,7 +15092,7 @@ export default function App() {
                               // con "Maestria: …" su un PG 5.0 non diventa un chip.
                               const categorieNota = categorieNotaTutte.filter((c) => c.categoria !== 'gittata' && !(a.isTS && c.categoria === 'tiroSalvezza') && !(versione === '2014' && /^maestria\s*:/i.test(String(c.testo || ''))));
                               const isTrucchetto = (spellInLista && spellInLista.livello === 0) || (spSpell && spSpell.livello === 0) || a.livello === 0;
-                              const iconaReazione = a.isSpell ? (isTrucchetto ? '✨' : '🪄')
+                              const iconaReazione = a.isSpell ? (isTrucchetto ? '✨' : '📖')
                                 : (a.tipo === 'tattica' || a.tipo === 'attacco') ? '⚔️'
                                 : a.tipo === 'stile' ? '🛡️'
                                 : a.tipo === 'talento' ? '⭐'
@@ -15169,7 +15169,7 @@ export default function App() {
                                                 {AZIONI_BONUS_5E.filter((x) => x.tipo === 'combattimento' || x.tipo === 'talento' || x.tipo === 'privilegio').map((b) => <option key={b.nome} value={b.nome} title={b.note || spiegaPrivilegio(b.nome)}>⚔️ {traduciDato(b.nome)}</option>)}
                                               </optgroup>
                                               <optgroup label={lingua === 'en' ? 'Bonus Action Spells' : 'Incantesimi Azione Bonus'}>
-                                                {AZIONI_BONUS_5E.filter((x) => x.tipo === 'incantesimo').map((b) => <option key={b.nome} value={b.nome} title={b.note || spiegaIncantesimo(b.nome)}>🪄 {traduciDato(b.nome)}</option>)}
+                                                {AZIONI_BONUS_5E.filter((x) => x.tipo === 'incantesimo').map((b) => <option key={b.nome} value={b.nome} title={b.note || spiegaIncantesimo(b.nome)}>📖 {traduciDato(b.nome)}</option>)}
                                               </optgroup>
                                             </>
                                           ) : (
@@ -15428,7 +15428,7 @@ export default function App() {
                                       )}
                                       {!a.isAuto && (
                                         <button
-                                          style={styles.buttonDanger}
+                                          style={{ ...styles.buttonDanger, borderRadius: 4 }}
                                           title={a.isSpell ? "Nascondi questo incantesimo dalla sezione Armi e attacchi" : "Elimina attacco"}
                                           onClick={() => {
                                             setConferma({
@@ -15712,7 +15712,7 @@ export default function App() {
                   <select value={filtroLivelloInc} onChange={(e) => setFiltroLivelloInc(e.target.value)} style={{ ...styles.inlineInput, padding: '6px 7px' }} aria-label={t('spell.filtro_livello')}>
                     <option value="">{t('spell.tutti_livelli')}</option>
                     <option value="0">✨ {t('spell.trucchetti')}</option>
-                    {Array.from({ length: 9 }, (_, i) => <option key={i + 1} value={String(i + 1)}>🪄 {i + 1}° {lingua === 'en' ? 'Level' : 'Livello'}</option>)}
+                    {Array.from({ length: 9 }, (_, i) => <option key={i + 1} value={String(i + 1)}>📖 {i + 1}° {lingua === 'en' ? 'Level' : 'Livello'}</option>)}
                   </select>
                   <select value={filtroScuolaInc} onChange={(e) => setFiltroScuolaInc(e.target.value)} style={{ ...styles.inlineInput, padding: '6px 7px' }} aria-label={t('spell.filtro_scuola')}>
                     <option value="">{t('spell.tutte_scuole')}</option>
@@ -16547,6 +16547,7 @@ export default function App() {
                                           style={{
                                             ...styles.buttonMini,
                                             padding: isRowInEccesso ? '2px 7px' : '2px 6px',
+                                            borderRadius: 4,
                                             color: isRowInEccesso ? '#fff' : C.red,
                                             background: isRowInEccesso ? '#ef4444' : 'transparent',
                                             borderColor: isRowInEccesso ? '#ef4444' : 'transparent',
