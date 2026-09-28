@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { t, traduciDato } from '../i18n.js';
-import { C, COLORE_SCUOLA } from './tema.js';
+import { C, coloreScuola } from './tema.js';
 import { styles } from './stili.js';
 import { INCANTESIMI_DB, VARIANTI_EDIZIONE_INCANTESIMI } from '../data/incantesimi.js';
 import { INCANTESIMI_XANATHAR } from '../dati/incantesimi-xanathar.js';
@@ -244,6 +244,7 @@ export function CompendioModal({
   onChiudi,
   lingua = 'it',
   versione = '2024',
+  notteAttiva = false,
   onAggiungiIncantesimo,
   onAggiungiInventario,
   onAggiungiAttacco,
@@ -981,9 +982,9 @@ export function CompendioModal({
                     {dettaglioSelezionato.scuola && (
                       <span
                         style={{
-                          color: COLORE_SCUOLA[dettaglioSelezionato.scuola.toLowerCase()] || C.goldDark,
-                          border: `1px solid ${COLORE_SCUOLA[dettaglioSelezionato.scuola.toLowerCase()] || C.goldDark}66`,
-                          background: `${COLORE_SCUOLA[dettaglioSelezionato.scuola.toLowerCase()] || C.goldDark}18`,
+                          color: coloreScuola(dettaglioSelezionato.scuola, notteAttiva) || C.goldDark,
+                          border: `1px solid ${coloreScuola(dettaglioSelezionato.scuola, notteAttiva) || C.goldDark}66`,
+                          background: `${coloreScuola(dettaglioSelezionato.scuola, notteAttiva) || C.goldDark}18`,
                           borderRadius: 5,
                           padding: '1px 6px',
                           fontWeight: 700,

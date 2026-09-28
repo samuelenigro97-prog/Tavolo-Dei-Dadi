@@ -2,6 +2,33 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.44.0] – 2026-09-28
+
+### Aggiunto
+- **Icona del tipo di azione in Combattimento**: ogni riga (Azione/Azione
+  Bonus/Reazione) mostra ora un chip "⏱ 1 Azione/Azione Bonus/Reazione"
+  (stessa icona e stesso colore verde del chip "tempo" di Incantesimi),
+  subito dopo la gittata — che resta sempre il primo chip, invariato.
+- **Concentrazione e Rituale scritti per intero, con un colore proprio**:
+  prima un incantesimo con concentrazione mostrava solo un'abbreviazione
+  "Conc." in un chip neutro senza colore (il testo libero della nota).
+  Ora "Concentrazione" e "Rituale" sono due chip dedicati, con la stessa
+  icona usata nei filtri rapidi (🧠/📜) e un colore proprio (categorie
+  `concentrazione` e `rituale` in `COLORE_CATEGORIA_INFO`).
+
+### Corretto
+- **Colore delle scuole di magia non più fisso tra i due temi**: come già
+  per `COLORE_CATEGORIA_INFO`, `COLORE_SCUOLA` ora ha una coppia
+  chiaro/scuro per ogni scuola invece di un hex unico — Necromanzia (la
+  più segnalata) restava troppo tenue e si perdeva nel tema chiaro perché
+  lo stesso verde chiaro doveva reggere sia lo sfondo bianco sia quello
+  quasi nero. Aggiornati anche gli altri 7 hex per la stessa ragione.
+- **Filtri rapidi di Incantesimi di altezze diverse** ("Tutti", "Solo
+  Preparati", "Azione", "Azione Bonus", "Reazione", "Concentrazione",
+  "Rituali"): senza `white-space: nowrap` alcuni pill andavano a capo su
+  due righe a seconda dello spazio ricevuto dal flex-wrap del contenitore,
+  diventando più alti degli altri. Ora restano sempre su una riga.
+
 ## [4.43.0] – 2026-09-28
 
 ### Cambiato

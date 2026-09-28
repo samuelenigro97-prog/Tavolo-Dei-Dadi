@@ -4,7 +4,7 @@ import { useRegisterSW } from 'virtual:pwa-register/react';
 import { ICONE_CLASSE, ICONE_SPECIE, ICONE_BESTIE_SVG, GALLERIA_BESTIE_PRESET, generaAvatarBestia, iconaBestia } from './ritratti';
 import { t, setLinguaAttuale, DIZIONARIO, traduciDato, linguaAttuale } from './i18n';
 import { avviaAmbiente, fermaAmbiente, setVolumeAmbiente, eseguiEffettoSonoro, sbloccaAudio, precaricaSfx } from './utils/audioAmbiente';
-import { C, COLORE_DADO, BASE_TEMA, PRESET_COLORI, ambientazioneCasuale, COLORE_SCUOLA } from './ui/tema.js';
+import { C, COLORE_DADO, BASE_TEMA, PRESET_COLORI, ambientazioneCasuale, coloreScuola } from './ui/tema.js';
 import { styles, GLOBAL_CSS } from './ui/stili.js';
 import { Editable, Rollable, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
@@ -1976,7 +1976,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.43.0';
+const APP_VERSION = '4.44.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -15265,6 +15265,13 @@ export default function App() {
                                           🎯 {gittataRiga}
                                         </span>
                                       )}
+                                      <span
+                                        className="chip-tempo"
+                                        style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria('tempo', notteAttiva)}1f`, border: `1px solid ${coloreCategoria('tempo', notteAttiva)}`, color: coloreCategoria('tempo', notteAttiva), fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
+                                        title={lingua === 'en' ? `Casting time: ${cat === 'Azione' ? '1 Action' : cat === 'Bonus' ? 'Bonus Action' : 'Reaction'}` : `Tempo di lancio: ${cat === 'Azione' ? '1 Azione' : cat === 'Bonus' ? 'Azione Bonus' : 'Reazione'}`}
+                                      >
+                                        ⏱ {cat === 'Azione' ? (lingua === 'en' ? '1 Action' : '1 Azione') : cat === 'Bonus' ? (lingua === 'en' ? 'Bonus Action' : 'Azione Bonus') : (lingua === 'en' ? 'Reaction' : 'Reazione')}
+                                      </span>
                                       {hasReach && (
                                         <span
                                           style={{
@@ -15740,6 +15747,7 @@ export default function App() {
                         flex: '1 1 90px',
                         justifyContent: 'center',
                         display: 'inline-flex',
+                        whiteSpace: 'nowrap',
                         borderColor: (!filtroIncantesimo && !filtroLivelloInc && !filtroScuolaInc && (filtroClasseInc === (scheda.classe || '')) && !soloRitualiInc && !soloPreparatiInc && !soloConcInc && !filtroTempoInc) ? C.goldDark : C.border,
                         background: (!filtroIncantesimo && !filtroLivelloInc && !filtroScuolaInc && (filtroClasseInc === (scheda.classe || '')) && !soloRitualiInc && !soloPreparatiInc && !soloConcInc && !filtroTempoInc) ? 'rgba(200,140,20,0.18)' : 'transparent',
                         color: (!filtroIncantesimo && !filtroLivelloInc && !filtroScuolaInc && (filtroClasseInc === (scheda.classe || '')) && !soloRitualiInc && !soloPreparatiInc && !soloConcInc && !filtroTempoInc) ? C.goldDark : C.inkDim,
@@ -15760,6 +15768,7 @@ export default function App() {
                         flex: '1 1 90px',
                         justifyContent: 'center',
                         display: 'inline-flex',
+                        whiteSpace: 'nowrap',
                         borderColor: soloPreparatiInc ? C.goldDark : C.border,
                         background: soloPreparatiInc ? 'rgba(200,140,20,0.22)' : 'transparent',
                         color: soloPreparatiInc ? C.goldDark : C.ink,
@@ -15780,6 +15789,7 @@ export default function App() {
                         flex: '1 1 90px',
                         justifyContent: 'center',
                         display: 'inline-flex',
+                        whiteSpace: 'nowrap',
                         borderColor: filtroTempoInc === 'azione' ? '#2e9d4d' : C.border,
                         background: filtroTempoInc === 'azione' ? 'rgba(46,157,77,0.2)' : 'transparent',
                         color: filtroTempoInc === 'azione' ? '#2e9d4d' : C.ink,
@@ -15800,6 +15810,7 @@ export default function App() {
                         flex: '1 1 90px',
                         justifyContent: 'center',
                         display: 'inline-flex',
+                        whiteSpace: 'nowrap',
                         borderColor: filtroTempoInc === 'bonus' ? '#d48806' : C.border,
                         background: filtroTempoInc === 'bonus' ? 'rgba(212,136,6,0.2)' : 'transparent',
                         color: filtroTempoInc === 'bonus' ? '#d48806' : C.ink,
@@ -15820,6 +15831,7 @@ export default function App() {
                         flex: '1 1 90px',
                         justifyContent: 'center',
                         display: 'inline-flex',
+                        whiteSpace: 'nowrap',
                         borderColor: filtroTempoInc === 'reazione' ? '#1890ff' : C.border,
                         background: filtroTempoInc === 'reazione' ? 'rgba(24,144,255,0.2)' : 'transparent',
                         color: filtroTempoInc === 'reazione' ? '#1890ff' : C.ink,
@@ -15840,6 +15852,7 @@ export default function App() {
                         flex: '1 1 90px',
                         justifyContent: 'center',
                         display: 'inline-flex',
+                        whiteSpace: 'nowrap',
                         borderColor: soloConcInc ? '#9e4be6' : C.border,
                         background: soloConcInc ? 'rgba(158,75,230,0.2)' : 'transparent',
                         color: soloConcInc ? '#9e4be6' : C.ink,
@@ -15860,6 +15873,7 @@ export default function App() {
                         flex: '1 1 90px',
                         justifyContent: 'center',
                         display: 'inline-flex',
+                        whiteSpace: 'nowrap',
                         borderColor: soloRitualiInc ? C.goldDark : C.border,
                         background: soloRitualiInc ? 'rgba(200,140,20,0.18)' : 'transparent',
                         color: soloRitualiInc ? C.goldDark : C.ink,
@@ -16155,6 +16169,8 @@ export default function App() {
                             const gittata = valoreIncantesimoPerEdizione(s, 'gittata', versione);
                             const scuola = s.scuola || d?.scuola || '';
                             const area = s.area || d?.area || '';
+                            const isConcRow = Boolean(s.conc || d?.conc);
+                            const isRitualeRow = Boolean(s.rituale || d?.rituale);
                             // Trucchetti: stesso danno di Combattimento (dannoTrucchettoScalato: livello,
                             // e per Randello Incantato dado per edizione + mod da incantatore).
                             const dannoBaseInc = valoreIncantesimoPerEdizione(s, 'danno', versione);
@@ -16368,6 +16384,8 @@ export default function App() {
                                     {chip('⏱', t('spell.chip_tempo'), tempoLabel, coloreCategoria('tempo', notteAttiva))}
                                     {chip('🎯', t('spell.chip_gittata'), gittata, coloreCategoria('gittata', notteAttiva))}
                                     {area && chip('📐', 'Area', area, coloreCategoria('gittata', notteAttiva))}
+                                    {isConcRow && chip('🧠', lingua === 'en' ? 'Concentration' : 'Concentrazione', lingua === 'en' ? 'Concentration' : 'Concentrazione', coloreCategoria('concentrazione', notteAttiva))}
+                                    {isRitualeRow && chip('📜', lingua === 'en' ? 'Ritual' : 'Rituale', lingua === 'en' ? 'Ritual' : 'Rituale', coloreCategoria('rituale', notteAttiva))}
                                     {(danno || tipoDanno) && !parseEspressioneDado(danno) && (
                                       chip('💥', 'Danno', [danno, tipoDanno].filter(Boolean).join(' '), coloreCategoria('danno', notteAttiva))
                                     )}
@@ -16378,9 +16396,9 @@ export default function App() {
                                       style={{
                                         fontSize: 11,
                                         fontWeight: 700,
-                                        color: COLORE_SCUOLA[scuola.toLowerCase()] || C.goldDark,
-                                        border: `1px solid ${COLORE_SCUOLA[scuola.toLowerCase()] || C.goldDark}`,
-                                        background: `${COLORE_SCUOLA[scuola.toLowerCase()] || C.goldDark}1f`,
+                                        color: coloreScuola(scuola, notteAttiva) || C.goldDark,
+                                        border: `1px solid ${coloreScuola(scuola, notteAttiva) || C.goldDark}`,
+                                        background: `${coloreScuola(scuola, notteAttiva) || C.goldDark}1f`,
                                         borderRadius: 4,
                                         padding: '1px 5px',
                                         whiteSpace: 'nowrap',
@@ -20368,6 +20386,7 @@ export default function App() {
         onChiudi={() => setMostraCompendio(false)}
         lingua={lingua}
         versione={versione}
+        notteAttiva={notteAttiva}
         onAggiungiIncantesimo={(spell) => {
           const nomeSpell = spell.nome;
           const giaInLista = (scheda.incantesimiLista || []).some((s) => s.nome.toLowerCase() === nomeSpell.toLowerCase());

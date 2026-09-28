@@ -5,6 +5,23 @@
 
 export const NOVITA = [
   {
+    versione: '4.44.0',
+    voci: {
+      it: [
+        'In Combattimento ogni riga mostra ora un chip col tipo di azione (1 Azione / Azione Bonus / Reazione), come in Incantesimi, subito dopo la gittata.',
+        '"Concentrazione" e "Rituale" ora sono scritti per intero con un colore tutto loro, non più abbreviati in un "Conc." senza colore.',
+        'Il colore della scuola di Necromanzia (e delle altre 7 scuole) ora cambia tra tema chiaro e scuro come le altre categorie, così non si perde più sullo sfondo chiaro.',
+        'I filtri rapidi degli Incantesimi (Tutti, Azione, Concentrazione…) avevano altezze diverse quando il testo andava a capo: ora restano tutti su una riga.',
+      ],
+      en: [
+        'In Combat every row now shows a chip with the action type (1 Action / Bonus Action / Reaction), like in Spells, right after range.',
+        '"Concentration" and "Ritual" are now spelled out in full with their own color, no longer abbreviated as a colorless "Conc.".',
+        'The Necromancy school color (and the other 7 schools) now changes between light and dark theme like other categories, so it no longer washes out on a light background.',
+        'The Spells quick filters (All, Action, Concentration…) had different heights when their text wrapped: they now all stay on one line.',
+      ],
+    },
+  },
+  {
     versione: '4.43.0',
     voci: {
       it: [
