@@ -1976,7 +1976,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.42.0';
+const APP_VERSION = '4.43.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -15703,12 +15703,12 @@ export default function App() {
                     style={{ ...styles.inlineInput, minWidth: 0, padding: '6px 9px' }}
                   />
                   <select value={filtroLivelloInc} onChange={(e) => setFiltroLivelloInc(e.target.value)} style={{ ...styles.inlineInput, padding: '6px 7px' }} aria-label={t('spell.filtro_livello')}>
-                    <option value="">🔮 {t('spell.tutti_livelli')}</option>
+                    <option value="">{t('spell.tutti_livelli')}</option>
                     <option value="0">✨ {t('spell.trucchetti')}</option>
-                    {Array.from({ length: 9 }, (_, i) => <option key={i + 1} value={String(i + 1)}>📖 {i + 1}° {lingua === 'en' ? 'Level' : 'Livello'}</option>)}
+                    {Array.from({ length: 9 }, (_, i) => <option key={i + 1} value={String(i + 1)}>🪄 {i + 1}° {lingua === 'en' ? 'Level' : 'Livello'}</option>)}
                   </select>
                   <select value={filtroScuolaInc} onChange={(e) => setFiltroScuolaInc(e.target.value)} style={{ ...styles.inlineInput, padding: '6px 7px' }} aria-label={t('spell.filtro_scuola')}>
-                    <option value="">🔮 {t('spell.tutte_scuole')}</option>
+                    <option value="">{t('spell.tutte_scuole')}</option>
                     {[...new Set(incantesimiVisualizzati.map((s) => s.scuola || datiIncantesimo(s.nome)?.scuola).filter(Boolean))].sort((a, b) => traduciDato(a).localeCompare(traduciDato(b), lingua)).map((scuola) => <option key={scuola} value={scuola}>{formattaVoceConIcona(scuola)}</option>)}
                   </select>
                   <select value={filtroClasseInc} onChange={(e) => setFiltroClasseInc(e.target.value)} style={{ ...styles.inlineInput, padding: '6px 7px' }} aria-label={t('spell.filtro_classe')}>

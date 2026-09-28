@@ -2,6 +2,21 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.43.0] – 2026-09-28
+
+### Cambiato
+- **Emoji dei filtri Incantesimi allineate al resto dell'app**: nel menu a
+  tendina del livello, gli incantesimi con slot usavano 📖 mentre in
+  Combattimento e ovunque altrove il simbolo per "incantesimo (non
+  trucchetto)" è 🪄 — ora è lo stesso in entrambi i posti. Rimossa anche
+  l'emoji 🔮 da "Tutti i livelli" e "Tutte le scuole" (era un'icona
+  generica senza un vero significato lì).
+- **Verificato dal vivo** (misura dei computed style, non solo lettura del
+  codice) che le dimensioni dei chip/badge (gittata, scuola, tempo…) sono
+  già identiche pixel per pixel tra Combattimento e Incantesimi/Trucchetti
+  — la differenza percepita nei due screenshot era dovuta allo zoom/alla
+  larghezza finestra diversa tra le due catture, non a un bug di stile.
+
 ## [4.42.0] – 2026-09-28
 
 ### Cambiato

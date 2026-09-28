@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.43.0',
+    voci: {
+      it: [
+        'Nel filtro Incantesimi per livello, gli incantesimi con slot usavano un\'icona diversa (📖) da quella usata ovunque nell\'app per lo stesso concetto (🪄): ora sono uguali. Tolta anche l\'emoji senza significato da "Tutti i livelli" e "Tutte le scuole".',
+      ],
+      en: [
+        'In the Spells level filter, leveled spells used a different icon (📖) from the one used everywhere else in the app for the same concept (🪄): now they match. Also removed the meaningless emoji from "All levels" and "All schools".',
+      ],
+    },
+  },
+  {
     versione: '4.42.0',
     voci: {
       it: [
