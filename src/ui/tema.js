@@ -147,8 +147,8 @@ export const COLORE_SCUOLA = {
   illusion: '#c084fc',
   invocazione: '#f87171',
   evocation: '#f87171',
-  necromanzia: '#4ade80',
-  necromancy: '#4ade80',
+  necromanzia: '#a3e635',
+  necromancy: '#a3e635',
   trasmutazione: '#2dd4bf',
   transmutation: '#2dd4bf',
 };

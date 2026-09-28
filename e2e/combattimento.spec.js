@@ -77,6 +77,11 @@ test.describe('Combattimento', () => {
   });
 
   test('Velocità mostra il totale con i Poteri in blu, senza il "+3m" sotto', async ({ page }) => {
+    // Il colore atteso qui sotto è quello del tema chiaro: va forzato esplicitamente,
+    // perché il tema di default "auto" passa al tema scuro di notte (eNotte: 20-7),
+    // rendendo altrimenti il test dipendente dall'orario reale di esecuzione.
+    await page.evaluate(() => localStorage.setItem('scheda-interattiva:tema', 'chiaro'));
+    await apriScheda(page);
     const box = page.locator('.velocita-modificata');
     await expect(box).toHaveCount(1);
     await expect(box).toContainText('13.5');

@@ -1976,7 +1976,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.40.0';
+const APP_VERSION = '4.41.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -7722,132 +7722,6 @@ export default function App() {
         );
       })()}
 
-      {dettaglioInc != null && (() => {
-        const s = scheda.incantesimiLista.find((x) => x.id === dettaglioInc);
-        if (!s) return null;
-        const upd = (patch) => aggiorna({ incantesimiLista: scheda.incantesimiLista.map((x) => (x.id === s.id ? { ...x, ...patch } : x)) });
-        const eff = spiegaIncantesimo(s.nome) || datiIncantesimo(s.nome)?.desc || s.note || '';
-        const campo = { ...styles.inlineInput, width: '100%', padding: '6px 8px', fontSize: 14, marginTop: 2 };
-        const etichetta = { ...styles.detail, display: 'block', marginBottom: 1, marginTop: 8, fontWeight: 600 };
-        return (
-          <div
-            style={{ position: 'fixed', inset: 0, zIndex: 1004, padding: 16, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            onClick={(e) => { if (e.target === e.currentTarget) setDettaglioInc(null); }}
-          >
-            <div style={{ ...styles.panel, maxWidth: 420, width: '100%', maxHeight: '88vh', overflowY: 'auto' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                <strong style={{ color: C.goldDark, fontSize: 18 }}>{s.nome || 'Incantesimo'}</strong>
-                <button style={styles.buttonMini} onClick={() => setDettaglioInc(null)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
-              </div>
-              <div style={{ ...styles.detail, marginBottom: 4 }}>{t('modal.modifica')} · {s.livello === 0 ? t('spell.trucchetto') : t('spell.inc_liv', { n: s.livello })}</div>
-
-              <label style={etichetta}>{t('crea.nome')}</label>
-              <input 
-                style={campo} 
-                value={s.nome} 
-                onChange={(e) => {
-                  const val = e.target.value;
-                  const auto = datiIncantesimo(val);
-                  if (auto) {
-                    upd({ 
-                      nome: val, 
-                      livello: auto.livello ?? s.livello,
-                      tempo: auto.tempo ?? s.tempo,
-                      scuola: auto.scuola ?? s.scuola,
-                      area: auto.area ?? s.area,
-                      danno: auto.danno ?? s.danno,
-                      tipoDanno: auto.tipoDanno ?? s.tipoDanno
-                    });
-                  } else {
-                    upd({ nome: val });
-                  }
-                }} 
-                list="lista-incantesimi" 
-                placeholder={t('ph.inc_nome')} 
-              />
-              <datalist id="lista-incantesimi">
-                {incantesimiPerManuali(INCANTESIMI_NOMI, manualiAttivi).map((n) => <option key={n} value={n} />)}
-              </datalist>
-              {eff && <div style={{ background: 'rgba(0,0,0,0.04)', border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 12px', fontSize: 13, lineHeight: 1.4, marginTop: 6 }}>{eff}</div>}
-              <div style={{ display: 'flex', gap: 8 }}>
-                <div style={{ flex: 1 }}>
-                  <label style={etichetta}>{t('spell.livello_scelto_label')}</label>
-                  <select style={campo} value={s.livello} onChange={(e) => upd({ livello: Number(e.target.value) })}>
-                    {Array.from({ length: 10 }, (_, i) => <option key={i} value={i}>{i === 0 ? 'Trucchetto' : `${i}° livello`}</option>)}
-                  </select>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={etichetta}>{t('spell.col_tempo')}</label>
-                  <input style={campo} value={s.tempo} onChange={(e) => upd({ tempo: e.target.value })} />
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <div style={{ flex: 1 }}>
-                  <label style={etichetta}>Scuola di Magia</label>
-                  <select style={campo} value={s.scuola || ''} onChange={(e) => upd({ scuola: e.target.value })}>
-                    <option value="">— Nessuna —</option>
-                    {['Abiurazione', 'Ammaliamento', 'Divinazione', 'Evocazione', 'Illusione', 'Invocazione', 'Necromanzia', 'Trasmutazione'].map((sc) => (
-                      <option key={sc} value={sc}>{formattaVoceConIcona(sc)}</option>
-                    ))}
-                  </select>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={etichetta}>Area d'Effetto</label>
-                  <select style={campo} value={s.area || ''} onChange={(e) => upd({ area: e.target.value })}>
-                    <option value="">— Nessuna —</option>
-                    <option value="Cono">📐 Cono</option>
-                    <option value="Cubo">📦 Cubo</option>
-                    <option value="Cilindro">🥫 Cilindro</option>
-                    <option value="Linea">📏 Linea</option>
-                    <option value="Sfera">🔮 Sfera</option>
-                  </select>
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <div style={{ flex: 1 }}>
-                  <label style={etichetta}>Danno (es. 8d6, 3d8+5)</label>
-                  <input style={campo} value={s.danno || ''} onChange={(e) => upd({ danno: e.target.value })} placeholder="es. 8d6 fuoco" />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={etichetta}>Tipo di Danno</label>
-                  <select style={campo} value={s.tipoDanno || ''} onChange={(e) => upd({ tipoDanno: e.target.value })}>
-                    <option value="">— Nessuno —</option>
-                    {['Acido', 'Contundente', 'Freddo', 'Fulmine', 'Fuoco', 'Forza', 'Necrotico', 'Perforante', 'Psichico', 'Radiante', 'Tagliente', 'Tuono', 'Veleno'].map((td) => (
-                      <option key={td} value={td}>{formattaVoceConIcona(td)}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <label style={etichetta}>Note</label>
-              <input style={campo} value={s.note} onChange={(e) => upd({ note: e.target.value })} placeholder={t('ph.inc_note')} />
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, cursor: 'pointer', fontSize: 13, fontWeight: 600, color: C.ink }}>
-                <input
-                  type="checkbox"
-                  checked={!s.nascondiAttacco}
-                  onChange={(e) => upd({ nascondiAttacco: !e.target.checked })}
-                />
-                ✨ Mostra tra gli attacchi e le armi (se offensivo)
-              </label>
-
-              <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
-                <button
-                  style={{ ...styles.buttonDanger, flex: 1 }}
-                  onClick={() => setConferma({
-                    titolo: t('spell.elimina_titolo') || 'Elimina incantesimo',
-                    testo: `Vuoi eliminare "${s.nome || 'questo incantesimo'}" dalla lista incantesimi?`,
-                    onConferma: () => {
-                      aggiorna({ incantesimiLista: scheda.incantesimiLista.filter((x) => x.id !== s.id) });
-                      setDettaglioInc(null);
-                    },
-                  })}
-                >🗑 {t('modal.elimina')}</button>
-                <button style={{ ...styles.buttonPrimary, flex: 1 }} onClick={() => setDettaglioInc(null)}>Fatto</button>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
-
       {caricandoCloud && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 3000,
@@ -13111,11 +12985,7 @@ export default function App() {
                                 </span>
                               );
                             }
-                            return (
-                              <span style={{ fontSize: 11, color: C.inkDim, fontWeight: 400 }}>
-                                {infoPe.percentuale}%
-                              </span>
-                            );
+                            return null;
                           })()}
                         </div>
                         {/* Mini barra di progresso PE */}
@@ -13748,9 +13618,9 @@ export default function App() {
             </div>
             <div style={{ ...styles.vitalBox, gridColumn: 'span 2' }}>
               <div style={styles.vitalLabel}>{t("vital.riposo")}</div>
-              <div style={{ flex: 1, width: '100%', display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
-                <button style={{ ...styles.buttonMini, fontSize: 11, padding: '4px 10px' }} onClick={() => riposoBreve()} title={t('vital.riposo_breve_tip')}>☕ {t("vital.breve")}</button>
-                <button style={{ ...styles.buttonMini, fontSize: 11, padding: '4px 10px', borderColor: C.goldDark, color: C.goldDark }} onClick={() => riposoLungo()} title={t('vital.riposo_lungo_tip')}>🌙 {t("vital.lungo")}</button>
+              <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
+                <button style={{ ...styles.buttonMini, fontSize: 14, fontWeight: 700, padding: '8px 18px', width: '100%', maxWidth: 220 }} onClick={() => riposoBreve()} title={t('vital.riposo_breve_tip')}>☕ {t("vital.breve")}</button>
+                <button style={{ ...styles.buttonMini, fontSize: 14, fontWeight: 700, padding: '8px 18px', width: '100%', maxWidth: 220, borderColor: C.goldDark, color: C.goldDark }} onClick={() => riposoLungo()} title={t('vital.riposo_lungo_tip')}>🌙 {t("vital.lungo")}</button>
               </div>
             </div>
             <div style={{ ...styles.vitalBox }}>
@@ -16655,7 +16525,6 @@ export default function App() {
                                             {s.preparato !== false ? (lingua === 'en' ? 'Prep.' : 'Prep.') : (isRowUnpreparedMancante ? (lingua === 'en' ? 'Prepare' : 'Prepara') : (lingua === 'en' ? 'Not prep.' : 'Non prep.'))}
                                           </button>
                                         )}
-                                        <button style={{ ...styles.buttonMini, padding: '2px 6px' }} title={t('tip.modifica')} onClick={() => setDettaglioInc(s.id)}>✎</button>
                                         <button
                                           style={{
                                             ...styles.buttonMini,
@@ -17988,80 +17857,116 @@ export default function App() {
                           );
                         }
 
+                        const scheda_card = (c, i) => {
+                          const pfCalc = calcolaPfCompagno(c, scheda);
+                          return (
+                            <div
+                              key={c.nome + i}
+                              style={{
+                                background: C.panelLight,
+                                border: `1px solid ${C.border}`,
+                                borderRadius: 8,
+                                padding: '8px 10px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 4,
+                                justifyContent: 'space-between',
+                              }}
+                            >
+                              <div>
+                                <div style={{ fontWeight: 700, fontSize: 13, color: C.ink }}>
+                                  {lingua === 'en' ? c.nomeEn : c.nome}
+                                </div>
+                                <div style={{ fontSize: 11, color: C.inkDim }}>
+                                  🛡️ CA {c.ca} · ❤️ {pfCalc} PF {c.pfFormula ? `(${c.pfFormula})` : ''} · 👟 {typeof c.velocita === 'object' ? Object.entries(c.velocita).map(([k, v]) => `${k} ${v}m`).join(', ') : c.velocita}
+                                </div>
+                                {c.tipo && (
+                                  <div style={{ fontSize: 11, color: C.goldDark, marginTop: 1 }}>
+                                    {c.tipo}
+                                  </div>
+                                )}
+                              </div>
+
+                              <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const pfCalc = calcolaPfCompagno(c, scheda);
+                                    const azioniParsed = parseAzioniCompagno(c.azioni || []);
+                                    const idNuovo = `all-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+                                    const nuovo = {
+                                      id: idNuovo,
+                                      nome: c.nome,
+                                      nomeOriginale: c.nome,
+                                      tipo: c.tipo || c.taglia || 'Compagno',
+                                      taglia: c.taglia || 'Media',
+                                      ca: Number(c.ca) || 12,
+                                      pfMax: pfCalc,
+                                      pfAttuali: pfCalc,
+                                      velocita: c.velocita ? (typeof c.velocita === 'object' ? Object.entries(c.velocita).map(([k, v]) => `${k} ${v}m`).join(', ') : c.velocita) : '9m',
+                                      sensi: c.sensi || '',
+                                      abilita: c.abilita || '',
+                                      tratti: Array.isArray(c.tratti) ? c.tratti : [],
+                                      azioni: azioniParsed,
+                                      note: c.note || '',
+                                    };
+                                    aggiorna({ alleati: [...(scheda.alleati || []), nuovo] });
+                                    setMostraModalAggiungiCompagno(false);
+                                    registra({ etichetta: `🐾 ${c.nome}`, tipo: 'evoca', dettaglio: `Evocato/aggiunto compagno: ${c.nome} (${pfCalc} PF, CA ${c.ca})` });
+                                  }}
+                                  style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px', background: C.goldDark, color: '#fff', fontWeight: 700, flex: 1 }}
+                                >
+                                  ➕ {lingua === 'en' ? 'Summon / Add' : 'Evoca / Aggiungi'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setBestiaDettaglio(c)}
+                                  style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px' }}
+                                >
+                                  ℹ️ {lingua === 'en' ? 'Info' : 'Dettagli'}
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        };
+
+                        // Bestie ha un Grado di Sfida: raggruppa in "cartelle" GS crescente
+                        // con un divisore tra un GS e il successivo, alfabetico dentro ogni gruppo
+                        // (stesso pattern del catalogo Forma Selvatica/Metamorfosi).
+                        if (filtroCompagnoCat === 'bestie') {
+                          return (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                              {raggruppaPerGS(elenco).map((gruppo) => (
+                                <details key={gruppo.gsNum} open>
+                                  <summary
+                                    style={{
+                                      cursor: 'pointer',
+                                      fontSize: 12, fontWeight: 700, color: C.goldDark,
+                                      background: 'rgba(200,140,20,0.10)',
+                                      border: `1px solid ${C.border}`,
+                                      borderRadius: 6,
+                                      padding: '4px 8px',
+                                      marginBottom: 6,
+                                      listStyle: 'none',
+                                      userSelect: 'none',
+                                    }}
+                                  >
+                                    GS {gruppo.gs} <span style={{ fontWeight: 500, color: C.inkDim }}>· {gruppo.creature.length} {gruppo.creature.length === 1 ? (lingua === 'en' ? 'creature' : 'creatura') : (lingua === 'en' ? 'creatures' : 'creature')}</span>
+                                  </summary>
+                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 8, marginBottom: 10 }}>
+                                    {gruppo.creature.map((c, i) => scheda_card(c, i))}
+                                  </div>
+                                </details>
+                              ))}
+                            </div>
+                          );
+                        }
+
+                        const elencoOrdinato = [...elenco].sort((a, b) => (lingua === 'en' ? (a.nomeEn || a.nome) : a.nome).localeCompare(lingua === 'en' ? (b.nomeEn || b.nome) : b.nome, lingua === 'en' ? 'en' : 'it'));
+
                         return (
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 8 }}>
-                            {elenco.map((c, i) => {
-                              const pfCalc = calcolaPfCompagno(c, scheda);
-                              return (
-                                <div
-                                  key={c.nome + i}
-                                  style={{
-                                    background: C.panelLight,
-                                    border: `1px solid ${C.border}`,
-                                    borderRadius: 8,
-                                    padding: '8px 10px',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: 4,
-                                    justifyContent: 'space-between',
-                                  }}
-                                >
-                                  <div>
-                                    <div style={{ fontWeight: 700, fontSize: 13, color: C.ink }}>
-                                      {lingua === 'en' ? c.nomeEn : c.nome}
-                                    </div>
-                                    <div style={{ fontSize: 11, color: C.inkDim }}>
-                                      🛡️ CA {c.ca} · ❤️ {pfCalc} PF {c.pfFormula ? `(${c.pfFormula})` : ''} · 👟 {typeof c.velocita === 'object' ? Object.entries(c.velocita).map(([k, v]) => `${k} ${v}m`).join(', ') : c.velocita}
-                                    </div>
-                                    {c.tipo && (
-                                      <div style={{ fontSize: 11, color: C.goldDark, marginTop: 1 }}>
-                                        {c.tipo}
-                                      </div>
-                                    )}
-                                  </div>
-
-                                  <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        const pfCalc = calcolaPfCompagno(c, scheda);
-                                        const azioniParsed = parseAzioniCompagno(c.azioni || []);
-                                        const idNuovo = `all-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-                                        const nuovo = {
-                                          id: idNuovo,
-                                          nome: c.nome,
-                                          nomeOriginale: c.nome,
-                                          tipo: c.tipo || c.taglia || 'Compagno',
-                                          taglia: c.taglia || 'Media',
-                                          ca: Number(c.ca) || 12,
-                                          pfMax: pfCalc,
-                                          pfAttuali: pfCalc,
-                                          velocita: c.velocita ? (typeof c.velocita === 'object' ? Object.entries(c.velocita).map(([k, v]) => `${k} ${v}m`).join(', ') : c.velocita) : '9m',
-                                          sensi: c.sensi || '',
-                                          abilita: c.abilita || '',
-                                          tratti: Array.isArray(c.tratti) ? c.tratti : [],
-                                          azioni: azioniParsed,
-                                          note: c.note || '',
-                                        };
-                                        aggiorna({ alleati: [...(scheda.alleati || []), nuovo] });
-                                        setMostraModalAggiungiCompagno(false);
-                                        registra({ etichetta: `🐾 ${c.nome}`, tipo: 'evoca', dettaglio: `Evocato/aggiunto compagno: ${c.nome} (${pfCalc} PF, CA ${c.ca})` });
-                                      }}
-                                      style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px', background: C.goldDark, color: '#fff', fontWeight: 700, flex: 1 }}
-                                    >
-                                      ➕ {lingua === 'en' ? 'Summon / Add' : 'Evoca / Aggiungi'}
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => setBestiaDettaglio(c)}
-                                      style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px' }}
-                                    >
-                                      ℹ️ {lingua === 'en' ? 'Info' : 'Dettagli'}
-                                    </button>
-                                  </div>
-                                </div>
-                              );
-                            })}
+                            {elencoOrdinato.map((c, i) => scheda_card(c, i))}
                           </div>
                         );
                       })()

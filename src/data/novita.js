@@ -5,6 +5,25 @@
 
 export const NOVITA = [
   {
+    versione: '4.41.0',
+    voci: {
+      it: [
+        'Nel catalogo Evoca/Aggiungi Compagno, la scheda "Bestie" ora raggruppa le creature per Grado di Sfida con un divisore tra un gruppo e il successivo, in ordine alfabetico dentro ogni gruppo.',
+        'Il colore della scuola Necromanzia era identico a quello del tempo di lancio "1 Azione": ora è un verde diverso e i due badge si distinguono.',
+        'Rimosso il bottone matita accanto al cestino di incantesimi/trucchetti: apriva un modulo per modificarli a mano, ma le magie sono automatiche e prese dal manuale.',
+        'I bottoni Riposo Breve/Lungo sono più grandi e impilati (Breve sopra, Lungo sotto).',
+        'Tolto il numero percentuale che spuntava dal riquadro dei P.E. nel Profilo.',
+      ],
+      en: [
+        'In the Summon/Add Companion catalog, the "Beasts" tab now groups creatures by Challenge Rating with a divider between groups, alphabetical within each group.',
+        'The Necromancy school color was identical to the "1 Action" casting-time color: it\'s now a different green so the two badges are distinguishable.',
+        'Removed the pencil button next to the trash icon on spells/cantrips: it opened a form to hand-edit them, but spells are automatic and pulled from the rulebook.',
+        'Short/Long Rest buttons are bigger and stacked (Short on top, Long below).',
+        'Removed the percentage number peeking out of the XP box in Profile.',
+      ],
+    },
+  },
+  {
     versione: '4.40.0',
     voci: {
       it: [

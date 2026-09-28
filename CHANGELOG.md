@@ -2,6 +2,38 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.41.0] – 2026-09-28
+
+### Aggiunto
+- **Divisori per Grado di Sfida** nel catalogo "Evoca/Aggiungi Compagno o
+  Famiglio" (scheda Bestie): le creature sono raggruppate in "cartelle"
+  per GS crescente, in ordine alfabetico dentro ogni gruppo, come nel
+  catalogo Forma Selvatica/Metamorfosi. Le altre schede (Famigli,
+  Evocazioni, Tutti) restano in ordine alfabetico semplice.
+
+### Cambiato
+- **Colore Necromanzia**: era identico al colore del tempo di lancio "1
+  Azione" (stesso verde), rendendo i due badge indistinguibili sulla riga
+  di un incantesimo di quella scuola. Ora usa un verde-lime diverso.
+- **Bottoni Riposo Breve/Lungo** ingranditi e impilati verticalmente
+  (Breve sopra, Lungo sotto) invece che affiancati in piccolo.
+- Rimosso il numero percentuale che spuntava fuori dal riquadro dei P.E.
+  nel Profilo: la barra di progresso sotto basta da sola.
+
+### Rimosso
+- **Bottone matita (✎) accanto al cestino** di ogni incantesimo/trucchetto:
+  apriva un modulo per modificare a mano nome, scuola, danno ecc. di un
+  incantesimo, in contrasto con il resto dell'app dove le magie sono
+  automatiche e prese dal manuale (la sezione Poteri resta l'unico posto
+  per le regole personalizzate).
+
+### Corretto
+- **Test e2e "Velocità in blu" instabile**: il test confrontava il colore
+  con l'hex del tema chiaro senza forzarlo, e il tema di default "auto"
+  passa al tema scuro di notte (`eNotte`: 20-7) — il test falliva o meno a
+  seconda dell'ora reale di esecuzione. Ora il test forza esplicitamente
+  il tema chiaro.
+
 ## [4.40.0] – 2026-09-26
 
 ### Corretto
