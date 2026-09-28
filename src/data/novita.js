@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.42.0',
+    voci: {
+      it: [
+        'La scuola di magia sulla riga di un incantesimo ora sta subito prima dei bottoni di tiro attacco/danno, sulla destra, non più all\'inizio: i chip comuni (tempo, gittata…) sono ora nello stesso ordine sia in Incantesimi/Trucchetti sia in Combattimento.',
+      ],
+      en: [
+        'A spell\'s school badge now sits right before the attack/damage roll buttons, on the right, instead of at the start of the row: the common chips (time, range…) are now in the same order in both Spells/Cantrips and Combat.',
+      ],
+    },
+  },
+  {
     versione: '4.41.0',
     voci: {
       it: [

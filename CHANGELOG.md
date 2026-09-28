@@ -2,6 +2,16 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.42.0] – 2026-09-28
+
+### Cambiato
+- **Ordine dei chip allineato tra Incantesimi e Combattimento**: la scuola
+  di magia (che non ha un equivalente in Combattimento) si spostava prima
+  dei chip comuni (tempo, gittata…), rompendo l'allineamento tra le due
+  sezioni. Ora la scuola sta subito prima dei bottoni di tiro
+  attacco/danno, sulla destra — i chip comuni restano nello stesso ordine
+  in entrambe le sezioni.
+
 ## [4.41.0] – 2026-09-28
 
 ### Aggiunto
