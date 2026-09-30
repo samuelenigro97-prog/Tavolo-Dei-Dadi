@@ -756,11 +756,7 @@ export function BadgeTiroColpire({ bonus, colore, onRoll, disabled = false, titl
       type="button"
       className="tirabile badge-tiro badge-tiro-colpire"
       style={{
-        ...styles.buttonMini,
-        padding: '2px 6px',
-        borderRadius: 4,
-        fontSize: 11,
-        fontWeight: 700,
+        ...styles.buttonRiga,
         color: colore,
         borderColor: colore,
         display: 'inline-flex',
@@ -784,19 +780,17 @@ export function BadgeTiroColpire({ bonus, colore, onRoll, disabled = false, titl
  * Trucchetti/Incantesimi e Combattimento/Azioni Bonus/Reazioni. Con
  * `critico` diventa pieno (sfondo oro) con ⚔️: il prossimo tiro raddoppia i dadi.
  */
-export function BadgeTiroDanno({ danno, tipoDanno, critico = false, onRoll, disabled = false, title }) {
+export function BadgeTiroDanno({ danno, tipoDanno, critico = false, onRoll, disabled = false, title, colore }) {
+  const cura = tipoDanno === 'Guarigione';
+  const tinta = colore || C.red;
   return (
     <button
       type="button"
       className="tirabile badge-tiro badge-tiro-danno"
       style={{
-        ...styles.buttonMini,
-        padding: '2px 6px',
-        borderRadius: 4,
-        fontSize: 11,
-        fontWeight: 700,
-        color: critico ? '#fff' : C.red,
-        borderColor: critico ? C.goldDark : C.red,
+        ...styles.buttonRiga,
+        color: critico ? '#fff' : tinta,
+        borderColor: critico ? C.goldDark : tinta,
         background: critico ? C.goldDark : 'transparent',
         display: 'inline-flex',
         alignItems: 'center',
@@ -809,7 +803,7 @@ export function BadgeTiroDanno({ danno, tipoDanno, critico = false, onRoll, disa
       disabled={disabled}
       onClick={() => { if (!disabled) onRoll?.(); }}
     >
-      {critico ? '⚔️' : '💥'} {danno}{tipoDanno ? ` ${tipoDanno}` : ''}
+      {critico ? '⚔️' : cura ? '💚' : '💥'} {danno}{tipoDanno ? ` ${tipoDanno}` : ''}
       <span aria-hidden style={{ fontSize: 11, opacity: 0.6 }}>🎲</span>
     </button>
   );
@@ -825,11 +819,7 @@ export function BadgeTiroSalvezza({ cd, caratteristica, colore, title }) {
     <span
       className="badge-tiro badge-tiro-salvezza"
       style={{
-        ...styles.buttonMini,
-        padding: '2px 6px',
-        borderRadius: 4,
-        fontSize: 11,
-        fontWeight: 700,
+        ...styles.buttonRiga,
         color: colore,
         borderColor: colore,
         background: `${colore}1f`,

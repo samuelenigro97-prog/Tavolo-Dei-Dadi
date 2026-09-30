@@ -2,6 +2,35 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.46.0] – 2026-09-30
+
+Applicate a Combattimento e Incantesimi le indicazioni del mockup
+"anti-slop" (github.com/miqdadbadjuber/anti-slop).
+
+### Cambiato
+- **Palette ridotta**: il colore dice il tipo di dato, non la singola voce.
+  Restano i colori funzionali (blu = dove: gittata/portata/area; verde =
+  quando: tempo di lancio, durata, innesco; rosso = danno; ambra = tiro
+  salvezza; verde acqua = cura; oro = tiro per colpire) più un neutro per
+  le etichette descrittive (proprietà, effetto, Concentrazione, Rituale e
+  scuola di magia, che si distinguono per testo o icona). Prima c'erano
+  circa 13 tinte diverse, 8 solo per le scuole. Rimossi `COLORE_SCUOLA` e
+  `coloreScuola`, non più usati.
+- **La cura non è più rossa come il danno**: Parola di Guarigione, Cura
+  Ferite ecc. usano un colore proprio e l'icona 💚 invece di 💥.
+- **Filtri rapidi di Incantesimi**: angoli a 4px invece della "pillola" da
+  16px, un solo stile attivo (l'accento oro) invece di 5 colori diversi,
+  tolte le emoji che contraddicevano il resto (🎯 su "Tutti", che nell'app
+  vuol dire gittata; ⚡/⏳/🛡️ diversi da quelli del tracker azioni).
+- **Pulsanti di riga sincronizzati tra Combattimento e Incantesimi**: nuovo
+  stile condiviso `buttonRiga` (11px, padding 2/7, angoli 4) usato da
+  tiro per colpire, danno, tiro salvezza, Usa, Prep., Evoca, Metamorfosi,
+  Ingrandisci/Riduci, Aggiungi ed elimina (× e 🗑). Misurati dal vivo: ora
+  sono tutti alti 17px in entrambe le sezioni (prima il × era 25px e il 🗑
+  20px), come i chip accanto. Il 🗑 ha ora il bordo rosso come il ×.
+- Il chip "📏 3m" (portata) usa il colore della gittata invece di un blu
+  scritto a mano.
+
 ## [4.45.0] – 2026-09-28
 
 ### Corretto

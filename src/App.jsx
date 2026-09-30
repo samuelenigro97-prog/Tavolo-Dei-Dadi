@@ -4,7 +4,7 @@ import { useRegisterSW } from 'virtual:pwa-register/react';
 import { ICONE_CLASSE, ICONE_SPECIE, ICONE_BESTIE_SVG, GALLERIA_BESTIE_PRESET, generaAvatarBestia, iconaBestia } from './ritratti';
 import { t, setLinguaAttuale, DIZIONARIO, traduciDato, linguaAttuale } from './i18n';
 import { avviaAmbiente, fermaAmbiente, setVolumeAmbiente, eseguiEffettoSonoro, sbloccaAudio, precaricaSfx } from './utils/audioAmbiente';
-import { C, COLORE_DADO, BASE_TEMA, PRESET_COLORI, ambientazioneCasuale, coloreScuola } from './ui/tema.js';
+import { C, COLORE_DADO, BASE_TEMA, PRESET_COLORI, ambientazioneCasuale } from './ui/tema.js';
 import { styles, GLOBAL_CSS } from './ui/stili.js';
 import { Editable, Rollable, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
@@ -1976,7 +1976,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.45.0';
+const APP_VERSION = '4.46.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -15212,6 +15212,7 @@ export default function App() {
                                         <BadgeTiroDanno
                                           danno={a.danno}
                                           tipoDanno={a.tipoDanno}
+                                          colore={a.tipoDanno === 'Guarigione' ? coloreCategoria('guarigione', notteAttiva) : undefined}
                                           critico={!!isUltimoCrit}
                                           disabled={castBloccato}
                                           title={castBloccato ? 'Equipaggia un focus per lanciare questo incantesimo' : isUltimoCrit ? `⚔️ Tira i danni del critico (${a.danno} ×2)` : `Tira i danni (${a.danno})`}
@@ -15278,13 +15279,13 @@ export default function App() {
                                             fontSize: 11,
                                             padding: '1px 5px',
                                             borderRadius: 4,
-                                            background: 'rgba(59,130,246,0.12)',
-                                            border: '1px solid #3b82f6',
-                                            color: '#2563eb',
+                                            background: `${coloreCategoria('gittata', notteAttiva)}1f`,
+                                            border: `1px solid ${coloreCategoria('gittata', notteAttiva)}`,
+                                            color: coloreCategoria('gittata', notteAttiva),
                                             fontWeight: 700,
                                             display: 'inline-flex',
                                             alignItems: 'center',
-                                            gap: 2,
+                                            gap: 3,
                                             flexShrink: 0,
                                             cursor: 'help',
                                           }}
@@ -15394,18 +15395,10 @@ export default function App() {
                                         <button
                                           type="button"
                                           style={{
-                                            ...styles.buttonMini,
-                                            fontSize: 11,
-                                            padding: '2px 7px',
-                                            fontWeight: 700,
+                                            ...styles.buttonRiga,
                                             background: scheda.reazioneUsata ? 'rgba(239,68,68,0.12)' : 'rgba(46,157,77,0.14)',
                                             borderColor: scheda.reazioneUsata ? '#ef4444' : '#2e9d4d',
                                             color: scheda.reazioneUsata ? '#ef4444' : '#2e9d4d',
-                                            cursor: 'pointer',
-                                            whiteSpace: 'nowrap',
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: 3,
                                           }}
                                           title={scheda.reazioneUsata ? (lingua === 'en' ? 'Reaction used this round. Click to restore it.' : 'Reazione già usata in questo round. Clicca per ripristinare.') : (lingua === 'en' ? `Use ${a.nome} as reaction for this round` : `Usa ${a.nome} come reazione per questo round`)}
                                           onClick={() => {
@@ -15428,8 +15421,10 @@ export default function App() {
                                       )}
                                       {!a.isAuto && (
                                         <button
-                                          style={{ ...styles.buttonDanger, borderRadius: 4 }}
+                                          type="button"
+                                          style={{ ...styles.buttonRiga, color: C.red, borderColor: C.red }}
                                           title={a.isSpell ? "Nascondi questo incantesimo dalla sezione Armi e attacchi" : "Elimina attacco"}
+                                          aria-label={a.isSpell ? `Nascondi ${a.nome} dagli attacchi` : `Elimina ${a.nome}`}
                                           onClick={() => {
                                             setConferma({
                                               titolo: a.isSpell ? 'Nascondi attacco' : 'Elimina attacco',
@@ -15743,18 +15738,18 @@ export default function App() {
                         ...styles.buttonMini,
                         fontSize: 12,
                         padding: '5px 12px',
-                        borderRadius: 16,
+                        borderRadius: 4,
                         flex: '1 1 90px',
                         justifyContent: 'center',
                         display: 'inline-flex',
                         whiteSpace: 'nowrap',
                         borderColor: (!filtroIncantesimo && !filtroLivelloInc && !filtroScuolaInc && (filtroClasseInc === (scheda.classe || '')) && !soloRitualiInc && !soloPreparatiInc && !soloConcInc && !filtroTempoInc) ? C.goldDark : C.border,
                         background: (!filtroIncantesimo && !filtroLivelloInc && !filtroScuolaInc && (filtroClasseInc === (scheda.classe || '')) && !soloRitualiInc && !soloPreparatiInc && !soloConcInc && !filtroTempoInc) ? 'rgba(200,140,20,0.18)' : 'transparent',
-                        color: (!filtroIncantesimo && !filtroLivelloInc && !filtroScuolaInc && (filtroClasseInc === (scheda.classe || '')) && !soloRitualiInc && !soloPreparatiInc && !soloConcInc && !filtroTempoInc) ? C.goldDark : C.inkDim,
+                        color: (!filtroIncantesimo && !filtroLivelloInc && !filtroScuolaInc && (filtroClasseInc === (scheda.classe || '')) && !soloRitualiInc && !soloPreparatiInc && !soloConcInc && !filtroTempoInc) ? C.goldDark : C.ink,
                         fontWeight: (!filtroIncantesimo && !filtroLivelloInc && !filtroScuolaInc && (filtroClasseInc === (scheda.classe || '')) && !soloRitualiInc && !soloPreparatiInc && !soloConcInc && !filtroTempoInc) ? 700 : 500,
                       }}
                     >
-                      🎯 {lingua === 'en' ? 'All' : 'Tutti'}
+                      {lingua === 'en' ? 'All' : 'Tutti'}
                     </button>
 
                     <button
@@ -15764,13 +15759,13 @@ export default function App() {
                         ...styles.buttonMini,
                         fontSize: 12,
                         padding: '5px 12px',
-                        borderRadius: 16,
+                        borderRadius: 4,
                         flex: '1 1 90px',
                         justifyContent: 'center',
                         display: 'inline-flex',
                         whiteSpace: 'nowrap',
                         borderColor: soloPreparatiInc ? C.goldDark : C.border,
-                        background: soloPreparatiInc ? 'rgba(200,140,20,0.22)' : 'transparent',
+                        background: soloPreparatiInc ? 'rgba(200,140,20,0.18)' : 'transparent',
                         color: soloPreparatiInc ? C.goldDark : C.ink,
                         fontWeight: soloPreparatiInc ? 700 : 500,
                       }}
@@ -15785,18 +15780,18 @@ export default function App() {
                         ...styles.buttonMini,
                         fontSize: 12,
                         padding: '5px 12px',
-                        borderRadius: 16,
+                        borderRadius: 4,
                         flex: '1 1 90px',
                         justifyContent: 'center',
                         display: 'inline-flex',
                         whiteSpace: 'nowrap',
-                        borderColor: filtroTempoInc === 'azione' ? '#2e9d4d' : C.border,
-                        background: filtroTempoInc === 'azione' ? 'rgba(46,157,77,0.2)' : 'transparent',
-                        color: filtroTempoInc === 'azione' ? '#2e9d4d' : C.ink,
+                        borderColor: filtroTempoInc === 'azione' ? C.goldDark : C.border,
+                        background: filtroTempoInc === 'azione' ? 'rgba(200,140,20,0.18)' : 'transparent',
+                        color: filtroTempoInc === 'azione' ? C.goldDark : C.ink,
                         fontWeight: filtroTempoInc === 'azione' ? 700 : 500,
                       }}
                     >
-                      ⚡ {lingua === 'en' ? 'Action' : 'Azione'}
+                      {lingua === 'en' ? 'Action' : 'Azione'}
                     </button>
 
                     <button
@@ -15806,18 +15801,18 @@ export default function App() {
                         ...styles.buttonMini,
                         fontSize: 12,
                         padding: '5px 12px',
-                        borderRadius: 16,
+                        borderRadius: 4,
                         flex: '1 1 90px',
                         justifyContent: 'center',
                         display: 'inline-flex',
                         whiteSpace: 'nowrap',
-                        borderColor: filtroTempoInc === 'bonus' ? '#d48806' : C.border,
-                        background: filtroTempoInc === 'bonus' ? 'rgba(212,136,6,0.2)' : 'transparent',
-                        color: filtroTempoInc === 'bonus' ? '#d48806' : C.ink,
+                        borderColor: filtroTempoInc === 'bonus' ? C.goldDark : C.border,
+                        background: filtroTempoInc === 'bonus' ? 'rgba(200,140,20,0.18)' : 'transparent',
+                        color: filtroTempoInc === 'bonus' ? C.goldDark : C.ink,
                         fontWeight: filtroTempoInc === 'bonus' ? 700 : 500,
                       }}
                     >
-                      ⏳ {lingua === 'en' ? 'Bonus Action' : 'Azione Bonus'}
+                      {lingua === 'en' ? 'Bonus Action' : 'Azione Bonus'}
                     </button>
 
                     <button
@@ -15827,18 +15822,18 @@ export default function App() {
                         ...styles.buttonMini,
                         fontSize: 12,
                         padding: '5px 12px',
-                        borderRadius: 16,
+                        borderRadius: 4,
                         flex: '1 1 90px',
                         justifyContent: 'center',
                         display: 'inline-flex',
                         whiteSpace: 'nowrap',
-                        borderColor: filtroTempoInc === 'reazione' ? '#1890ff' : C.border,
-                        background: filtroTempoInc === 'reazione' ? 'rgba(24,144,255,0.2)' : 'transparent',
-                        color: filtroTempoInc === 'reazione' ? '#1890ff' : C.ink,
+                        borderColor: filtroTempoInc === 'reazione' ? C.goldDark : C.border,
+                        background: filtroTempoInc === 'reazione' ? 'rgba(200,140,20,0.18)' : 'transparent',
+                        color: filtroTempoInc === 'reazione' ? C.goldDark : C.ink,
                         fontWeight: filtroTempoInc === 'reazione' ? 700 : 500,
                       }}
                     >
-                      🛡️ {lingua === 'en' ? 'Reaction' : 'Reazione'}
+                      {lingua === 'en' ? 'Reaction' : 'Reazione'}
                     </button>
 
                     <button
@@ -15848,14 +15843,14 @@ export default function App() {
                         ...styles.buttonMini,
                         fontSize: 12,
                         padding: '5px 12px',
-                        borderRadius: 16,
+                        borderRadius: 4,
                         flex: '1 1 90px',
                         justifyContent: 'center',
                         display: 'inline-flex',
                         whiteSpace: 'nowrap',
-                        borderColor: soloConcInc ? '#9e4be6' : C.border,
-                        background: soloConcInc ? 'rgba(158,75,230,0.2)' : 'transparent',
-                        color: soloConcInc ? '#9e4be6' : C.ink,
+                        borderColor: soloConcInc ? C.goldDark : C.border,
+                        background: soloConcInc ? 'rgba(200,140,20,0.18)' : 'transparent',
+                        color: soloConcInc ? C.goldDark : C.ink,
                         fontWeight: soloConcInc ? 700 : 500,
                       }}
                     >
@@ -15869,7 +15864,7 @@ export default function App() {
                         ...styles.buttonMini,
                         fontSize: 12,
                         padding: '5px 12px',
-                        borderRadius: 16,
+                        borderRadius: 4,
                         flex: '1 1 90px',
                         justifyContent: 'center',
                         display: 'inline-flex',
@@ -16387,7 +16382,7 @@ export default function App() {
                                     {isConcRow && chip('🧠', lingua === 'en' ? 'Concentration' : 'Concentrazione', lingua === 'en' ? 'Concentration' : 'Concentrazione', coloreCategoria('concentrazione', notteAttiva))}
                                     {isRitualeRow && chip('📜', lingua === 'en' ? 'Ritual' : 'Rituale', lingua === 'en' ? 'Ritual' : 'Rituale', coloreCategoria('rituale', notteAttiva))}
                                     {(danno || tipoDanno) && !parseEspressioneDado(danno) && (
-                                      chip('💥', 'Danno', [danno, tipoDanno].filter(Boolean).join(' '), coloreCategoria('danno', notteAttiva))
+                                      chip(tipoDanno === 'Guarigione' ? '💚' : '💥', 'Danno', [danno, tipoDanno].filter(Boolean).join(' '), coloreCategoria(tipoDanno === 'Guarigione' ? 'guarigione' : 'danno', notteAttiva))
                                     )}
                                     {note && chip('📝', t('spell.chip_note'), note)}
                                   </div>
@@ -16396,11 +16391,12 @@ export default function App() {
                                       style={{
                                         fontSize: 11,
                                         fontWeight: 700,
-                                        color: coloreScuola(scuola, notteAttiva) || C.goldDark,
-                                        border: `1px solid ${coloreScuola(scuola, notteAttiva) || C.goldDark}`,
-                                        background: `${coloreScuola(scuola, notteAttiva) || C.goldDark}1f`,
+                                        color: coloreCategoria('scuola', notteAttiva),
+                                        border: `1px solid ${coloreCategoria('scuola', notteAttiva)}`,
+                                        background: `${coloreCategoria('scuola', notteAttiva)}1f`,
                                         borderRadius: 4,
                                         padding: '1px 5px',
+                                        lineHeight: '13px',
                                         whiteSpace: 'nowrap',
                                         flexShrink: 0,
                                         display: 'inline-flex',
@@ -16429,6 +16425,7 @@ export default function App() {
                                       <BadgeTiroDanno
                                         danno={danno}
                                         tipoDanno={tipoDanno}
+                                        colore={tipoDanno === 'Guarigione' ? coloreCategoria('guarigione', notteAttiva) : undefined}
                                         critico={!!isUltimoCritInc}
                                         title={isUltimoCritInc ? `⚔️ Critico attivo: tira i danni del critico (${danno} ×2)` : t('tip.tira_danno_inc')}
                                         onRoll={() => {
@@ -16442,7 +16439,7 @@ export default function App() {
                                     {/famiglio|evoca|spiriti|spirit|elementale|summon|conjure|destriero|steed|trova|omuncolo|guardiano/i.test(s.nome || '') && (
                                       <button
                                         type="button"
-                                        style={{ ...styles.buttonMini, padding: '2px 7px', fontSize: 11, fontWeight: 700, color: C.goldDark, borderColor: C.gold, background: 'rgba(201,162,39,0.12)' }}
+                                        style={{ ...styles.buttonRiga, color: C.goldDark, borderColor: C.gold, background: 'rgba(201,162,39,0.12)' }}
                                         title={lingua === 'en' ? 'Open the summon/companion catalog for this spell' : 'Apri il catalogo evocazioni/compagni per questo incantesimo'}
                                         onClick={() => {
                                           setFiltroCompagnoCat(/animal|bestie|beast/i.test(s.nome || '') ? 'bestie' : 'evocazioni');
@@ -16456,7 +16453,7 @@ export default function App() {
                                     {/metamorfosi|polymorph/i.test(s.nome || '') && (
                                       <button
                                         type="button"
-                                        style={{ ...styles.buttonMini, padding: '2px 7px', fontSize: 11, fontWeight: 700, color: C.goldDark, borderColor: C.gold, background: 'rgba(201,162,39,0.12)' }}
+                                        style={{ ...styles.buttonRiga, color: C.goldDark, borderColor: C.gold, background: 'rgba(201,162,39,0.12)' }}
                                         title={lingua === 'en' ? 'Open the polymorph catalog (choose the creature to become)' : 'Apri il catalogo Metamorfosi (scegli la creatura da assumere)'}
                                         onClick={() => setTabTrasformazione('metamorfosi')}
                                       >
@@ -16468,14 +16465,10 @@ export default function App() {
                                         <button
                                           type="button"
                                           style={{
-                                            ...styles.buttonMini,
-                                            padding: '2px 6px',
-                                            fontSize: 11,
-                                            fontWeight: 700,
+                                            ...styles.buttonRiga,
                                             color: scheda.effettoTaglia === 'ingrandito' ? '#fff' : (C.green || '#2e7d32'),
                                             background: scheda.effettoTaglia === 'ingrandito' ? (C.green || '#2e7d32') : 'transparent',
                                             borderColor: C.green || '#2e7d32',
-                                            cursor: 'pointer',
                                           }}
                                           title="Attiva Ingrandire: +1 taglia, +1d4 danni armi, vantaggio prove/TS FOR, carico raddoppiato"
                                           onClick={() => aggiorna({ effettoTaglia: scheda.effettoTaglia === 'ingrandito' ? null : 'ingrandito' })}
@@ -16485,14 +16478,10 @@ export default function App() {
                                         <button
                                           type="button"
                                           style={{
-                                            ...styles.buttonMini,
-                                            padding: '2px 6px',
-                                            fontSize: 11,
-                                            fontWeight: 700,
+                                            ...styles.buttonRiga,
                                             color: scheda.effettoTaglia === 'ridotto' ? '#fff' : (C.red || '#c0392b'),
                                             background: scheda.effettoTaglia === 'ridotto' ? (C.red || '#c0392b') : 'transparent',
                                             borderColor: C.red || '#c0392b',
-                                            cursor: 'pointer',
                                           }}
                                           title="Attiva Ridurre: -1 taglia, -1d4 danni armi, svantaggio prove/TS FOR, carico dimezzato"
                                           onClick={() => aggiorna({ effettoTaglia: scheda.effettoTaglia === 'ridotto' ? null : 'ridotto' })}
@@ -16503,17 +16492,13 @@ export default function App() {
                                     )}
                                     {s.catalogo ? (
                                       <button
+                                        type="button"
                                         style={{
-                                          ...styles.buttonMini,
-                                          padding: '2px 8px',
-                                          borderRadius: 6,
-                                          fontSize: 11,
-                                          fontWeight: 700,
+                                          ...styles.buttonRiga,
                                           color: '#fff',
                                           background: isRowCatalogoMancante ? '#2e9d4d' : C.goldDark,
                                           borderColor: isRowCatalogoMancante ? '#2e9d4d' : C.goldDark,
                                           boxShadow: isRowCatalogoMancante ? '0 0 6px rgba(46,157,77,0.4)' : 'none',
-                                          cursor: 'pointer',
                                         }}
                                         title={lingua === 'en' ? 'Add this spell to your character sheet' : 'Aggiungi questo incantesimo alla tua scheda'}
                                         onClick={() => cambiaPreparazione(s)}
@@ -16524,12 +16509,9 @@ export default function App() {
                                       <>
                                         {classePreparata && s.livello >= 1 && (
                                           <button
+                                            type="button"
                                             style={{
-                                              ...styles.buttonMini,
-                                              padding: '2px 7px',
-                                              borderRadius: 6,
-                                              fontSize: 11,
-                                              fontWeight: 700,
+                                              ...styles.buttonRiga,
                                               color: isRowInEccesso ? '#fff' : (s.preparato !== false ? C.goldDark : (isRowUnpreparedMancante ? '#2e9d4d' : C.inkDim)),
                                               background: isRowInEccesso ? '#ef4444' : (s.preparato !== false ? 'rgba(201,162,39,0.12)' : (isRowUnpreparedMancante ? 'rgba(46,157,77,0.15)' : 'transparent')),
                                               borderColor: isRowInEccesso ? '#ef4444' : (s.preparato !== false ? C.goldDark : (isRowUnpreparedMancante ? '#2e9d4d' : C.border)),
@@ -16544,17 +16526,16 @@ export default function App() {
                                           </button>
                                         )}
                                         <button
+                                          type="button"
                                           style={{
-                                            ...styles.buttonMini,
-                                            padding: isRowInEccesso ? '2px 7px' : '2px 6px',
-                                            borderRadius: 4,
+                                            ...styles.buttonRiga,
                                             color: isRowInEccesso ? '#fff' : C.red,
                                             background: isRowInEccesso ? '#ef4444' : 'transparent',
-                                            borderColor: isRowInEccesso ? '#ef4444' : 'transparent',
+                                            borderColor: isRowInEccesso ? '#ef4444' : C.red,
                                             boxShadow: isRowInEccesso ? '0 0 6px rgba(239,68,68,0.4)' : 'none',
-                                            fontWeight: isRowInEccesso ? 700 : 400,
                                           }}
                                           title={t('tip.elimina_inc')}
+                                          aria-label={`${t('tip.elimina_inc')}: ${s.nome}`}
                                           onClick={() => {
                                             setConferma({
                                               titolo: t('spell.elimina_titolo') || 'Elimina incantesimo',

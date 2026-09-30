@@ -132,33 +132,3 @@ export function ambientazioneCasuale() {
   const idx = Math.floor(Math.random() * opzioni.length);
   return opzioni[idx] || 'foresta';
 }
-
-// Colori tematici per le 8 scuole di magia D&D 5e, DIVERSI tra tema chiaro
-// e scuro (come COLORE_CATEGORIA_INFO in rules/scheda.js): un solo hex non
-// può avere contrasto leggibile su sfondo bianco E su sfondo quasi-nero allo
-// stesso tempo (es. Necromanzia si perdeva nel tema chiaro con un hex solo).
-export const COLORE_SCUOLA = {
-  abiurazione:    { chiaro: '#0369a1', scuro: '#38bdf8' },
-  abjuration:     { chiaro: '#0369a1', scuro: '#38bdf8' },
-  ammaliamento:   { chiaro: '#be185d', scuro: '#f472b6' },
-  enchantment:    { chiaro: '#be185d', scuro: '#f472b6' },
-  divinazione:    { chiaro: '#5b21b6', scuro: '#a78bfa' },
-  divination:     { chiaro: '#5b21b6', scuro: '#a78bfa' },
-  evocazione:     { chiaro: '#c2410c', scuro: '#fb923c' },
-  conjuration:    { chiaro: '#c2410c', scuro: '#fb923c' },
-  illusione:      { chiaro: '#86198f', scuro: '#c084fc' },
-  illusion:       { chiaro: '#86198f', scuro: '#c084fc' },
-  invocazione:    { chiaro: '#9f1239', scuro: '#fb7185' },
-  evocation:      { chiaro: '#9f1239', scuro: '#fb7185' },
-  necromanzia:    { chiaro: '#3f6212', scuro: '#bef264' },
-  necromancy:     { chiaro: '#3f6212', scuro: '#bef264' },
-  trasmutazione:  { chiaro: '#0e7490', scuro: '#2dd4bf' },
-  transmutation:  { chiaro: '#0e7490', scuro: '#2dd4bf' },
-};
-
-/** Risolve il colore fisso di una scuola di magia per il tema attivo (chiaro/scuro). */
-export function coloreScuola(scuola, scuro) {
-  const coppia = COLORE_SCUOLA[String(scuola || '').toLowerCase()];
-  if (!coppia) return null;
-  return scuro ? coppia.scuro : coppia.chiaro;
-}

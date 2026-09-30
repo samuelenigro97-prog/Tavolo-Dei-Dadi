@@ -5,6 +5,21 @@
 
 export const NOVITA = [
   {
+    versione: '4.46.0',
+    voci: {
+      it: [
+        'Colori più sobri in Combattimento e Incantesimi: ogni colore indica un tipo di dato (dove, quando, danno, tiro salvezza, cura); scuole di magia e proprietà ora sono etichette neutre.',
+        'Le cure (es. Parola di Guarigione) hanno un colore e un\'icona propri, non più il rosso del danno.',
+        'Tutti i pulsanti nelle righe (tiro, danno, Usa, Prep., elimina…) hanno la stessa altezza in Combattimento e in Incantesimi, e i filtri rapidi non sono più a forma di pillola.',
+      ],
+      en: [
+        'Calmer colors in Combat and Spells: each color marks a type of data (where, when, damage, saving throw, healing); spell schools and properties are now neutral labels.',
+        'Healing (e.g. Healing Word) has its own color and icon, no longer the damage red.',
+        'All row buttons (roll, damage, Use, Prep., delete…) now share the same height in Combat and Spells, and the quick filters are no longer pill-shaped.',
+      ],
+    },
+  },
+  {
     versione: '4.45.0',
     voci: {
       it: [

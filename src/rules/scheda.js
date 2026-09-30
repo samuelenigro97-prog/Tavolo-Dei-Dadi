@@ -483,29 +483,30 @@ export function analizzaMunizioniArma(attacco, inventario = [], armaDb = null) {
   };
 }
 
-/**
- * Palette unica per tipo di informazione, condivisa da Combattimento e
- * Incantesimi (badge/chip): stesso concetto → sempre stesso colore, in ogni
- * sezione. Colori fissi (non tinti dalla classe, a differenza di C.gold) ma
- * DIVERSI tra tema chiaro e scuro: un solo hex non può avere contrasto
- * leggibile su sfondo bianco E su sfondo quasi-nero allo stesso tempo.
- * Ogni categoria è concettualmente diversa dalle altre (es. Gittata ≠
- * Innesco anche se entrambe "informative"): non condividere colori tra
- * categorie diverse solo perché non compaiono mai nella stessa riga.
- */
+// Palette ridotta: il colore dice il TIPO di dato, non la singola voce.
+// Pochi colori funzionali (dove, quando, costo, tiro salvezza, cura, tiro per
+// colpire) + un neutro per le etichette descrittive; troppi colori diversi
+// sulla stessa riga competono tra loro e nessuno spicca più.
+// Coppie chiaro/scuro perché un solo hex non regge sfondo bianco e quasi-nero.
+const NEUTRO = { chiaro: '#57534e', scuro: '#d6d3d1' };
+const QUANDO = { chiaro: '#15803d', scuro: '#4ade80' };
+
+/** Palette per tipo di informazione, condivisa da Combattimento e Incantesimi. */
 export const COLORE_CATEGORIA_INFO = {
-  gittata:      { chiaro: '#1d4ed8', scuro: '#60a5fa' }, // 🎯 Gittata / Portata / Area
-  tempo:        { chiaro: '#15803d', scuro: '#4ade80' }, // ⏱️ Tempo di lancio (Azione/Bonus/Reazione)
-  durata:       { chiaro: '#6d28d9', scuro: '#c4b5fd' }, // ⏳ Durata
-  tiroSalvezza: { chiaro: '#b45309', scuro: '#fbbf24' }, // 🎲 Tiro Salvezza / CD
-  danno:        { chiaro: '#b91c1c', scuro: '#f87171' }, // 💥 Danno
-  proprieta:    { chiaro: '#a21caf', scuro: '#f0abfc' }, // 🏷️ Proprietà (Trucchetto, Magico, Versatile, Maestria)
-  innesco:      { chiaro: '#0f766e', scuro: '#5eead4' }, // 🎯 Innesco di una reazione ("Quando...")
-  effetto:      { chiaro: '#6d28d9', scuro: '#c4b5fd' }, // 🛡️ Effetto di una reazione (= colore Durata: non compaiono mai insieme)
-  attacco:      { chiaro: '#a16207', scuro: '#fde047' },
-  modificato:   { chiaro: '#2563eb', scuro: '#93c5fd' }, // 🔵 Valore modificato da Poteri/Sfinimento (es. totale Velocità) // 🎲 Tiro per colpire — giallo fisso, NON tinto dal colore di classe (a differenza di C.gold/C.goldDark)
-  concentrazione: { chiaro: '#4338ca', scuro: '#a5b4fc' }, // 🧠 Richiede Concentrazione
-  rituale:      { chiaro: '#57534e', scuro: '#d6d3d1' }, // 📜 Può essere lanciato come Rituale
+  gittata:      { chiaro: '#1d4ed8', scuro: '#60a5fa' }, // dove: gittata, portata, area
+  tempo:        QUANDO,                                   // quando: tempo di lancio
+  durata:       QUANDO,                                   // quando: durata
+  innesco:      QUANDO,                                   // quando: innesco di una reazione
+  tiroSalvezza: { chiaro: '#b45309', scuro: '#fbbf24' }, // tiro salvezza / CD
+  danno:        { chiaro: '#b91c1c', scuro: '#f87171' }, // costo: danno
+  guarigione:   { chiaro: '#0f766e', scuro: '#5eead4' }, // cura (non è un danno)
+  attacco:      { chiaro: '#a16207', scuro: '#fde047' }, // tiro per colpire, non tinto dalla classe
+  modificato:   { chiaro: '#2563eb', scuro: '#93c5fd' }, // valore modificato da Poteri/Sfinimento
+  proprieta:    NEUTRO,                                   // descrittivo: Magico, Versatile, Maestria
+  effetto:      NEUTRO,                                   // descrittivo: effetto di una reazione
+  concentrazione: NEUTRO,                                 // descrittivo: l'icona 🧠 lo distingue
+  rituale:      NEUTRO,                                   // descrittivo: l'icona 📜 lo distingue
+  scuola:       NEUTRO,                                   // descrittivo: il nome della scuola basta
 };
 
 /** Risolve il colore fisso di una categoria per il tema attivo (chiaro/scuro). */

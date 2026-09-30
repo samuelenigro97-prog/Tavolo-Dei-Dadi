@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { t, traduciDato } from '../i18n.js';
-import { C, coloreScuola } from './tema.js';
+import { C } from './tema.js';
+import { coloreCategoria } from '../rules/scheda.js';
 import { styles } from './stili.js';
 import { INCANTESIMI_DB, VARIANTI_EDIZIONE_INCANTESIMI } from '../data/incantesimi.js';
 import { INCANTESIMI_XANATHAR } from '../dati/incantesimi-xanathar.js';
@@ -982,9 +983,9 @@ export function CompendioModal({
                     {dettaglioSelezionato.scuola && (
                       <span
                         style={{
-                          color: coloreScuola(dettaglioSelezionato.scuola, notteAttiva) || C.goldDark,
-                          border: `1px solid ${coloreScuola(dettaglioSelezionato.scuola, notteAttiva) || C.goldDark}66`,
-                          background: `${coloreScuola(dettaglioSelezionato.scuola, notteAttiva) || C.goldDark}18`,
+                          color: coloreCategoria('scuola', notteAttiva),
+                          border: `1px solid ${coloreCategoria('scuola', notteAttiva)}66`,
+                          background: `${coloreCategoria('scuola', notteAttiva)}18`,
                           borderRadius: 5,
                           padding: '1px 6px',
                           fontWeight: 700,
