@@ -7,12 +7,12 @@ API: la chiave vive qui, nel Worker.
 
 È gratuito per un uso personale (piano free di Cloudflare Workers).
 
-## Cosa ti serve
+## Cosa Ti Serve
 - Un account [Cloudflare](https://dash.cloudflare.com/sign-up) (gratis).
 - Una **chiave API Anthropic** (da <https://console.anthropic.com/>).
 - Node.js installato (per il comando `npx wrangler`).
 
-## Opzione A — dal sito Cloudflare (senza terminale, consigliata)
+## Opzione A — Dal Sito Cloudflare (Senza Terminale, Consigliata)
 
 1. Vai su <https://dash.cloudflare.com> → **Workers & Pages** → **Create** →
    **Create Worker**. Dai un nome (es. `tavolo-dei-dadi-transcribe`) → **Deploy**.
@@ -27,7 +27,7 @@ API: la chiave vive qui, nel Worker.
 5. Nell'app: sezione *Importa / esporta scheda* → *⚙️ Configura import da PDF (IA)*
    → incolla l'URL. Fatto: il pulsante **🤖 Importa da PDF** ora funziona.
 
-## Opzione B — da terminale (wrangler)
+## Opzione B — Da Terminale (Wrangler)
 
 ```bash
 cd worker
@@ -38,20 +38,20 @@ npx wrangler deploy                       # 3) pubblica
 
 Wrangler stampa l'URL pubblico: copialo e incollalo nell'app come al punto 5.
 
-## Consiglio di sicurezza
+## Consiglio di Sicurezza
 Chi conosce l'URL del Worker può usarlo e consumare la tua quota API. Per
 limitarlo al solo tuo sito, in `wrangler.toml` scommenta `ALLOW_ORIGIN` con
 l'indirizzo del tuo sito (es. `https://TUOUTENTE.github.io`) e rifai
 `npx wrangler deploy`. In ogni caso, non condividere l'URL del Worker.
 
-## In locale (sviluppo)
+## In Locale (Sviluppo)
 In `npm run dev` l'app usa il server Express (`server/index.js`) via il proxy
 `/api`: basta un file `.env` con `ANTHROPIC_API_KEY=...`. Il Worker serve solo
 per l'uso **online**.
 
 ---
 
-# Archivio DM — vedere le schede create dagli utenti
+# Archivio DM — Vedere le Schede Create dagli Utenti
 
 Lo **stesso Worker** offre anche un archivio delle schede (endpoint `/pg`), utile
 per avere personaggi veri su cui lavorare. Funziona così:
@@ -61,7 +61,7 @@ per avere personaggi veri su cui lavorare. Funziona così:
 - l'elenco è leggibile **solo con la chiave DM**, che vive nel Worker come
   segreto e non è nel sito. Senza quella chiave nessuno vede niente.
 
-## Attivazione (una volta sola)
+## Attivazione (Una Volta Sola)
 
 ```bash
 cd worker
@@ -86,12 +86,12 @@ npx wrangler deploy                       # 4) pubblica
    `.github/workflows/deploy.yml` (`env:` del comando `npm run build`).
    **Se la variabile è vuota, l'intera funzione resta spenta.**
 
-## Come si consulta
+## Come Si Consulta
 Nell'app: **🏠 Menu → 🗂 Archivio DM** → inserisci la chiave DM. Vedi l'elenco
 (nome, classe, livello, quando è stato aggiornato, da quale dispositivo) e con
 **Apri** carichi la scheda tra i tuoi personaggi per studiarla.
 
-## Nota su privacy e dati
+## Nota su Privacy e Dati
 Il sito è pubblico: chi lo usa deposita la propria scheda senza accorgersene.
 Sono dati di gioco (nome del personaggio, classe, note), non dati personali, e
 le immagini non vengono mai inviate — ma è comunque corretto **scriverlo nella
@@ -103,7 +103,7 @@ curl -X DELETE "https://IL-TUO-WORKER.workers.dev/pg/<id>?key=LA_TUA_CHIAVE"
 
 ---
 
-# Stanze temporanee — condivisione senza account
+# Stanze Temporanee — Condivisione Senza Account
 
 Lo stesso Worker espone anche:
 
@@ -136,7 +136,7 @@ hashato. Nessun IP viene memorizzato in chiaro.
 Il backup Gist resta disponibile come funzione separata per gli utenti che lo
 avevano già configurato. Le stanze non leggono né richiedono il relativo token.
 
-# Sincronizzazione tra dispositivi tramite codice — senza token GitHub
+# Sincronizzazione Tra Dispositivi Tramite Codice — Senza Token GitHub
 
 Terza funzione sullo stesso Worker, pensata come alternativa più semplice al
 backup Gist per chi non vuole creare un token GitHub: un codice a 10 caratteri
