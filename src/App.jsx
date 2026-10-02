@@ -15206,6 +15206,13 @@ export default function App() {
                                   </td>
                                   <td style={styles.td} className="attacchi-note" data-label={t('combat.col_note')}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+                                      <span
+                                        className="chip-tempo"
+                                        style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria('tempo', notteAttiva)}1f`, border: `1px solid ${coloreCategoria('tempo', notteAttiva)}`, color: coloreCategoria('tempo', notteAttiva), fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
+                                        title={lingua === 'en' ? `Casting time: ${cat === 'Azione' ? '1 Action' : cat === 'Bonus' ? 'Bonus Action' : 'Reaction'}` : `Tempo di lancio: ${cat === 'Azione' ? '1 Azione' : cat === 'Bonus' ? 'Azione Bonus' : 'Reazione'}`}
+                                      >
+                                        ⏱ {cat === 'Azione' ? (lingua === 'en' ? '1 Action' : '1 Azione') : cat === 'Bonus' ? (lingua === 'en' ? 'Bonus Action' : 'Azione Bonus') : (lingua === 'en' ? 'Reaction' : 'Reazione')}
+                                      </span>
                                       {gittataRiga && (
                                         <span
                                           className="chip-gittata"
@@ -15215,13 +15222,6 @@ export default function App() {
                                           🎯 {gittataRiga}
                                         </span>
                                       )}
-                                      <span
-                                        className="chip-tempo"
-                                        style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria('tempo', notteAttiva)}1f`, border: `1px solid ${coloreCategoria('tempo', notteAttiva)}`, color: coloreCategoria('tempo', notteAttiva), fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
-                                        title={lingua === 'en' ? `Casting time: ${cat === 'Azione' ? '1 Action' : cat === 'Bonus' ? 'Bonus Action' : 'Reaction'}` : `Tempo di lancio: ${cat === 'Azione' ? '1 Azione' : cat === 'Bonus' ? 'Azione Bonus' : 'Reazione'}`}
-                                      >
-                                        ⏱ {cat === 'Azione' ? (lingua === 'en' ? '1 Action' : '1 Azione') : cat === 'Bonus' ? (lingua === 'en' ? 'Bonus Action' : 'Azione Bonus') : (lingua === 'en' ? 'Reaction' : 'Reazione')}
-                                      </span>
                                       {hasReach && (
                                         <span
                                           style={{
