@@ -968,7 +968,6 @@ export function controlliScheda(scheda) {
   const abilita = scheda.abilita || {};
   const tiriSalvezza = scheda.tiriSalvezza || {};
 
-  // --- Tiri salvezza: solo la classe principale li concede, sempre. ---
   const tsAttesi = (classeKey && TS_CLASSE[classeKey]) || [];
   for (const { key, label } of CARATTERISTICHE) {
     if (tsAttesi.includes(key) && !tiriSalvezza[key]) {
@@ -983,7 +982,6 @@ export function controlliScheda(scheda) {
     }
   }
 
-  // --- Competenze fisse del background: sempre concesse, nessuna scelta. ---
   const bgLista = BACKGROUND_COMPETENZE[scheda.background] || [];
   for (const chiave of bgLista) {
     const def = ABILITA.find((a) => a.key === chiave);
@@ -999,7 +997,6 @@ export function controlliScheda(scheda) {
     }
   }
 
-  // --- Abilità e Budget: quante sono spiegabili da razza + classe + multiclasse + background ---
   const raceInfo = competenzeSpecieDi(scheda.specie);
   const classeDati = classeKey && COMPETENZE_CLASSE[classeKey];
   const classeInfo = classeDati
@@ -1057,7 +1054,6 @@ export function controlliScheda(scheda) {
     });
   }
 
-  // --- Verifica Bonus Competenza rispetto al Livello Totale ---
   if (scheda.classe && scheda.bonusCompetenza != null && Number(scheda.bonusCompetenza) > 0) {
     const livTotale = (scheda.livello || 1) + (Array.isArray(scheda.multiclasse) ? scheda.multiclasse.reduce((s, m) => s + (Number(m.livello) || 0), 0) : 0);
     const bonusAtteso = bonusCompetenzaDaLivello(livTotale);
@@ -1073,7 +1069,6 @@ export function controlliScheda(scheda) {
     }
   }
 
-  // --- Verifica Incantesimi Preparati / Conosciuti ---
   if (scheda.classe && Array.isArray(scheda.incantesimiLista)) {
     const maxInc = (Number(scheda.maxIncantesimi) > 0)
       ? Number(scheda.maxIncantesimi)
@@ -1147,7 +1142,6 @@ export function controlliScheda(scheda) {
     }
   }
 
-  // --- Caratteristica da Incantatore ---
   const carAttesa = caratteristicaIncantatoreEffettiva(scheda.classe, scheda.sottoclasse);
   if (carAttesa && scheda.incantatore?.caratteristica && scheda.incantatore.caratteristica !== carAttesa) {
     const nomeAttesa = CARATTERISTICHE.find((c) => c.key === carAttesa)?.label || carAttesa;
@@ -1162,7 +1156,6 @@ export function controlliScheda(scheda) {
     });
   }
 
-  // --- Punti Ferita Massimi ---
   if (scheda.pfMax != null && Number(scheda.pfMax) <= 0) {
     risultati.push({
       id: 'pf-max-invalido',
@@ -1171,7 +1164,6 @@ export function controlliScheda(scheda) {
     });
   }
 
-  // --- Sintonia Oggetti Magici (massimo 3) ---
   if (Array.isArray(scheda.sintonia) && scheda.sintonia.filter(Boolean).length > 3) {
     risultati.push({
       id: 'sintonia-max',
@@ -1183,7 +1175,6 @@ export function controlliScheda(scheda) {
     });
   }
 
-  // --- Livello Minimo Sottoclasse ---
   if (scheda.classe && scheda.sottoclasse) {
     // Livello di sblocco della sottoclasse per l'edizione del PG (primo valore della tabella).
     const livMin = sottoclasseLivPer(scheda.versione === '2014' ? '2014' : '2024')[chiaveClasse(scheda.classe)]?.[0] || 0;
@@ -1197,7 +1188,6 @@ export function controlliScheda(scheda) {
     }
   }
 
-  // --- Punteggi Caratteristiche (range legale 1 - 30) ---
   for (const { key, label } of CARATTERISTICHE) {
     const v = Number(scheda.caratteristiche?.[key]);
     if (v != null && !isNaN(v) && v > 0) {
@@ -1211,7 +1201,6 @@ export function controlliScheda(scheda) {
     }
   }
 
-  // --- Competenza nell'Armatura e Scudo Indossati ---
   if (scheda.armatura?.tipo && scheda.armatura.tipo !== 'nessuna' && scheda.armatura.tipo !== 'manuale') {
     const tipo = scheda.armatura.tipo;
     const add = scheda.addestramento?.armature || {};

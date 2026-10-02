@@ -130,9 +130,6 @@ function attivaOverrideSilenzioso() {
   } catch { /* ignorato */ }
 }
 
-// --- Effetti sonori "one-shot" da file (colpo d'arma, incantesimo) ---
-// Caricati e decodificati una volta in AudioBuffer per una riproduzione
-// ISTANTANEA (niente ritardo) e di qualità (file reali, non sintesi).
 const SFX_FILES = {
   sword: 'sfx-sword.mp3', arrow: 'sfx-freccia.mp3', dice: 'sfx-dadi.mp3', magic: 'sfx-magic.mp3',
   // Overlay per la città medievale (si sovrappongono alla base: campane, fabbro, carretti)

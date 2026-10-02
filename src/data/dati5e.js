@@ -2377,10 +2377,6 @@ export const CLASSI = [
 ];
 
 
-// ============================================================================
-// CONFIGURAZIONE MANUALI E FONTI DI REGOLE D&D 5e
-// ============================================================================
-
 export const DEFAULT_MANUALI = {
   phb2024: true,
   phb2014: true,

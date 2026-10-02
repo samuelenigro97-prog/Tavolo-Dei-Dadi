@@ -36,8 +36,6 @@ export function preparaPerCondivisione(scheda) {
   return { scheda: copia, ritrattoRimosso };
 }
 
-// --- codifica binaria <-> testo ------------------------------------------
-
 function byteInBase64url(bytes) {
   let bin = '';
   for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);

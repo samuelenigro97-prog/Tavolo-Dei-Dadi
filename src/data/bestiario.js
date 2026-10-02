@@ -3,7 +3,6 @@
 
 /** Velocità in metri. `terra` è sempre presente; le altre solo se la bestia ce l'ha. */
 export const BESTIE = [
-  // --- GRADO DI SFIDA 0 ---
   {
     nome: 'Gufo', nomeEn: 'Owl', gs: '0', gsNum: 0,
     taglia: 'Minuscola', ca: 11, pf: 1, pfFormula: '1d4 − 1',
@@ -148,7 +147,6 @@ export const BESTIE = [
     note: 'Permette di scavare cunicoli nella terra a velocità 1.5 m al turno.',
   },
 
-  // --- GRADO DI SFIDA 1/8 ---
   {
     nome: 'Mastino', nomeEn: 'Mastiff', gs: '1/8', gsNum: 0.125,
     taglia: 'Media', ca: 12, pf: 5, pfFormula: '1d8 + 1',
@@ -181,7 +179,6 @@ export const BESTIE = [
     azioni: ['Zoccoli: +4 al tiro per colpire, 2d4+2 danni contundenti.'],
   },
 
-  // --- GRADO DI SFIDA 1/4 ---
   {
     nome: 'Lupo', nomeEn: 'Wolf', gs: '1/4', gsNum: 0.25,
     taglia: 'Media', ca: 13, pf: 11, pfFormula: '2d8 + 2',
@@ -335,7 +332,6 @@ export const BESTIE = [
     ],
   },
 
-  // --- GRADO DI SFIDA 1/2 ---
   {
     nome: 'Orso nero', nomeEn: 'Black Bear', gs: '1/2', gsNum: 0.5,
     taglia: 'Media', ca: 11, pf: 19, pfFormula: '3d8 + 6',
@@ -421,7 +417,6 @@ export const BESTIE = [
     azioni: ['Morso: +4 al tiro per colpire, 1d8+2 danni perforanti.'],
   },
 
-  // --- GRADO DI SFIDA 1 ---
   {
     nome: 'Orso bruno', nomeEn: 'Brown Bear', gs: '1', gsNum: 1,
     taglia: 'Grande', ca: 11, pf: 34, pfFormula: '4d10 + 12',
@@ -562,7 +557,6 @@ export const BESTIE = [
     note: '52 PF, tentacoli a 4,5 metri di portata e trattenuto a CD 16 in ambiente acquatico.',
   },
 
-  // --- GRADO DI SFIDA 2 (Circolo della Luna dal 6° liv.) ---
   {
     nome: 'Orso polare / delle caverne', nomeEn: 'Polar Bear', gs: '2', gsNum: 2,
     taglia: 'Grande', ca: 12, pf: 42, pfFormula: '5d10 + 15',
@@ -666,7 +660,6 @@ export const BESTIE = [
     azioni: ['Morso: +6 al tiro per colpire, 2d10+4 danni perforanti.'],
   },
 
-  // --- GRADO DI SFIDA 3 (Circolo della Luna dal 9° liv.) ---
   {
     nome: 'Anchilosauro', nomeEn: 'Ankylosaurus', gs: '3', gsNum: 3,
     taglia: 'Enorme', ca: 15, pf: 68, pfFormula: '8d12 + 16',
@@ -694,7 +687,6 @@ export const BESTIE = [
     note: '3 attacchi a turno con veleno devastante da 4d10.',
   },
 
-  // --- GRADO DI SFIDA 4 (Circolo della Luna dal 12° liv.) ---
   {
     nome: 'Elefante', nomeEn: 'Elephant', gs: '4', gsNum: 4,
     taglia: 'Enorme', ca: 12, pf: 76, pfFormula: '8d12 + 24',
@@ -720,7 +712,6 @@ export const BESTIE = [
     azioni: ['Coda chiodata: +7 al tiro per colpire, portata 3 m, 6d6+5 danni perforanti; TS Forza CD 15 o prono.'],
   },
 
-  // --- GRADO DI SFIDA 5 (Circolo della Luna dal 15° liv.) ---
   {
     nome: 'Triceratopo', nomeEn: 'Triceratops', gs: '5', gsNum: 5,
     taglia: 'Enorme', ca: 13, pf: 95, pfFormula: '10d12 + 30',
@@ -761,7 +752,6 @@ export const BESTIE = [
     note: '126 PF e morso letale da 3d10+6.',
   },
 
-  // --- GRADO DI SFIDA 6 (Circolo della Luna dal 18° liv.) ---
   {
     nome: 'Mammut', nomeEn: 'Mammoth', gs: '6', gsNum: 6,
     taglia: 'Enorme', ca: 13, pf: 126, pfFormula: '11d12 + 55',
@@ -777,7 +767,6 @@ export const BESTIE = [
     note: 'Forza 24 (+7), 126 PF e fino a 8d8+4d10+21 danni in carica.',
   },
 
-  // --- GRADO DI SFIDA 7 (oltre la tabella Forma Selvatica: solo Metamorfosi) ---
   {
     nome: 'Gorilla gigante', nomeEn: 'Giant Ape', gs: '7', gsNum: 7,
     taglia: 'Enorme', ca: 12, pf: 157, pfFormula: '15d12 + 60',
@@ -794,7 +783,6 @@ export const BESTIE = [
     note: '157 PF e attacco multiplo da 2 pugni: tra le più forti disponibili con la Metamorfosi.',
   },
 
-  // --- GRADO DI SFIDA 8 (oltre la tabella Forma Selvatica: solo Metamorfosi) ---
   {
     nome: 'Tirannosauro rex', nomeEn: 'Tyrannosaurus Rex', gs: '8', gsNum: 8,
     taglia: 'Enorme', ca: 13, pf: 136, pfFormula: '13d12 + 52',
@@ -814,7 +802,6 @@ export const BESTIE = [
 
 /** Famigli speciali / avanzati (Patto della Catena Warlock + Trova Famiglio + Compagni Tasha). */
 export const FAMIGLI = [
-  // --- WARLOCK PATTO DELLA CATENA & SPECIALI ---
   {
     nome: 'Pseudodrago (Famiglio)', nomeEn: 'Pseudodragon (Familiar)', tipo: 'Drago (Patto della Catena)',
     taglia: 'Minuscola', ca: 13, pf: 7, pfFormula: '2d4 + 2',
@@ -902,7 +889,6 @@ export const FAMIGLI = [
     note: 'Mini-Beholder volante con 4 potenti raggi ottici a distanza.',
   },
 
-  // --- FAMIGLI STANDARD (Trova Famiglio) ---
   {
     nome: 'Gufo (Famiglio)', nomeEn: 'Owl (Familiar)', tipo: 'Famiglio Bestiale / Celestiale / Fatato',
     taglia: 'Minuscola', ca: 11, pf: 1, pfFormula: '1d4 − 1',
@@ -946,7 +932,6 @@ export const FAMIGLI = [
     azioni: ['Becco: 1 danno.'],
   },
 
-  // --- COMPAGNI DI TASHA & ARTIFICIERE ---
   {
     nome: 'Bestia della Terra (Compagno Ranger)', nomeEn: 'Beast of the Land (Ranger Companion)', tipo: 'Bestia Primitiva (Tasha)',
     taglia: 'Media', ca: 13, pf: 20, pfFormula: '5 + 5 × Livello Ranger',
@@ -998,7 +983,6 @@ export const FAMIGLI = [
 
 /** Evocazioni & Creature Spiritiche comuni (Elementali, Destrieri, Spiriti Guardiani, Tasha Summons). */
 export const EVOCAZIONI = [
-  // --- GLI ELEMENTALI DEI 4 PIANI ---
   {
     nome: 'Elementale del Fuoco', nomeEn: 'Fire Elemental', tipo: 'Elementale (Evocazione)',
     taglia: 'Grande', ca: 13, pf: 102, pfFormula: '12d10 + 36',
@@ -1067,7 +1051,6 @@ export const EVOCAZIONI = [
     ],
   },
 
-  // --- DESTRIERI & SPIRITI GUARDIANI ---
   {
     nome: 'Spirito Guardiano Celato', nomeEn: 'Spirit Guardian', tipo: 'Celestiale / Fatato / Immondo',
     taglia: 'Media', ca: 15, pf: 40, pfFormula: '—',
@@ -1119,7 +1102,6 @@ export const EVOCAZIONI = [
     ],
   },
 
-  // --- SPIRITI DI EVOCAZIONE DI TASHA (Summon Spells) ---
   {
     nome: 'Spirito Bestiale (Tasha)', nomeEn: 'Bestial Spirit (Summon Beast)', tipo: 'Bestia (Evocazione Tasha)',
     taglia: 'Piccola / Media', ca: 11, pf: 30, pfFormula: '20 + 5 per livello slot > 2',
@@ -1268,12 +1250,7 @@ export function raggruppaPerGS(creature) {
     .map((g) => ({ ...g, creature: [...g.creature].sort((a, b) => a.nome.localeCompare(b.nome, 'it')) }));
 }
 
-// ============================================================================
-// CATALOGO MOSTRI CLASSICI D&D 5e (SRD 5.1 / PHB / MM) PER IL COMBAT TRACKER
-// ============================================================================
-
 export const MOSTRI_5E = [
-  // --- NON-MORTI ---
   {
     nome: 'Scheletro', nomeEn: 'Skeleton', categoria: 'Non-Morti', gs: '1/4', gsNum: 0.25,
     taglia: 'Media', ca: 13, pf: 13, pfFormula: '2d8 + 4',
@@ -1363,7 +1340,6 @@ export const MOSTRI_5E = [
     note: 'Non-morto vampirico assetato di sangue e rigenerante.'
   },
 
-  // --- GOBLINOIDI, ORCHI & COBOLDI ---
   {
     nome: 'Coboldo', nomeEn: 'Kobold', categoria: 'Umanoidi & Mostri', gs: '1/8', gsNum: 0.125,
     taglia: 'Piccola', ca: 12, pf: 5, pfFormula: '2d6 − 2',
@@ -1442,7 +1418,6 @@ export const MOSTRI_5E = [
     note: 'Gigantesco mostro con rigenerazione letale, vulnerabile solo al fuoco e all’acido.'
   },
 
-  // --- UMANOIDI & PNG ---
   {
     nome: 'Guardia', nomeEn: 'Guard', categoria: 'Umanoidi & PNG', gs: '1/8', gsNum: 0.125,
     taglia: 'Media', ca: 16, pf: 11, pfFormula: '2d8 + 2',
@@ -1532,7 +1507,6 @@ export const MOSTRI_5E = [
     note: 'Sicario mortale con veleni letali e colpi a sorpresa devastanti.'
   },
 
-  // --- MOSTRUOSITÀ, ABERRAZIONI & MELME ---
   {
     nome: 'Arpia', nomeEn: 'Harpy', categoria: 'Mostruosità & Draghi', gs: '1', gsNum: 1,
     taglia: 'Media', ca: 11, pf: 38, pfFormula: '7d8 + 7',
@@ -1644,7 +1618,6 @@ export const MOSTRI_5E = [
     note: 'Tiranno oculare supremo con 10 raggi letali e cono antimagia.'
   },
 
-  // --- ELEMENTALI, COSTTRUTTI & IMMONDI ---
   {
     nome: 'Gargoyle', nomeEn: 'Gargoyle', categoria: 'Elementali & Immondi', gs: '2', gsNum: 2,
     taglia: 'Media', ca: 15, pf: 52, pfFormula: '7d8 + 21',

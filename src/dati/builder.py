@@ -1,6 +1,5 @@
 import fitz
 import re
-import json
 
 pdf_path = '/Users/samuele/Downloads/Calderone Omnicomprensivo di Tasha.pdf'
 doc = fitz.open(pdf_path)

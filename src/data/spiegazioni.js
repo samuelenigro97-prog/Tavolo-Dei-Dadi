@@ -521,8 +521,6 @@ export const SPIEG_PRIVILEGI = {
   'Arcanum mistico': 'Impari un incantesimo di alto livello che lanci gratis una volta per riposo lungo.',
   'Maestro occulto': 'Il culmine del warlock: recuperi tutti gli slot del patto con un breve rituale.',
 
-  // ===== PRIVILEGI DI SOTTOCLASSE (2024) — riassunti nostri =====
-  // Barbaro
   'Frenesia': 'Durante l’Ira compi un attacco senz’armi o con arma bonus a ogni turno.',
   'Presenza Intimidatoria': 'Come azione bonus spaventi un nemico vicino (TS Saggezza).',
   'Rappresaglia': 'Come reazione, quando subisci danni in mischia puoi contrattaccare.',
@@ -754,7 +752,6 @@ export const SPIEG_PRIVILEGI = {
   'Resilienza Celestiale': 'Ottieni PF temporanei per te e gli alleati a ogni riposo.',
   'Vendetta Ardente': 'Quando scenderesti a 0 PF esplodi di luce, curandoti e ferendo i nemici.',
 
-  // ===== Nomi ufficiali 2024 (Barbaro/Bardo/Chierico) — voci nuove o rinominate =====
   'Ira Incontenibile': 'Mentre sei in ira non puoi essere affascinato né spaventato; se lo sei, la condizione termina quando entri in ira.',
   'Ritorsione': 'Come reazione, quando una creatura entro 1,5 m ti ferisce puoi contrattaccarla in mischia.',
   'Ira della Natura Selvaggia': 'La tua ira assume un aspetto animale (Aquila, Lupo o Orso) con benefici diversi.',
@@ -782,7 +779,6 @@ export const SPIEG_PRIVILEGI = {
   'Colpo Guidato': 'Con Incanalare Divinità aggiungi un grosso bonus a un tiro per colpire.',
   'Sacerdote di Guerra': 'Come azione bonus compi un attacco d’arma aggiuntivo.',
 
-  // ===== Nomi ufficiali 2024 — Ladro, Mago, Monaco, Paladino, Ranger, Stregone, Warlock =====
   'Ispirazione in Combattimento': 'Gli alleati possono usare la tua Ispirazione bardica per danni o CA in combattimento.',
   'Incantesimi del Dominio': 'Il tuo dominio ti concede incantesimi sempre preparati.',
   // Ladro
@@ -868,7 +864,6 @@ export const SPIEG_PRIVILEGI = {
   'Guerriero Chiaroveggente': 'Un tuo alleato psichico dà vantaggio ai tiri contro un nemico.',
   'Creare Servitore': 'Puoi ammaliare permanentemente un umanoide o una bestia.',
 
-  // ===== Nomi ufficiali 2024 — Druido e Guerriero =====
   'Ausilio dalla Terra': 'Spendi una Forma Selvatica per far apparire un’area di fiori curativi e spine dannose.',
   'Interdizione della Natura': 'Ottieni immunità/resistenza a certi danni e condizioni grazie alla natura.',
   'Rifugio della Natura': 'I nemici devono superare un TS per riuscire ad attaccarti.',
@@ -1009,7 +1004,6 @@ export const SPIEG_PRIVILEGI = {
   'Fabbro da Guerra': 'Sottoclasse dell’Artefice (Tasha): combatte in prima linea guidando un fedele Difensore d’Acciaio.',
   'Attacco Extra': 'Puoi attaccare due volte, invece che una, quando usi l\'azione di Attacco durante il tuo turno.',
   'ispirazione': 'Puoi spendere Ispirazione per ritirare un dado quando fallisci una prova, tiro per colpire o TS.',
-  // ─── INVOCAZIONI OCCULTE E MANOVRE BATTLE MASTER ───
   'Deflagrazione Agonizzante': "Invocazione Occulta: potenza pura.\nQuando lanci Deflagrazione Occulta, aggiungi il tuo modificatore di Carisma ai danni inflitti da ogni raggio che colpisce.",
   'Armatura delle Ombre': "Invocazione Occulta: difesa arcana.\nPuoi lanciare Armatura Magica su te stesso a volontà, senza spendere slot incantesimo né componenti materiali.",
   'Vista del Diavolo': "Invocazione Occulta: occhi nell’abisso.\nPuoi vedere normalmente nell’oscurità, sia magica che non magica, fino a una distanza di 36 metri.",
@@ -1045,9 +1039,6 @@ export const SPIEG_PRIVILEGI = {
 // Indice minuscolo per ricerche senza distinzione di maiuscole.
 const _lcMap = (obj) => { const m = {}; for (const k in obj) m[k.toLowerCase()] = obj[k]; return m; };
 
-// --- Traduzioni inglesi (chiavi in italiano) -------------------------------
-// Quando la lingua è "en" si cerca prima qui; se la voce non è ancora tradotta
-// si ricade sul testo italiano, così non compaiono mai buchi.
 import { linguaAttuale } from '../i18n.js';
 import { EN_METAMAGIA, EN_TALENTI, EN_TRATTI, EN_PRIVILEGI, EN_INCANTESIMI, EN_PRIVILEGI_CLASSE, EN_INVOCAZIONI, EN_INFUSIONI, EN_VARIANTI_INCANTESIMI } from './spiegazioni.en.js';
 const EN_METAMAGIA_LC = _lcMap(EN_METAMAGIA);
@@ -1063,10 +1054,6 @@ function _en(mappaLc, chiave) {
   return mappaLc[chiave] || null;
 }
 
-// --- Edizione delle regole (5.0 = 2014, 5.5 = 2024) ------------------------
-// Alcune voci cambiano fra le due edizioni: in quel caso il testo è un oggetto
-// { base?, '2014': …, '2024': … } e qui viene scelto il pezzo giusto, così un
-// PG della 5.0 legge le regole della 5.0 e uno della 5.5 quelle della 5.5.
 let edizioneAttuale = '2024';
 export function setEdizioneAttuale(v) {
   edizioneAttuale = String(v) === '2014' ? '2014' : '2024';
@@ -1618,7 +1605,6 @@ const SPIEG_TALENTI = {
     '2024': "- Aumento di Caratteristica: +1 a Forza.\n- Colpo di Scudo: se compi l’azione di Attacco mentre impugni uno scudo, come azione bonus puoi spingere una creatura entro 1,5 m (a terra prona oppure via di 1,5 m).\n- Frapporre lo Scudo: quando un effetto ti concede un TS su Destrezza per dimezzare i danni, puoi usare la reazione per aggiungere il bonus alla CA dello scudo a quel tiro salvezza.",
   },
 
-  // ─── ESPANSIONE TALENTI 2014 & 2024 (ORIGINE, GENERALI, STILI, DONI EPICI) ───
   'Allerta': {"2014":"- +5 all’Iniziativa.\n- Non puoi essere sorpreso finché sei cosciente.\n- Gli attaccanti che non vedi non ottengono vantaggio ai tiri per colpire contro di te.","2024":"- Prontezza all’Iniziativa: aggiungi il tuo Bonus di Competenza ai tiri d’iniziativa.\n- Scambio d’Iniziativa: subito dopo aver tirato l’iniziativa, puoi scambiare il tuo risultato con quello di un alleato consenziente entro 9 m che non sia incapacitato.","base":"Sempre vigile e pronto a reagire."},
   'Artigiano': {"2014":"- Ottieni competenza in tre strumenti da artigiano a tua scelta.","2024":"- Competenza negli Strumenti: ottieni competenza in tre strumenti da artigiano a tua scelta.\n- Sconto: ottieni uno sconto del 20% su tutti gli oggetti non magici che acquisti.\n- Fabbricazione Rapida: puoi fabbricare oggetti non magici nel 50% del tempo normale.","base":"Maestro nel forgiare e creare oggetti."},
   'Condottiero': {"2014":"- +1 a Forza o Costituzione.\n- Competenza nelle armi improvvisate; il colpo disarmato infligge 1d4 + FOR.\n- Se colpisci con un colpo disarmato o un’arma improvvisata, con l’azione bonus puoi tentare di afferrare il bersaglio.","2024":"- Colpi Potenziati: i tuoi colpi disarmati infliggono 1d4 + FOR e puoi ritirare gli 1 sui dadi di danno dei colpi disarmati.\n- Spinta Disarmata: quando colpisci con un colpo disarmato durante l’azione di Attacco, puoi spingere il bersaglio di 1,5 m.\n- Mobili e Oggetti: hai competenza nelle armi improvvisate.","base":"Rissoso, abile nella lotta e con armi improvvisate."},

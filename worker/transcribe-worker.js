@@ -344,7 +344,6 @@ async function gestisciArchivio(request, env, headers, percorso) {
   const url = new URL(request.url);
   const id = percorso.startsWith('/pg/') ? decodeURIComponent(percorso.slice(4)) : '';
 
-  // --- Deposito di una scheda (nessuna chiave richiesta) ---
   if (request.method === 'POST') {
     let corpo;
     try { corpo = await request.json(); } catch { corpo = null; }
@@ -399,7 +398,6 @@ async function gestisciArchivio(request, env, headers, percorso) {
     return new Response(JSON.stringify({ ok: true }), { headers });
   }
 
-  // --- Da qui in poi serve la chiave DM ---
   const chiaveDm = url.searchParams.get('key') || request.headers.get('x-dm-key') || '';
   if (!env.DM_KEY || chiaveDm !== env.DM_KEY) {
     return new Response(JSON.stringify({ error: 'Chiave DM non valida' }), { status: 401, headers });

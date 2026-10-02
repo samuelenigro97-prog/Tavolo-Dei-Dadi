@@ -1482,7 +1482,6 @@ export const EN_PRIVILEGI_CLASSE = {
     '2024': "- You regain all uses of Bardic Inspiration at the end of a Short Rest or a Long Rest.\n- In addition, if you have no uses left, you can expend a spell slot (no action required) to regain one.",
   },
   "Deviare l'energia": 'You can also deflect attacks that deal elemental damage.',
-  // ─── ELDRITCH INVOCATIONS & BATTLE MASTER MANEUVERS ───
   'Deflagrazione Agonizzante': "Agonizing Blast: add your Charisma modifier to the damage of each Eldritch Blast beam that hits.",
   'Armatura delle Ombre': "Armor of Shadows: cast Mage Armor on yourself at will, without expending a spell slot.",
   'Vista del Diavolo': "Devil’s Sight: you can see normally in darkness, both magical and nonmagical, up to 36 meters.",

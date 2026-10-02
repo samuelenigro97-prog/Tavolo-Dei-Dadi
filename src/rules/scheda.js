@@ -240,10 +240,6 @@ export function bonusTiroSalvezza(scheda, car) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Taglia 5e e modificatori dimensionali (Ingrandire / Ridurre / Forma Bestiale)
-// ---------------------------------------------------------------------------
-
 export const SCALE_TAGLIE_5E = ['Minuscola', 'Piccola', 'Media', 'Grande', 'Enorme', 'Mastodontica'];
 
 export const MOLTIPLICATORI_TAGLIA = {

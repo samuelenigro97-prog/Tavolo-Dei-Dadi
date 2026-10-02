@@ -710,10 +710,6 @@ export function Sezione({ id, titolo, children, aperto = true, onToggleAperto, m
   );
 }
 
-// ---------------------------------------------------------------------------
-// App
-// ---------------------------------------------------------------------------
-
 
 /**
  * Campo dell'anagrafica non più modificabile dopo la creazione (classe,

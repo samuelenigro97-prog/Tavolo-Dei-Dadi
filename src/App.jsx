@@ -1,15 +1,15 @@
-import { Fragment, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from 'react-dom';
 import { useRegisterSW } from 'virtual:pwa-register/react';
-import { ICONE_CLASSE, ICONE_SPECIE, ICONE_BESTIE_SVG, GALLERIA_BESTIE_PRESET, generaAvatarBestia, iconaBestia } from './ritratti';
-import { t, setLinguaAttuale, DIZIONARIO, traduciDato, linguaAttuale } from './i18n';
+import { ICONE_CLASSE, ICONE_SPECIE, GALLERIA_BESTIE_PRESET, generaAvatarBestia } from "./ritratti";
+import { t, setLinguaAttuale, traduciDato } from "./i18n";
 import { avviaAmbiente, fermaAmbiente, setVolumeAmbiente, eseguiEffettoSonoro, sbloccaAudio, precaricaSfx } from './utils/audioAmbiente';
-import { C, COLORE_DADO, BASE_TEMA, PRESET_COLORI, ambientazioneCasuale } from './ui/tema.js';
+import { C, BASE_TEMA, PRESET_COLORI, ambientazioneCasuale } from "./ui/tema.js";
 import { styles, GLOBAL_CSS } from './ui/stili.js';
 import { Editable, Rollable, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
 import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, esitoDannoPf0, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
-import { FLYORA_JSON, ESEMPIO_GNOMO, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } from './data/esempi.js';
+import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } from "./data/esempi.js";
 import { fixEquipaggiamentoVaelion, migrazioneRegoleVaelion, autoIdratazionePersonaggioPredefinito } from './data/migrazioniPersonaggi.js';
 import { CARATTERISTICHE, ABILITA } from './data/caratteristiche.js';
 import { effettiCondizione } from './data/condizioni.js';
@@ -24,10 +24,6 @@ import { salvaJson, rosterSenzaImmagini, riagganciaImmagini, salvaImmaginiRoster
 import { datiTabelleBackground, TABELLE_BACKGROUND } from './data/tabelleBackground.js';
 import { CompendioModal } from './ui/CompendioModal.jsx';
 
-
-// ---------------------------------------------------------------------------
-// Palette e stili
-// ---------------------------------------------------------------------------
 
 // Tema chiaro "foglio di carta": bianco, inchiostro scuro, accenti sobri.
 
@@ -1291,19 +1287,14 @@ function avatarSvgFallback(classe, specie, nome) {
 
 
 
-// ---------------------------------------------------------------------------
-// Regole D&D 5e e parser delle espressioni di dado
-// ---------------------------------------------------------------------------
-
 
 import { spiegaPrivilegio, spiegaIncantesimo, spiegaTratto, spiegaTalento, spiegaMetamagia, spiegaInvocazione, spiegaInfusione, setEdizioneAttuale, METAMAGIA_5E, TALENTI_5E, INVOCAZIONI_5E, INFUSIONI_ARTEFICE_5E, INCANTESIMI_NOMI as NOMI_SPIEG_INC } from './data/spiegazioni.js';
 import { INCANTESIMI_DB, ALIAS_INCANTESIMI, datiIncantesimo, valoreIncantesimoPerEdizione } from './data/incantesimi.js';
 
 const INCANTESIMI_NOMI = Array.from(new Set([...NOMI_SPIEG_INC, ...Object.keys(INCANTESIMI_DB)])).sort((a, b) => a.localeCompare(b, 'it'));
-import { NOMI_CLASSI, BACKGROUND_5E, TAGLIE_5E, ALLINEAMENTI_5E, SESSO_5E, SOTTOCLASSI_5E, INCANTESIMI_CLASSE, TRUCCHETTI_NOTI, INC_MAX_2024, INC_MAX_2014_NOTI, SLOT_FULL_CASTER, SLOT_MEZZO_CASTER, CLASSI_FULL_CASTER, CLASSI_MEZZO_CASTER, DANNI_5E, SENSI_5E, CONDIZIONI_5E, PESI_OGGETTI, NOMI_OGGETTI, PESO_ARMATURA_TIPO, LINGUE_5E, ARMI_5E, STRUMENTI_5E, REAZIONI_5E, AZIONI_BONUS_5E, GRUPPI_ARMI_5E, GRUPPI_STRUMENTI_5E, GRUPPI_LINGUE_5E, DEFAULT_MANUALI, MANUALI_INFO, SOTTOCLASSI_FONTI, TALENTI_FONTI, INCANTESIMI_FONTI, talentiPerManuali, incantesimiPerManuali, fonteValida, PE_PER_LIVELLO } from './data/dati5e.js';
-import { BACKGROUND_COMPETENZE, BACKGROUND_TALENTO_ORIGINE_2024, SPECIE_5E, tabellaPrivilegiSottoclasse, CARATT_INCANTATORE, PRIORITA_CARATT, DADO_VITA_CLASSE, BACKGROUND_CARATT, TS_CLASSE, ADDESTRAMENTO_CLASSE, COMPETENZE_CLASSE, PRIVILEGI_CLASSE_L1, PRIVILEGI_CLASSE_L1_2014, PRIVILEGI_CLASSE_LIV, PRIVILEGI_CLASSE_LIV_2014, ASI_LIV, SOTTOCLASSE_LIV, SOTTOCLASSE_LIV_2014, COMPETENZE_SPECIE, NOMI_SPECIE, NOMI_SPECIE_GENERE, COGNOMI_SPECIE, NOMI_GENERICI, SPECIE_DATI, SPECIE_DATI_2014, BONUS_CARATT_SPECIE_2014, SFINIMENTO_2014, BASE_ARMATURA_DEFAULT, ESEMPI_ARMATURA } from './data/dati5e.js';
-import { modificatore, conSegno, tiraDado, parseEspressioneDado, FACCE_DADO_VITA, facceDadoVita, esprDadiVita, gruppiDadoVita, bonusCompetenzaDaLivello, tiraDanni, tiraD20, capacitaCarico, modalitaEffettiva } from './rules/dadi.js';
-import { trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, livelloIncantatoreCombinato, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, moltiplicatoreTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, catalogoIncantesimiPreparabili, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, CONTENUTO_DOTAZIONI_5E, trovaContenutoDotazione, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, riepilogoCondizioni, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, dettagliAbilita, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, livelloDiClasse, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from './rules/regole.js';
+import { NOMI_CLASSI, BACKGROUND_5E, TAGLIE_5E, ALLINEAMENTI_5E, SESSO_5E, SOTTOCLASSI_5E, INCANTESIMI_CLASSE, DANNI_5E, SENSI_5E, CONDIZIONI_5E, NOMI_OGGETTI, LINGUE_5E, ARMI_5E, STRUMENTI_5E, REAZIONI_5E, AZIONI_BONUS_5E, GRUPPI_ARMI_5E, GRUPPI_STRUMENTI_5E, GRUPPI_LINGUE_5E, DEFAULT_MANUALI, MANUALI_INFO, SOTTOCLASSI_FONTI, talentiPerManuali, PE_PER_LIVELLO, BACKGROUND_COMPETENZE, BACKGROUND_TALENTO_ORIGINE_2024, SPECIE_5E, tabellaPrivilegiSottoclasse, CARATT_INCANTATORE, PRIORITA_CARATT, DADO_VITA_CLASSE, BACKGROUND_CARATT, TS_CLASSE, ADDESTRAMENTO_CLASSE, COMPETENZE_CLASSE, PRIVILEGI_CLASSE_L1, PRIVILEGI_CLASSE_L1_2014, ASI_LIV, SOTTOCLASSE_LIV, COMPETENZE_SPECIE, NOMI_SPECIE, NOMI_SPECIE_GENERE, COGNOMI_SPECIE, NOMI_GENERICI, SPECIE_DATI, SPECIE_DATI_2014, BONUS_CARATT_SPECIE_2014, SFINIMENTO_2014, BASE_ARMATURA_DEFAULT, ESEMPI_ARMATURA } from "./data/dati5e.js";
+import { modificatore, conSegno, tiraDado, parseEspressioneDado, facceDadoVita, esprDadiVita, gruppiDadoVita, bonusCompetenzaDaLivello, tiraDanni, tiraD20, capacitaCarico, modalitaEffettiva } from "./rules/dadi.js";
+import { trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, dettagliAbilita, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from "./rules/regole.js";
 import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi } from './rules/poteri.js';
 
 /**
@@ -1412,11 +1403,6 @@ const DENARI = [
  */
 
 
-// --- Dadi vita ------------------------------------------------------------
-// In 5e il NUMERO di dadi vita è sempre pari al livello del personaggio; il
-// TIPO di dado (d6…d12) dipende dalla classe. Ricaviamo le facce dalla stringa
-// salvata e teniamo la quantità agganciata al livello.
-
 
 
 
@@ -1435,10 +1421,6 @@ const DENARI = [
 
 /** Tira il d20 nella modalità scelta: normale, vantaggio o svantaggio. */
 
-
-// ---------------------------------------------------------------------------
-// Modello della scheda
-// ---------------------------------------------------------------------------
 
 function schedaVuota() {
   return {
@@ -1969,10 +1951,6 @@ const EQUIP_5E = [
 const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w.nome)];
 
 
-
-// ---------------------------------------------------------------------------
-// Persistenza su localStorage: roster di personaggi { attivo, personaggi }
-// ---------------------------------------------------------------------------
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
@@ -3270,9 +3248,6 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Componenti di editing inline (1 click = modifica, doppio click = tiro)
-// ---------------------------------------------------------------------------
 export default function App() {
   // Dichiarato prima del rilevatore PWA: un aggiornamento aspetta che il
   // salvataggio cloud corrente sia terminato prima di ricaricare la pagina.
@@ -3456,9 +3431,6 @@ export default function App() {
     try { localStorage.setItem('scheda-interattiva:transcribe-url', transcribeUrl); } catch { /* niente */ }
   }, [transcribeUrl]);
   const [pdfStato, setPdfStato] = useState(''); // '' | 'loading'
-  // --- Archivio schede del DM ---
-  // Identificativo casuale e anonimo del dispositivo: serve solo a tenere
-  // separate le schede di persone diverse nell'elenco del DM.
   const idDispositivo = useMemo(() => {
     try {
       let v = localStorage.getItem('scheda-interattiva:id-dispositivo');
@@ -4445,9 +4417,6 @@ export default function App() {
     scheda?.alleati,
   ]);
 
-  // --- Archivio DM: deposita una copia della scheda attiva ---
-  // Parte ~45 secondi dopo l'ultima modifica effettiva (anti-spreco Cloudflare KV)
-  // e solo se la scheda ha un nome vero e i dati sono effettivamente cambiati.
   const ultimoInvioDmRef = useRef('');
   useEffect(() => {
     if (!URL_ARCHIVIO_PG || !scheda || isSolaLettura) return;
@@ -4470,9 +4439,6 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [scheda, roster.attivo, idDispositivo]);
 
-  // --- Mappa della campagna, legata al PG ---
-  // Immagine e segnalino sono salvati NELLA scheda, così la mappa resta col
-  // personaggio a cui la carichi (e segue export/cloud).
   const mappaCampagna = scheda?.mappaCampagna || '';
   const setMappaCampagna = (v) => {
     aggiorna({ mappaCampagna: v || '' });
@@ -4552,8 +4518,6 @@ export default function App() {
     cs.lista.slice(0, cs.numero).forEach((k) => { abilita[k] = Math.max(abilita[k] || 0, 2); });
     return { abilita };
   }
-
-  // --- gestione roster ---
 
   function nuovoPersonaggio(dati = schedaVuota()) {
     const id = nuovoId();
@@ -4892,8 +4856,6 @@ export default function App() {
     }
   }, [combat.attivo, combat.round, combat.turno, combat.combattenti, scheda?.nome]);
 
-  // --- Combat tracker ---
-
   /** Ordina esplicitamente i combattenti per iniziativa. Mantiene invariato il turno attivo. */
   function ordinaIniziativa() {
     setCombat((c) => {
@@ -5131,8 +5093,6 @@ export default function App() {
       return { ...c, combattenti: ordinati, turno: curIdx - 1 };
     });
   }
-
-  // --- tiri ---
 
   /** Tiro di d20 generico con animazione. `extra` finisce nello stato del tiro. */
   function lanciaD20(etichetta, bonus, extra = {}) {
@@ -5717,8 +5677,6 @@ export default function App() {
     img.src = url;
   }
 
-  // --- import / export ---
-
   /** Scarica la scheda corrente come file JSON. */
   function esportaJson() {
     const nomeFile = (scheda.nome || 'scheda')
@@ -6120,10 +6078,6 @@ export default function App() {
 
 
 
-  // --- Protezione dai conflitti (v4.40.0) ---
-  // Ogni canale ricorda la versione online da cui partono le modifiche locali
-  // (la "base"). Prima di inviare si rilegge la copia online: se un altro
-  // dispositivo l'ha cambiata, non si sovrascrive mai in silenzio.
   const CANALI_SYNC = {
     gist: { base: 'scheda-interattiva:sync-base', ts: 'scheda-interattiva:sync-ts' },
     codice: { base: 'scheda-interattiva:sync-codice-base', ts: 'scheda-interattiva:sync-codice-ts' },
@@ -6187,8 +6141,6 @@ export default function App() {
     setStato({ text: t('conflitto.in_pausa'), type: 'error' });
     return true;
   }
-
-  // --- Cloud Sync (GitHub Gist) ---
 
   async function leggiContenutoFileGist(file, token) {
     if (!file) return null;
@@ -6448,8 +6400,6 @@ export default function App() {
       setCaricandoCloud(false);
     }
   }
-
-  // --- Sincronizzazione tramite codice (senza token GitHub) ---
 
   /** Stessa logica di salvaSuCloud per la sincronizzazione a codice (Worker):
    *  rilegge, confronta con la base, invia solo se nessun altro ha salvato nel
@@ -6760,7 +6710,6 @@ export default function App() {
     };
   }, []);
 
-  // --- Finestra di conflitto: azioni ---
   function scaricaRosterJson(r, etichetta) {
     const ids = Object.keys(r?.personaggi || {});
     const quando = new Date();
@@ -9255,7 +9204,6 @@ export default function App() {
       })()}
 
       {mostraLevelUp && (() => {
-        // --- Target del Level Up: classe principale, secondaria esistente o nuova classe (True Multiclassing) ---
         const targetMode = levelUpBozza.target !== undefined ? levelUpBozza.target : 'main';
         const isNewMc = targetMode === 'new';
         const isSecMc = typeof targetMode === 'number';
