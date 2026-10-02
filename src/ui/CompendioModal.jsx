@@ -511,13 +511,13 @@ export function CompendioModal({
         id: `bestia-${b.nome}`,
         tipo: 'bestiario',
         nome: b.nome,
-        gs: b.gs != null ? b.gs : '—',
+        gs: b.gs != null ? b.gs : '-',
         ca: b.ca || 10,
         pf: b.pf || 10,
         vel: b.vel || '9m',
         taglia: b.taglia || 'Media',
         tipoCreatura: b.tipo || 'Bestia',
-        desc: `GS ${b.gs != null ? b.gs : '—'} · CA ${b.ca || 10} · PF ${b.pf || 10} · Vel ${b.vel || '9m'}`,
+        desc: `GS ${b.gs != null ? b.gs : '-'} · CA ${b.ca || 10} · PF ${b.pf || 10} · Vel ${b.vel || '9m'}`,
         raw: b,
       });
     }

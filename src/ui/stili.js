@@ -2210,11 +2210,7 @@ tbody tr:hover {
   .incantesimo-in-eccesso, .incantesimo-mancante-controllo, .incantesimo-mancante-row { animation: none; }
 }
 
-/* ------------------------------------------------------------------ */
-/* STAMPA / PDF                                                        */
-/* "Stampa" del browser (o "Salva come PDF") produce la sola scheda:   */
-/* via comandi interattivi, sfondi scenografici e tema scuro, che su   */
-/* carta sprecherebbero inchiostro e renderebbero il testo illeggibile. */
+/* STAMPA / PDF: produce la sola scheda ottimizzata per carta */
 @media print {
   /* Sempre fondo bianco e testo nero, anche se a schermo è notte.
      Le variabili sono impostate inline su :root da App.jsx (style.setProperty),
@@ -2302,14 +2298,7 @@ tbody tr:hover {
     margin: 10mm 12mm;
   }
 }
-/* ------------------------------------------------------------------ */
-/* COMPENDIO: tab delle categorie                                       */
-/* 11 categorie non stanno in una riga da 820px. Su schermo stretto     */
-/* scorrono in orizzontale (il dito lo scopre da solo, è il gesto        */
-/* naturale sopra una lista di chip). Da tablet in su non c'e' il tocco, */
-/* e senza barra di scorrimento visibile 4 categorie su 11 restavano     */
-/* semplicemente introvabili: vanno a capo invece.                      */
-/* ------------------------------------------------------------------ */
+/* COMPENDIO: tab delle categorie con scorrimento orizzontale su schermi stretti */
 .compendio-tabs {
   flex-wrap: nowrap;
   overflow-x: auto;
@@ -2318,6 +2307,15 @@ tbody tr:hover {
   .compendio-tabs {
     flex-wrap: wrap;
     overflow-x: visible;
+  }
+}
+
+/* Touch Target Accessibility (R-03 / antislop-layoutmobile) */
+@media (pointer: coarse) {
+  .btn-header-azione,
+  .inventario-table .inventario-riga > .inventario-azioni button {
+    min-height: 38px;
+    min-width: 38px;
   }
 }
 `;

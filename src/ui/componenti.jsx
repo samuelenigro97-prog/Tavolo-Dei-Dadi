@@ -242,7 +242,7 @@ export function Editable({ value, valoreModifica, onChange, onRoll, tipo = 'test
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
     >
-      {soloIcona ? '✏️' : (String(value ?? '') === '' ? '—' : String(value))}
+      {soloIcona ? '✏️' : (String(value ?? '') === '' ? '-' : String(value))}
     </span>
   );
 }
@@ -615,9 +615,9 @@ export function ListaQuadratini({ value, onChange, lookup, placeholder, opzioni,
                     value={listaOpzioni.some((o) => o.nome === edit.valore) ? edit.valore : ''}
                     onChange={(e) => setEdit({ ...edit, valore: e.target.value })}
                   >
-                    <option value="">— Scegli dalla lista —</option>
+                    <option value="">(Scegli dalla lista)</option>
                     {listaOpzioni.map((o) => (
-                      <option key={o.nome} value={o.nome}>{o.desc ? `${o.nome} — ${o.desc}` : o.nome}</option>
+                      <option key={o.nome} value={o.nome}>{o.desc ? `${o.nome}: ${o.desc}` : o.nome}</option>
                     ))}
                   </select>
                 )}

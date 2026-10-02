@@ -5820,8 +5820,8 @@ export default function App() {
     }
   }
 
-  // --- Snapshot automatici: rete di sicurezza contro cancellazioni/reset accidentali.
-  //     Sono LEGGERI (senza immagini) per non riempire lo spazio del browser. ---
+  // Snapshot automatici: rete di sicurezza contro cancellazioni/reset accidentali.
+  // Sono leggeri (senza immagini) per non riempire lo spazio del browser.
   function leggiSnapshots() {
     try { return JSON.parse(localStorage.getItem('scheda-interattiva:snapshots')) || []; } catch { return []; }
   }
@@ -11867,33 +11867,44 @@ export default function App() {
                       <span style={stileEtichettaInline}>
                         <span>⚙️</span> <span>{lingua === 'en' ? 'System' : 'Sistema'}</span>
                       </span>
-                      <button style={{ ...btnAzione, ...(mostraMenu ? { color: C.goldDark, borderColor: C.goldDark, background: 'rgba(201,162,39,0.15)' } : {}) }} title={t('tip.menu_iniziale')} onClick={() => setMostraMenu((v) => !v)}>
+                      <button
+                        className="btn-header-azione"
+                        style={{ ...btnAzione, ...(mostraMenu ? { color: C.goldDark, borderColor: C.goldDark, background: 'rgba(201,162,39,0.15)' } : {}) }}
+                        title={t('tip.menu_iniziale')}
+                        aria-label={t('tip.menu_iniziale')}
+                        onClick={() => setMostraMenu((v) => !v)}
+                      >
                         🏠
                       </button>
                       <button
                         ref={notificheBtnRef}
-                        className={daNotificare ? 'btn-notifiche-lampeggia' : ''}
+                        className={`btn-header-azione ${daNotificare ? 'btn-notifiche-lampeggia' : ''}`.trim()}
                         style={{
                           ...btnAzione,
                           position: 'relative',
                           ...(daNotificare ? { color: C.goldDark, borderColor: C.goldDark } : {}),
                         }}
                         title={daNotificare ? (nuovaVersione ? (lingua === 'en' ? 'A new version is available' : 'È disponibile una nuova versione') : (controlliAttivi.length > 0 ? (lingua === 'en' ? `${controlliAttivi.length} sheet alerts` : `${controlliAttivi.length} avvisi sulla scheda`) : t('notifiche.novita_presenti'))) : t('notifiche.titolo')}
+                        aria-label={t('notifiche.titolo')}
                         onClick={apriNotifiche}
                       >
                         <span className={daNotificare ? 'icona-campanello' : ''}>🔔</span>
                       </button>
                       <button
+                        className="btn-header-azione"
                         style={btnAzione}
                         title={lingua === 'it' ? 'Lingua: italiano (passa all’inglese)' : 'Language: English (switch to Italian)'}
+                        aria-label={lingua === 'it' ? 'Lingua: passa all’inglese' : 'Language: switch to Italian'}
                         onClick={() => setLingua((l) => (l === 'it' ? 'en' : 'it'))}
                       >
                         {lingua === 'it' ? '🇮🇹' : '🇬🇧'}
                       </button>
                       <button
                         ref={esportaBtnRef}
+                        className="btn-header-azione"
                         style={{ ...btnAzione, ...(mostraMenuEsporta ? { borderColor: C.goldDark, color: C.goldDark } : {}) }}
                         title={t('import_export.tip')}
+                        aria-label={t('import_export.tip')}
                         onClick={() => {
                           if (!mostraMenuEsporta) {
                             const r = esportaBtnRef.current?.getBoundingClientRect();
@@ -11908,6 +11919,7 @@ export default function App() {
                         📂
                       </button>
                       <button
+                        className="btn-header-azione"
                         style={{
                           ...btnAzione,
                           color: statoColoreCloud,
@@ -11931,6 +11943,7 @@ export default function App() {
                                 ? (lingua === 'en' ? 'Sync configured (automatic saving paused)' : 'Sincronizzazione configurata (salvataggio automatico in pausa)')
                                 : (lingua === 'en' ? 'Sync is off: click to set it up' : 'Sincronizzazione non attiva: clicca per configurarla')
                         }
+                        aria-label="Cloud Sync"
                         onClick={() => { setCloudStatus({ text: '', type: '' }); setSyncCodiceStatus({ text: '', type: '' }); setMostraCloud(true); }}
                       >
                         <span style={{ fontSize: 14 }}>☁️</span>
@@ -11944,13 +11957,47 @@ export default function App() {
                       <span style={stileEtichettaInline}>
                         <span>🧭</span> <span>{lingua === 'en' ? 'Session' : 'Sessione'}</span>
                       </span>
-                      <button style={btnAzione} title={t('tooltip.tema')} onClick={() => setTema(tema === 'auto' ? 'chiaro' : tema === 'chiaro' ? 'scuro' : 'auto')}>{tema === 'auto' ? '🌗' : tema === 'chiaro' ? '☀️' : '🌙'}</button>
-                      <button ref={ambientazioneBtnRef} style={btnAzione} title={t('luogo.tooltip')} onClick={() => { if (!mostraPannelloAudio) { const r = ambientazioneBtnRef.current?.getBoundingClientRect(); if (r) setPosPannelloAudio({ top: Math.max(8, Math.min(window.innerHeight - 160, r.bottom + 5)), left: Math.max(8, Math.min(window.innerWidth - 288, r.left)) }); } setMostraPannelloAudio(!mostraPannelloAudio); }}>{iconaAmbientazione(presetColori)}</button>
-                      <button style={{ ...btnAzione, ...(mostraDiarioModal ? { color: C.goldDark, borderColor: C.goldDark, background: 'rgba(201,162,39,0.15)' } : {}) }} onClick={() => setMostraDiarioModal(true)} title={`${t('sez.diario')} (${(Array.isArray(scheda.diario) ? scheda.diario.length : 0)})`}>📜</button>
+                      <button
+                        className="btn-header-azione"
+                        style={btnAzione}
+                        title={t('tooltip.tema')}
+                        aria-label={t('tooltip.tema')}
+                        onClick={() => setTema(tema === 'auto' ? 'chiaro' : tema === 'chiaro' ? 'scuro' : 'auto')}
+                      >
+                        {tema === 'auto' ? '🌗' : tema === 'chiaro' ? '☀️' : '🌙'}
+                      </button>
+                      <button
+                        ref={ambientazioneBtnRef}
+                        className="btn-header-azione"
+                        style={btnAzione}
+                        title={t('luogo.tooltip')}
+                        aria-label={t('luogo.tooltip')}
+                        onClick={() => { if (!mostraPannelloAudio) { const r = ambientazioneBtnRef.current?.getBoundingClientRect(); if (r) setPosPannelloAudio({ top: Math.max(8, Math.min(window.innerHeight - 160, r.bottom + 5)), left: Math.max(8, Math.min(window.innerWidth - 288, r.left)) }); } setMostraPannelloAudio(!mostraPannelloAudio); }}
+                      >
+                        {iconaAmbientazione(presetColori)}
+                      </button>
+                      <button
+                        className="btn-header-azione"
+                        style={{ ...btnAzione, ...(mostraDiarioModal ? { color: C.goldDark, borderColor: C.goldDark, background: 'rgba(201,162,39,0.15)' } : {}) }}
+                        onClick={() => setMostraDiarioModal(true)}
+                        title={`${t('sez.diario')} (${(Array.isArray(scheda.diario) ? scheda.diario.length : 0)})`}
+                        aria-label={t('sez.diario')}
+                      >
+                        📜
+                      </button>
 
-                      <button style={btnAzione} onClick={() => (mappaCampagna ? setMappaAperta((v) => !v) : mappaRef.current?.click())} title={mappaCampagna ? (mappaAperta ? t('mappa.chiudi') : t('mappa.apri')) : t('mappa.carica')}>🗺️</button>
+                      <button
+                        className="btn-header-azione"
+                        style={btnAzione}
+                        onClick={() => (mappaCampagna ? setMappaAperta((v) => !v) : mappaRef.current?.click())}
+                        title={mappaCampagna ? (mappaAperta ? t('mappa.chiudi') : t('mappa.apri')) : t('mappa.carica')}
+                        aria-label={mappaCampagna ? (mappaAperta ? t('mappa.chiudi') : t('mappa.apri')) : t('mappa.carica')}
+                      >
+                        🗺️
+                      </button>
                       <button
                         data-combat-toggle="true"
+                        className="btn-header-azione"
                         style={{
                           ...btnAzione,
                           ...(combat.attivo ? { color: C.goldDark, borderColor: C.goldDark, background: combat.aperto ? 'rgba(201,162,39,0.22)' : 'rgba(201,162,39,0.12)', boxShadow: '0 0 8px rgba(201,162,39,0.3)' } : {}),
@@ -11961,6 +12008,7 @@ export default function App() {
                           else aggiungiPgAlCombat();
                         }}
                         title={(combat.attivo && combat.aperto ? t('ct.minimizza') : t('ct.apri')) + (combat.combattenti.length ? ` (${combat.combattenti.length})` : '')}
+                        aria-label="Combat Tracker"
                       >
                         ⚔️
                       </button>
