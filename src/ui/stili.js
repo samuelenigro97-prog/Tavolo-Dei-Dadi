@@ -443,15 +443,15 @@ export const GLOBAL_CSS = `
   --font-title: 'Cinzel', Georgia, 'Times New Roman', serif;
 }
 :root[data-tema="scuro"] {
-  --c-bg: #171310; --c-panel: #211b16; --c-panel-light: #2a231c;
-  --c-border: #46392b; --c-ink: #e9dfcd; --c-ink-dim: #a0937f;
+  --c-bg: #050506; --c-panel: #0e0e11; --c-panel-light: #16161b;
+  --c-border: #24242d; --c-ink: #ebecee; --c-ink-dim: #868692;
   --c-gold: #c9a227; --c-gold-dark: #dcb84f; --c-red: #d0685a;
   --c-green: #7fb069; --c-title: #de8f88;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema="chiaro"]) {
-    --c-bg: #171310; --c-panel: #211b16; --c-panel-light: #2a231c;
-    --c-border: #46392b; --c-ink: #e9dfcd; --c-ink-dim: #a0937f;
+    --c-bg: #050506; --c-panel: #0e0e11; --c-panel-light: #16161b;
+    --c-border: #24242d; --c-ink: #ebecee; --c-ink-dim: #868692;
     --c-gold: #c9a227; --c-gold-dark: #dcb84f; --c-red: #d0685a;
     --c-green: #7fb069; --c-title: #de8f88;
   }

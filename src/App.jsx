@@ -4056,15 +4056,16 @@ export default function App() {
     const coloreGlow = mescola(t.bg, tintaClasse, scuroEff ? 0.22 : 0.12);
     const glowClasse = `radial-gradient(150% 110% at 50% -18%, ${hexRgba(coloreGlow, scuroEff ? 0.15 : 0.08)}, transparent 75%)`;
     const auraClasseSotto = `radial-gradient(120% 90% at 50% 110%, ${hexRgba(tintaClasse, scuroEff ? 0.13 : 0.05)}, transparent 80%)`;
-    const ambra = `radial-gradient(75% 50% at 50% -2%, rgba(224,162,74,${scuroEff ? 0.09 : 0.04}), transparent 70%)`;
-    const vignetta = `radial-gradient(120% 120% at 50% 42%, transparent 56%, ${mescola(t.bg, '#000000', scuroEff ? 0.38 : 0.11)} 100%)`;
+    const ambra = scuroEff ? '' : `radial-gradient(75% 50% at 50% -2%, rgba(224,162,74,0.04), transparent 70%)`;
+    const vignetta = `radial-gradient(120% 120% at 50% 42%, transparent 56%, ${mescola(t.bg, '#000000', scuroEff ? 0.45 : 0.11)} 100%)`;
     const sfondoAmbiente = presetDati.sfondo || '';
     const baseUrl = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.BASE_URL) || '/';
     const idAmb = presetDati.id;
     const conImmagine = idAmb && idAmb !== 'default';
-    const veloAlpha = scuroEff ? 0.5 : 0.32;
+    const veloAlpha = scuroEff ? 0.55 : 0.32;
+    const veloColore = scuroEff ? `rgba(0,0,0,${veloAlpha})` : `rgba(14,11,8,${veloAlpha})`;
     const velo = conImmagine
-      ? `linear-gradient(rgba(14,11,8,${veloAlpha}), rgba(14,11,8,${veloAlpha}))`
+      ? `linear-gradient(${veloColore}, ${veloColore})`
       : '';
     const AMB_NOTTE = new Set(['taverna', 'mercato', 'citta', 'dungeon', 'foresta', 'palude', 'notte', 'mare', 'tundra', 'montagna', 'tempesta', 'accampamento', 'deserto', 'tempio']);
     const fileImg = (scuroEff && AMB_NOTTE.has(idAmb)) ? `${idAmb}-notte.jpg` : `${idAmb}.jpg`;
@@ -11866,7 +11867,7 @@ export default function App() {
                       <span style={stileEtichettaInline}>
                         <span>⚙️</span> <span>{lingua === 'en' ? 'System' : 'Sistema'}</span>
                       </span>
-                      <button style={btnAzione} title={t('tip.menu_iniziale')} onClick={() => setMostraMenu(true)}>
+                      <button style={{ ...btnAzione, ...(mostraMenu ? { color: C.goldDark, borderColor: C.goldDark, background: 'rgba(201,162,39,0.15)' } : {}) }} title={t('tip.menu_iniziale')} onClick={() => setMostraMenu((v) => !v)}>
                         🏠
                       </button>
                       <button
@@ -12042,7 +12043,7 @@ export default function App() {
                         flexShrink: 0,
                         marginRight: 2,
                       }}
-                      onClick={() => setMostraMenuHubMobile(true)}
+                      onClick={() => setMostraMenuHubMobile((v) => !v)}
                       title="Apri Menu Hub"
                     >
                       <span style={{ fontSize: 13, lineHeight: 1 }}>☰</span>
