@@ -1,11 +1,9 @@
-# Regole di Progetto e Formattazione per Gemini / Antigravity
+# AGENTS.md
 
-## Formattazione Risposte (Obbligatoria)
-- Tutte le risposte contenenti calcoli matematici, conteggi, tiri di dadi, modifiche al codice o riepiloghi tecnici DEVONO essere SEMPRE racchiuse all'interno di un blocco alert GitHub:
-  > [!IMPORTANT]
-  > **RISPOSTA / CALCOLO / MODIFICHE**
-  > - Inserire qui tutti i dettagli, numeri, modifiche e conclusioni.
-- Il testo di introduzione/conversazione ordinario deve rimanere all'esterno del blocco per garantire un netto contrasto visivo.
+Il contesto completo del progetto (stack, convenzioni, test, versionamento,
+lavoro multi-agente e regole antislop) è in [`CLAUDE.md`](CLAUDE.md): leggilo
+per intero prima di iniziare qualsiasi modifica. Le regole ponytail qui sotto
+valgono sempre (sono le stesse riportate in `CLAUDE.md`).
 
 <!-- ponytail:start -->
 <!-- Source: https://github.com/DietrichGebert/ponytail/blob/43b759ffded10870c32c5faa153ac1f112a61b71/AGENTS.md, copied verbatim. MIT License, Copyright (c) 2026 DietrichGebert. -->
@@ -42,17 +40,3 @@ Not lazy about: understanding the problem (read it fully and trace the real flow
 
 (Yes, this file also applies to agents working on the ponytail repo itself. Especially to them.)
 <!-- ponytail:end -->
-
-<!-- antislop:start -->
-## antislop
-For UI, copy, people, mobile layout, or code comments work, read `antislop.md` (core) and then the skill for the task:
-- UI / visual: `skills/antislop-ui/SKILL.md`
-- Copy & text: `skills/antislop-copywriting/SKILL.md`
-- People: `skills/antislop-human/SKILL.md`
-- Mobile / responsive: `skills/antislop-layoutmobile/SKILL.md`
-- Code comments: `skills/antislop-code/SKILL.md`
-Before starting, follow the core's "Two Usage Modes" section in strict order: explicit session instruction first, then global preference, then ask. A session instruction always wins. For a resolved mode, say `antislop active: <mode> (session override).` or `antislop active: <mode> (global preference).` once before presenting findings or making edits, using the actual mode and source. Acknowledging the user's request without naming the source does not replace this notice.
-Only an explicit choice of antislop during or after selects a session mode. A request to review, audit, or avoid file edits does not select a mode; read the global preference in that case. Another skill's mode does not select antislop's mode.
-If the mode is unresolved, ask during/after and end the response; wait for the answer before any UI review, planning, or concept. For read-only tasks, put the active-mode notice only at the start of the final answer, never in progress messages. For editing tasks, announce before the first edit and omit it from the final answer.
-To update antislop later: download `antislop.md` again, or run `npx antislop-ai --update`.
-<!-- antislop:end -->
