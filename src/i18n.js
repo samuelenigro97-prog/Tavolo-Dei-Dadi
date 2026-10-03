@@ -2008,7 +2008,17 @@ const DATI_EN = {
   'Spirito Guardiano Celato': 'Hidden Guardian Spirit', 'Pegaso (Destriero Superiore)': 'Pegasus (Greater Steed)',
   'Grifone (Destriero Superiore)': 'Griffon (Greater Steed)', 'Spirito Bestiale (Tasha)': 'Beast Spirit (Tasha)',
   'Spirito Fatato (Tasha)': 'Fey Spirit (Tasha)', 'Spirito dell’Ombra (Tasha)': 'Shadow Spirit (Tasha)',
-  'Spirito Non Morto (Tasha)': 'Undead Spirit (Tasha)',
+  'Spirito Non Morto (Tasha)': 'Undead Spirit (Tasha)',  // Tempi di lancio, gittate, aree e tipi di danno degli incantesimi (chip delle righe)
+  '1 Azione': '1 Action', '1 Azione Bonus': '1 Bonus Action', 'Azione Bonus': 'Bonus Action',
+  '1 Reazione': '1 Reaction', 'Reazione': 'Reaction', 'Azione': 'Action',
+  '1 Minuto': '1 Minute', 'Minuti': 'Minutes', 'minuti': 'minutes', 'minuto': 'minute',
+  '1 ora': '1 hour', '1 Ora': '1 Hour', 'ore': 'hours',
+  'Tocco': 'Touch', 'Sé stesso': 'Self', 'Mischia': 'Melee', 'Vista': 'Sight', 'Illimitata': 'Unlimited',
+  'sfera': 'sphere', 'linea': 'line', 'cono': 'cone', 'cubo': 'cube',
+  'Sfera': 'Sphere', 'Cubo': 'Cube', 'Cilindro': 'Cylinder', 'Linea': 'Line', 'Cono': 'Cone',
+  'Quadrato': 'Square', 'Cerchio': 'Circle',
+  'Guarigione': 'Healing', 'Cura': 'Healing', 'Variabile': 'Variable', 'Elementale': 'Elemental',
+  'Caotico': 'Chaotic', 'Magico': 'Magical',
 };
 
 const _DATI_EN_TOKENS = Object.keys(DATI_EN).sort((a, b) => b.length - a.length); // più lunghi prima
@@ -2027,4 +2037,22 @@ export function traduciDato(v) {
     out = out.replace(new RegExp(`\\b${_escapeRe(it)}\\b`, 'g'), DATI_EN[it]);
   }
   return out;
+}
+
+/**
+ * Testo breve in due lingue scritto sul posto, per frasi che non meritano una
+ * chiave nel dizionario (messaggi con variabili, titoli). Usa la lingua corrente.
+ */
+export function tr(it, en) {
+  return linguaAttuale === 'en' && en != null ? en : it;
+}
+
+const CARATTERISTICHE_EN = {
+  Forza: 'Strength', Destrezza: 'Dexterity', Costituzione: 'Constitution',
+  Intelligenza: 'Intelligence', Saggezza: 'Wisdom', Carisma: 'Charisma',
+};
+/** Nome di una caratteristica nella lingua corrente ("Forza" non è il danno "Force"). */
+export function traduciCaratteristica(nome) {
+  if (linguaAttuale !== 'en' || !nome) return nome;
+  return CARATTERISTICHE_EN[nome] || traduciDato(nome);
 }

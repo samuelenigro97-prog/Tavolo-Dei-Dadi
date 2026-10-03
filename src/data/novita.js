@@ -5,6 +5,25 @@
 
 export const NOVITA = [
   {
+    versione: '4.48.0',
+    voci: {
+      it: [
+        'Se la sincronizzazione è spenta, un promemoria in alto ti ricorda di scaricare un backup dei personaggi ogni 7 giorni. Se il browser esaurisce lo spazio, l\'app libera prima le copie di emergenza più vecchie e, se non basta, ti avvisa subito con il pulsante "Scarica backup".',
+        'L\'app pesa molto meno da installare: musiche e sfondi delle ambientazioni si scaricano solo quando li usi, poi restano disponibili anche offline.',
+        'In inglese ora è tradotto anche quello che restava in italiano: "1 Action", gittata, area, tipo di danno, messaggi e stati della sincronizzazione.',
+        'Combattimento su telefono: i pulsanti delle reazioni non coprono più il titolo e i testi di innesco ed effetto si leggono per intero.',
+        'Pulsanti più grandi sulle righe degli incantesimi, Escape chiude menu e finestre, e il menu iniziale compare solo al primo avvio.',
+      ],
+      en: [
+        'When sync is off, a reminder at the top asks you to download a backup of your characters every 7 days. If the browser runs out of space, the app first frees the oldest emergency copies and, if that is not enough, warns you right away with a "Download backup" button.',
+        'The app is much lighter to install: ambience music and backgrounds download only when you use them, then stay available offline.',
+        'The English version now also translates what was still in Italian: "1 Action", range, area, damage type, messages and sync statuses.',
+        'Combat on phones: the reaction buttons no longer cover the title, and trigger and effect texts are shown in full.',
+        'Bigger buttons on spell rows, Escape closes menus and dialogs, and the start menu shows up only on first launch.',
+      ],
+    },
+  },
+  {
     versione: '4.47.0',
     voci: {
       it: [

@@ -2314,12 +2314,20 @@ tbody tr:hover {
   color: var(--c-red) !important; border-color: var(--c-red) !important;
 }
 
-/* Touch Target Accessibility (R-03 / antislop-layoutmobile) */
+/* Bersagli touch più grandi sui dispositivi touch (pulsanti piccoli e vicini
+   sono la prima causa di tocchi sbagliati, es. Elimina al posto di Prep.) */
 @media (pointer: coarse) {
   .btn-header-azione,
   .inventario-table .inventario-riga > .inventario-azioni button {
     min-height: 38px;
     min-width: 38px;
+  }
+  .spell-azioni { gap: 8px !important; }
+  .spell-azioni button {
+    min-height: 36px;
+    min-width: 44px;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
   }
 }
 `;

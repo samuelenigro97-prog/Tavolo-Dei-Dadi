@@ -49,6 +49,9 @@ export function parseEspressioneDado(espressione) {
   return { termini };
 }
 
+// Dadi vita: in 5e il NUMERO di dadi vita è sempre pari al livello del
+// personaggio; il TIPO di dado (d6…d12) dipende dalla classe. Ricaviamo le
+// facce dalla stringa salvata e teniamo la quantità agganciata al livello.
 export const FACCE_DADO_VITA = [6, 8, 10, 12];
 
 export function facceDadoVita(espressione) {

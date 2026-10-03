@@ -84,10 +84,13 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // includo gli mp3 (loop ambientali CC0) e i font autoospitati (tema Vintage) così restano disponibili offline
-        globPatterns: ['**/*.{js,css,html,png,jpg,svg,mp3,ogg,woff2}'],
-        // gli mp3 pesano più del default: alzo il limite per la precache
-        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
+        // Precache = ciò che serve all'app per funzionare offline (codice, icone,
+        // font del tema Vintage). Audio (public/audio, ~9 MB) e sfondi delle
+        // ambientazioni (public/ambientazioni, ~14 MB) NON entrano nella
+        // precache: si scaricano solo quando servono e poi restano in cache
+        // (CacheFirst qui sotto), così l'installazione pesa ~2-3 MB invece di ~25.
+        globPatterns: ['**/*.{js,css,html,png,jpg,svg,woff2}'],
+        globIgnores: ['**/ambientazioni/**', '**/audio/**', '**/tavolo-dei-dadi-cover-*.png'],
         navigateFallbackDenylist: [/^\/api\//],
         // quando si aggiorna, attiva subito il nuovo SW e ripulisci le cache vecchie
         skipWaiting: true,
@@ -102,15 +105,33 @@ export default defineConfig({
             options: { cacheName: 'pages', networkTimeoutSeconds: 3 },
           },
           {
+            // sfondi delle ambientazioni: non cambiano, si tengono dopo il primo uso
+            urlPattern: /\/ambientazioni\/[^/]+\.(?:jpg|png|webp)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'ambientazioni',
+              expiration: { maxEntries: 40 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
             urlPattern: /\.(?:js|css|png|jpg|svg)$/,
             handler: 'NetworkFirst',
             options: { cacheName: 'assets', networkTimeoutSeconds: 3 },
           },
           {
-            // i loop audio non cambiano mai: CacheFirst (nessun ri-download)
+            // i loop audio non cambiano mai: CacheFirst (nessun ri-download).
+            // L'<audio> chiede intervalli di byte (Range): rangeRequests li
+            // ricava dalla copia completa in cache, scaricata in sottofondo da
+            // memorizzaAudioOffline() in audioAmbiente.js al primo ascolto.
             urlPattern: /\.(?:mp3|ogg)$/,
             handler: 'CacheFirst',
-            options: { cacheName: 'audio', expiration: { maxEntries: 30 } },
+            options: {
+              cacheName: 'audio',
+              expiration: { maxEntries: 40 },
+              cacheableResponse: { statuses: [0, 200] },
+              rangeRequests: true,
+            },
           },
         ],
       },
