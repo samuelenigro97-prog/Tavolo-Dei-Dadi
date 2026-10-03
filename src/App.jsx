@@ -3702,11 +3702,11 @@ export default function App() {
   const ambientazioneBtnRef = useRef(null);
   const [posPannelloAudio, setPosPannelloAudio] = useState({ top: 56, left: 10 });
   const [effettiSonoriAttivi, setEffettiSonoriAttivi] = useState(() => localStorage.getItem('scheda-interattiva:effetti-sonori') !== 'false');
-  // Muto rapido: azzera tutto l'audio (sottofondo + effetti) con un click, senza
-  // toccare il volume impostato — così basta ri-cliccare per tornare com'era.
-  const [mutoAudio, setMutoAudio] = useState(() => localStorage.getItem('scheda-interattiva:muto-audio') === 'true');
-  // Effetti sonori attivi solo se non sono in muto.
-  const suoniEffOn = effettiSonoriAttivi && !mutoAudio;
+  // Il sottofondo parte sempre silenziato/disattivato all'apertura del progetto:
+  // l'utente lo attiva solo quando lo decide lui dal pannello atmosfera.
+  const [sottofondoAttivo, setSottofondoAttivo] = useState(false);
+  // I suoni di sistema (dadi, colpi d'arma, magie, SFX) sono invece subito attivi all'apertura.
+  const suoniEffOn = effettiSonoriAttivi;
   // Safari iOS consente l'avvio dei file audio solo nello stesso gesto che li
   // attiva. Quando partono già dal click, evita che l'effect li fermi e ricrei
   // subito dopo fuori dal gesto (operazione che Safari bloccherebbe).
@@ -3719,17 +3719,15 @@ export default function App() {
       localStorage.setItem('scheda-interattiva:volume-effetti', volumeEffetti);
       localStorage.setItem('scheda-interattiva:url-audio-custom', urlCustomAudio);
       localStorage.setItem('scheda-interattiva:effetti-sonori', effettiSonoriAttivi ? 'true' : 'false');
-      localStorage.setItem('scheda-interattiva:muto-audio', mutoAudio ? 'true' : 'false');
     } catch { /* niente */ }
-  }, [ambienteAudio, volumeAudio, volumeEffetti, urlCustomAudio, effettiSonoriAttivi, mutoAudio]);
+  }, [ambienteAudio, volumeAudio, volumeEffetti, urlCustomAudio, effettiSonoriAttivi]);
 
   // Audio notturno per ambientazione: di notte ogni ambiente mantiene il proprio
   // sottofondo (bosco resta bosco, città resta città) ma più cupo (volume ridotto)
   // e, se all'aperto, con un velo di grilli/insetti sopra → "suona di notte".
+  // Parte SOLTANTO se sottofondoAttivo è true.
   useEffect(() => {
-    // Muto significa arresto reale: ferma player HTML, nodi Web Audio, timer e
-    // overlay. Riattivandolo, l'ambiente corrente riparte da zero.
-    if (mutoAudio) {
+    if (!sottofondoAttivo || !ambienteAudio || ambienteAudio === 'spento') {
       fermaAmbiente();
       return;
     }
@@ -3739,13 +3737,12 @@ export default function App() {
     }
     avviaAmbiente(ambienteAudio, volumeAudio * (notteAttiva ? 0.6 : 1), urlCustomAudio, notteAttiva);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ambienteAudio, notteAttiva, mutoAudio]);
+  }, [ambienteAudio, notteAttiva, sottofondoAttivo]);
 
   useEffect(() => {
-    // In muto non esiste più alcun player da regolare; fuori dal muto aggiorna
-    // il volume senza riavviare il loop.
-    if (!mutoAudio) setVolumeAmbiente(volumeAudio * (notteAttiva ? 0.6 : 1));
-  }, [volumeAudio, notteAttiva, mutoAudio]);
+    // Fuori dal muto aggiorna il volume senza riavviare il loop.
+    if (sottofondoAttivo) setVolumeAmbiente(volumeAudio * (notteAttiva ? 0.6 : 1));
+  }, [volumeAudio, notteAttiva, sottofondoAttivo]);
 
   // Pre-carica gli effetti sonori (colpo d'arma/incantesimo) al PRIMO tocco:
   // così il primo tiro suona subito, senza ritardo (l'audio va sbloccato da un gesto).
@@ -11645,26 +11642,38 @@ export default function App() {
             </button>
             <button
               onClick={() => {
-                if (mutoAudio) {
+                if (sottofondoAttivo) {
+                  fermaAmbiente();
+                  setSottofondoAttivo(false);
+                } else {
                   sbloccaAudio();
                   audioAvviatoDaGestoRef.current = true;
-                  avviaAmbiente(ambienteAudio, volumeAudio * (notteAttiva ? 0.6 : 1), urlCustomAudio, notteAttiva);
+                  const targetAudio = (!ambienteAudio || ambienteAudio === 'spento')
+                    ? (PRESET_COLORI.find((p) => p.id === presetColori)?.audio || 'taverna')
+                    : ambienteAudio;
+                  if (targetAudio && targetAudio !== 'spento') {
+                    setAmbienteAudio(targetAudio);
+                    avviaAmbiente(targetAudio, volumeAudio * (notteAttiva ? 0.6 : 1), urlCustomAudio, notteAttiva);
+                  }
+                  setSottofondoAttivo(true);
                 }
-                setMutoAudio((m) => !m);
               }}
-              title={mutoAudio ? (lingua === 'en' ? 'Audio muted · click to unmute' : 'Audio disattivato · clicca per riattivarlo') : (lingua === 'en' ? 'Mute all audio (ambience and effects)' : 'Disattiva tutto l’audio (sottofondo ed effetti)')}
+              title={sottofondoAttivo
+                ? (lingua === 'en' ? 'Background audio: ON · click to pause' : 'Sottofondo: ON · clicca per metterlo in pausa')
+                : (lingua === 'en' ? 'Background audio: OFF · click to start' : 'Sottofondo: OFF · clicca per avviare l’atmosfera')}
+              aria-label={sottofondoAttivo ? 'Sottofondo attivo' : 'Sottofondo disattivato'}
               style={{
                 padding: '6px 4px', minHeight: 32, borderRadius: 6,
-                border: `1px solid ${!mutoAudio ? C.goldDark : C.border}`,
-                background: !mutoAudio ? C.goldDark : C.panelLight,
-                color: !mutoAudio ? '#ffffff' : C.inkDim,
+                border: `1px solid ${sottofondoAttivo ? C.goldDark : C.border}`,
+                background: sottofondoAttivo ? C.goldDark : C.panelLight,
+                color: sottofondoAttivo ? '#ffffff' : C.inkDim,
                 fontWeight: 'bold', fontSize: 12, cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 whiteSpace: 'nowrap', width: '100%', boxSizing: 'border-box',
                 transition: 'all 0.15s ease'
               }}
             >
-              {mutoAudio ? 'Audio: OFF' : 'Audio: ON'}
+              {sottofondoAttivo ? '🔊 Sottofondo: ON' : '🔇 Sottofondo: OFF'}
             </button>
           </div>
 
@@ -11678,12 +11687,16 @@ export default function App() {
                   key={p.id}
                   onClick={() => {
                     sbloccaAudio();
-                    if (!mutoAudio) {
-                      audioAvviatoDaGestoRef.current = p.audio !== ambienteAudio;
-                      avviaAmbiente(p.audio, volumeAudio * (notteAttiva ? 0.6 : 1), urlCustomAudio, notteAttiva);
-                    }
                     setPresetColori(p.id);
                     setAmbienteAudio(p.audio);
+                    if (p.audio && p.audio !== 'spento') {
+                      audioAvviatoDaGestoRef.current = true;
+                      setSottofondoAttivo(true);
+                      avviaAmbiente(p.audio, volumeAudio * (notteAttiva ? 0.6 : 1), urlCustomAudio, notteAttiva);
+                    } else {
+                      setSottofondoAttivo(false);
+                      fermaAmbiente();
+                    }
                   }}
                   title={`${p.nome}${conSuono ? ' · audio ambientale incluso' : ' · silenzio'}`}
                   style={{
@@ -12076,7 +12089,7 @@ export default function App() {
                         ref={ambientazioneBtnRef}
                         className="btn-header-azione"
                         style={btnAzione}
-                        title={t('luogo.tooltip')}
+                        title={t('luogo.tooltip') + (sottofondoAttivo ? ' · 🔊 Sottofondo ON' : ' · 🔇 Sottofondo OFF')}
                         aria-label={t('luogo.tooltip')}
                         onClick={() => { if (!mostraPannelloAudio) { const r = ambientazioneBtnRef.current?.getBoundingClientRect(); if (r) setPosPannelloAudio({ top: Math.max(8, Math.min(window.innerHeight - 160, r.bottom + 5)), left: Math.max(8, Math.min(window.innerWidth - 288, r.left)) }); } setMostraPannelloAudio(!mostraPannelloAudio); }}
                       >
