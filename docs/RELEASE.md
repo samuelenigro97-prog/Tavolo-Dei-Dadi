@@ -1,20 +1,37 @@
-# Release manuale — Tavolo dei Dadi
+# Release — Tavolo dei Dadi
 
-In attesa di poter automatizzare via GitHub Actions, usa questa checklist.
+## Cosa succede in automatico
 
-## Artifact da pubblicare
-- build PWA: contenuto di `dist/` compresso come `tavolo-dei-dadi-dist.zip`
-- opzionale: screenshot mobile/desktop della versione
+1. Ogni pull request verso `main` e ogni push su `main` avviano il workflow
+   **CI** (`.github/workflows/ci.yml`): `npm run lint` (gli warning non
+   bloccano), `npm test`, `npm run build`, smoke test (`node test/smoke.mjs`)
+   e `npm run test:e2e`.
+2. Quando la CI finisce **con successo su un push a `main`**, parte
+   `deploy.yml`: ricostruisce quello stesso commit e lo pubblica su GitHub
+   Pages. Se la CI fallisce, il deploy non parte e resta online la versione
+   precedente. `deploy.yml` si può anche avviare a mano (*Run workflow*).
 
-## Checklist
+La base della build (`/Tavolo-Dei-Dadi/`) la ricava `vite.config.js` dal nome
+del repository (`GITHUB_REPOSITORY`); il deploy controlla che `dist/index.html`
+punti davvero a quel percorso.
+
+## Verifica locale
+
 1. `npm ci`
-2. `npm test`
-3. `npm run build`
-4. Se è una release visibile, verifica che `APP_VERSION` sia stato alzato.
-5. Verifica l'app deployata: https://samuelenigro97-prog.github.io/Tavolo-Dei-Dadi/
-6. Crea tag semver, es. `v2.89.0`.
-7. Crea la GitHub Release dal tag e carica `tavolo-dei-dadi-dist.zip`.
-8. Nel corpo release copia la sezione corrispondente da `CHANGELOG.md`.
+2. `npm run lint && npm test && npm run build`
+3. `node test/smoke.mjs` (dopo la build) e `npm run test:e2e` se la modifica
+   tocca l'interfaccia.
 
-## Da automatizzare
-Quando il token/integrazione avrà scope `workflow`, creare `.github/workflows/release.yml` con trigger su tag `v*`, test, build PWA, zip di `dist/` e pubblicazione release.
+## Versione
+
+Per ogni modifica: `APP_VERSION` in `src/App.jsx` (e `version` in
+`package.json`), voce in cima a `CHANGELOG.md`, e una voce IT/EN in
+`src/data/novita.js` solo se il cambiamento è visibile ai giocatori.
+
+## Release su GitHub (facoltativa)
+
+1. Tag semver, es. `git tag v4.49.0 && git push origin v4.49.0`.
+2. Crea la Release dal tag e copia nel corpo la sezione di `CHANGELOG.md`.
+3. Facoltativo: allega `dist/` compresso.
+
+Dopo la pubblicazione, verifica l'app: https://samuelenigro97-prog.github.io/Tavolo-Dei-Dadi/

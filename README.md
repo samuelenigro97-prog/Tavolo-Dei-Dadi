@@ -1,6 +1,7 @@
 # 🎲 Tavolo dei Dadi
 
 [![Licenza MIT](https://img.shields.io/github/license/samuelenigro97-prog/Tavolo-Dei-Dadi)](LICENSE.md)
+[![CI](https://github.com/samuelenigro97-prog/Tavolo-Dei-Dadi/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/samuelenigro97-prog/Tavolo-Dei-Dadi/actions/workflows/ci.yml)
 [![Deploy](https://github.com/samuelenigro97-prog/Tavolo-Dei-Dadi/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/samuelenigro97-prog/Tavolo-Dei-Dadi/actions/workflows/deploy.yml)
 [![Release](https://img.shields.io/github/v/release/samuelenigro97-prog/Tavolo-Dei-Dadi?display_name=tag&sort=semver)](https://github.com/samuelenigro97-prog/Tavolo-Dei-Dadi/releases)
 
@@ -63,6 +64,26 @@ npm test          # unitari (Node test runner)
 npm run test:e2e  # end-to-end (Playwright, un file per sezione della scheda)
 npm run lint       # ESLint
 ```
+
+### Verificare prima di proporre una modifica
+
+```bash
+npm ci
+npm run lint && npm test && npm run build
+npm run test:e2e   # se la modifica tocca l'interfaccia
+```
+
+Gli stessi controlli girano su GitHub (workflow **CI**, `.github/workflows/ci.yml`)
+a ogni pull request verso `main` e a ogni push su `main`: lint, test unitari,
+build, smoke test (l'app costruita si apre in Chromium senza errori JS) ed e2e.
+
+- **Spunta verde** sulla PR o sul commit: tutti i controlli sono passati.
+- **Croce rossa**: almeno un controllo è fallito. Il dettaglio è nella scheda
+  *Actions*; se falliscono gli e2e, il report di Playwright è allegato alla run.
+
+Il sito su GitHub Pages si aggiorna solo dopo una CI verde su `main`
+(`deploy.yml` parte al termine della CI e pubblica esattamente quel commit):
+con la croce rossa resta online la versione precedente.
 
 ## Stack
 

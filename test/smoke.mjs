@@ -16,7 +16,9 @@ async function getChromium() {
 }
 
 const PORT = 4173;
-const BASE = process.env.BASE_PATH || '/';
+// Stessa regola di vite.config.js: in GitHub Actions la base è /<nome del repo>/.
+const NOME_REPO = (process.env.GITHUB_ACTIONS && process.env.GITHUB_REPOSITORY || '').split('/')[1];
+const BASE = NOME_REPO ? `/${NOME_REPO}/` : (process.env.BASE_PATH || '/');
 const URL_APP = `http://localhost:${PORT}${BASE.endsWith('/') ? BASE : BASE + '/'}`;
 
 // Avvia `vite preview` (bin locale, niente wrapper npx). Invece di leggere l'URL
