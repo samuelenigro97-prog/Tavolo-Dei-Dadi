@@ -1,11 +1,9 @@
-# Regole di Progetto e Formattazione per Gemini / Antigravity
+# AGENTS.md
 
-## Formattazione Risposte (Obbligatoria)
-- Tutte le risposte contenenti calcoli matematici, conteggi, tiri di dadi, modifiche al codice o riepiloghi tecnici DEVONO essere SEMPRE racchiuse all'interno di un blocco alert GitHub:
-  > [!IMPORTANT]
-  > **RISPOSTA / CALCOLO / MODIFICHE**
-  > - Inserire qui tutti i dettagli, numeri, modifiche e conclusioni.
-- Il testo di introduzione/conversazione ordinario deve rimanere all'esterno del blocco per garantire un netto contrasto visivo.
+Il contesto completo del progetto (stack, convenzioni, test, versionamento,
+lavoro multi-agente) è in [`CLAUDE.md`](CLAUDE.md): leggilo
+per intero prima di iniziare qualsiasi modifica. Le regole ponytail qui sotto
+valgono sempre (sono le stesse riportate in `CLAUDE.md`).
 
 <!-- ponytail:start -->
 <!-- Source: https://github.com/DietrichGebert/ponytail/blob/43b759ffded10870c32c5faa153ac1f112a61b71/AGENTS.md, copied verbatim. MIT License, Copyright (c) 2026 DietrichGebert. -->
@@ -42,4 +40,3 @@ Not lazy about: understanding the problem (read it fully and trace the real flow
 
 (Yes, this file also applies to agents working on the ponytail repo itself. Especially to them.)
 <!-- ponytail:end -->
-
