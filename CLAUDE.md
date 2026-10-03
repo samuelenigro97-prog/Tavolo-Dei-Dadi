@@ -231,9 +231,9 @@ Indirizzo: https://samuelenigro97-prog.github.io/Tavolo-Dei-Dadi/ (repo
 rinominato in `Tavolo-Dei-Dadi` il 03/10/2026). Il percorso di Pages distingue
 le maiuscole: la base della build deve coincidere esattamente con il nome
 del repo, altrimenti la pagina resta bianca (asset 404). In GitHub Actions
-`vite.config.js` la ricava da `GITHUB_REPOSITORY` (ha la precedenza su
-`BASE_PATH` del workflow, che è ancora `/tavolo-dei-dadi/`: modificarlo
-richiede un token con scope `workflow`).
+`vite.config.js` la ricava da `GITHUB_REPOSITORY` (solo per build e preview;
+il dev server resta su `./`), e `deploy.yml` verifica che `dist/index.html`
+punti a `/<nome del repo>/`.
 
 Distribuzione attuale: solo **PWA via web** (GitHub Pages), non è pubblicata
 su Google Play / Apple App Store. Portarla su uno store richiederebbe un
@@ -258,6 +258,10 @@ chiede esplicitamente, è un progetto a parte rispetto alle modifiche alla PWA.
   interno — spesso serve `.last()`, a volte un `.filter().filter()` in più
   se un discendente più interno ripete lo stesso testo.
 - **Lint**: `npm run lint` (ESLint, `eslint-plugin-react`/`react-hooks`).
+- **CI**: `.github/workflows/ci.yml` esegue lint, unitari, build, smoke test
+  (`test/smoke.mjs`) ed e2e su ogni PR verso `main` e ogni push su `main`.
+  `deploy.yml` pubblica su Pages solo dopo una CI verde su `main` (trigger
+  `workflow_run`), quindi una CI rossa blocca la pubblicazione.
 - Dopo una modifica al JSX, **build verde e test verdi non bastano** da soli
   contro errori runtime (es. un import mancante non rompe build/test ma
   rompe l'app): quando possibile, aprire davvero l'app (dev server o
@@ -276,7 +280,8 @@ Per ogni modifica visibile all'utente: **workflow completo, in quest'ordine**:
 4. Aggiungi una voce bilingue (IT/EN) in cima a `src/data/novita.js` **solo
    per cambi visibili all'utente** (salta questo passaggio per release
    puramente di sviluppo/tooling, es. l'aggiunta della suite e2e).
-5. Commit e push su `main`.
+5. Commit, PR verso `main` e merge solo con la CI verde (il deploy parte da
+   solo dopo la CI su `main`).
 
 ## Lavoro multi-agente
 

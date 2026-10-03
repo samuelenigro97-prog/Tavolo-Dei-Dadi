@@ -2,6 +2,29 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.49.0] – 2026-10-03
+
+### Aggiunto
+- **CI sui test prima della pubblicazione**: nuovo workflow
+  `.github/workflows/ci.yml` su ogni pull request verso `main` e ogni push
+  su `main`. Esegue lint (gli warning non bloccano), test unitari, build,
+  smoke test (`test/smoke.mjs`: l'app costruita si apre in Chromium senza
+  errori JS) e test end-to-end Playwright; in caso di errore allega il
+  report di Playwright alla run.
+
+### Cambiato
+- **Il deploy su GitHub Pages aspetta la CI**: `deploy.yml` parte solo
+  quando la CI finisce con successo su un push a `main` (`workflow_run`) e
+  pubblica esattamente quel commit; resta avviabile a mano.
+- Tolto da `deploy.yml` il vecchio `BASE_PATH: /tavolo-dei-dadi/`: la base
+  `/Tavolo-Dei-Dadi/` la ricava `vite.config.js` dal nome del repository, e
+  il deploy controlla che `dist/index.html` la usi davvero. La base del CI
+  vale solo per build e preview: il dev server (e2e) resta su `./`.
+- `test/smoke.mjs` usa la stessa regola per la base.
+- Documentato come verificare in locale e cosa significa la spunta verde o
+  la croce rossa (README, `docs/RELEASE.md`, `CLAUDE.md`).
+- `version` in `package.json` allineata alla versione dell'app.
+
 ## [4.48.0] – 2026-10-03
 
 ### Aggiunto
