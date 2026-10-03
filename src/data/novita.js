@@ -5,6 +5,25 @@
 
 export const NOVITA = [
   {
+    versione: '4.47.0',
+    voci: {
+      it: [
+        'Concentrazione e Rituale hanno ora un colore proprio (fucsia), così si riconoscono a colpo d\'occhio nelle righe degli incantesimi. Se la nota dice già "Conc.", l\'etichetta non compare più due volte.',
+        'Meno icone: restano solo dove aiutano davvero (pulsanti della barra in alto, tipo di danno sui riquadri di tiro, slot incantesimo). Tempo di lancio, gittata, Prep., titoli di sezione, voci di menu e messaggi ora sono solo testo, distinti dal colore.',
+        'Titoli di sezione non più tutti in maiuscolo, più facili da leggere.',
+        'Il pulsante per eliminare un incantesimo ora dice "Elimina", è neutro (diventa rosso solo al passaggio) e chiede sempre conferma.',
+        'Il riquadro del tiro per colpire mostra "Attacco +9" invece di un\'icona.',
+      ],
+      en: [
+        'Concentration and Ritual now have their own color (fuchsia), so you can spot them at a glance in spell rows. If the note already says "Conc.", the label no longer shows up twice.',
+        'Fewer icons: they stay only where they really help (top bar buttons, damage type on roll badges, spell slots). Casting time, range, Prep., section titles, menu items and messages are now plain text, told apart by color.',
+        'Section titles are no longer all caps, so they are easier to read.',
+        'The button to delete a spell now says "Delete", is neutral (it turns red only on hover) and always asks for confirmation.',
+        'The attack roll badge shows "Attack +9" instead of an icon.',
+      ],
+    },
+  },
+  {
     versione: '4.46.1',
     voci: {
       it: [

@@ -6,9 +6,9 @@ import { t, setLinguaAttuale, traduciDato } from "./i18n";
 import { avviaAmbiente, fermaAmbiente, setVolumeAmbiente, eseguiEffettoSonoro, sbloccaAudio, precaricaSfx } from './utils/audioAmbiente';
 import { C, BASE_TEMA, PRESET_COLORI, ambientazioneCasuale } from "./ui/tema.js";
 import { styles, GLOBAL_CSS } from './ui/stili.js';
-import { Editable, Rollable, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
+import { Editable, Rollable, iconaTipoDanno, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
-import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, esitoDannoPf0, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
+import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
 import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } from "./data/esempi.js";
 import { fixEquipaggiamentoVaelion, migrazioneRegoleVaelion, autoIdratazionePersonaggioPredefinito } from './data/migrazioniPersonaggi.js';
 import { CARATTERISTICHE, ABILITA } from './data/caratteristiche.js';
@@ -162,7 +162,7 @@ function TendinaCompetenzaCustom({
     ) : (
       gruppiFiltrati.map((g, gIdx) => (
         <div key={g.titolo || gIdx} style={{ marginBottom: 6 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', letterSpacing: 0.6, padding: '4px 6px 2px', borderTop: gIdx > 0 ? `1px dashed ${C.border}` : 'none', marginTop: gIdx > 0 ? 4 : 0 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, letterSpacing: 0.6, padding: '4px 6px 2px', borderTop: gIdx > 0 ? `1px dashed ${C.border}` : 'none', marginTop: gIdx > 0 ? 4 : 0 }}>
             {g.titolo}
           </div>
           {g.voci.map((v, i) => renderItem(v, i))}
@@ -240,7 +240,7 @@ function TendinaCompetenzaCustom({
           >
             {/* Header oro */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 8px', borderBottom: `1px solid ${C.border}`, background: 'rgba(200,140,20,0.08)' }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', letterSpacing: 0.8 }}>{label}</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, letterSpacing: 0.8 }}>{label}</span>
               <button
                 type="button"
                 onClick={() => setAperto(false)}
@@ -447,7 +447,7 @@ function TendinaStrumenti({ valoreStrumenti, onToggleStrumento }) {
 
   if (customItems.length > 0) {
     gruppi.push({
-      titolo: t('train.personalizzati') || '✨ Personalizzati',
+      titolo: t('train.personalizzati') || 'Personalizzati',
       voci: customItems.map((nome) => ({
         id: nome,
         label: traduciDato(nome),
@@ -495,7 +495,7 @@ function TendinaLingue({ valoreLingue, onToggleLingua }) {
 
   if (customItems.length > 0) {
     gruppi.push({
-      titolo: t('train.personalizzate') || '✨ Personalizzate',
+      titolo: t('train.personalizzate') || 'Personalizzate',
       voci: customItems.map((nome) => ({
         id: nome,
         label: traduciDato(nome),
@@ -1954,7 +1954,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.46.1';
+const APP_VERSION = '4.47.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -3031,7 +3031,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
     >
       <div style={{ ...styles.panel, maxWidth: 640, width: '100%', maxHeight: '88vh', overflowY: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <strong style={{ color: C.goldDark, fontSize: 18 }}>🗂 Archivio del Master</strong>
+          <strong style={{ color: C.goldDark, fontSize: 18 }}>Archivio del Master</strong>
           <button style={styles.buttonMini} onClick={onChiudi} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
         </div>
         <p style={{ ...styles.detail, marginTop: 0 }}>
@@ -3095,14 +3095,14 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
                             onClick={() => apriInSolaLettura(s)}
                             title="Apri e consulta la scheda completa nel tavolo in sola lettura (senza modificarla)"
                           >
-                            {aprendoId === s.id ? '…' : '👁️ Apri'}
+                            {aprendoId === s.id ? '…' : 'Apri'}
                           </button>
                           <button
                             style={{ ...styles.buttonMini, fontWeight: 600, background: '#2e9d4d', color: '#fff', borderColor: '#2e9d4d' }}
                             onClick={() => esportaScheda(s)}
                             title="Esporta e scarica il file JSON di questo personaggio"
                           >
-                            ⬆️ Esporta
+                            Esporta
                           </button>
                           <button
                             style={{ ...styles.buttonMini, fontWeight: 500 }}
@@ -3110,7 +3110,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
                             onClick={() => apri(s.id)}
                             title="Carica questo personaggio nella tua scheda per poterlo modificare"
                           >
-                            {aprendoId === s.id ? 'Importo…' : '⬇️ Importa'}
+                            {aprendoId === s.id ? 'Importo…' : 'Importa'}
                           </button>
                           <button
                             style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '3px 6px' }}
@@ -3128,11 +3128,11 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
                           {/* Banner sola lettura */}
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6, background: C.panelLight, padding: '6px 10px', borderRadius: 6 }}>
                             <div>
-                              <strong style={{ fontSize: 12, color: C.goldDark }}>👁️ Visualizzazione scheda (Sola lettura)</strong>
+                              <strong style={{ fontSize: 12, color: C.goldDark }}>Visualizzazione scheda (Sola lettura)</strong>
                               <span style={{ fontSize: 11, color: C.inkDim, marginLeft: 6 }}>Nessuna modifica ai dati</span>
                             </div>
                             <button style={{ ...styles.buttonMini, background: '#2e9d4d', color: '#fff', borderColor: '#2e9d4d', fontSize: 11, fontWeight: 700 }} onClick={() => esportaScheda(s)}>
-                              ⬇️ Scarica file JSON
+                              Scarica file JSON
                             </button>
                           </div>
 
@@ -3179,7 +3179,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
                                   <div style={{ fontSize: 13, fontWeight: 800 }}>{conSegno(mod)}</div>
                                   <div style={{ fontSize: 11, color: C.inkDim }}>{score}</div>
                                   <div style={{ fontSize: 11, color: hasTs ? '#2e9d4d' : C.inkDim, fontWeight: hasTs ? 700 : 400 }}>
-                                    {hasTs ? '🛡️ TS' : 'TS —'}
+                                    {hasTs ? 'TS' : 'TS —'}
                                   </div>
                                 </div>
                               );
@@ -3190,28 +3190,28 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 5, background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 6, padding: '8px 10px', fontSize: 12 }}>
                             {completa.attacchi && completa.attacchi.length > 0 && (
                               <div>
-                                <strong>⚔️ Attacchi ({completa.attacchi.length}):</strong>{' '}
+                                <strong>Attacchi ({completa.attacchi.length}):</strong>{' '}
                                 {completa.attacchi.map((a) => `${a.nome || 'Attacco'} (${a.danno || '—'})`).join(', ')}
                               </div>
                             )}
                             {completa.incantesimiLista && completa.incantesimiLista.length > 0 && (
                               <div>
-                                <strong>✨ Incantesimi ({completa.incantesimiLista.length}):</strong>{' '}
+                                <strong>Incantesimi ({completa.incantesimiLista.length}):</strong>{' '}
                                 {completa.incantesimiLista.slice(0, 10).map((inc) => inc.nome).join(', ')}
                                 {completa.incantesimiLista.length > 10 ? ` + altri ${completa.incantesimiLista.length - 10}...` : ''}
                               </div>
                             )}
                             {completa.inventario && completa.inventario.length > 0 && (
                               <div>
-                                <strong>🎒 Inventario ({completa.inventario.length} ogg.):</strong>{' '}
+                                <strong>Inventario ({completa.inventario.length} ogg.):</strong>{' '}
                                 {completa.inventario.slice(0, 8).map((it) => it.nome).join(', ')}
                                 {completa.inventario.length > 8 ? ` + altri ${completa.inventario.length - 8}...` : ''}
                               </div>
                             )}
-                            {completa.background && <div><strong>📜 Background:</strong> {completa.background}</div>}
+                            {completa.background && <div><strong>Background:</strong> {completa.background}</div>}
                             {completa.talenti && (
                               <div>
-                                <strong>🌟 Talenti:</strong>{' '}
+                                <strong>Talenti:</strong>{' '}
                                 {typeof completa.talenti === 'string' ? completa.talenti : (Array.isArray(completa.talenti) ? completa.talenti.map(t => t?.nome || t).join(', ') : '—')}
                               </div>
                             )}
@@ -4847,7 +4847,7 @@ export default function App() {
           reazioneUsata: false,
         });
         registra({
-          etichetta: '🔄 Turno',
+          etichetta: 'Turno',
           tipo: 'turno',
           dettaglio: `Inizio turno Round ${combat.round}: tocca a ${scheda?.nome || 'te'}! Azioni e movimento ripristinati automaticamente.`,
         });
@@ -5038,7 +5038,7 @@ export default function App() {
           if (esitoPf0.tsMorteDopo) {
             patchPg.tsMorte = esitoPf0.tsMorteDopo;
             registra({
-              etichetta: esitoPf0.istantaneo ? '💀 Morte' : '💀 TS Morte',
+              etichetta: esitoPf0.istantaneo ? 'Morte' : 'TS Morte',
               tipo: 'tattica',
               dettaglio: esitoPf0.istantaneo
                 ? `${scheda.nome || 'PG'} muore: danno subito a 0 PF con eccesso pari o superiore ai PF massimi.`
@@ -5289,8 +5289,8 @@ export default function App() {
           : 'arma';
     const etichettaPresa = attacco?.aDueMani ? (lingua === 'en' ? ' (Two-Handed)' : ' (2 Mani)') : '';
     conAnimazione(() => {
-      setDanni({ etichetta: `${critico ? '⚔ Danni critici' : 'Danni'}: ${nome}${etichettaPresa}${notaExtra}`, ...esito, critico });
-      registra({ etichetta: `${critico ? '⚔ CRITICO ' : ''}${t('log.danni')}: ${nome}${etichettaPresa}${notaExtra}`, tipo: 'danni', totale: esito.totale, dettaglio: esito.dettaglio, critico });
+      setDanni({ etichetta: `${critico ? 'Danni critici' : 'Danni'}: ${nome}${etichettaPresa}${notaExtra}`, ...esito, critico });
+      registra({ etichetta: `${critico ? 'CRITICO ' : ''}${t('log.danni')}: ${nome}${etichettaPresa}${notaExtra}`, tipo: 'danni', totale: esito.totale, dettaglio: esito.dettaglio, critico });
     }, esito.totale, maxFacce || 20, false, suonoDanno);
   }
 
@@ -5495,8 +5495,8 @@ export default function App() {
       localStorage.setItem('scheda-interattiva:tema', nuovoTema);
     } catch { /* ignore */ }
 
-    const cicloLabel = nuovoTema === 'chiaro' ? '🌅 Giorno' : '🌌 Notte';
-    registra({ etichetta: `🌙 ${t('vital.riposo_lungo_tooltip')}`, tipo: 'riposo', dettaglio: `${t('rest.lungo_fatto')} · ${cicloLabel}` });
+    const cicloLabel = nuovoTema === 'chiaro' ? 'Giorno' : 'Notte';
+    registra({ etichetta: `${t('vital.riposo_lungo_tooltip')}`, tipo: 'riposo', dettaglio: `${t('rest.lungo_fatto')} · ${cicloLabel}` });
   }
 
   function riposoLungo() {
@@ -5773,7 +5773,7 @@ export default function App() {
     aRoster.click();
     URL.revokeObjectURL(urlRoster);
     segnaBackupFatto();
-    setSyncCodiceStatus({ text: `✅ Backup esportato (${ids.length} personaggi).`, type: 'success' });
+    setSyncCodiceStatus({ text: `Backup esportato (${ids.length} personaggi).`, type: 'success' });
   }
 
   /** Ripristina l'archivio locale da un file JSON (supporta backup multipli o singoli). */
@@ -5801,7 +5801,7 @@ export default function App() {
             });
             return { attivo: ultimo, personaggi: base };
           });
-          setSyncCodiceStatus({ text: `✅ Ripristinati ${lista.length} personaggi.`, type: 'success' });
+          setSyncCodiceStatus({ text: `Ripristinati ${lista.length} personaggi.`, type: 'success' });
           segnaBackupFatto();
           return;
         }
@@ -5813,7 +5813,7 @@ export default function App() {
         const base = (r?.personaggi && Object.keys(r.personaggi).length > 0) ? { ...r.personaggi } : {};
         return { attivo: id, personaggi: { ...base, [id]: norm } };
       });
-      setSyncCodiceStatus({ text: `✅ Personaggio "${formattaNomePg(norm.nome) || 'PG'}" importato.`, type: 'success' });
+      setSyncCodiceStatus({ text: `Personaggio "${formattaNomePg(norm.nome) || 'PG'}" importato.`, type: 'success' });
       segnaBackupFatto();
     } catch (e) {
       setSyncCodiceStatus({ text: `File JSON non valido: ${e.message}`, type: 'error' });
@@ -6268,7 +6268,7 @@ export default function App() {
       setUltimoSync(orario);
       localStorage.setItem('scheda-interattiva:ultimo-sync', orario);
       segnaBackupFatto(); // il sync sul cloud conta come backup: azzera il promemoria
-      setCloudStatus({ text: `✅ Sincronizzato · ${orario}`, type: 'success' });
+      setCloudStatus({ text: `Sincronizzato · ${orario}`, type: 'success' });
       return nuovoId;
     } catch (err) {
       setCloudStatus({ text: err.message, type: 'error' });
@@ -6331,7 +6331,7 @@ export default function App() {
               setGistId(esistente.id);
               localStorage.setItem('scheda-interattiva:gist-id', esistente.id);
               await caricaGistById(esistente.id, token);
-              setCloudStatus({ text: '✅ Backup esistente caricato e sincronizzato.', type: 'success' });
+              setCloudStatus({ text: 'Backup esistente caricato e sincronizzato.', type: 'success' });
               setAutoSync(true);
               localStorage.setItem('scheda-interattiva:auto-sync', 'on');
               return;
@@ -6394,7 +6394,7 @@ export default function App() {
       setCaricandoCloud(true);
       setCloudStatus({ text: 'Caricamento in corso…', type: 'info' });
       await caricaGistById(gistId, githubToken);
-      setCloudStatus({ text: '✅ Personaggi caricati e sincronizzati.', type: 'success' });
+      setCloudStatus({ text: 'Personaggi caricati e sincronizzati.', type: 'success' });
     } catch (err) {
       setCloudStatus({ text: err.message, type: 'error' });
     } finally {
@@ -6462,7 +6462,7 @@ export default function App() {
       setUltimoSyncCodice(orario);
       localStorage.setItem('scheda-interattiva:ultimo-sync-codice', orario);
       segnaBackupFatto();
-      setSyncCodiceStatus({ text: `✅ Sincronizzato · ${orario}`, type: 'success' });
+      setSyncCodiceStatus({ text: `Sincronizzato · ${orario}`, type: 'success' });
     } catch (err) {
       if (!silenzioso) {
         setSyncCodiceStatus({ text: messaggioErroreSync(err.message), type: 'error' });
@@ -6590,7 +6590,7 @@ export default function App() {
       setCaricandoCloud(true);
       setSyncCodiceStatus({ text: 'Caricamento in corso…', type: 'info' });
       await caricaDaCodiceSyncPer(codiceSyncRef.current);
-      setSyncCodiceStatus({ text: '✅ Personaggi caricati e sincronizzati.', type: 'success' });
+      setSyncCodiceStatus({ text: 'Personaggi caricati e sincronizzati.', type: 'success' });
     } catch (err) {
       setSyncCodiceStatus({ text: messaggioErroreSync(err.message), type: 'error' });
     } finally {
@@ -6628,7 +6628,7 @@ export default function App() {
       setAutoSyncCodice(true);
       localStorage.setItem('scheda-interattiva:auto-sync-codice', 'on');
       setCodiceSyncInput('');
-      setSyncCodiceStatus({ text: '✅ Personaggi caricati e sincronizzati.', type: 'success' });
+      setSyncCodiceStatus({ text: 'Personaggi caricati e sincronizzati.', type: 'success' });
     } catch (err) {
       setSyncCodiceStatus({ text: messaggioErroreSync(err.message), type: 'error' });
     } finally {
@@ -6971,7 +6971,7 @@ export default function App() {
     }
     if (dettaglio) {
       setNuvolettaCorrezioni({
-        titolo: lingua === 'en' ? '🪄 Correction applied' : '🪄 Correzione applicata',
+        titolo: lingua === 'en' ? 'Correction applied' : 'Correzione applicata',
         voci: [dettaglio],
         timestamp: Date.now(),
       });
@@ -7024,8 +7024,8 @@ export default function App() {
     if (modifiche.length > 0) {
       setNuvolettaCorrezioni({
         titolo: lingua === 'en'
-          ? `🪄 ${modifiche.length} ${modifiche.length === 1 ? 'fix applied' : 'fixes applied'}`
-          : `🪄 ${modifiche.length} ${modifiche.length === 1 ? 'correzione applicata' : 'correzioni applicate'}`,
+          ? `${modifiche.length} ${modifiche.length === 1 ? 'fix applied' : 'fixes applied'}`
+          : `${modifiche.length} ${modifiche.length === 1 ? 'correzione applicata' : 'correzioni applicate'}`,
         voci: modifiche,
         timestamp: Date.now(),
       });
@@ -7101,7 +7101,7 @@ export default function App() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: `2px solid ${C.border}`, paddingBottom: 8, marginBottom: 10 }}>
               <div>
                 <h2 style={{ fontSize: 18, margin: 0, color: C.goldDark, fontWeight: 800 }}>
-                  🐾 {lingua === 'en' ? bestiaDettaglio.nomeEn : bestiaDettaglio.nome}
+                  {lingua === 'en' ? bestiaDettaglio.nomeEn : bestiaDettaglio.nome}
                 </h2>
                 <div style={{ fontSize: 12, color: C.inkDim, fontStyle: 'italic' }}>
                   {bestiaDettaglio.taglia} {bestiaDettaglio.tipo || 'bestia'}{bestiaDettaglio.gs != null ? ` · GS ${bestiaDettaglio.gs} (${bestiaDettaglio.gsNum * 200 || 10} PE)` : ''}
@@ -7113,11 +7113,11 @@ export default function App() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, marginBottom: 12, textAlign: 'center' }}>
               <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 6, padding: '4px 6px' }}>
                 <div style={{ fontSize: 11, color: C.inkDim, textTransform: 'uppercase', fontWeight: 700 }}>{t('armor.classe_armatura')}</div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: C.ink }}>🛡️ {bestiaDettaglio.ca}</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: C.ink }}>{bestiaDettaglio.ca}</div>
               </div>
               <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 6, padding: '4px 6px' }}>
                 <div style={{ fontSize: 11, color: C.inkDim, textTransform: 'uppercase', fontWeight: 700 }}>{t('vital.punti_ferita')}</div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: C.ink }}>❤️ {bestiaDettaglio.pf} <span style={{ fontSize: 11, fontWeight: 'normal', color: C.inkDim }}>({bestiaDettaglio.pfFormula})</span></div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: C.ink }}>{bestiaDettaglio.pf} <span style={{ fontSize: 11, fontWeight: 'normal', color: C.inkDim }}>({bestiaDettaglio.pfFormula})</span></div>
               </div>
               <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 6, padding: '4px 6px' }}>
                 <div style={{ fontSize: 11, color: C.inkDim, textTransform: 'uppercase', fontWeight: 700 }}>{t('stat.velocita')}</div>
@@ -7165,8 +7165,8 @@ export default function App() {
             {/* Azioni e Attacchi */}
             {bestiaDettaglio.azioni && bestiaDettaglio.azioni.length > 0 && (
               <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 8, marginTop: 8 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: C.goldDark, marginBottom: 6 }}>
-                  ⚔️ {lingua === 'en' ? 'Actions and attacks' : 'Azioni e attacchi'}
+                <div style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, marginBottom: 6 }}>
+                  {lingua === 'en' ? 'Actions and attacks' : 'Azioni e attacchi'}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {bestiaDettaglio.azioni.map((azRaw, idx) => {
@@ -7187,10 +7187,10 @@ export default function App() {
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'wrap' }}>
-                          <span style={{ fontWeight: 800, color: C.ink }}>⚔️ {az.nome}</span>
+                          <span style={{ fontWeight: 800, color: C.ink }}>{az.nome}</span>
                           {az.cd != null && (
                             <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 5px', background: `${coloreCategoria('tiroSalvezza', notteAttiva)}1f`, color: coloreCategoria('tiroSalvezza', notteAttiva), borderRadius: 4, border: `1px solid ${coloreCategoria('tiroSalvezza', notteAttiva)}` }}>
-                              🎲 CD {az.cd}
+                              CD {az.cd}
                             </span>
                           )}
                         </div>
@@ -7211,7 +7211,7 @@ export default function App() {
                                 }}
                                 title={`Tira per Colpire: 1d20 ${conSegno(az.bonus)}`}
                               >
-                                <span>🎯</span> <span>{lingua === 'en' ? 'Attack' : 'Colpisci'} ({conSegno(az.bonus)})</span>
+                                <span>{lingua === 'en' ? 'Attack' : 'Colpisci'} ({conSegno(az.bonus)})</span>
                               </button>
                             )}
                             {az.danno && (
@@ -7223,7 +7223,7 @@ export default function App() {
                                 }}
                                 title={`Tira Danni: ${az.danno}`}
                               >
-                                <span>💥</span> <span>{lingua === 'en' ? 'Damage' : 'Danni'} ({az.danno})</span>
+                                <span>{lingua === 'en' ? 'Damage' : 'Danni'} ({az.danno})</span>
                               </button>
                             )}
                           </div>
@@ -7237,7 +7237,7 @@ export default function App() {
 
             {bestiaDettaglio.note && (
               <div style={{ fontSize: 11, fontStyle: 'italic', color: C.inkDim, marginTop: 8, borderTop: `1px dashed ${C.border}`, paddingTop: 6 }}>
-                💡 {bestiaDettaglio.note}
+                {bestiaDettaglio.note}
               </div>
             )}
 
@@ -7302,7 +7302,7 @@ export default function App() {
                     setBestiaDettaglio(null);
                   }}
                 >
-                  🐾 {lingua === 'en' ? `Wild Shape (${bestiaDettaglio.pf} HP)` : `Forma Selvatica (${bestiaDettaglio.pf} PF)`}
+                  {lingua === 'en' ? `Wild Shape (${bestiaDettaglio.pf} HP)` : `Forma Selvatica (${bestiaDettaglio.pf} PF)`}
                 </button>
               )}
               {bestiaDettaglio.gs != null && (
@@ -7353,7 +7353,7 @@ export default function App() {
                     ? (lingua === 'en' ? 'No Metamorphosis uses left' : 'Nessun utilizzo di Metamorfosi rimasto')
                     : (lingua === 'en' ? 'Polymorph: replaces all ability scores, including mental ones' : 'Metamorfosi: sostituisce tutte le caratteristiche, incluse quelle mentali')}
                 >
-                  🔮 {lingua === 'en' ? `Metamorphosis (${bestiaDettaglio.pf} HP)` : `Metamorfosi (${bestiaDettaglio.pf} PF)`}
+                  {lingua === 'en' ? `Metamorphosis (${bestiaDettaglio.pf} HP)` : `Metamorfosi (${bestiaDettaglio.pf} PF)`}
                 </button>
               )}
             </div>
@@ -7410,7 +7410,7 @@ export default function App() {
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, borderBottom: `1px solid ${C.border}`, paddingBottom: 6 }}>
                   <strong style={{ color: C.goldDark, fontSize: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
-                    ☕ {lingua === 'en' ? 'Short Rest (1 Hour)' : 'Riposo Breve (1 Ora)'}
+                    {lingua === 'en' ? 'Short Rest (1 Hour)' : 'Riposo Breve (1 Ora)'}
                   </strong>
                   <button style={styles.buttonMini} onClick={() => setModalRiposo(null)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
                 </div>
@@ -7422,8 +7422,8 @@ export default function App() {
                   </div>
 
                   <div style={{ marginBottom: 10 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', marginBottom: 4 }}>
-                      🎲 {lingua === 'en' ? 'Spend Hit Dice to Heal:' : 'Spendi Dadi Vita per Curarti:'}
+                    <div style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, marginBottom: 4 }}>
+                      {lingua === 'en' ? 'Spend Hit Dice to Heal:' : 'Spendi Dadi Vita per Curarti:'}
                     </div>
                     {(() => {
                       const gruppi = gruppiDadoVita(scheda.dadiVita);
@@ -7453,7 +7453,7 @@ export default function App() {
                                     padding: '3px 8px',
                                   }}
                                 >
-                                  🎲 {lingua === 'en' ? `Roll 1d${g.facce} (${conSegno(conMod)})` : `Tira 1d${g.facce} (${conSegno(conMod)})`}
+                                  {lingua === 'en' ? `Roll 1d${g.facce} (${conSegno(conMod)})` : `Tira 1d${g.facce} (${conSegno(conMod)})`}
                                 </button>
                               </div>
                             );
@@ -7464,7 +7464,7 @@ export default function App() {
                   </div>
 
                   <div style={{ fontSize: 11, color: C.inkDim, borderTop: `1px dashed ${C.border}`, paddingTop: 6, marginBottom: 12 }}>
-                    ⚡ <strong>{lingua === 'en' ? 'Short rest auto-recharge:' : 'Ricarica automatica riposo breve:'}</strong>
+                    <strong>{lingua === 'en' ? 'Short rest auto-recharge:' : 'Ricarica automatica riposo breve:'}</strong>
                     <div style={{ fontSize: 11, marginTop: 2 }}>
                       {(() => {
                         const risorseBrevi = (scheda.risorse || []).filter((r) => r.ricarica === 'breve');
@@ -7502,11 +7502,11 @@ export default function App() {
                           ),
                         } : {}),
                       }));
-                      registra({ etichetta: `🔥 ${t('vital.riposo_breve_tooltip')}`, tipo: 'riposo', dettaglio: isWarlock ? t('rest.breve_fatto_warlock') : t('rest.breve_fatto') });
+                      registra({ etichetta: `${t('vital.riposo_breve_tooltip')}`, tipo: 'riposo', dettaglio: isWarlock ? t('rest.breve_fatto_warlock') : t('rest.breve_fatto') });
                       setModalRiposo(null);
                     }}
                   >
-                    ☕ {lingua === 'en' ? 'Complete Short Rest' : 'Conferma Riposo Breve'}
+                    {lingua === 'en' ? 'Complete Short Rest' : 'Conferma Riposo Breve'}
                   </button>
                 </div>
               </>
@@ -7514,7 +7514,7 @@ export default function App() {
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, borderBottom: `1px solid ${C.border}`, paddingBottom: 6 }}>
                   <strong style={{ color: C.goldDark, fontSize: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
-                    🌙 {lingua === 'en' ? 'Long Rest (8 Hours)' : 'Riposo Lungo (8 Ore)'}
+                    {lingua === 'en' ? 'Long Rest (8 Hours)' : 'Riposo Lungo (8 Ore)'}
                   </strong>
                   <button style={styles.buttonMini} onClick={() => setModalRiposo(null)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
                 </div>
@@ -7524,18 +7524,18 @@ export default function App() {
                     {lingua === 'en' ? 'A Long Rest restores your adventurer completely:' : 'Il Riposo Lungo ripristina completamente il tuo avventuriero:'}
                   </div>
                   <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 4, fontSize: 12 }}>
-                    <li>❤️ <strong>{lingua === 'en' ? 'Hit Points:' : 'Punti Ferita:'}</strong> {lingua === 'en' ? `healed to maximum (${scheda.pfMax} HP)` : `ripristinati al massimo (${scheda.pfMax} PF)`}</li>
-                    <li>🔮 <strong>{lingua === 'en' ? 'Spell Slots:' : 'Slot Incantesimo:'}</strong> {lingua === 'en' ? 'all spent slots fully restored' : 'tutti gli slot spesi tornano disponibili'}</li>
-                    <li>🎲 <strong>{lingua === 'en' ? 'Hit Dice:' : 'Dadi Vita:'}</strong> {(() => {
+                    <li><strong>{lingua === 'en' ? 'Hit Points:' : 'Punti Ferita:'}</strong> {lingua === 'en' ? `healed to maximum (${scheda.pfMax} HP)` : `ripristinati al massimo (${scheda.pfMax} PF)`}</li>
+                    <li><strong>{lingua === 'en' ? 'Spell Slots:' : 'Slot Incantesimo:'}</strong> {lingua === 'en' ? 'all spent slots fully restored' : 'tutti gli slot spesi tornano disponibili'}</li>
+                    <li><strong>{lingua === 'en' ? 'Hit Dice:' : 'Dadi Vita:'}</strong> {(() => {
                       const livTot = (scheda.livello || 1) + (Array.isArray(scheda.multiclasse) ? scheda.multiclasse.reduce((a, m) => a + (m?.livello || 0), 0) : 0);
                       const rec = Math.max(1, Math.floor(livTot / 2));
                       return lingua === 'en' ? `recover ${rec} spent Hit Dice` : `recuperi ${rec} Dadi Vita spesi`;
                     })()}</li>
-                    <li>⚡ <strong>{lingua === 'en' ? 'Class Features:' : 'Risorse di Classe:'}</strong> {lingua === 'en' ? 'all Short and Long recharge features reset' : 'tutte le risorse ricaricate al 100%'}</li>
+                    <li><strong>{lingua === 'en' ? 'Class Features:' : 'Risorse di Classe:'}</strong> {lingua === 'en' ? 'all Short and Long recharge features reset' : 'tutte le risorse ricaricate al 100%'}</li>
                     {scheda.sfinimento > 0 && (
-                      <li>😮‍💨 <strong>{lingua === 'en' ? 'Exhaustion:' : 'Sfinimento:'}</strong> {lingua === 'en' ? `reduced by 1 (from ${scheda.sfinimento} to ${scheda.sfinimento - 1})` : `ridotto di 1 livello (da ${scheda.sfinimento} a ${scheda.sfinimento - 1})`}</li>
+                      <li><strong>{lingua === 'en' ? 'Exhaustion:' : 'Sfinimento:'}</strong> {lingua === 'en' ? `reduced by 1 (from ${scheda.sfinimento} to ${scheda.sfinimento - 1})` : `ridotto di 1 livello (da ${scheda.sfinimento} a ${scheda.sfinimento - 1})`}</li>
                     )}
-                    <li>🧹 <strong>{lingua === 'en' ? 'Death saves and temp HP:' : 'TS contro morte e PF temporanei:'}</strong> {lingua === 'en' ? 'reset to 0' : 'azzerati'}</li>
+                    <li><strong>{lingua === 'en' ? 'Death saves and temp HP:' : 'TS contro morte e PF temporanei:'}</strong> {lingua === 'en' ? 'reset to 0' : 'azzerati'}</li>
                   </ul>
                 </div>
 
@@ -7553,7 +7553,7 @@ export default function App() {
                       setModalRiposo(null);
                     }}
                   >
-                    🌙 {lingua === 'en' ? 'Execute Long Rest' : 'Esegui Riposo Lungo'}
+                    {lingua === 'en' ? 'Execute Long Rest' : 'Esegui Riposo Lungo'}
                   </button>
                 </div>
               </>
@@ -7582,7 +7582,7 @@ export default function App() {
             tipo: 'd20',
             naturale: d20,
             totale: tot,
-            dettaglio: `${dettDadi} = ${tot} · CD ${checkConc.cd} (${checkConc.spell}) → ${passa ? '✅ Mantenuta' : '❌ Persa'}`,
+            dettaglio: `${dettDadi} = ${tot} · CD ${checkConc.cd} (${checkConc.spell}) → ${passa ? 'Mantenuta' : 'Persa'}`,
             critico: d20 === 20,
             fumble: d20 === 1,
           });
@@ -7598,7 +7598,7 @@ export default function App() {
             <div style={{ ...styles.panel, maxWidth: 420, width: '100%', boxShadow: '0 8px 30px rgba(0,0,0,0.4)', borderRadius: 12 }} onClick={(e) => e.stopPropagation()}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                 <strong style={{ color: C.goldDark, fontSize: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span>🧠</span> {t('conc.auto_titolo')}
+                  {t('conc.auto_titolo')}
                 </strong>
                 <span style={{ fontSize: 11, background: 'rgba(201,162,39,0.15)', color: C.goldDark, padding: '2px 7px', borderRadius: 6, fontWeight: 700 }}>
                   CD {checkConc.cd}
@@ -7611,13 +7611,13 @@ export default function App() {
                   : `Hai subito ${checkConc.danno} danni mentre ti concentri su `}
                 <strong style={{ color: C.goldDark }}>{checkConc.spell}</strong>.
                 <div style={{ fontSize: 11, color: C.inkDim, marginTop: 4 }}>
-                  📐 {tsInfo.spiegazioneCd}
+                  {tsInfo.spiegazioneCd}
                 </div>
               </div>
 
               {tsInfo.haIncantatoreDaGuerra && !esito && (
                 <div style={{ fontSize: 12, background: 'rgba(46,157,77,0.12)', border: '1px solid #2e9d4d', borderRadius: 6, padding: '5px 8px', marginBottom: 10, color: '#2e9d4d', fontWeight: 600 }}>
-                  ⭐ <strong>{lingua === 'en' ? 'War Caster / Eldritch Mind' : 'Incantatore da Guerra / Mente Occulta'}</strong>: {lingua === 'en' ? 'You have Advantage on concentration saves!' : 'Hai Vantaggio sui TS di concentrazione!'}
+                  <strong>{lingua === 'en' ? 'War Caster / Eldritch Mind' : 'Incantatore da Guerra / Mente Occulta'}</strong>: {lingua === 'en' ? 'You have Advantage on concentration saves!' : 'Hai Vantaggio sui TS di concentrazione!'}
                 </div>
               )}
 
@@ -7635,7 +7635,7 @@ export default function App() {
                     }}
                     onClick={() => eseguiTiroConc(tsInfo.haIncantatoreDaGuerra ? 1 : 0)}
                   >
-                    🎲 {tsInfo.haIncantatoreDaGuerra ? (lingua === 'en' ? 'Roll with Advantage' : 'Tira con Vantaggio') : t('conc.ts')} ({conSegno(bonusCon)})
+                    {tsInfo.haIncantatoreDaGuerra ? (lingua === 'en' ? 'Roll with Advantage' : 'Tira con Vantaggio') : t('conc.ts')} ({conSegno(bonusCon)})
                   </button>
                   <div style={{ display: 'flex', gap: 6 }}>
                     <button
@@ -7643,14 +7643,14 @@ export default function App() {
                       style={{ ...styles.buttonMini, flex: 1, fontSize: 11 }}
                       onClick={() => eseguiTiroConc(1)}
                     >
-                      ✨ {lingua === 'en' ? 'Advantage' : 'Con Vantaggio'}
+                      {lingua === 'en' ? 'Advantage' : 'Con Vantaggio'}
                     </button>
                     <button
                       type="button"
                       style={{ ...styles.buttonMini, flex: 1, fontSize: 11 }}
                       onClick={() => eseguiTiroConc(-1)}
                     >
-                      ⚠️ {lingua === 'en' ? 'Disadvantage' : 'Con Svantaggio'}
+                      {lingua === 'en' ? 'Disadvantage' : 'Con Svantaggio'}
                     </button>
                   </div>
                 </div>
@@ -7661,8 +7661,8 @@ export default function App() {
                   </div>
                   <div style={{ fontSize: 16, fontWeight: 800, marginTop: 6, color: esito.passa ? '#2e9d4d' : C.red }}>
                     {esito.passa
-                      ? `✅ ${lingua === 'en' ? 'Concentration maintained' : 'Concentrazione mantenuta'}`
-                      : `❌ ${lingua === 'en' ? 'Concentration lost' : 'Concentrazione persa'}`}
+                      ? `${lingua === 'en' ? 'Concentration maintained' : 'Concentrazione mantenuta'}`
+                      : `${lingua === 'en' ? 'Concentration lost' : 'Concentrazione persa'}`}
                   </div>
                 </div>
               )}
@@ -7761,7 +7761,7 @@ export default function App() {
               style={{ ...styles.button, width: '100%', marginBottom: 8 }}
               onClick={() => setMostraListaCarica((v) => !v)}
             >
-              👥 {t('menu.carica_personaggio')} {mostraListaCarica ? '▴' : '▾'} ({Object.keys(roster.personaggi).length})
+              {t('menu.carica_personaggio')} {mostraListaCarica ? '▴' : '▾'} ({Object.keys(roster.personaggi).length})
             </button>
             {mostraListaCarica && (
               <>
@@ -7779,6 +7779,7 @@ export default function App() {
                       <button
                         style={{ ...styles.buttonDanger, padding: '4px 10px', fontSize: 13, flexShrink: 0 }}
                         title={t('menu.elimina_tooltip', { nome: p.nome || t('menu.senza_nome') })}
+                        aria-label={t('menu.elimina_tooltip', { nome: p.nome || t('menu.senza_nome') })}
                         onClick={() => setConferma({
                           titolo: t('menu.elimina_titolo'),
                           testo: `Vuoi eliminare davvero "${p.nome || t('menu.senza_nome')}"? L'azione è irreversibile.`,
@@ -7816,27 +7817,27 @@ export default function App() {
               style={{ ...styles.button, width: '100%', marginBottom: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontWeight: 700, color: C.goldDark, borderColor: C.goldDark }}
               onClick={() => { setMostraModalManuali(true); }}
             >
-              <span>📚</span>
+              
               <span>{lingua === 'it' ? `Manuali e fonti (${Object.values(manualiAttivi).filter(Boolean).length} attivi)` : `Sourcebooks (${Object.values(manualiAttivi).filter(Boolean).length} active)`}</span>
             </button>
 
             {/* Specchio tasti header globali nello stesso identico ordine, con le stesse etichette e icone */}
             <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px solid ${C.border}` }}>
-              <div style={{ ...styles.detail, marginBottom: 8, fontWeight: 700 }}>⚡ {lingua === 'en' ? 'Quick actions' : 'Azioni rapide'}</div>
+              <div style={{ ...styles.detail, marginBottom: 8, fontWeight: 700 }}>{lingua === 'en' ? 'Quick actions' : 'Azioni rapide'}</div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
                 <button
                   style={{ ...styles.button, width: '100%', minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                   onClick={() => { setMostraMenu(false); setTimeout(() => apriNotifiche(), 50); }}
                   title={t('notifiche.titolo')}
                 >
-                  <span>🔔</span> <span>{t('notifiche.titolo_breve')}{novitaNonLette ? ' (!)' : ''}</span>
+                  <span>{t('notifiche.titolo_breve')}{novitaNonLette ? ' (!)' : ''}</span>
                 </button>
                 <button
                   style={{ ...styles.button, width: '100%', minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                   onClick={() => setLingua((l) => (l === 'it' ? 'en' : 'it'))}
                   title={t('tooltip.lingua')}
                 >
-                  <span>{lingua === 'it' ? '🇮🇹' : '🇬🇧'}</span> <span>{t('common.lingua')}</span>
+                  <span>{t('common.lingua')}</span>
                 </button>
                 <button
                   style={{ ...styles.button, width: '100%', minHeight: 38, gridColumn: 'span 2', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
@@ -7849,7 +7850,7 @@ export default function App() {
                   }}
                   title={t('import_export.tip')}
                 >
-                  <span>📂</span> <span>{t('import_export.btn')}</span>
+                  <span>{t('import_export.btn')}</span>
                 </button>
                 <button
                   style={{
@@ -7871,12 +7872,12 @@ export default function App() {
                   onClick={() => { setMostraMenu(false); setTimeout(() => { setCloudStatus({ text: '', type: '' }); setMostraCloud(true); }, 50); }}
                   title={isCloudAttivo ? (lingua === 'en' ? 'Sync is on' : 'Sincronizzazione attiva') : (lingua === 'en' ? 'Sync is off' : 'Sincronizzazione non attiva')}
                 >
-                  <span style={{ fontSize: 16 }}>☁️</span>
+                  
                   <span>{lingua === 'en' ? 'Backup & sync' : 'Backup e sincronizzazione'}</span>
                 </button>
                 <div style={{ gridColumn: 'span 2', marginTop: 4 }}>
                   <div style={{ fontSize: 11, color: C.inkDim, marginBottom: 4, fontWeight: 600 }}>
-                    🎭 {lingua === 'en' ? 'Section frames' : 'Cornici delle sezioni'}
+                    {lingua === 'en' ? 'Section frames' : 'Cornici delle sezioni'}
                   </div>
                   <select
                     value={temaCornici}
@@ -7884,21 +7885,21 @@ export default function App() {
                     style={{ ...styles.inlineInput, width: '100%', height: 32, padding: '4px 8px', borderRadius: 6, background: C.panel, color: C.ink, fontSize: 12, border: `1px solid ${C.border}` }}
                     title={lingua === 'en' ? 'Choose the style of the section frames' : 'Scegli lo stile delle cornici delle sezioni'}
                   >
-                    <option value="auto">✨ {lingua === 'en' ? `Automatic (character class: ${scheda.classe || 'default'})` : `Automatiche (classe del personaggio: ${scheda.classe || 'predefinita'})`}</option>
-                    <option value="druido">🌿 Druido (rami e foglie)</option>
-                    <option value="mago">🔮 Mago (rune arcane e stelle)</option>
-                    <option value="guerriero">⚔️ Guerriero (piastre rivettate)</option>
-                    <option value="ladro">🗡️ Ladro (lame e ombre)</option>
-                    <option value="chierico">☀️ Chierico (reliquiario e luce)</option>
-                    <option value="paladino">🛡️ Paladino (scudo araldico)</option>
-                    <option value="bardo">🎵 Bardo (volute barocche e note)</option>
-                    <option value="barbaro">🪓 Barbaro (artigli e zanne)</option>
-                    <option value="ranger">🏹 Ranger (frecce e nodi silvestri)</option>
-                    <option value="stregone">⚡ Stregone (energia arcana e fulmini)</option>
-                    <option value="warlock">👁️ Warlock (spirali occulte e occhi)</option>
-                    <option value="monaco">☯️ Monaco (cerchio zen e giada)</option>
-                    <option value="artefice">⚙️ Artefice (ingranaggi e ottone)</option>
-                    <option value="disattivato">🔒 {lingua === 'en' ? 'No frames' : 'Nessuna cornice'}</option>
+                    <option value="auto">{lingua === 'en' ? `Automatic (character class: ${scheda.classe || 'default'})` : `Automatiche (classe del personaggio: ${scheda.classe || 'predefinita'})`}</option>
+                    <option value="druido">Druido (rami e foglie)</option>
+                    <option value="mago">Mago (rune arcane e stelle)</option>
+                    <option value="guerriero">Guerriero (piastre rivettate)</option>
+                    <option value="ladro">Ladro (lame e ombre)</option>
+                    <option value="chierico">Chierico (reliquiario e luce)</option>
+                    <option value="paladino">Paladino (scudo araldico)</option>
+                    <option value="bardo">Bardo (volute barocche e note)</option>
+                    <option value="barbaro">Barbaro (artigli e zanne)</option>
+                    <option value="ranger">Ranger (frecce e nodi silvestri)</option>
+                    <option value="stregone">Stregone (energia arcana e fulmini)</option>
+                    <option value="warlock">Warlock (spirali occulte e occhi)</option>
+                    <option value="monaco">Monaco (cerchio zen e giada)</option>
+                    <option value="artefice">Artefice (ingranaggi e ottone)</option>
+                    <option value="disattivato">{lingua === 'en' ? 'No frames' : 'Nessuna cornice'}</option>
                   </select>
                 </div>
               </div>
@@ -7908,14 +7909,14 @@ export default function App() {
               <div style={{ ...styles.detail, marginBottom: 8, fontWeight: 700 }}>{t('menu.sezione_backup')}</div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
                 <button style={{ ...styles.button, width: '100%', minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }} onClick={() => jsonRef.current?.click()} title={t('menu.ripristina_tip')}>
-                  <span>📥</span> <span>{t('menu.ripristina')}</span>
+                  <span>{t('menu.ripristina')}</span>
                 </button>
                 <button style={{ ...styles.button, width: '100%', minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }} onClick={esportaBackupCompleto} title={t('menu.esporta_tutto_tip')}>
-                  <span>📦</span> <span>{t('menu.esporta_tutto')}</span>
+                  <span>{t('menu.esporta_tutto')}</span>
                 </button>
                 {leggiSnapshots().length > 0 && (
                   <button style={{ ...styles.button, width: '100%', minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }} onClick={() => setMostraRipristino(true)}>
-                    <span>🕓</span> <span>{t('menu.versioni')}</span>
+                    <span>{t('menu.versioni')}</span>
                   </button>
                 )}
                 {URL_ARCHIVIO_PG && (
@@ -7924,7 +7925,7 @@ export default function App() {
                     onClick={() => { setMostraArchivioDm(true); }}
                     title={t('menu.archivio_dm_tip')}
                   >
-                    <span>🗂</span> <span>{t('menu.archivio_dm')}</span>
+                    <span>{t('menu.archivio_dm')}</span>
                   </button>
                 )}
               </div>
@@ -7938,14 +7939,14 @@ export default function App() {
                   onClick={() => { setMostraMenu(false); setMostraNoteLegali(true); }}
                   title={t('legali.titolo')}
                 >
-                  <span>⚖️</span> <span>{t('menu.note_legali')}</span>
+                  <span>{t('menu.note_legali')}</span>
                 </button>
                 <button
                   style={{ ...styles.button, width: '100%', height: 38, minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0 6px', fontSize: 13, boxSizing: 'border-box' }}
                   onClick={() => { setMostraMenu(false); setMostraDonazioni(true); }}
                   title={t('donazioni.titolo')}
                 >
-                  <span>☕</span> <span>{t('menu.sostieni')}</span>
+                  <span>{t('menu.sostieni')}</span>
                 </button>
                 <a
                   href="https://github.com/samuelenigro97-prog/Tavolo-Dei-Dadi"
@@ -7954,7 +7955,7 @@ export default function App() {
                   style={{ ...styles.button, textDecoration: 'none', width: '100%', height: 38, minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0 6px', fontSize: 13, boxSizing: 'border-box' }}
                   title={t('menu.github_tip')}
                 >
-                  <span>🐙</span> <span>{t('menu.github')}</span>
+                  <span>{t('menu.github')}</span>
                 </a>
               </div>
             </div>
@@ -8028,7 +8029,7 @@ export default function App() {
               </div>
             )}
 
-            {/* Selettore Modalità: 📱 Locale vs ☁️ Online */}
+            {/* Selettore Modalità: Locale vs Online */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 14, background: 'rgba(0,0,0,0.06)', padding: 3, borderRadius: 8 }}>
               <button
                 type="button"
@@ -8045,7 +8046,7 @@ export default function App() {
                 }}
                 onClick={() => { setTabBackup('locale'); setSyncCodiceStatus({ text: '', type: '' }); }}
               >
-                📱 Su questo dispositivo
+                Su questo dispositivo
               </button>
               <button
                 type="button"
@@ -8062,14 +8063,14 @@ export default function App() {
                 }}
                 onClick={() => { setTabBackup('online'); setSyncCodiceStatus({ text: '', type: '' }); }}
               >
-                ☁️ Online
+                Online
               </button>
             </div>
 
             {tabBackup === 'locale' ? (
               <div style={{ padding: 12, borderRadius: 8, background: 'rgba(0,0,0,0.04)', border: `1px solid ${C.border}`, marginBottom: 16 }}>
                 <div style={{ ...styles.detail, fontWeight: 'bold', fontSize: 13, marginBottom: 4, color: C.ink }}>
-                  📱 Backup su file
+                  Backup su file
                 </div>
                 <p style={{ ...styles.detail, fontSize: 12, marginTop: 0, marginBottom: 12, lineHeight: 1.5 }}>
                   Esporta in un unico file JSON tutti i personaggi salvati su questo dispositivo, oppure ripristina un backup precedente.
@@ -8077,7 +8078,7 @@ export default function App() {
 
                 <div style={{ background: 'rgba(201,162,39,0.08)', border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 10px', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 12, color: C.ink, fontWeight: 600 }}>
-                    📦 Personaggi salvati:
+                    Personaggi salvati:
                   </span>
                   <strong style={{ color: C.goldDark, fontSize: 14 }}>
                     {Object.keys(roster.personaggi || {}).length}
@@ -8090,7 +8091,7 @@ export default function App() {
                     style={{ ...styles.buttonPrimary, width: '100%', padding: '9px 12px', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
                     onClick={esportaBackupCompleto}
                   >
-                    📦 Esporta backup (JSON)
+                    Esporta backup (JSON)
                   </button>
 
                   <button
@@ -8098,7 +8099,7 @@ export default function App() {
                     style={{ ...styles.button, width: '100%', padding: '9px 12px', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
                     onClick={() => ripristinaArchivioRef.current?.click()}
                   >
-                    📥 Ripristina backup…
+                    Ripristina backup…
                   </button>
                   <input
                     ref={ripristinaArchivioRef}
@@ -8225,7 +8226,7 @@ export default function App() {
             onClick={(e) => { if (e.target === e.currentTarget) setMostraPrivilegi(false); }}
           >
             <div style={{ ...styles.panel, maxWidth: 520, width: '100%', maxHeight: '88vh', overflowY: 'auto' }}>
-              <h1 style={{ ...styles.title, textAlign: 'center', marginBottom: 4 }}>📖 {t('priv.panoramica')}</h1>
+              <h1 style={{ ...styles.title, textAlign: 'center', marginBottom: 4 }}>{t('priv.panoramica')}</h1>
               <div style={{ textAlign: 'center', ...styles.detail, marginBottom: 12 }}>
                 {traduciDato(scheda.classe) || '—'}{scheda.sottoclasse ? ` · ${traduciDato(scheda.sottoclasse)}` : ''} · Liv. {liv} · {versione === '2024' ? 'D&D 5.5' : 'D&D 5.0'}
               </div>
@@ -8250,8 +8251,8 @@ export default function App() {
                         </div>
                       );
                     })}
-                    {sub && <div style={{ color: C.green }}>🌟 {t('priv.sottoclasse')}{scheda.sottoclasse ? ` (${traduciDato(scheda.sottoclasse)})` : ''}</div>}
-                    {asi && <div style={{ color: C.inkDim }}>🎯 {t('priv.aumento_car')}</div>}
+                    {sub && <div style={{ color: C.green }}>{t('priv.sottoclasse')}{scheda.sottoclasse ? ` (${traduciDato(scheda.sottoclasse)})` : ''}</div>}
+                    {asi && <div style={{ color: C.inkDim }}>{t('priv.aumento_car')}</div>}
                     {futuro && <span style={{ ...styles.detail, fontStyle: 'italic' }}>— {t('priv.futuro')}</span>}
                   </div>
                 </div>
@@ -8280,7 +8281,7 @@ export default function App() {
             onClick={(e) => { if (e.target === e.currentTarget) setMostraPrivilegiSub(false); }}
           >
             <div style={{ ...styles.panel, maxWidth: 540, width: '100%', maxHeight: '88vh', overflowY: 'auto' }}>
-              <h1 style={{ ...styles.title, textAlign: 'center', marginBottom: 4 }}>📖 {t('priv.panoramica_sub')}</h1>
+              <h1 style={{ ...styles.title, textAlign: 'center', marginBottom: 4 }}>{t('priv.panoramica_sub')}</h1>
               <div style={{ textAlign: 'center', ...styles.detail, marginBottom: 12 }}>
                 {versione === '2024' ? 'D&D 5.5' : 'D&D 5.0'}
               </div>
@@ -8301,7 +8302,7 @@ export default function App() {
                       style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 9px', borderRadius: 8, background: mostraPrivilegiSub === item.sottoclasse ? 'rgba(200,140,20,0.18)' : C.panel, borderColor: mostraPrivilegiSub === item.sottoclasse ? C.goldDark : C.border, fontWeight: mostraPrivilegiSub === item.sottoclasse ? 700 : 500 }}
                       onClick={() => setMostraPrivilegiSub(item.sottoclasse)}
                     >
-                      🌟 {traduciDato(item.sottoclasse)}
+                      {traduciDato(item.sottoclasse)}
                     </button>
                   ))}
                 </div>
@@ -8315,7 +8316,7 @@ export default function App() {
                 return (
                   <div key={idx} style={{ marginBottom: 18, background: 'rgba(0,0,0,0.02)', border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px' }}>
                     <div style={{ fontSize: 14, fontWeight: 800, color: C.goldDark, marginBottom: 2 }}>
-                      🌟 {traduciDato(item.sottoclasse)}
+                      {traduciDato(item.sottoclasse)}
                     </div>
                     <div style={{ fontSize: 11, color: C.inkDim, marginBottom: 8 }}>
                       {traduciDato(item.classe)} · Livello {item.livello}
@@ -8368,7 +8369,7 @@ export default function App() {
           aggiorna({ pe: nuovoTotale });
           setInputAggiungiPe('');
           registra({
-            etichetta: `⭐ Punti Esperienza`,
+            etichetta: `Punti Esperienza`,
             tipo: 'pe',
             totale: num,
             dettaglio: `Guadagnati +${num.toLocaleString()} PE (Totale: ${nuovoTotale.toLocaleString()} PE)`,
@@ -8410,7 +8411,7 @@ export default function App() {
               {/* Header */}
               <div style={{ padding: '14px 18px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <strong style={{ fontSize: 15, color: C.goldDark, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span>⭐</span> {lingua === 'en' ? 'Experience Points (XP Tracker)' : 'Tracciatore Punti Esperienza (PE)'}
+                  {lingua === 'en' ? 'Experience Points (XP Tracker)' : 'Tracciatore Punti Esperienza (PE)'}
                 </strong>
                 <button
                   type="button"
@@ -8506,15 +8507,15 @@ export default function App() {
                         boxShadow: '0 4px 12px rgba(16,185,129,0.3)',
                       }}
                     >
-                      ✨ {lingua === 'en' ? 'Ready to level up: open the level-up guide' : 'Puoi salire di livello: apri l’avanzamento'}
+                      {lingua === 'en' ? 'Ready to level up: open the level-up guide' : 'Puoi salire di livello: apri l’avanzamento'}
                     </button>
                   )}
                 </div>
 
                 {/* Sezione Aggiungi Rapido P.E. */}
                 <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                    ➕ {lingua === 'en' ? 'Add Session / Encounter XP' : 'Aggiungi Punti Esperienza'}
+                  <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, letterSpacing: 0.5 }}>
+                    {lingua === 'en' ? 'Add Session / Encounter XP' : 'Aggiungi Punti Esperienza'}
                   </div>
                   
                   {/* Input personalizzato */}
@@ -8589,7 +8590,7 @@ export default function App() {
 
                 {/* Tabella Ufficiale Soglie D&D 5e */}
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', marginBottom: 6 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, marginBottom: 6 }}>
                     {lingua === 'en' ? `Official XP Progression Table (${versione === '2024' ? '5.5' : '5e'})` : `Tabella Ufficiale Soglie PE (${versione === '2024' ? '5.5' : '5e'})`}
                   </div>
                   <div style={{ maxHeight: 180, overflowY: 'auto', border: `1px solid ${C.border}`, borderRadius: 6 }}>
@@ -8704,28 +8705,28 @@ export default function App() {
                 
                 {/* 1. Modalità di Movimento */}
                 <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, letterSpacing: 0.5 }}>
                     {lingua === 'en' ? 'Movement modes per round' : 'Velocità e tipi di movimento'}
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 8 }}>
                     <div style={{ background: C.panel, padding: '8px 10px', borderRadius: 6, border: `1px solid ${C.border}` }}>
-                      <div style={{ fontSize: 11, color: C.inkDim }}>🚶 {lingua === 'en' ? 'Walking / Base' : 'Camminata / Base'}</div>
+                      <div style={{ fontSize: 11, color: C.inkDim }}>{lingua === 'en' ? 'Walking / Base' : 'Camminata / Base'}</div>
                       <div style={{ fontSize: 16, fontWeight: 800, color: C.ink }}>{mov.velBase} m</div>
                     </div>
                     <div style={{ background: C.panel, padding: '8px 10px', borderRadius: 6, border: `1px solid ${C.border}` }}>
-                      <div style={{ fontSize: 11, color: C.inkDim }}>💨 {lingua === 'en' ? 'Dash (Action)' : 'Scatto (Azione)'}</div>
+                      <div style={{ fontSize: 11, color: C.inkDim }}>{lingua === 'en' ? 'Dash (Action)' : 'Scatto (Azione)'}</div>
                       <div style={{ fontSize: 16, fontWeight: 800, color: C.goldDark }}>{mov.scatto} m</div>
                     </div>
                     <div style={{ background: C.panel, padding: '8px 10px', borderRadius: 6, border: `1px solid ${C.border}` }}>
-                      <div style={{ fontSize: 11, color: C.inkDim }}>🧗 {lingua === 'en' ? 'Climbing' : 'Scalata'}</div>
+                      <div style={{ fontSize: 11, color: C.inkDim }}>{lingua === 'en' ? 'Climbing' : 'Scalata'}</div>
                       <div style={{ fontSize: 16, fontWeight: 800, color: C.ink }}>{mov.scalata} m</div>
                     </div>
                     <div style={{ background: C.panel, padding: '8px 10px', borderRadius: 6, border: `1px solid ${C.border}` }}>
-                      <div style={{ fontSize: 11, color: C.inkDim }}>🏊 {lingua === 'en' ? 'Swimming' : 'Nuoto'}</div>
+                      <div style={{ fontSize: 11, color: C.inkDim }}>{lingua === 'en' ? 'Swimming' : 'Nuoto'}</div>
                       <div style={{ fontSize: 16, fontWeight: 800, color: C.ink }}>{mov.nuoto} m</div>
                     </div>
                     <div style={{ background: C.panel, padding: '8px 10px', borderRadius: 6, border: `1px solid ${C.border}` }}>
-                      <div style={{ fontSize: 11, color: C.inkDim }}>🐛 {lingua === 'en' ? 'Crawling' : 'Strisciata'}</div>
+                      <div style={{ fontSize: 11, color: C.inkDim }}>{lingua === 'en' ? 'Crawling' : 'Strisciata'}</div>
                       <div style={{ fontSize: 16, fontWeight: 800, color: C.ink }}>{mov.strisciata} m</div>
                     </div>
                   </div>
@@ -8734,7 +8735,7 @@ export default function App() {
                 {/* 2. Calcolatore Salti */}
                 <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, letterSpacing: 0.5 }}>
                       {lingua === 'en' ? `Jump Calculator (${(scheda?.versione || '2024') === '2024' ? '5.5' : '5e'}) (Strength-Based)` : `Calcolatore Salti (${(scheda?.versione || '2024') === '2024' ? '5.5' : '5e'}) (Basato su Forza)`}
                     </div>
                     <span style={{ fontSize: 11, color: C.inkDim }}>FOR {mov.forPunteggio} ({conSegno(mov.modFor)})</span>
@@ -8762,7 +8763,7 @@ export default function App() {
                     {/* Salto in Alto */}
                     <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
                       <div style={{ fontWeight: 700, fontSize: 12, color: C.ink }}>
-                        🧗 {lingua === 'en' ? 'High Jump' : 'Salto in Alto'}
+                        {lingua === 'en' ? 'High Jump' : 'Salto in Alto'}
                       </div>
                       <div style={{ fontSize: 12, color: C.inkDim, display: 'flex', justifyContent: 'space-between' }}>
                         <span>{lingua === 'en' ? 'With 3m run-up:' : 'Con rincorsa (3m):'}</span>
@@ -8773,7 +8774,7 @@ export default function App() {
                         <strong style={{ color: C.ink, fontSize: 13 }}>{mov.saltoAltoFermo} m</strong>
                       </div>
                       <div style={{ fontSize: 11, color: C.inkDim, borderTop: `1px dashed ${C.border}`, paddingTop: 4, marginTop: 2 }}>
-                        🤲 {lingua === 'en' ? 'Reach with arms:' : 'Presa a braccia tese:'} <strong style={{ color: C.ink }}>{mov.altezzaRaggiungibile} m</strong>
+                        {lingua === 'en' ? 'Reach with arms:' : 'Presa a braccia tese:'} <strong style={{ color: C.ink }}>{mov.altezzaRaggiungibile} m</strong>
                       </div>
                     </div>
                   </div>
@@ -8781,22 +8782,22 @@ export default function App() {
 
                 {/* 3. Capacità Fisiche: Sollevamento & Trascinamento */}
                 <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', letterSpacing: 0.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, letterSpacing: 0.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>{lingua === 'en' ? 'Lifting and dragging' : 'Sollevare, spingere e trascinare'}</span>
                     {mov.haCorporaturaPossente && (
                       <span style={{ fontSize: 11, color: '#10b981', background: 'rgba(16,185,129,0.12)', border: '1px solid #10b981', padding: '1px 5px', borderRadius: 4, fontWeight: 700 }}>
-                        ✨ {lingua === 'en' ? 'Powerful Build ×2' : 'Corporatura Possente ×2'}
+                        {lingua === 'en' ? 'Powerful Build ×2' : 'Corporatura Possente ×2'}
                       </span>
                     )}
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                     <div style={{ background: C.panel, padding: '8px 10px', borderRadius: 6, border: `1px solid ${C.border}` }}>
-                      <div style={{ fontSize: 11, color: C.inkDim }}>🏋️ {lingua === 'en' ? 'Max Overhead Lift:' : 'Sollevamento Massimo:'}</div>
+                      <div style={{ fontSize: 11, color: C.inkDim }}>{lingua === 'en' ? 'Max Overhead Lift:' : 'Sollevamento Massimo:'}</div>
                       <div style={{ fontSize: 16, fontWeight: 800, color: C.ink }}>{mov.sollevamentoKg} kg</div>
                       <div style={{ fontSize: 11, color: C.inkDim }}>{lingua === 'en' ? '(Strength × 15 kg)' : '(Forza × 15 kg)'}</div>
                     </div>
                     <div style={{ background: C.panel, padding: '8px 10px', borderRadius: 6, border: `1px solid ${C.border}` }}>
-                      <div style={{ fontSize: 11, color: C.inkDim }}>🚜 {lingua === 'en' ? 'Max Push / Drag:' : 'Spinta / Trascinamento Max:'}</div>
+                      <div style={{ fontSize: 11, color: C.inkDim }}>{lingua === 'en' ? 'Max Push / Drag:' : 'Spinta / Trascinamento Max:'}</div>
                       <div style={{ fontSize: 16, fontWeight: 800, color: C.goldDark }}>{mov.spintaKg} kg</div>
                       <div style={{ fontSize: 11, color: C.inkDim }}>{lingua === 'en' ? '(Strength × 30 kg)' : '(Forza × 30 kg)'}</div>
                     </div>
@@ -8817,12 +8818,12 @@ export default function App() {
         const eseguiReazione = (r) => {
           aggiorna({ reazioneUsata: true });
           const desc = lingua === 'en' ? (r.effettoEn || r.innescoEn) : (r.effettoIt || r.innescoIt);
-          registra({ etichetta: `⚡ ${r.nome}`, tipo: 'reazione', dettaglio: `${r.nome} (${lingua === 'en' ? r.innescoEn : r.innescoIt}): ${desc}` });
+          registra({ etichetta: `${r.nome}`, tipo: 'reazione', dettaglio: `${r.nome} (${lingua === 'en' ? r.innescoEn : r.innescoIt}): ${desc}` });
           if (suoniEffOn) eseguiEffettoSonoro(r.tipo === 'incantesimo' ? 'magia' : 'arma', volumeEffetti);
           setMostraModalReazioni(false);
           setInfo({
-            titolo: `⚡ ${r.nome}`,
-            testo: `🎯 ${lingua === 'en' ? 'Trigger' : 'Innesco'}: ${lingua === 'en' ? r.innescoEn : r.innescoIt}\n\n🛡️ ${lingua === 'en' ? 'Effect' : 'Effetto'}: ${lingua === 'en' ? r.effettoEn : r.effettoIt}`,
+            titolo: `${r.nome}`,
+            testo: `${lingua === 'en' ? 'Trigger' : 'Innesco'}: ${lingua === 'en' ? r.innescoEn : r.innescoIt}\n\n🛡️ ${lingua === 'en' ? 'Effect' : 'Effetto'}: ${lingua === 'en' ? r.effettoEn : r.effettoIt}`,
           });
         };
 
@@ -8951,7 +8952,7 @@ export default function App() {
                               style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 6px' }}
                               title={lingua === 'en' ? 'Add to quick attacks list' : 'Aggiungi alla tabella attacchi/reazioni'}
                             >
-                              ➕ {lingua === 'en' ? 'Pin' : 'Aggiungi'}
+                              {lingua === 'en' ? 'Pin' : 'Aggiungi'}
                             </button>
                           )}
                           <button
@@ -8969,19 +8970,19 @@ export default function App() {
                               cursor: reazioneUsata ? 'not-allowed' : 'pointer',
                             }}
                           >
-                            ⚡ {lingua === 'en' ? 'Trigger' : 'Usa Reazione'}
+                            {lingua === 'en' ? 'Trigger' : 'Usa Reazione'}
                           </button>
                         </div>
                       </div>
 
                       {/* Innesco */}
                       <div style={{ fontSize: 12, color: C.goldDark, background: 'rgba(201,162,39,0.08)', padding: '4px 8px', borderRadius: 6, lineHeight: 1.3 }}>
-                        🎯 <strong>{lingua === 'en' ? 'Trigger' : 'Innesco'}:</strong> {lingua === 'en' ? r.innescoEn : r.innescoIt}
+                        <strong>{lingua === 'en' ? 'Trigger' : 'Innesco'}:</strong> {lingua === 'en' ? r.innescoEn : r.innescoIt}
                       </div>
 
                       {/* Effetto */}
                       <div style={{ fontSize: 11, color: C.inkDim, lineHeight: 1.35, paddingLeft: 4 }}>
-                        🛡️ <strong>{lingua === 'en' ? 'Effect' : 'Effetto'}:</strong> {lingua === 'en' ? r.effettoEn : r.effettoIt}
+                        <strong>{lingua === 'en' ? 'Effect' : 'Effetto'}:</strong> {lingua === 'en' ? r.effettoEn : r.effettoIt}
                       </div>
                     </div>
                   );
@@ -9066,13 +9067,12 @@ export default function App() {
               {/* Header */}
               <div style={{ padding: '14px 18px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: C.panelLight }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 20 }}>📚</span>
                   <div>
                     <strong style={{ fontSize: 16, color: C.ink }}>
                       {lingua === 'en' ? infoAb.nomeEn : infoAb.nomeIt}
                     </strong>
                     <span style={{ fontSize: 11, color: C.inkDim, marginLeft: 8 }}>
-                      ({carAbbr}) • {liv === 3 ? '✦ Maestria (Expertise)' : liv === 2 ? '★ Competenza Razza/Classe' : liv === 1 ? '● Competente' : '○ Non Competente'}
+                      ({carAbbr}) • {liv === 3 ? '✦ Maestria (Expertise)' : liv === 2 ? 'Competenza Razza/Classe' : liv === 1 ? '● Competente' : '○ Non Competente'}
                     </span>
                   </div>
                 </div>
@@ -9097,21 +9097,21 @@ export default function App() {
                   onClick={() => eseguiTiro(0)}
                   style={{ ...styles.buttonMini, fontSize: 12, fontWeight: 700, padding: '5px 12px', background: 'rgba(201,162,39,0.15)', borderColor: C.gold, color: C.goldDark }}
                 >
-                  🎲 {lingua === 'en' ? 'Normal Roll' : 'Tiro Normale'} ({conSegno(bonus)})
+                  {lingua === 'en' ? 'Normal Roll' : 'Tiro Normale'} ({conSegno(bonus)})
                 </button>
                 <button
                   type="button"
                   onClick={() => eseguiTiro(1)}
                   style={{ ...styles.buttonMini, fontSize: 12, fontWeight: 700, padding: '5px 12px', background: 'rgba(46,157,77,0.15)', borderColor: '#2e9d4d', color: '#2e9d4d' }}
                 >
-                  ✨ {lingua === 'en' ? 'Advantage' : 'Con Vantaggio'}
+                  {lingua === 'en' ? 'Advantage' : 'Con Vantaggio'}
                 </button>
                 <button
                   type="button"
                   onClick={() => eseguiTiro(-1)}
                   style={{ ...styles.buttonMini, fontSize: 12, fontWeight: 700, padding: '5px 12px', background: 'rgba(239,68,68,0.12)', borderColor: C.red, color: C.red }}
                 >
-                  ⚠️ {lingua === 'en' ? 'Disadvantage' : 'Con Svantaggio'}
+                  {lingua === 'en' ? 'Disadvantage' : 'Con Svantaggio'}
                 </button>
               </div>
 
@@ -9124,7 +9124,7 @@ export default function App() {
 
                 {/* Tabella CD di Riferimento */}
                 <div>
-                  <h4 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5, color: C.goldDark, marginBottom: 6 }}>
+                  <h4 style={{ fontSize: 12, letterSpacing: 0.5, color: C.goldDark, marginBottom: 6 }}>
                     {lingua === 'en' ? 'Official Reference DCs (Difficulty Class)' : 'Classi di Difficoltà Ufficiali (CD)'}
                   </h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -9159,7 +9159,7 @@ export default function App() {
                 {/* Sinergie con Strumenti (Xanathar p. 78-85) */}
                 {(infoAb.sinergie || []).length > 0 && (
                   <div>
-                    <h4 style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5, color: C.goldDark, marginBottom: 6 }}>
+                    <h4 style={{ fontSize: 12, letterSpacing: 0.5, color: C.goldDark, marginBottom: 6 }}>
                       {lingua === 'en' ? 'Tool Synergies (Xanathar\'s Guide)' : 'Sinergie con gli Strumenti (Xanathar)'}
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -9178,7 +9178,7 @@ export default function App() {
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
                             <strong style={{ fontSize: 12, color: syn.posseduto ? '#2e9d4d' : C.ink }}>
-                              🔧 {syn.strumento}
+                              {syn.strumento}
                             </strong>
                             {syn.posseduto ? (
                               <span style={{ fontSize: 11, fontWeight: 700, color: '#2e9d4d', background: 'rgba(46,157,77,0.15)', padding: '1px 6px', borderRadius: 4 }}>
@@ -9324,7 +9324,7 @@ export default function App() {
 
             {/* SELETTORE CLASSE PER L'AVANZAMENTO */}
             <div style={{ marginBottom: 16, background: 'rgba(0,0,0,0.02)', border: `1px solid ${C.border}`, borderRadius: 10, padding: '12px' }}>
-              <label style={{ ...styles.detail, display: 'block', marginBottom: 8, fontWeight: 700, color: C.goldDark, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              <label style={{ ...styles.detail, display: 'block', marginBottom: 8, fontWeight: 700, color: C.goldDark, fontSize: 12, letterSpacing: 0.5 }}>
                 {t('levelup.scegli_classe_avanzamento')}
               </label>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -9468,7 +9468,7 @@ export default function App() {
             {/* SCELTA SOTTOCLASSE (SE AL LIVELLO DI SOTTOCLASSE) */}
             {mostraSceltaSub && (
               <div style={{ marginBottom: 14, background: 'rgba(214,169,15,0.06)', border: `1px solid ${C.goldDark}`, borderRadius: 8, padding: '10px 12px' }}>
-                <label style={{ ...styles.detail, display: 'block', marginBottom: 4, fontWeight: 700, color: C.goldDark, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4 }}>
+                <label style={{ ...styles.detail, display: 'block', marginBottom: 4, fontWeight: 700, color: C.goldDark, fontSize: 12, letterSpacing: 0.4 }}>
                   {t('levelup.scegli_sub')} ({traduciDato(targetClasse)}):
                 </label>
                 <select
@@ -9485,7 +9485,7 @@ export default function App() {
             {/* ASI O TALENTO (SE AL LIVELLO ASI) */}
             {haASI && (
               <div style={{ marginBottom: 14, background: 'rgba(0,0,0,0.02)', border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px' }}>
-                <div style={{ fontWeight: 700, marginBottom: 6, color: C.goldDark, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4 }}>{t('levelup.asi_o_talento')} ({traduciDato(targetClasse)} Liv. {targetLivelloNuovo})</div>
+                <div style={{ fontWeight: 700, marginBottom: 6, color: C.goldDark, fontSize: 12, letterSpacing: 0.4 }}>{t('levelup.asi_o_talento')} ({traduciDato(targetClasse)} Liv. {targetLivelloNuovo})</div>
                 <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
                   {[['aumento', t('levelup.aumento_car')], ['talento', t('levelup.talento')]].map(([m, lab]) => (
                     <button key={m} style={levelUpBozza.asiMode === m ? styles.modeButton(true) : styles.modeButton(false)} onClick={() => setLevelUpBozza((b) => ({ ...b, asiMode: m }))}>{lab}</button>
@@ -9578,7 +9578,7 @@ export default function App() {
               {/* Privilegi di Classe Sbloccati */}
               {privNuovi && (
                 <div style={{ padding: '10px 0', borderBottom: `1px solid ${C.border}` }}>
-                  <div style={{ fontWeight: 700, marginBottom: 6, color: C.goldDark, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4 }}>
+                  <div style={{ fontWeight: 700, marginBottom: 6, color: C.goldDark, fontSize: 12, letterSpacing: 0.4 }}>
                     {t('levelup.privilegi_ottenuti')}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -9602,7 +9602,7 @@ export default function App() {
               {/* Privilegi Sottoclasse Sbloccati */}
               {subPrivNuovi ? (
                 <div style={{ padding: '10px 0', borderBottom: `1px solid ${C.border}` }}>
-                  <div style={{ fontWeight: 700, marginBottom: 6, color: C.goldDark, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4 }}>
+                  <div style={{ fontWeight: 700, marginBottom: 6, color: C.goldDark, fontSize: 12, letterSpacing: 0.4 }}>
                     {t('levelup.nuovi_priv_sub')} ({subSel || 'Sottoclasse'}):
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -9628,7 +9628,7 @@ export default function App() {
               {/* Progressioni Meccaniche & Risorse */}
               {progressioni.length > 0 && (
                 <div style={{ padding: '10px 0', borderBottom: `1px solid ${C.border}` }}>
-                  <div style={{ fontWeight: 700, marginBottom: 6, color: C.goldDark, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.4 }}>
+                  <div style={{ fontWeight: 700, marginBottom: 6, color: C.goldDark, fontSize: 12, letterSpacing: 0.4 }}>
                     {t('levelup.risorse_potenziate')}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -9645,8 +9645,7 @@ export default function App() {
               {(slotStr || trucchettiDaScegliere > 0 || nuoviIncantesimi > 0) && (
                 <div style={{ padding: '12px 0', borderBottom: haASI ? `1px solid ${C.border}` : 'none' }}>
                   {/* Intestazione Sezione */}
-                  <div style={{ fontWeight: 700, marginBottom: 8, color: C.goldDark, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span>✨</span>
+                  <div style={{ fontWeight: 700, marginBottom: 8, color: C.goldDark, fontSize: 12, letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: 6 }}>
                     <span>{lingua === 'it' ? 'Incantesimi e slot' : 'Spells and spell slots'}</span>
                   </div>
 
@@ -9662,7 +9661,6 @@ export default function App() {
                       alignItems: 'center',
                       gap: 8,
                     }}>
-                      <span style={{ fontSize: 18 }}>🎉</span>
                       <div>
                         <div style={{ color: '#2e9d4d', fontWeight: 800, fontSize: 13 }}>
                           {t('levelup.sblocchi', { n: nuovoLivInc })}
@@ -9741,7 +9739,6 @@ export default function App() {
                       gap: 4,
                     }}>
                       <div style={{ fontSize: 12, fontWeight: 700, color: C.ink, display: 'flex', alignItems: 'center', gap: 5 }}>
-                        <span>📖</span>
                         <span>{lingua === 'it' ? 'Da imparare o preparare:' : 'To learn or prepare:'}</span>
                       </div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 2 }}>
@@ -9953,9 +9950,7 @@ export default function App() {
                   onClick={() => setMostraModalManuali(true)}
                   title={lingua === 'it' ? 'Configura i manuali e le espansioni attive (Tasha, Xanathar, ecc.)' : 'Configure active sourcebooks (Tasha, Xanathar, etc.)'}
                 >
-                  <span>📚</span>
                   <span>{lingua === 'it' ? `Manuali (${Object.values(manualiAttivi).filter(Boolean).length})` : `Books (${Object.values(manualiAttivi).filter(Boolean).length})`}</span>
-                  <span>⚙️</span>
                 </button>
               </div>
 
@@ -9980,10 +9975,10 @@ export default function App() {
                 const d = datiSpecieDi(bozzaCrea.specie, regoleVersione);
                 return (
                   <div style={{ background: 'rgba(0,0,0,0.04)', border: `1px solid ${C.border}`, borderRadius: 8, padding: '6px 10px', marginBottom: 12, fontSize: 11, lineHeight: 1.5 }}>
-                    {d && <div>🏃 {t('vital.movimento')} {d.velocita} m · 📏 {d.taglia}{d.sensi ? ` · 👁 ${d.sensi}` : ''}</div>}
-                    {d && <div>✨ {t('crea.tratti')}: {d.tratti}</div>}
+                    {d && <div>{t('vital.movimento')} {d.velocita} m · {d.taglia}{d.sensi ? ` · ${d.sensi}` : ''}</div>}
+                    {d && <div>{t('crea.tratti')}: {d.tratti}</div>}
                     <div style={{ color: C.inkDim }}>
-                      💪 {t('crea.bonus_car')}: {regoleVersione === '2024'
+                      {t('crea.bonus_car')}: {regoleVersione === '2024'
                         ? t('crea.bonus_bg')
                         : (riepilogoBonusCaratt(bonusRazza) || t('crea.bonus_razza'))}
                     </div>
@@ -10004,12 +9999,12 @@ export default function App() {
               </select>
 
               {/* Livello iniziale: crea subito un PG di livello alto senza fare Level Up a mano */}
-              <label style={{ ...styles.detail, display: 'block', marginBottom: 3 }}>{lingua === 'it' ? '🎚️ Livello iniziale' : '🎚️ Starting level'}</label>
+              <label style={{ ...styles.detail, display: 'block', marginBottom: 3 }}>{lingua === 'it' ? 'Livello iniziale' : 'Starting level'}</label>
               <select style={{ ...stileSelect, marginBottom: 12 }} value={bozzaCrea.livello} onChange={(e) => {
                 const livello = Math.max(1, Math.min(20, parseInt(e.target.value, 10) || 1));
                 setB({ livello, sottoclasse: livello < livelloSceltaSottoclasse(bozzaCrea.classe, regoleVersione) ? '' : bozzaCrea.sottoclasse });
               }}>
-                {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => <option key={n} value={n}>{lingua === 'it' ? `🎚️ Livello ${n}` : `🎚️ Level ${n}`}</option>)}
+                {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => <option key={n} value={n}>{lingua === 'it' ? `Livello ${n}` : `Level ${n}`}</option>)}
               </select>
 
               {/* Multiclasse: classe e livello della classe principale prima,
@@ -10026,7 +10021,7 @@ export default function App() {
                         setB({ multiclasseClasse2: e.target.checked ? (listaC.find((n) => n !== bozzaCrea.classe) || '') : '', multiclasseLivello2: 1 });
                       }}
                     />
-                    ➕ {lingua === 'it' ? 'Multiclasse: aggiungi una seconda classe' : 'Multiclass: add a second class'}
+                    {lingua === 'it' ? 'Multiclasse: aggiungi una seconda classe' : 'Multiclass: add a second class'}
                   </label>
                   {bozzaCrea.multiclasseClasse2 && (() => {
                     const maxLiv2 = Math.max(1, 20 - Number(bozzaCrea.livello || 1));
@@ -10045,7 +10040,7 @@ export default function App() {
                         </div>
                         {serveSubMc2 && scelteSubMc2.length > 0 && (
                           <select style={{ ...stileSelect, marginTop: 6 }} value={bozzaCrea.sottoclasseMc2} onChange={(e) => setB({ sottoclasseMc2: e.target.value })}>
-                            <option value="">{lingua === 'it' ? `⚔️ Sottoclasse (${bozzaCrea.multiclasseClasse2}) — scegli...` : `⚔️ Subclass (${bozzaCrea.multiclasseClasse2}) — choose...`}</option>
+                            <option value="">{lingua === 'it' ? `Sottoclasse (${bozzaCrea.multiclasseClasse2}) — scegli...` : `Subclass (${bozzaCrea.multiclasseClasse2}) — choose...`}</option>
                             {[...scelteSubMc2].sort((a, b) => a.localeCompare(b, lingua)).map((n) => <option key={n} value={n}>{n}</option>)}
                           </select>
                         )}
@@ -10065,7 +10060,7 @@ export default function App() {
                         setB({ multiclasseClasse3: e.target.checked ? (listaC.find((n) => n !== bozzaCrea.classe && n !== bozzaCrea.multiclasseClasse2) || '') : '', multiclasseLivello3: 1 });
                       }}
                     />
-                    ➕ {lingua === 'it' ? 'Triclasse: aggiungi una terza classe' : 'Triclass: add a third class'}
+                    {lingua === 'it' ? 'Triclasse: aggiungi una terza classe' : 'Triclass: add a third class'}
                   </label>
                   {bozzaCrea.multiclasseClasse3 && (() => {
                     const maxLiv3 = Math.max(1, 20 - Number(bozzaCrea.livello || 1) - Number(bozzaCrea.multiclasseLivello2 || 1));
@@ -10084,7 +10079,7 @@ export default function App() {
                         </div>
                         {serveSubMc3 && scelteSubMc3.length > 0 && (
                           <select style={{ ...stileSelect, marginTop: 6 }} value={bozzaCrea.sottoclasseMc3} onChange={(e) => setB({ sottoclasseMc3: e.target.value })}>
-                            <option value="">{lingua === 'it' ? `⚔️ Sottoclasse (${bozzaCrea.multiclasseClasse3}) — scegli...` : `⚔️ Subclass (${bozzaCrea.multiclasseClasse3}) — choose...`}</option>
+                            <option value="">{lingua === 'it' ? `Sottoclasse (${bozzaCrea.multiclasseClasse3}) — scegli...` : `Subclass (${bozzaCrea.multiclasseClasse3}) — choose...`}</option>
                             {[...scelteSubMc3].sort((a, b) => a.localeCompare(b, lingua)).map((n) => <option key={n} value={n}>{n}</option>)}
                           </select>
                         )}
@@ -10103,7 +10098,7 @@ export default function App() {
                 return (
                   <div style={{ background: 'rgba(0,0,0,0.04)', border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 10px', marginTop: -6, marginBottom: 12, fontSize: 11 }}>
                     <div style={{ fontWeight: 'bold', marginBottom: 6, color: C.inkDim }}>
-                      💪 {asi.length} {asi.length > 1 ? 'aumenti' : 'aumento'} di caratteristica (livello{asi.length > 1 ? 'i' : ''} {asi.join(', ')})
+                      {asi.length} {asi.length > 1 ? 'aumenti' : 'aumento'} di caratteristica (livello{asi.length > 1 ? 'i' : ''} {asi.join(', ')})
                     </div>
                     {asi.map((lv) => {
                       const scelta = bozzaCrea.asiTalenti?.[lv] || '';
@@ -10120,7 +10115,7 @@ export default function App() {
                             style={{ ...styles.inlineInput, fontSize: 11, padding: '2px 4px', flex: '1 1 150px', minWidth: 0 }}
                           >
                             <option value="">— o scegli un talento —</option>
-                            {talentiOrdinati.map((tl) => <option key={tl.nome} value={tl.nome}>✨ {tl.nome}</option>)}
+                            {talentiOrdinati.map((tl) => <option key={tl.nome} value={tl.nome}>{tl.nome}</option>)}
                           </select>
                         </div>
                       );
@@ -10136,14 +10131,14 @@ export default function App() {
                   <label style={{ ...styles.detail, display: 'block', marginBottom: 3, fontWeight: 'bold' }}>{t('crea.talento_origine_label')}</label>
                   <select value={bozzaCrea.talentoOrigine} onChange={(e) => setB({ talentoOrigine: e.target.value })} style={stileSelect}>
                     <option value="">{t('crea.scegli')}</option>
-                    {[...talentiPerManuali(TALENTI_5E, manualiAttivi)].sort((a, b) => a.nome.localeCompare(b.nome, lingua)).map((tl) => <option key={tl.nome} value={tl.nome}>✨ {tl.nome} — {tl.desc}</option>)}
+                    {[...talentiPerManuali(TALENTI_5E, manualiAttivi)].sort((a, b) => a.nome.localeCompare(b.nome, lingua)).map((tl) => <option key={tl.nome} value={tl.nome}>{tl.nome} — {tl.desc}</option>)}
                   </select>
                 </div>
               )}
 
               {bozzaCrea.classe && Number(bozzaCrea.livello) >= livelloSceltaSottoclasse(bozzaCrea.classe, regoleVersione) && (
                 <>
-                  <label style={{ ...styles.detail, display: 'block', marginBottom: 3 }}>⚔️ {lingua === 'it' ? 'Sottoclasse' : 'Subclass'}</label>
+                  <label style={{ ...styles.detail, display: 'block', marginBottom: 3 }}>{lingua === 'it' ? 'Sottoclasse' : 'Subclass'}</label>
                   <select style={{ ...stileSelect, marginBottom: 12 }} value={bozzaCrea.sottoclasse} onChange={(e) => setB({ sottoclasse: e.target.value })}>
                     <option value="">{t('crea.scegli')}</option>
                     {[...sottoclassiPerClasse(bozzaCrea.classe, manualiAttivi)].sort((a, b) => a.localeCompare(b, lingua)).map((n) => <option key={n} value={n}>{n}</option>)}
@@ -10158,31 +10153,31 @@ export default function App() {
               </select>
               {bozzaCrea.background && (
                 <div style={{ background: 'rgba(0,0,0,0.04)', border: `1px solid ${C.border}`, borderRadius: 8, padding: '6px 10px', marginBottom: 12, fontSize: 11, lineHeight: 1.5 }}>
-                  <div>🎓 {t('crea.competenze')}: {(BACKGROUND_COMPETENZE[bozzaCrea.background] || []).map((k) => t('skill.' + k)).join(', ') || '—'}</div>
+                  <div>{t('crea.competenze')}: {(BACKGROUND_COMPETENZE[bozzaCrea.background] || []).map((k) => t('skill.' + k)).join(', ') || '—'}</div>
                   {regoleVersione === '2024' && (
                     <>
                       {bonusBg.length > 0 && (
-                        <div>💪 {t('crea.caratteristiche')}: +2 {bonusBg[0]?.slice(0, 3).toUpperCase()}, +1 {bonusBg[1]?.slice(0, 3).toUpperCase()} ({t('crea.a_scelta')})</div>
+                        <div>{t('crea.caratteristiche')}: +2 {bonusBg[0]?.slice(0, 3).toUpperCase()}, +1 {bonusBg[1]?.slice(0, 3).toUpperCase()} ({t('crea.a_scelta')})</div>
                       )}
                       {BACKGROUND_TALENTO_ORIGINE_2024[bozzaCrea.background] && (
-                        <div>✨ <strong>{lingua === 'it' ? 'Talento di Origine' : 'Origin Feat'}:</strong> {BACKGROUND_TALENTO_ORIGINE_2024[bozzaCrea.background]}</div>
+                        <div><strong>{lingua === 'it' ? 'Talento di Origine' : 'Origin Feat'}:</strong> {BACKGROUND_TALENTO_ORIGINE_2024[bozzaCrea.background]}</div>
                       )}
                     </>
                   )}
                 </div>
               )}
 
-              {/* Competenze di classe: scelta dell'utente (diventano ★ nella scheda) */}
+              {/* Competenze di classe: scelta dell'utente (diventano nella scheda) */}
               {bozzaCrea.classe && (() => {
                 const ts = tiriSalvezzaPerClasse(bozzaCrea.classe);
                 const add = addestramentoPerClasse(bozzaCrea.classe);
                 const tsNomi = ts ? Object.entries(ts).filter(([, v]) => v).map(([k]) => t('attr.' + k)).join(', ') : '';
                 return (
                   <div style={{ background: 'rgba(0,0,0,0.04)', border: `1px solid ${C.border}`, borderRadius: 8, padding: '6px 10px', marginBottom: 12, fontSize: 11, lineHeight: 1.5 }}>
-                    {tsNomi && <div>🛡️ <strong>{lingua === 'it' ? 'Tiri Salvezza' : 'Saving Throws'}:</strong> {tsNomi}</div>}
+                    {tsNomi && <div><strong>{lingua === 'it' ? 'Tiri Salvezza' : 'Saving Throws'}:</strong> {tsNomi}</div>}
                     {add && (
                       <div>
-                        ⚔️ <strong>{lingua === 'it' ? 'Competenze' : 'Proficiencies'}:</strong> {add.armi}
+                        <strong>{lingua === 'it' ? 'Competenze' : 'Proficiencies'}:</strong> {add.armi}
                         {add.armature?.pesanti ? ' · Tutte le armature e scudi' : add.armature?.medie ? ' · Armature leggere, medie e scudi' : add.armature?.leggere ? ' · Armature leggere' : ' · Nessuna armatura'}
                       </div>
                     )}
@@ -10298,7 +10293,7 @@ export default function App() {
 
               <label style={{ ...styles.detail, display: 'block', marginBottom: 6, fontWeight: 'bold' }}>Caratteristiche</label>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
-                {[['auto', '🎲 Tira e assegna'], ['assegna', '🎲 Tira e scelgo io'], ['manuale', '✍️ A mano']].map(([m, etichetta]) => (
+                {[['auto', 'Tira e assegna'], ['assegna', 'Tira e scelgo io'], ['manuale', 'A mano']].map(([m, etichetta]) => (
                   <button
                     key={m}
                     style={{ ...styles.modeButton(bozzaCrea.metodo === m), fontSize: 12, padding: '4px 10px' }}
@@ -10324,7 +10319,7 @@ export default function App() {
                     style={{ ...styles.button, marginBottom: 8 }}
                     onClick={() => setB({ pool: Array.from({ length: 6 }, tira4d6ScartaMinimo).sort((a, b) => b - a), assegna: {} })}
                   >
-                    🎲 {bozzaCrea.pool ? 'Ritira i valori' : 'Tira i 6 valori'}
+                    {bozzaCrea.pool ? 'Ritira i valori' : 'Tira i 6 valori'}
                   </button>
                   {bozzaCrea.pool && (
                     <>
@@ -10429,7 +10424,7 @@ export default function App() {
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
               <strong style={{ color: C.goldDark, fontSize: 14, display: 'flex', alignItems: 'center', gap: 5 }}>
-                <span>📂</span> <span>{t('import_export.titolo')}</span>
+                <span>{t('import_export.titolo')}</span>
               </strong>
               <button style={styles.buttonMini} onClick={() => setMostraMenuEsporta(false)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
             </div>
@@ -10447,7 +10442,6 @@ export default function App() {
               }}
               title={t('import_export.carica_file_sub')}
             >
-              <span style={{ fontSize: 16 }}>📂</span>
               <div>
                 <strong style={{ display: 'block' }}>{t('import_export.carica_file')}</strong>
                 <span style={{ fontSize: 11, color: C.inkDim, fontWeight: 'normal' }}>{t('import_export.carica_file_sub')}</span>
@@ -10471,7 +10465,7 @@ export default function App() {
                             if (dati) {
                               const normalizzata = normalizeImported(dati);
                               aggiorna(normalizzata);
-                              setInfo({ titolo: '✅ Importazione completata', testo: `Scheda "${normalizzata.nome || 'Personaggio'}" importata dal link.` });
+                              setInfo({ titolo: 'Importazione completata', testo: `Scheda "${normalizzata.nome || 'Personaggio'}" importata dal link.` });
                             }
                           });
                           return;
@@ -10480,16 +10474,15 @@ export default function App() {
                       const obj = JSON.parse(str);
                       const normalizzata = normalizeImported(obj);
                       aggiorna(normalizzata);
-                      setInfo({ titolo: '✅ Importazione completata', testo: `Scheda "${normalizzata.nome || 'Personaggio'}" importata dal testo.` });
+                      setInfo({ titolo: 'Importazione completata', testo: `Scheda "${normalizzata.nome || 'Personaggio'}" importata dal testo.` });
                     } catch (err) {
-                      setInfo({ titolo: '❌ Importazione non riuscita', testo: 'Il testo incollato non è un JSON valido o il link non contiene una scheda valida.' });
+                      setInfo({ titolo: 'Importazione non riuscita', testo: 'Il testo incollato non è un JSON valido o il link non contiene una scheda valida.' });
                     }
                   }
                 }, 50);
               }}
               title={t('import_export.incolla_json_sub')}
             >
-              <span style={{ fontSize: 16 }}>📋</span>
               <div>
                 <strong style={{ display: 'block' }}>{t('import_export.incolla_json')}</strong>
                 <span style={{ fontSize: 11, color: C.inkDim, fontWeight: 'normal' }}>{t('import_export.incolla_json_sub')}</span>
@@ -10510,7 +10503,6 @@ export default function App() {
               }}
               title={t('esporta.salva_json_tip')}
             >
-              <span style={{ fontSize: 16 }}>💾</span>
               <div>
                 <strong style={{ display: 'block' }}>{t('esporta.salva_json')}</strong>
                 <span style={{ fontSize: 11, color: C.inkDim, fontWeight: 'normal' }}>{t('esporta.salva_json_sub')}</span>
@@ -10527,7 +10519,6 @@ export default function App() {
               }}
               title={t('esporta.stampa_pdf_tip')}
             >
-              <span style={{ fontSize: 16 }}>🖨️</span>
               <div>
                 <strong style={{ display: 'block' }}>{t('esporta.stampa_pdf')}</strong>
                 <span style={{ fontSize: 11, color: '#fff', opacity: 0.9, fontWeight: 'normal' }}>{t('esporta.stampa_pdf_sub')}</span>
@@ -10542,7 +10533,6 @@ export default function App() {
               }}
               title={t('esporta.condividi_link_tip')}
             >
-              <span style={{ fontSize: 16 }}>🔗</span>
               <div>
                 <strong style={{ display: 'block' }}>{t('esporta.condividi_link')}</strong>
                 <span style={{ fontSize: 11, color: C.inkDim, fontWeight: 'normal' }}>{t('esporta.condividi_link_sub')}</span>
@@ -10557,7 +10547,6 @@ export default function App() {
               }}
               title={t('esporta.backup_tutti_tip')}
             >
-              <span style={{ fontSize: 16 }}>🗄️</span>
               <div>
                 <strong style={{ display: 'block' }}>{t('esporta.backup_tutti')}</strong>
                 <span style={{ fontSize: 11, color: C.inkDim, fontWeight: 'normal' }}>{t('esporta.backup_tutti_sub')}</span>
@@ -10588,14 +10577,14 @@ export default function App() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <strong style={{ color: C.goldDark, fontSize: 15, marginRight: 'auto' }}>🔔 {t('notifiche.titolo')}</strong>
+              <strong style={{ color: C.goldDark, fontSize: 15, marginRight: 'auto' }}>{t('notifiche.titolo')}</strong>
               <button style={{ ...styles.buttonMini, padding: '2px 7px' }} onClick={() => setMostraNotifiche(false)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
             </div>
 
             {/* SEZIONE 1: CONTROLLO E REGOLE DELLA SCHEDA */}
             <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: C.goldDark, letterSpacing: 0.5, marginBottom: 6 }}>
-                📋 {t('notifiche.sezione_scheda')}
+              <div style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, letterSpacing: 0.5, marginBottom: 6 }}>
+                {t('notifiche.sezione_scheda')}
               </div>
 
               {/* Nuvoletta feedback differenze applicate */}
@@ -10643,7 +10632,6 @@ export default function App() {
                   {controlliAttivi.length === 0 && (
                     <div style={{ border: `1px solid #2e9d4d`, borderRadius: 8, padding: '8px 10px', background: 'rgba(46, 157, 77, 0.12)' }}>
                       <div style={{ fontSize: 12, color: C.ink, display: 'flex', alignItems: 'flex-start', gap: 6, lineHeight: 1.4 }}>
-                        <span style={{ fontSize: 14 }}>✅</span>
                         <span>{t('notifiche.scheda_ok')}</span>
                       </div>
                       {(scheda.controlliIgnorati || []).length > 0 && (
@@ -10669,7 +10657,7 @@ export default function App() {
                       <div style={{ border: `1px solid ${certi ? C.red : C.gold}`, borderRadius: 8, padding: '8px 10px', background: certi ? 'color-mix(in srgb, var(--c-panel) 88%, #c83c3c)' : 'color-mix(in srgb, var(--c-panel) 88%, #c88c14)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, marginBottom: 6 }}>
                           <div style={{ fontSize: 13, color: C.ink, fontWeight: 700 }}>
-                            ⚠️ {lingua === 'en' ? 'Things to check' : 'Cose da verificare'}
+                            {lingua === 'en' ? 'Things to check' : 'Cose da verificare'}
                           </div>
                           {haCorreggibili && (
                             <button
@@ -10677,7 +10665,7 @@ export default function App() {
                               onClick={correggiTuttiControlli}
                               title={lingua === 'en' ? 'Apply all fixes with one click' : 'Applica tutte le correzioni con un click'}
                             >
-                              ⚡ {lingua === 'en' ? 'Fix all' : 'Correggi tutto'}
+                              {lingua === 'en' ? 'Fix all' : 'Correggi tutto'}
                             </button>
                           )}
                         </div>
@@ -10708,8 +10696,8 @@ export default function App() {
                                     onClick={() => eseguiCorrezione(r)}
                                   >
                                     {r.tipo === 'vai_a_sezione'
-                                      ? `🪄 ${lingua === 'en' ? 'Go to Section' : 'Vai a ' + (r.sezione === 'incantesimi' ? 'Magia' : (r.sezione === 'addestramento' ? 'Addestramento' : 'Sezione'))}`
-                                      : `🪄 ${lingua === 'en' ? 'Fix' : 'Correggi'}`}
+                                      ? `${lingua === 'en' ? 'Go to Section' : 'Vai a ' + (r.sezione === 'incantesimi' ? 'Magia' : (r.sezione === 'addestramento' ? 'Addestramento' : 'Sezione'))}`
+                                      : `${lingua === 'en' ? 'Fix' : 'Correggi'}`}
                                   </button>
                                 )}
                                 <button
@@ -10744,12 +10732,12 @@ export default function App() {
             {avvisoBackup && (
               <div style={{ border: `1px solid ${C.gold}`, borderRadius: 8, padding: '8px 10px', marginBottom: 12, background: 'color-mix(in srgb, var(--c-panel) 88%, #c88c14)' }}>
                 <div style={{ fontSize: 12, color: C.ink, marginBottom: 6 }}>
-                  🛟 <strong>Fai un backup dei tuoi personaggi.</strong> I dati sono salvati solo su questo
+                  <strong>Fai un backup dei tuoi personaggi.</strong> I dati sono salvati solo su questo
                   dispositivo: un backup ti protegge se cambi telefono o svuoti la cache.
                 </div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   <button style={{ ...styles.buttonPrimary, fontSize: 11, padding: '4px 10px' }} onClick={esportaBackupCompleto}>
-                    💾 Scarica backup
+                    Scarica backup
                   </button>
                   <button
                     style={{ ...styles.buttonMini, fontSize: 11 }}
@@ -10762,8 +10750,8 @@ export default function App() {
 
             {/* SEZIONE 3: NOVITÀ DELL'APPLICAZIONE */}
             <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 10, marginBottom: 10 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: C.goldDark, letterSpacing: 0.5, marginBottom: 6 }}>
-                📰 {t('notifiche.sezione_novita')}
+              <div style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, letterSpacing: 0.5, marginBottom: 6 }}>
+                {t('notifiche.sezione_novita')}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {novitaRecenti(3).map((n) => (
@@ -10795,7 +10783,7 @@ export default function App() {
                 }}
                 title={t('aggiorna.ricarica_desc')}
               >
-                <span>🔄</span> <span>{t('aggiorna.ricarica_app')}</span>
+                <span>{t('aggiorna.ricarica_app')}</span>
               </button>
             </div>
           </div>
@@ -10891,7 +10879,7 @@ export default function App() {
           onClick={(e) => { if (e.target === e.currentTarget) setStanzaUi((s) => ({ ...s, aperta: false })); }}
         >
           <div style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 480, width: '100%' }}>
-            <h2 style={{ ...styles.title, fontSize: 20, margin: '0 0 6px', textAlign: 'center' }}>🚪 {t('stanze.titolo')}</h2>
+            <h2 style={{ ...styles.title, fontSize: 20, margin: '0 0 6px', textAlign: 'center' }}>{t('stanze.titolo')}</h2>
             <p style={{ ...styles.detail, fontSize: 13, margin: '0 0 14px', textAlign: 'center' }}>{t('stanze.snapshot_desc', { ore: DURATA_STANZA_ORE })}</p>
 
             <button style={{ ...styles.buttonPrimary, width: '100%' }} disabled={stanzaUi.caricamento} onClick={creaStanzaCorrente}>
@@ -10912,9 +10900,9 @@ export default function App() {
                     style={{ display: 'block' }}
                   />
                 </div>
-                <div style={{ ...styles.detail, fontSize: 11, color: C.inkDim, marginBottom: 8 }}>📱 Inquadra con la fotocamera per aprire al volo</div>
+                <div style={{ ...styles.detail, fontSize: 11, color: C.inkDim, marginBottom: 8 }}>Inquadra con la fotocamera per aprire al volo</div>
 
-                <button style={styles.buttonMini} onClick={() => navigator.clipboard?.writeText(formattaCodiceStanza(stanzaUi.creato))}>📋 {t('stanze.copia')}</button>
+                <button style={styles.buttonMini} onClick={() => navigator.clipboard?.writeText(formattaCodiceStanza(stanzaUi.creato))}>{t('stanze.copia')}</button>
                 <div style={{ ...styles.detail, fontSize: 11, marginTop: 6 }}>{t('stanze.scade')}</div>
               </div>
             )}
@@ -10947,7 +10935,7 @@ export default function App() {
           onClick={(e) => { if (e.target === e.currentTarget) setCondivisione(null); }}
         >
           <div style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 520, width: '100%', maxHeight: '86vh', overflowY: 'auto' }}>
-            <h2 style={{ ...styles.title, fontSize: 20, margin: '0 0 4px', textAlign: 'center' }}>🔗 {t('condividi.titolo')}</h2>
+            <h2 style={{ ...styles.title, fontSize: 20, margin: '0 0 4px', textAlign: 'center' }}>{t('condividi.titolo')}</h2>
             <p style={{ ...styles.detail, textAlign: 'center', margin: '0 0 12px' }}>
               {condivisione.copiato ? t('condividi.copiato') : t('condividi.copia_a_mano')}
             </p>
@@ -10959,12 +10947,12 @@ export default function App() {
             />
             {condivisione.ritrattoRimosso && (
               <p style={{ ...styles.detail, fontSize: 12, marginTop: 8, color: C.goldDark }}>
-                🖼️ {t('condividi.senza_foto')}
+                {t('condividi.senza_foto')}
               </p>
             )}
             {condivisione.lungo && (
               <p style={{ ...styles.detail, fontSize: 12, marginTop: 6, color: C.red }}>
-                ⚠️ {t('condividi.lungo')}
+                {t('condividi.lungo')}
               </p>
             )}
             <p style={{ ...styles.detail, fontSize: 12, marginTop: 8 }}>🔒 {t('condividi.privacy')}</p>
@@ -10979,7 +10967,7 @@ export default function App() {
       {pgDaLink && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1011, padding: 16, background: 'rgba(0,0,0,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 460, width: '100%' }}>
-            <h2 style={{ ...styles.title, fontSize: 20, margin: '0 0 10px', textAlign: 'center' }}>📥 {t('condividi.ricevuto')}</h2>
+            <h2 style={{ ...styles.title, fontSize: 20, margin: '0 0 10px', textAlign: 'center' }}>{t('condividi.ricevuto')}</h2>
             <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', marginBottom: 12 }}>
               <div style={{ fontWeight: 700, color: C.ink, fontSize: 16 }}>{pgDaLink.nome || t('menu.senza_nome')}</div>
               <div style={styles.detail}>
@@ -11004,7 +10992,7 @@ export default function App() {
           >
             <div style={{ ...styles.panel, maxWidth: 460, width: '100%', maxHeight: '80vh', overflowY: 'auto' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <strong style={{ color: C.goldDark, fontSize: 16 }}>🕓 Versioni precedenti</strong>
+                <strong style={{ color: C.goldDark, fontSize: 16 }}>Versioni precedenti</strong>
                 <button style={styles.buttonMini} onClick={() => setMostraRipristino(false)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
               </div>
               <p style={{ ...styles.detail, marginTop: 0 }}>
@@ -11047,18 +11035,18 @@ export default function App() {
         >
           <div style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 480, width: '100%', maxHeight: '86vh', overflowY: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.45)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <h2 style={{ ...styles.title, fontSize: 20, margin: 0 }}>⚖️ {t('legali.titolo')}</h2>
+              <h2 style={{ ...styles.title, fontSize: 20, margin: 0 }}>{t('legali.titolo')}</h2>
               <button style={styles.buttonMini} onClick={() => setMostraNoteLegali(false)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 13, lineHeight: 1.5 }}>
               <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px' }}>
-                <strong style={{ color: C.goldDark, display: 'block', marginBottom: 4 }}>📜 {t('legali.srd_titolo')}</strong>
+                <strong style={{ color: C.goldDark, display: 'block', marginBottom: 4 }}>{t('legali.srd_titolo')}</strong>
                 <p style={{ margin: 0, color: C.ink }}>{t('legali.srd_testo')}</p>
               </div>
 
               <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px' }}>
-                <strong style={{ color: C.goldDark, display: 'block', marginBottom: 4 }}>🐉 {t('legali.wotc_titolo')}</strong>
+                <strong style={{ color: C.goldDark, display: 'block', marginBottom: 4 }}>{t('legali.wotc_titolo')}</strong>
                 <p style={{ margin: 0, color: C.ink }}>{t('legali.wotc_testo')}</p>
               </div>
 
@@ -11088,7 +11076,6 @@ export default function App() {
             {/* Titolo e Chiusura */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${C.border}`, paddingBottom: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 24 }}>📚</span>
                 <div>
                   <h2 style={{ ...styles.title, margin: 0, fontSize: 18, lineHeight: 1.2 }}>
                     {lingua === 'it' ? 'Manuali e fonti' : 'Sourcebooks'}
@@ -11117,28 +11104,28 @@ export default function App() {
                   style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px', fontWeight: 600 }}
                   onClick={() => setManualiAttivi({ phb2024: true, phb2014: true, tasha: true, xanathar: true, fizban_mm: true })}
                 >
-                  🌟 {lingua === 'it' ? 'Tutto Attivo (Consigliato)' : 'All Active (Recommended)'}
+                  {lingua === 'it' ? 'Tutto Attivo (Consigliato)' : 'All Active (Recommended)'}
                 </button>
                 <button
                   type="button"
                   style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px', fontWeight: 600 }}
                   onClick={() => setManualiAttivi({ phb2024: true, phb2014: false, tasha: false, xanathar: false, fizban_mm: false })}
                 >
-                  ✨ {lingua === 'it' ? 'Solo D&D 2024 (5.5)' : 'Only D&D 2024 (5.5)'}
+                  {lingua === 'it' ? 'Solo D&D 2024 (5.5)' : 'Only D&D 2024 (5.5)'}
                 </button>
                 <button
                   type="button"
                   style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px', fontWeight: 600 }}
                   onClick={() => setManualiAttivi({ phb2024: false, phb2014: true, tasha: false, xanathar: false, fizban_mm: false })}
                 >
-                  📕 {lingua === 'it' ? 'Solo D&D 2014 (5.0)' : 'Only D&D 2014 (5.0)'}
+                  {lingua === 'it' ? 'Solo D&D 2014 (5.0)' : 'Only D&D 2014 (5.0)'}
                 </button>
                 <button
                   type="button"
                   style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px', fontWeight: 600 }}
                   onClick={() => setManualiAttivi({ phb2024: false, phb2014: true, tasha: true, xanathar: true, fizban_mm: true })}
                 >
-                  🔮 {lingua === 'it' ? '2014 + Tasha & Xanathar' : '2014 + Tasha & Xanathar'}
+                  {lingua === 'it' ? '2014 + Tasha & Xanathar' : '2014 + Tasha & Xanathar'}
                 </button>
               </div>
             </div>
@@ -11234,7 +11221,6 @@ export default function App() {
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${C.border}`, paddingBottom: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 24 }}>🐾</span>
                 <div>
                   <h2 style={{ ...styles.title, margin: 0, fontSize: 18, lineHeight: 1.2 }}>
                     {campoForma === 'metamorfosi'
@@ -11265,7 +11251,7 @@ export default function App() {
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 800, fontSize: 14, color: C.ink }}>
-                  🐾 {formaAttiva?.dati?.nome?.toUpperCase()}
+                  {formaAttiva?.dati?.nome?.toUpperCase()}
                 </div>
                 <div style={{ fontSize: 12, color: C.inkDim, marginTop: 2 }}>
                   {formaAttiva?.dati?.ritratto ? (lingua === 'en' ? 'Custom portrait active' : 'Ritratto personalizzato attivo') : (lingua === 'en' ? 'Standard D&D vector artwork active' : 'Illustrazione vettoriale standard attiva')}
@@ -11283,7 +11269,7 @@ export default function App() {
                       });
                     }}
                   >
-                    🔄 {lingua === 'en' ? 'Reset to Vector Art' : 'Ripristina grafica originale'}
+                    {lingua === 'en' ? 'Reset to Vector Art' : 'Ripristina grafica originale'}
                   </button>
                 )}
               </div>
@@ -11292,7 +11278,7 @@ export default function App() {
             {/* Opzione 1: Carica dal Dispositivo */}
             <div style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: 12 }}>
               <strong style={{ display: 'block', fontSize: 13, color: C.ink, marginBottom: 4 }}>
-                📁 {lingua === 'en' ? 'Upload from your device' : 'Carica immagine dal tuo dispositivo'}
+                {lingua === 'en' ? 'Upload from your device' : 'Carica immagine dal tuo dispositivo'}
               </strong>
               <div style={{ fontSize: 12, color: C.inkDim, marginBottom: 8 }}>
                 {lingua === 'en' ? 'Upload any PNG, JPG or WebP image from your computer or phone.' : 'Supporta qualsiasi immagine PNG, JPG o WebP dal tuo computer o smartphone.'}
@@ -11302,7 +11288,6 @@ export default function App() {
                 style={{ ...styles.button, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontWeight: 700 }}
                 onClick={() => ritrattoBestiaRef.current?.click()}
               >
-                <span>📂</span>
                 <span>{lingua === 'en' ? 'Select File...' : 'Scegli File...'}</span>
               </button>
             </div>
@@ -11310,7 +11295,7 @@ export default function App() {
             {/* Opzione 2: Incolla Link da Internet / Immagine Generata */}
             <div style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: 12 }}>
               <strong style={{ display: 'block', fontSize: 13, color: C.ink, marginBottom: 4 }}>
-                🌐 {lingua === 'en' ? 'Paste image URL (Internet / AI generated)' : 'Incolla link da internet o immagine generata'}
+                {lingua === 'en' ? 'Paste image URL (Internet / AI generated)' : 'Incolla link da internet o immagine generata'}
               </strong>
               <div style={{ fontSize: 12, color: C.inkDim, marginBottom: 8 }}>
                 {lingua === 'en' ? 'Paste any direct image URL from D&D Beyond, Pinterest, Midjourney, etc.' : 'Incolla il link diretto di un’illustrazione da Pinterest, Google Immagini, D&D Beyond o generatore AI.'}
@@ -11350,7 +11335,7 @@ export default function App() {
             <div style={{ border: `1px solid ${C.border}`, borderRadius: 10, padding: 12 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                 <strong style={{ fontSize: 13, color: C.ink }}>
-                  🎨 {lingua === 'en' ? 'D&D 5e Fantasy Artwork Presets' : 'Galleria Illustrazioni & Token D&D 5e'}
+                  {lingua === 'en' ? 'D&D 5e Fantasy Artwork Presets' : 'Galleria Illustrazioni & Token D&D 5e'}
                 </strong>
                 <span style={{ fontSize: 11, color: C.inkDim }}>{GALLERIA_BESTIE_PRESET.length} opzioni</span>
               </div>
@@ -11423,7 +11408,7 @@ export default function App() {
         >
           <div style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 460, width: '100%', maxHeight: '86vh', overflowY: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.45)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <h2 style={{ ...styles.title, fontSize: 20, margin: 0 }}>☕ {t('donazioni.titolo')}</h2>
+              <h2 style={{ ...styles.title, fontSize: 20, margin: 0 }}>{t('donazioni.titolo')}</h2>
               <button style={styles.buttonMini} onClick={() => setMostraDonazioni(false)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
             </div>
             <p style={{ ...styles.detail, margin: '0 0 12px' }}>{t('donazioni.sottotitolo')}</p>
@@ -11456,11 +11441,10 @@ export default function App() {
                   textAlign: 'center',
                 }}
               >
-                <span style={{ fontSize: 16 }}>☕</span>
                 <span>{t('donazioni.bottone_kofi')}</span>
               </a>
 
-              <p style={{ margin: '4px 0 0', fontWeight: 600, color: C.goldDark, textAlign: 'center', fontSize: 12 }}>🎲 {t('donazioni.grazie')}</p>
+              <p style={{ margin: '4px 0 0', fontWeight: 600, color: C.goldDark, textAlign: 'center', fontSize: 12 }}>{t('donazioni.grazie')}</p>
             </div>
 
             <button style={{ ...styles.button, width: '100%' }} onClick={() => setMostraDonazioni(false)}>
@@ -11540,7 +11524,7 @@ export default function App() {
                 transition: 'all 0.15s ease'
               }}
             >
-              🎲 Suoni dadi: {effettiSonoriAttivi ? 'ON' : 'OFF'}
+              Suoni dadi: {effettiSonoriAttivi ? 'ON' : 'OFF'}
             </button>
             <button
               onClick={() => {
@@ -11563,7 +11547,7 @@ export default function App() {
                 transition: 'all 0.15s ease'
               }}
             >
-              {mutoAudio ? '🔇 Audio: OFF' : '🔊 Audio: ON'}
+              {mutoAudio ? 'Audio: OFF' : 'Audio: ON'}
             </button>
           </div>
 
@@ -11602,7 +11586,7 @@ export default function App() {
           {/* Soundboard SFX Rapida (effetti one-shot per sessione) */}
           <div style={{ borderTop: `1px dashed ${C.border}`, paddingTop: 6 }}>
             <div style={{ fontSize: 11, fontWeight: 'bold', color: C.goldDark, marginBottom: 4 }}>
-              ⚡ Effetti Sonori Rapidi (SFX)
+              Effetti Sonori Rapidi (SFX)
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4 }}>
               {[
@@ -11639,7 +11623,7 @@ export default function App() {
           </div>
 
           <div style={{ fontSize: 11, color: C.inkDim, opacity: 0.8, textAlign: 'center' }}>
-            🔊 Suoni ambientali ed effetti procedurali · Web Audio API & Freesound CC0
+            Suoni ambientali ed effetti procedurali · Web Audio API & Freesound CC0
           </div>
         </div>
         </div>
@@ -11690,7 +11674,7 @@ export default function App() {
                 style={{ ...styles.buttonMini, background: 'rgba(255,255,255,0.2)', color: '#ffffff', borderColor: 'rgba(255,255,255,0.45)', padding: '4px 8px', fontSize: 11, fontWeight: 700 }}
                 onClick={() => setMostraArchivioDm(true)}
               >
-                🗂 {lingua === 'en' ? 'DM archive' : 'Archivio del Master'}
+                {lingua === 'en' ? 'DM archive' : 'Archivio del Master'}
               </button>
               <button
                 style={{ ...styles.buttonMini, background: '#c62828', color: '#ffffff', borderColor: '#e53935', padding: '4px 10px', fontSize: 11, fontWeight: 800 }}
@@ -11801,7 +11785,7 @@ export default function App() {
                     {/* Gruppo 1: GESTIONE SCHEDA */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2.5, flexShrink: 0 }}>
                       <span style={stileEtichettaInline}>
-                        <span>👤</span> <span>{lingua === 'en' ? 'Sheet' : 'Scheda'}</span>
+                        <span>{lingua === 'en' ? 'Sheet' : 'Scheda'}</span>
                       </span>
                       <button
                         style={btnAzione}
@@ -11817,12 +11801,14 @@ export default function App() {
                           setMostraCrea(true);
                         }}
                         title={t('tip.nuovo_pg')}
+                        aria-label={t('tip.nuovo_pg')}
                       >
                         ＋
                       </button>
                       <button
                         style={btnAzione}
                         title={t('tip.levelup')}
+                        aria-label={t('tip.levelup')}
                         onClick={() => {
                           const dvMatch = String(scheda.dadiVita || '').match(/d(\d+)/i);
                           const facceDV = dvMatch ? parseInt(dvMatch[1]) : 8;
@@ -11842,6 +11828,7 @@ export default function App() {
                         style={btnAzione}
                         onClick={eliminaPersonaggio}
                         title={t('tip.elimina_pg')}
+                        aria-label={t('tip.elimina_pg')}
                       >
                         🗑
                       </button>
@@ -11849,6 +11836,7 @@ export default function App() {
                         style={{ ...btnAzione, ...(mostraDadiModal ? { color: C.goldDark, borderColor: C.goldDark, background: 'rgba(201,162,39,0.15)' } : {}) }}
                         onClick={() => setMostraDadiModal(true)}
                         title={t('roll.tavolo_dadi')}
+                        aria-label={t('roll.tavolo_dadi')}
                       >
                         🎲
                       </button>
@@ -11856,6 +11844,7 @@ export default function App() {
                         style={{ ...btnAzione, ...(mostraCompendio ? { color: C.goldDark, borderColor: C.goldDark, background: 'rgba(201,162,39,0.15)' } : {}) }}
                         onClick={() => setMostraCompendio(true)}
                         title={`${t('compendio.titolo')} (Cmd+K)`}
+                        aria-label={`${t('compendio.titolo')} (Cmd+K)`}
                       >
                         🔍
                       </button>
@@ -11865,7 +11854,7 @@ export default function App() {
                     {/* Gruppo 2: SISTEMA */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2.5, flexShrink: 0 }}>
                       <span style={stileEtichettaInline}>
-                        <span>⚙️</span> <span>{lingua === 'en' ? 'System' : 'Sistema'}</span>
+                        <span>{lingua === 'en' ? 'System' : 'Sistema'}</span>
                       </span>
                       <button
                         className="btn-header-azione"
@@ -11943,7 +11932,7 @@ export default function App() {
                                 ? (lingua === 'en' ? 'Sync configured (automatic saving paused)' : 'Sincronizzazione configurata (salvataggio automatico in pausa)')
                                 : (lingua === 'en' ? 'Sync is off: click to set it up' : 'Sincronizzazione non attiva: clicca per configurarla')
                         }
-                        aria-label="Cloud Sync"
+                        aria-label={t('aria.sync')}
                         onClick={() => { setCloudStatus({ text: '', type: '' }); setSyncCodiceStatus({ text: '', type: '' }); setMostraCloud(true); }}
                       >
                         <span style={{ fontSize: 14 }}>☁️</span>
@@ -11955,7 +11944,7 @@ export default function App() {
                     {/* Gruppo 3: SESSIONE */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2.5, flexShrink: 0 }}>
                       <span style={stileEtichettaInline}>
-                        <span>🧭</span> <span>{lingua === 'en' ? 'Session' : 'Sessione'}</span>
+                        <span>{lingua === 'en' ? 'Session' : 'Sessione'}</span>
                       </span>
                       <button
                         className="btn-header-azione"
@@ -12008,7 +11997,7 @@ export default function App() {
                           else aggiungiPgAlCombat();
                         }}
                         title={(combat.attivo && combat.aperto ? t('ct.minimizza') : t('ct.apri')) + (combat.combattenti.length ? ` (${combat.combattenti.length})` : '')}
-                        aria-label="Combat Tracker"
+                        aria-label={t('aria.combat_tracker')}
                       >
                         ⚔️
                       </button>
@@ -12043,6 +12032,7 @@ export default function App() {
                       style={{ ...btnAzione, width: 28, height: 28, minWidth: 28, maxWidth: 28, minHeight: 28, maxHeight: 28, fontSize: 13 }}
                       onClick={() => setMostraDadiModal(true)}
                       title={t('roll.tavolo_dadi')}
+                      aria-label={t('roll.tavolo_dadi')}
                     >
                       🎲
                     </button>
@@ -12065,6 +12055,7 @@ export default function App() {
                         else aggiungiPgAlCombat();
                       }}
                       title={combat.attivo && combat.aperto ? t('ct.minimizza') : t('ct.apri')}
+                      aria-label={combat.attivo && combat.aperto ? t('ct.minimizza') : t('ct.apri')}
                     >
                       ⚔️
                     </button>
@@ -12093,6 +12084,7 @@ export default function App() {
                       }}
                       onClick={() => setMostraMenuHubMobile((v) => !v)}
                       title="Apri Menu Hub"
+                      aria-label="Apri Menu Hub"
                     >
                       <span style={{ fontSize: 13, lineHeight: 1 }}>☰</span>
                       <span>Menu</span>
@@ -12124,7 +12116,7 @@ export default function App() {
                     <div style={styles.detail}>
                       {tiro.dadi.length > 1 && ` · ${tiro.modalita} [${tiro.dadi.join(', ')}] → ${tiro.naturale}`}
                     </div>
-                    {tiro.naturale === 20 && <span style={styles.badge(C.goldDark)}>⚔ CRITICO! 20 naturale</span>}
+                    {tiro.naturale === 20 && <span style={styles.badge(C.goldDark)}>CRITICO! 20 naturale</span>}
                     {tiro.naturale === 1 && <span style={styles.badge(C.red)}>💀 1 naturale</span>}
                     {tiro.esito && <span style={styles.badge(C.goldDark)}>{tiro.esito}</span>}
                     {tiro.attacco && tiro.naturale !== 1 && (
@@ -12137,8 +12129,8 @@ export default function App() {
                           onClick={lanciaDanniAttacco}
                         >
                           {tiro.naturale === 20
-                            ? `⚔ ${t('atk.tira_danni_critico')} (${tiro.attacco.danno} ×2)`
-                            : `🗡 ${t('atk.tira_danni')} (${tiro.attacco.danno})`}
+                            ? `${t('atk.tira_danni_critico')} (${tiro.attacco.danno} ×2)`
+                            : `${t('atk.tira_danni')} (${tiro.attacco.danno})`}
                         </button>
                       ) : (
                         <div style={styles.detail}>{t('atk.danno_invalido')}</div>
@@ -12153,7 +12145,7 @@ export default function App() {
                     <div style={{ fontSize: 24, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 8 }}>
                       {danni.libero || danni.tabella || /magia selvaggia/i.test(danni.etichetta) ? '✨' : danni.guarigione ? '✚' : '💥'} <strong>{danni.totale}</strong>
                       {danni.libero || danni.tabella || /magia selvaggia/i.test(danni.etichetta) ? '' : danni.guarigione ? ' PF recuperati' : ' danni'}
-                      {danni.critico && <span style={styles.badge(C.goldDark)}>⚔ CRITICO!</span>}
+                      {danni.critico && <span style={styles.badge(C.goldDark)}>CRITICO!</span>}
                     </div>
                     <div style={{ ...styles.detail, marginTop: 4 }}>
                       {t('roll.dettaglio')}: {danni.dettaglio}
@@ -12202,11 +12194,11 @@ export default function App() {
                         : (lingua === 'en' ? 'Wild Shape active' : 'Forma Selvatica attiva')}: {lingua === 'en' ? (formaAttiva.dati.nomeEn || formaAttiva.dati.nome) : formaAttiva.dati.nome}
                     </div>
                     <div style={{ fontSize: 12, color: C.inkDim, fontWeight: 600 }}>
-                      {formaAttiva.dati.taglia} {formaAttiva.dati.tipo || 'bestia'} · GS {formaAttiva.dati.gs} · 🛡️ CA {formaAttiva.dati.ca} · 🐾 {formaAttiva.dati.velocita?.terra || 9}m
-                      {formaAttiva.dati.velocita?.nuoto ? ` · 🏊 ${formaAttiva.dati.velocita.nuoto}m` : ''}
-                      {formaAttiva.dati.velocita?.volo ? ` · 🦅 ${formaAttiva.dati.velocita.volo}m` : ''}
-                      {formaAttiva.dati.velocita?.scalata ? ` · 🧗 ${formaAttiva.dati.velocita.scalata}m` : ''}
-                      {formaAttiva.dati.velocita?.scavo ? ` · ⛏️ ${formaAttiva.dati.velocita.scavo}m` : ''}
+                      {formaAttiva.dati.taglia} {formaAttiva.dati.tipo || 'bestia'} · GS {formaAttiva.dati.gs} · CA {formaAttiva.dati.ca} · {formaAttiva.dati.velocita?.terra || 9}m
+                      {formaAttiva.dati.velocita?.nuoto ? ` · ${formaAttiva.dati.velocita.nuoto}m` : ''}
+                      {formaAttiva.dati.velocita?.volo ? ` · ${formaAttiva.dati.velocita.volo}m` : ''}
+                      {formaAttiva.dati.velocita?.scalata ? ` · ${formaAttiva.dati.velocita.scalata}m` : ''}
+                      {formaAttiva.dati.velocita?.scavo ? ` · ${formaAttiva.dati.velocita.scavo}m` : ''}
                     </div>
                   </div>
                 </div>
@@ -12217,7 +12209,6 @@ export default function App() {
                     onClick={() => setMostraModalRitrattoBestia(true)}
                     title={lingua === 'en' ? 'Change beast portrait artwork' : 'Cambia illustrazione o carica immagine per la forma bestiale'}
                   >
-                    <span>🖼️</span>
                     <span>{lingua === 'en' ? 'Change Art' : 'Cambia Immagine'}</span>
                   </button>
                   <button
@@ -12230,7 +12221,7 @@ export default function App() {
                     }}
                     title={lingua === 'en' ? 'Revert to your normal form' : 'Ritorna alla tua forma normale'}
                   >
-                    👤 {lingua === 'en' ? 'Revert to Normal Form' : 'Torna alla Forma Normale'}
+                    {lingua === 'en' ? 'Revert to Normal Form' : 'Torna alla Forma Normale'}
                   </button>
                 </div>
               </div>
@@ -12239,7 +12230,7 @@ export default function App() {
               <div style={{ marginBottom: 12 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                   <span style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>
-                    ❤️ {lingua === 'en' ? 'Form Hit Points' : 'Punti Ferita della Forma'}
+                    {lingua === 'en' ? 'Form Hit Points' : 'Punti Ferita della Forma'}
                   </span>
                   <span style={{ fontSize: 15, fontWeight: 800, color: C.ink }}>
                     {formaAttiva.dati.pfAttuali} / {formaAttiva.dati.pfMax} PF
@@ -12330,12 +12321,12 @@ export default function App() {
                 <div style={{ marginBottom: 10, background: 'rgba(0,0,0,0.02)', padding: '6px 10px', borderRadius: 6, border: `1px dashed ${C.border}` }}>
                   {formaAttiva.dati.sensi && (
                     <div style={{ fontSize: 12, color: C.inkDim, marginBottom: (formaAttiva.dati.tratti && formaAttiva.dati.tratti.length > 0) ? 4 : 0 }}>
-                      👁️ <strong>{lingua === 'en' ? 'Senses' : 'Sensi'}:</strong> {formaAttiva.dati.sensi}
+                      <strong>{lingua === 'en' ? 'Senses' : 'Sensi'}:</strong> {formaAttiva.dati.sensi}
                     </div>
                   )}
                   {formaAttiva.dati.tratti && formaAttiva.dati.tratti.map((tratto, tIdx) => (
                     <div key={tIdx} style={{ fontSize: 12, color: C.ink, lineHeight: 1.35, marginTop: 2 }}>
-                      ✨ <em>{typeof tratto === 'string' ? tratto : tratto.nome}</em>
+                      <em>{typeof tratto === 'string' ? tratto : tratto.nome}</em>
                     </div>
                   ))}
                 </div>
@@ -12344,8 +12335,8 @@ export default function App() {
               {/* Azioni & Attacchi della Bestia */}
               {formaAttiva.dati.azioni && formaAttiva.dati.azioni.length > 0 && (
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', color: C.goldDark, marginBottom: 6 }}>
-                    ⚔️ {lingua === 'en' ? 'Beast actions and attacks' : 'Azioni e attacchi della bestia'}
+                  <div style={{ fontSize: 12, fontWeight: 800, color: C.goldDark, marginBottom: 6 }}>
+                    {lingua === 'en' ? 'Beast actions and attacks' : 'Azioni e attacchi della bestia'}
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {formaAttiva.dati.azioni.map((azRaw, idx) => {
@@ -12367,11 +12358,11 @@ export default function App() {
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'wrap' }}>
                             <span style={{ fontWeight: 800, color: C.ink, fontSize: 13 }}>
-                              ⚔️ {az.nome}
+                              {az.nome}
                             </span>
                             {az.cd != null && (
                               <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 6px', background: `${coloreCategoria('tiroSalvezza', notteAttiva)}1f`, color: coloreCategoria('tiroSalvezza', notteAttiva), borderRadius: 6, border: `1px solid ${coloreCategoria('tiroSalvezza', notteAttiva)}` }}>
-                                🎲 CD {az.cd}
+                                CD {az.cd}
                               </span>
                             )}
                           </div>
@@ -12410,7 +12401,6 @@ export default function App() {
                                   }}
                                   title={`Tira per Colpire: 1d20 ${conSegno(az.bonus)}`}
                                 >
-                                  <span>🎯</span>
                                   <span>{lingua === 'en' ? 'Attack Roll' : 'Tiro per Colpire'} ({conSegno(az.bonus)})</span>
                                 </button>
                               )}
@@ -12435,7 +12425,6 @@ export default function App() {
                                   }}
                                   title={`Tira Danni: ${az.danno}`}
                                 >
-                                  <span>💥</span>
                                   <span>{lingua === 'en' ? 'Damage' : 'Danni'} ({az.danno})</span>
                                 </button>
                               )}
@@ -12464,7 +12453,7 @@ export default function App() {
                       style={{ margin: 0, flex: 1 }}
                       onClick={() => aggiorna({ sezioniAperte: { ...(scheda.sezioniAperte || {}), ritratto: true } })}
                       aria-expanded={false}
-                    >▸ 🖼️ {t('profilo.ritratto')}</button>
+                    >▸ {t('profilo.ritratto')}</button>
                   </div>
                 )}
                 {(scheda.sezioniAperte?.ritratto ?? true) && (
@@ -12481,7 +12470,7 @@ export default function App() {
                         border: isTrasformato ? '2.5px solid #52b788' : `2px solid ${coloreClasse(scheda.classe) ? C.gold : C.border}`,
                         cursor: 'pointer', position: 'relative',
                       }}
-                      title={isTrasformato ? `🐾 ${formaAttiva.dati.nome}: clicca per cambiare illustrazione o caricare un'immagine` : (scheda.ritratto ? 'Clic: cambia immagine' : 'Clic: carica l’immagine del personaggio')}
+                      title={isTrasformato ? `${formaAttiva.dati.nome}: clicca per cambiare illustrazione o caricare un'immagine` : (scheda.ritratto ? 'Clic: cambia immagine' : 'Clic: carica l’immagine del personaggio')}
                       onClick={() => {
                         if (isTrasformato) {
                           setMostraModalRitrattoBestia(true);
@@ -12556,7 +12545,7 @@ export default function App() {
                             onClick={(e) => { e.stopPropagation(); setMostraModalRitrattoBestia(true); }}
                             title="Cambia immagine o illustrazione della forma bestiale"
                           >
-                            <span>🖼️</span> <span>{lingua === 'en' ? 'Art' : 'Arte'}</span>
+                            <span>{lingua === 'en' ? 'Art' : 'Arte'}</span>
                           </button>
                         </div>
                       ) : (
@@ -12978,7 +12967,7 @@ export default function App() {
                             if (infoPe.puoSalire) {
                               return (
                                 <span style={{ fontSize: 11, fontWeight: 700, color: '#10b981', background: 'rgba(16,185,129,0.12)', border: '1px solid #10b981', padding: '0 4px', borderRadius: 3 }}>
-                                  ✨ Up!
+                                  Up!
                                 </span>
                               );
                             }
@@ -13053,8 +13042,8 @@ export default function App() {
             return (
               <div style={{ ...styles.panel, padding: '10px 12px', margin: '4px 0 10px', background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 6 }}>
-                  <span style={{ ...styles.detail, fontWeight: 700, color: C.goldDark, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                    ⚔️ {t('mc.titolo')}
+                  <span style={{ ...styles.detail, fontWeight: 700, color: C.goldDark, fontSize: 12, letterSpacing: 0.5 }}>
+                    {t('mc.titolo')}
                   </span>
                   <span style={{ ...styles.detail, fontSize: 11 }}>
                     {t('mc.liv_totale')}: <strong style={{ color: C.goldDark, fontSize: 13 }}>{livTot}</strong> ({traduciDato(scheda.classe) || '—'} {scheda.livello || 1}{scheda.sottoclasse ? ` (${traduciDato(scheda.sottoclasse)})` : ''}{mc.map((m) => ` / ${traduciDato(m.classe) || '—'} ${m.livello || 1}${m.sottoclasse ? ` (${traduciDato(m.sottoclasse)})` : ''}`).join('')})
@@ -13133,14 +13122,14 @@ export default function App() {
 
                 <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap', alignItems: 'center' }}>
                   <button style={{ ...styles.buttonMini, padding: '4px 8px' }} onClick={() => setMc([...mc, { classe: '', livello: 1, sottoclasse: '' }])}>
-                    ➕ {t('mc.aggiungi')}
+                    {t('mc.aggiungi')}
                   </button>
                   <button
                     style={{ ...styles.button, fontSize: 12, padding: '4px 12px' }}
                     title="Applica e compila automaticamente bonus di competenza, dadi vita, slot combinati e privilegi di classe/sottoclasse"
                     onClick={() => applicaTuttoMc(mc)}
                   >
-                    🔄 {t('mc.applica')}
+                    {t('mc.applica')}
                   </button>
                   <span style={{ ...styles.detail, fontSize: 11, opacity: 0.8 }}>
                     Aggiorna competenza, DV, slot e compila i privilegi di tutte le classi.
@@ -13158,7 +13147,7 @@ export default function App() {
                   {/* Sezione Superiore: Punti Ferita — perfettamente centrata nello spazio disponibile */}
                   <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2px 0' }}>
                     <div style={{ ...styles.vitalLabel, position: 'static', margin: 0, marginBottom: 6, fontSize: 12 }}>
-                      ❤️ {t("vital.pf")} {isTrasformato && <span style={{ color: '#2e7d32', fontWeight: 800 }}>· 🐾 {formaAttiva.dati.nome}</span>}
+                      {t("vital.pf")} {isTrasformato && <span style={{ color: '#2e7d32', fontWeight: 800 }}>· {formaAttiva.dati.nome}</span>}
                     </div>
 
                     {/* BARRA DELLA VITA STILE VIDEOGIOCO */}
@@ -13258,7 +13247,7 @@ export default function App() {
                     {isTrasformato ? (
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, margin: '3px 0 4px' }}>
                         <span style={{ fontSize: 11, color: C.inkDim, background: 'rgba(0,0,0,0.04)', padding: '2px 8px', borderRadius: 6, border: `1px solid ${C.border}` }}>
-                          👤 {lingua === 'en' ? 'Humanoid HP (preserved)' : 'PF Umanoide (preservati)'}: <strong>{scheda.pfAttuali} / {scheda.pfMax}</strong>
+                          {lingua === 'en' ? 'Humanoid HP (preserved)' : 'PF Umanoide (preservati)'}: <strong>{scheda.pfAttuali} / {scheda.pfMax}</strong>
                         </span>
                       </div>
                     ) : (
@@ -13267,7 +13256,7 @@ export default function App() {
                           style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#42a5f5', background: 'rgba(66,165,245,0.12)', border: '1px solid rgba(66,165,245,0.45)', borderRadius: 10, padding: '1px 8px' }}
                           title={t('vital.temporanei')}
                         >
-                          🛡️ <span style={{ fontSize: 11, color: C.inkDim, letterSpacing: 0.4, textTransform: 'uppercase' }}>{t("vital.temporanei")}</span>
+                          <span style={{ fontSize: 11, color: C.inkDim, letterSpacing: 0.4, textTransform: 'uppercase' }}>{t("vital.temporanei")}</span>
                           <Editable value={scheda.pfTemp} tipo="numero" onChange={(v) => aggiorna({ pfTemp: v })} width={24} style={{ fontSize: 12, fontWeight: 'bold', color: '#42a5f5' }} />
                         </span>
                       </div>
@@ -13314,7 +13303,7 @@ export default function App() {
                           if (esitoPf0.tsMorteDopo) {
                             patch.tsMorte = esitoPf0.tsMorteDopo;
                             registra({
-                              etichetta: esitoPf0.istantaneo ? '💀 Morte' : '💀 TS Morte',
+                              etichetta: esitoPf0.istantaneo ? 'Morte' : 'TS Morte',
                               tipo: 'tattica',
                               dettaglio: esitoPf0.istantaneo
                                 ? `${scheda.nome || 'PG'} muore: danno subito a 0 PF con eccesso pari o superiore ai PF massimi.`
@@ -13389,7 +13378,7 @@ export default function App() {
                                 disabled={(spesiMapDV[g.facce] || 0) >= g.quantita}
                                 onClick={() => tiraDadoVita(g.facce)}
                               >
-                                🎲 {t('vital.usa')}
+                                {t('vital.usa')}
                               </button>
                             </span>
                           ))}
@@ -13404,7 +13393,7 @@ export default function App() {
                   {/* Sezione Inferiore: Tiri Morte / Death Saves — perfettamente centrata e ben dimensionata */}
                   <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '4px 0' }}>
                     <div style={{ ...styles.vitalLabel, position: 'static', margin: 0, marginBottom: 6, fontSize: 13, fontWeight: 800, letterSpacing: 1 }}>
-                      💀 {lingua === 'en' ? 'Death saves' : 'TS contro morte'}
+                      {lingua === 'en' ? 'Death saves' : 'TS contro morte'}
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
@@ -13412,7 +13401,7 @@ export default function App() {
                         {/* 3 sopra: Successi */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span style={{ fontSize: 13, fontWeight: 700, color: C.green, minWidth: 76, textAlign: 'right' }}>
-                            ✔ {lingua === 'en' ? 'Successes' : 'Successi'}
+                            {lingua === 'en' ? 'Successes' : 'Successi'}
                           </span>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             {[1, 2, 3].map((n) => {
@@ -13511,7 +13500,7 @@ export default function App() {
                             disabled={rolling || (scheda.tsMorte?.successi || 0) >= 3 || (scheda.tsMorte?.fallimenti || 0) >= 3}
                             title="Tira 1d20 TS Morte"
                           >
-                            🎲 {lingua === 'en' ? 'Roll' : 'Tira'}
+                            {lingua === 'en' ? 'Roll' : 'Tira'}
                           </button>
                         )}
                       </div>
@@ -13596,7 +13585,7 @@ export default function App() {
                       aggiorna({ copertura: v });
                       const copInfo = TIPI_COPERTURA_5E.find((c) => c.key === v);
                       if (v !== 'nessuna') {
-                        registra({ etichetta: '🛡️ Copertura', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'}: ${lingua === 'en' ? copInfo.labelEn : copInfo.labelIt}` });
+                        registra({ etichetta: 'Copertura', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'}: ${lingua === 'en' ? copInfo.labelEn : copInfo.labelIt}` });
                       }
                     }}
                     title="Copertura 5e: +2 CA/TS Des (mezza), +5 CA/TS Des (tre quarti), totale"
@@ -13608,7 +13597,7 @@ export default function App() {
                 </div>
                 {(!competenteInArmatura(scheda, scheda.armatura.tipo) || (scheda.armatura.scudo && !scheda.addestramento?.armature?.scudi)) && (
                   <div style={{ fontSize: 11, color: C.red, marginTop: 3, lineHeight: 1.2 }} title={t('tip.senza_comp_armatura')}>
-                    ⚠️ Non competente{!competenteInArmatura(scheda, scheda.armatura.tipo) ? ` (${scheda.armatura.tipo})` : ''}{scheda.armatura.scudo && !scheda.addestramento?.armature?.scudi ? ' (scudo)' : ''}
+                    Non competente{!competenteInArmatura(scheda, scheda.armatura.tipo) ? ` (${scheda.armatura.tipo})` : ''}{scheda.armatura.scudo && !scheda.addestramento?.armature?.scudi ? ' (scudo)' : ''}
                   </div>
                 )}
               </div>
@@ -13616,8 +13605,8 @@ export default function App() {
             <div style={{ ...styles.vitalBox, gridColumn: 'span 2' }}>
               <div style={styles.vitalLabel}>{t("vital.riposo")}</div>
               <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
-                <button style={{ ...styles.buttonMini, fontSize: 14, fontWeight: 700, padding: '8px 18px', width: '100%', maxWidth: 220 }} onClick={() => riposoBreve()} title={t('vital.riposo_breve_tip')}>☕ {t("vital.breve")}</button>
-                <button style={{ ...styles.buttonMini, fontSize: 14, fontWeight: 700, padding: '8px 18px', width: '100%', maxWidth: 220, borderColor: C.goldDark, color: C.goldDark }} onClick={() => riposoLungo()} title={t('vital.riposo_lungo_tip')}>🌙 {t("vital.lungo")}</button>
+                <button style={{ ...styles.buttonMini, fontSize: 14, fontWeight: 700, padding: '8px 18px', width: '100%', maxWidth: 220 }} onClick={() => riposoBreve()} title={t('vital.riposo_breve_tip')}>{t("vital.breve")}</button>
+                <button style={{ ...styles.buttonMini, fontSize: 14, fontWeight: 700, padding: '8px 18px', width: '100%', maxWidth: 220, borderColor: C.goldDark, color: C.goldDark }} onClick={() => riposoLungo()} title={t('vital.riposo_lungo_tip')}>{t("vital.lungo")}</button>
               </div>
             </div>
             <div style={{ ...styles.vitalBox }}>
@@ -13656,8 +13645,8 @@ export default function App() {
             <div
               style={{ ...styles.vitalBox }}
               title={lingua === 'en'
-                ? `🏃 Long Jump (running): ${punteggioCaratteristica(scheda, 'forza') || 10} ft (${((punteggioCaratteristica(scheda, 'forza') || 10) * 0.3).toFixed(1)} m) • ⬆️ High Jump: ${3 + modificatore(punteggioCaratteristica(scheda, 'forza') || 10)} ft (${((3 + modificatore(punteggioCaratteristica(scheda, 'forza') || 10)) * 0.3).toFixed(1)} m) • 🫁 Hold Breath: ${Math.max(1, 1 + modificatore(punteggioCaratteristica(scheda, 'costituzione') || 10))} minutes`
-                : `🏃 Salto in Lungo (con rincorsa): ${punteggioCaratteristica(scheda, 'forza') || 10} piedi (${((punteggioCaratteristica(scheda, 'forza') || 10) * 0.3).toFixed(1)} m) • ⬆️ Salto in Alto: ${3 + modificatore(punteggioCaratteristica(scheda, 'forza') || 10)} piedi (${((3 + modificatore(punteggioCaratteristica(scheda, 'forza') || 10)) * 0.3).toFixed(1)} m) • 🫁 Trattenere il Respiro: ${Math.max(1, 1 + modificatore(punteggioCaratteristica(scheda, 'costituzione') || 10))} minuti`}
+                ? `Long Jump (running): ${punteggioCaratteristica(scheda, 'forza') || 10} ft (${((punteggioCaratteristica(scheda, 'forza') || 10) * 0.3).toFixed(1)} m) • High Jump: ${3 + modificatore(punteggioCaratteristica(scheda, 'forza') || 10)} ft (${((3 + modificatore(punteggioCaratteristica(scheda, 'forza') || 10)) * 0.3).toFixed(1)} m) • Hold Breath: ${Math.max(1, 1 + modificatore(punteggioCaratteristica(scheda, 'costituzione') || 10))} minutes`
+                : `Salto in Lungo (con rincorsa): ${punteggioCaratteristica(scheda, 'forza') || 10} piedi (${((punteggioCaratteristica(scheda, 'forza') || 10) * 0.3).toFixed(1)} m) • Salto in Alto: ${3 + modificatore(punteggioCaratteristica(scheda, 'forza') || 10)} piedi (${((3 + modificatore(punteggioCaratteristica(scheda, 'forza') || 10)) * 0.3).toFixed(1)} m) • Trattenere il Respiro: ${Math.max(1, 1 + modificatore(punteggioCaratteristica(scheda, 'costituzione') || 10))} minuti`}
             >
               <div style={styles.vitalLabel}>{t("vital.movimento")}</div>
               <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
@@ -13763,7 +13752,7 @@ export default function App() {
                 <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                   {isTrasformato && formaAttiva.dati.sensi ? (
                     <div style={{ fontSize: 12, fontWeight: 700, color: '#2e7d32', textAlign: 'center', padding: '0 4px', lineHeight: 1.25 }} title={`Sensi della Bestia: ${formaAttiva.dati.sensi}`}>
-                      🐾 {formaAttiva.dati.sensi}
+                      {formaAttiva.dati.sensi}
                     </div>
                   ) : (
                     <CampoConTendina
@@ -13819,7 +13808,7 @@ export default function App() {
                         }}
                       >
                         <span style={{ color: scheda.effettoTaglia === 'ingrandito' ? (C.green || '#2e7d32') : (C.red || '#c0392b'), fontWeight: 700 }}>
-                          {scheda.effettoTaglia === 'ingrandito' ? '✨ Ingrandito' : '✨ Ridotto'}
+                          {scheda.effettoTaglia === 'ingrandito' ? 'Ingrandito' : 'Ridotto'}
                         </span>
                         <button
                           type="button"
@@ -13962,7 +13951,7 @@ export default function App() {
                                 >
                                   <div className="popover-titolo" style={{ fontWeight: 'bold', marginBottom: 4 }}>{t('inv.fonte_bonus')}:</div>
                                   {fontiCar.length
-                                    ? fontiCar.map((o) => <div key={o.id}>🎒 {o.nome}</div>)
+                                    ? fontiCar.map((o) => <div key={o.id}>{o.nome}</div>)
                                     : <div className="popover-titolo">—</div>}
                                 </div>,
                                 document.body
@@ -13988,7 +13977,7 @@ export default function App() {
                           background: tsMancante ? 'rgba(231,76,60,0.12)' : 'transparent',
                           padding: tsMancante ? '2px 4px' : styles.skillRow(true).padding,
                         }}
-                        title={tsMancante ? `⚠️ ${tsMancante.testo} (clicca per tirare, clicca sul pallino per impostare)` : `Tieni premuto e rilascia: tiro salvezza di ${t('attr.' + key)} · click sul pallino: competenza`}
+                        title={tsMancante ? `${tsMancante.testo} (clicca per tirare, clicca sul pallino per impostare)` : `Tieni premuto e rilascia: tiro salvezza di ${t('attr.' + key)} · click sul pallino: competenza`}
                         onRoll={() => lanciaD20(`Tiro salvezza: ${t('attr.' + key)}`, bonusTS, { tipoTiro: 'salvezza' })}
                       >
                         <span
@@ -14004,7 +13993,7 @@ export default function App() {
                         <strong style={{ width: 26, flexShrink: 0, textAlign: 'center' }}>{conSegno(bonusTS)}</strong>
                         <em className="skill-nome" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, flex: 1 }}>{t('attr.tiro_salvezza')}</em>
                         {tsMancante && (
-                          <span style={{ marginLeft: 'auto', fontSize: 11, color: C.red, fontWeight: 700 }}>⚠️ Manca</span>
+                          <span style={{ marginLeft: 'auto', fontSize: 11, color: C.red, fontWeight: 700 }}>Manca</span>
                         )}
                         {(() => {
                           const bonusOggettiTS = bonusTiriSalvezzaOggetti(scheda);
@@ -14031,7 +14020,7 @@ export default function App() {
                                 >
                                   <div className="popover-titolo" style={{ fontWeight: 'bold', marginBottom: 4 }}>{t('inv.fonte_bonus')}:</div>
                                   {fontiTS.length
-                                    ? fontiTS.map((o) => <div key={o.id}>🎒 {o.nome}</div>)
+                                    ? fontiTS.map((o) => <div key={o.id}>{o.nome}</div>)
                                     : <div className="popover-titolo">—</div>}
                                 </div>,
                                 document.body
@@ -14059,7 +14048,7 @@ export default function App() {
                           background: abMancante ? 'rgba(231,76,60,0.12)' : 'transparent',
                           padding: abMancante ? '2px 4px' : styles.skillRow(true).padding,
                         }}
-                        title={abMancante ? `⚠️ ${abMancante.testo} (clicca per tirare, clicca sul pallino per impostare)` : `Tieni premuto e rilascia: prova di ${t('skill.' + a.key)} · click sul pallino: niente → competenza (●) → competenza di classe/razza (★) → Maestria/Expertise, doppia competenza (✦)`}
+                        title={abMancante ? `${abMancante.testo} (clicca per tirare, clicca sul pallino per impostare)` : `Tieni premuto e rilascia: prova di ${t('skill.' + a.key)} · click sul pallino: niente → competenza (●) → competenza di classe/razza (★) → Maestria/Expertise, doppia competenza (✦)`}
                         onRoll={() => lanciaD20(`${t('skill.' + a.key)}`, bonus, { tipoTiro: 'prova' })}
                       >
                         <span
@@ -14084,7 +14073,7 @@ export default function App() {
                           title={lingua === 'en' ? 'Click for 5e rules, reference DCs and tool synergies' : 'Clicca per regole 5e, CD di riferimento e sinergie con gli strumenti'}
                         >{t('skill.' + a.key)}</span>
                         {abMancante && (
-                          <span style={{ marginLeft: 'auto', fontSize: 11, color: C.red, fontWeight: 700 }}>⚠️ Manca</span>
+                          <span style={{ marginLeft: 'auto', fontSize: 11, color: C.red, fontWeight: 700 }}>Manca</span>
                         )}
                       </Rollable>
                     );
@@ -14152,14 +14141,14 @@ export default function App() {
                     },
                     reazioneUsata: false,
                   });
-                  registra({ etichetta: '🔄 Turno', tipo: 'turno', dettaglio: `Inizio nuovo turno di combattimento (${scheda.nome || 'PG'})` });
+                  registra({ etichetta: 'Turno', tipo: 'turno', dettaglio: `Inizio nuovo turno di combattimento (${scheda.nome || 'PG'})` });
                 };
 
                 const applicaTattica = (nomeTattica) => {
                   if (nomeTattica === 'schivata') {
                     setTurno({ azione: true, tatticaAttiva: 'schivata' });
-                    registra({ etichetta: '🛡️ Schivata', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} compie l'azione di Schivata: gli attacchi contro di te hanno svantaggio e hai vantaggio ai TS su Destrezza.` });
-                    setInfo({ titolo: '🛡️ Schivata (Dodge)', testo: 'Fino all\'inizio del tuo prossimo turno, ogni tiro per colpire contro di te ha svantaggio (se puoi vedere l\'attaccante) e hai vantaggio ai tiri salvezza su Destrezza.' });
+                    registra({ etichetta: 'Schivata', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} compie l'azione di Schivata: gli attacchi contro di te hanno svantaggio e hai vantaggio ai TS su Destrezza.` });
+                    setInfo({ titolo: 'Schivata (Dodge)', testo: 'Fino all\'inizio del tuo prossimo turno, ogni tiro per colpire contro di te ha svantaggio (se puoi vedere l\'attaccante) e hai vantaggio ai tiri salvezza su Destrezza.' });
                   } else if (nomeTattica === 'disimpegno') {
                     const usaBonus = turno.haAzioneScaltra && !turno.bonusUsato;
                     if (usaBonus) {
@@ -14167,8 +14156,8 @@ export default function App() {
                     } else {
                       setTurno({ azione: true, tatticaAttiva: 'disimpegno' });
                     }
-                    registra({ etichetta: '💨 Disimpegno', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} compie l'azione di Disimpegno: il tuo movimento non provoca attacchi di opportunità per il resto del turno.` });
-                    setInfo({ titolo: '💨 Disimpegno (Disengage)', testo: 'Per il resto del tuo turno, il tuo movimento non provoca attacchi di opportunità da parte delle creature nemiche.' });
+                    registra({ etichetta: 'Disimpegno', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} compie l'azione di Disimpegno: il tuo movimento non provoca attacchi di opportunità per il resto del turno.` });
+                    setInfo({ titolo: 'Disimpegno (Disengage)', testo: 'Per il resto del tuo turno, il tuo movimento non provoca attacchi di opportunità da parte delle creature nemiche.' });
                   } else if (nomeTattica === 'scatto') {
                     const usaBonus = turno.haAzioneScaltra && !turno.bonusUsato;
                     if (usaBonus) {
@@ -14176,7 +14165,7 @@ export default function App() {
                     } else {
                       setTurno({ azione: true, tatticaAttiva: 'scatto' });
                     }
-                    registra({ etichetta: '🏃 Scatto', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} compie l'azione di Scatto: movimento massimo del turno raddoppiato a ${turno.velBase * 2} m.` });
+                    registra({ etichetta: 'Scatto', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} compie l'azione di Scatto: movimento massimo del turno raddoppiato a ${turno.velBase * 2} m.` });
                   } else if (nomeTattica === 'nascondersi') {
                     const usaBonus = turno.haAzioneScaltra && !turno.bonusUsato;
                     if (usaBonus) {
@@ -14191,12 +14180,12 @@ export default function App() {
                     const totBonus = modDes + (comp === 1 || comp === 2 ? bonusComp : comp === 3 ? bonusComp * 2 : 0);
                     const d20 = tiraDado(20);
                     const tot = d20 + totBonus;
-                    registra({ etichetta: '🙈 Nascondersi', tipo: 'prova', totale: tot, dettaglio: `Prova di Furtività (Nascondersi): 1d20 [${d20}] ${conSegno(totBonus)} = ${tot}` });
-                    setInfo({ titolo: `🙈 Furtività: ${tot}`, testo: `Hai tentato di nasconderti con un risultato di ${tot} (d20 [${d20}] ${conSegno(totBonus)}). Confrontalo con la Percezione Passiva dei nemici.` });
+                    registra({ etichetta: 'Nascondersi', tipo: 'prova', totale: tot, dettaglio: `Prova di Furtività (Nascondersi): 1d20 [${d20}] ${conSegno(totBonus)} = ${tot}` });
+                    setInfo({ titolo: `Furtività: ${tot}`, testo: `Hai tentato di nasconderti con un risultato di ${tot} (d20 [${d20}] ${conSegno(totBonus)}). Confrontalo con la Percezione Passiva dei nemici.` });
                   } else if (nomeTattica === 'aiuto') {
                     setTurno({ azione: true, tatticaAttiva: 'aiuto' });
-                    registra({ etichetta: '🤝 Aiuto', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} compie l'azione di Aiuto: concede vantaggio al prossimo tiro per colpire o prova di caratteristica di un alleato.` });
-                    setInfo({ titolo: '🤝 Azione di Aiuto (Help)', testo: 'Concedi vantaggio alla prossima prova di caratteristica di un alleato, oppure al prossimo tiro per colpire di un alleato contro un nemico entro 1,5 m da te prima dell\'inizio del tuo prossimo turno.' });
+                    registra({ etichetta: 'Aiuto', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} compie l'azione di Aiuto: concede vantaggio al prossimo tiro per colpire o prova di caratteristica di un alleato.` });
+                    setInfo({ titolo: 'Azione di Aiuto (Help)', testo: 'Concedi vantaggio alla prossima prova di caratteristica di un alleato, oppure al prossimo tiro per colpire di un alleato contro un nemico entro 1,5 m da te prima dell\'inizio del tuo prossimo turno.' });
                   }
                 };
 
@@ -14238,7 +14227,7 @@ export default function App() {
                           cursor: 'pointer',
                         }}
                       >
-                        <span>⚔️ {lingua === 'en' ? 'Action' : 'Azione'}</span>
+                        <span>{lingua === 'en' ? 'Action' : 'Azione'}</span>
                         <span>{turno.azioneUsata ? '🔴' : '🟢'}</span>
                       </button>
 
@@ -14260,7 +14249,7 @@ export default function App() {
                           cursor: 'pointer',
                         }}
                       >
-                        <span>⚡ {lingua === 'en' ? 'Bonus Action' : 'Azione Bonus'}</span>
+                        <span>{lingua === 'en' ? 'Bonus Action' : 'Azione Bonus'}</span>
                         <span>{turno.bonusUsato ? '🔴' : '🟢'}</span>
                       </button>
 
@@ -14282,7 +14271,7 @@ export default function App() {
                           cursor: 'pointer',
                         }}
                       >
-                        <span>🛡️ {lingua === 'en' ? 'Reaction' : 'Reazione'}</span>
+                        <span>{lingua === 'en' ? 'Reaction' : 'Reazione'}</span>
                         <span>{scheda.reazioneUsata ? '🔴' : '🟢'}</span>
                       </button>
 
@@ -14306,14 +14295,14 @@ export default function App() {
                         }}
                         title={lingua === 'en' ? 'Reset all actions and movement for a new combat round' : 'Ripristina tutte le azioni e il movimento per iniziare un nuovo round'}
                       >
-                        <span>🔄 {lingua === 'en' ? 'New Turn' : 'Nuovo Turno'}</span>
+                        <span>{lingua === 'en' ? 'New Turn' : 'Nuovo Turno'}</span>
                       </button>
                     </div>
 
                     {/* Riga Movimento Residuo (sempre visibile) */}
                     <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, background: C.panel, padding: '6px 10px', borderRadius: 8, border: `1px solid ${C.border}` }}>
                       <span style={{ fontSize: 12, fontWeight: 700, color: C.ink }}>
-                        🏃 {lingua === 'en' ? 'Move:' : 'Movimento:'}{' '}
+                        {lingua === 'en' ? 'Move:' : 'Movimento:'}{' '}
                         <strong style={{ color: turno.movimentoRimanente > 0 ? '#2e9d4d' : C.red, fontSize: 13 }}>
                           {turno.movimentoRimanente}m
                         </strong>
@@ -14386,7 +14375,7 @@ export default function App() {
                             }}
                             title={lingua === 'en' ? 'Free Object Interaction (draw weapon, open door, etc.)' : 'Interazione gratuita con un oggetto (estrarre arma, aprire porta...)'}
                           >
-                            ✋ {lingua === 'en' ? 'Free Object' : 'Interazione Oggetto'} {turno.interazioneUsata ? '🔴' : '🟢'}
+                            {lingua === 'en' ? 'Free Object' : 'Interazione Oggetto'} {turno.interazioneUsata ? '🔴' : '🟢'}
                           </button>
                           <button
                             type="button"
@@ -14401,7 +14390,7 @@ export default function App() {
                             }}
                             title={lingua === 'en' ? 'Dodge action (disadvantage to attackers, advantage on Dex saves)' : 'Azione Schivata (svantaggio a chi ti attacca, vantaggio ai TS Destrezza)'}
                           >
-                            🛡️ {lingua === 'en' ? 'Dodge' : 'Schiva'}
+                            {lingua === 'en' ? 'Dodge' : 'Schiva'}
                           </button>
                           <button
                             type="button"
@@ -14416,7 +14405,7 @@ export default function App() {
                             }}
                             title={lingua === 'en' ? 'Disengage action (movement does not provoke opportunity attacks)' : 'Azione Disimpegno (il tuo movimento non provoca attacchi di opportunità)'}
                           >
-                            💨 {lingua === 'en' ? 'Disengage' : 'Disimpegnati'}
+                            {lingua === 'en' ? 'Disengage' : 'Disimpegnati'}
                           </button>
                           <button
                             type="button"
@@ -14431,7 +14420,7 @@ export default function App() {
                             }}
                             title={lingua === 'en' ? 'Dash action (doubles movement for the turn)' : 'Azione Scatto (raddoppia il movimento del turno)'}
                           >
-                            🏃 {lingua === 'en' ? 'Dash' : 'Scatta'}
+                            {lingua === 'en' ? 'Dash' : 'Scatta'}
                           </button>
                           <button
                             type="button"
@@ -14439,7 +14428,7 @@ export default function App() {
                             style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 6px' }}
                             title={lingua === 'en' ? 'Hide action (Stealth check)' : 'Azione Nascondersi (prova rapida di Furtività)'}
                           >
-                            🙈 {lingua === 'en' ? 'Hide' : 'Nasconditi'}
+                            {lingua === 'en' ? 'Hide' : 'Nasconditi'}
                           </button>
                           <button
                             type="button"
@@ -14447,14 +14436,13 @@ export default function App() {
                             style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 6px' }}
                             title={lingua === 'en' ? 'Help action (grants advantage to an ally)' : 'Azione Aiuto (concede vantaggio a un alleato)'}
                           >
-                            🤝 {lingua === 'en' ? 'Help' : 'Aiuta'}
+                            {lingua === 'en' ? 'Help' : 'Aiuta'}
                           </button>
                         </div>
 
                         {/* Riga Copertura & Difesa Tattica 5e */}
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6, background: C.panel, padding: '6px 10px', borderRadius: 8, border: `1px solid ${C.border}` }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <span style={{ fontSize: 13 }}>🛡️</span>
                             <strong style={{ fontSize: 11, color: C.ink }}>
                               {lingua === 'en' ? 'Cover:' : 'Copertura:'}
                             </strong>
@@ -14472,7 +14460,7 @@ export default function App() {
                                     const copInfo = TIPI_COPERTURA_5E.find((c) => c.key === nuovaCop);
                                     if (nuovaCop !== 'nessuna') {
                                       registra({
-                                        etichetta: '🛡️ Copertura',
+                                        etichetta: 'Copertura',
                                         tipo: 'tattica',
                                         dettaglio: `${scheda.nome || 'PG'}: ${lingua === 'en' ? copInfo.labelEn : copInfo.labelIt} (${lingua === 'en' ? copInfo.descEn : copInfo.descIt})`,
                                       });
@@ -14510,7 +14498,6 @@ export default function App() {
                           return (
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6, background: C.panel, padding: '6px 10px', borderRadius: 8, border: `1px solid ${C.border}` }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                <span style={{ fontSize: 13 }}>⚡</span>
                                 <strong style={{ fontSize: 11, color: C.goldDark }}>
                                   {lingua === 'en' ? 'Class boosts:' : 'Potenziamenti di classe:'}
                                 </strong>
@@ -14524,7 +14511,7 @@ export default function App() {
                                       const v = !scheda.applicaFurtivo;
                                       aggiorna({ applicaFurtivo: v });
                                       if (v) {
-                                        registra({ etichetta: '🗡️ Attacco Furtivo', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} attiva Attacco Furtivo (+${furtivo.formula}) sul prossimo colpo!` });
+                                        registra({ etichetta: 'Attacco Furtivo', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} attiva Attacco Furtivo (+${furtivo.formula}) sul prossimo colpo!` });
                                       }
                                     }}
                                     style={{
@@ -14539,7 +14526,7 @@ export default function App() {
                                     }}
                                     title={lingua === 'en' ? `Apply Sneak Attack (+${furtivo.formula}) to next weapon damage roll` : `Applica i dadi di Attacco Furtivo (+${furtivo.formula}) al prossimo tiro danni`}
                                   >
-                                    🗡️ {lingua === 'en' ? 'Sneak' : 'Furtivo'} (+{furtivo.formula}) {scheda.applicaFurtivo ? '●' : '○'}
+                                    {lingua === 'en' ? 'Sneak' : 'Furtivo'} (+{furtivo.formula}) {scheda.applicaFurtivo ? '●' : '○'}
                                   </button>
                                 )}
 
@@ -14552,7 +14539,7 @@ export default function App() {
                                       const ireUsate = v ? Math.min(ira.utilizziMax, (scheda.ireUsate || 0) + 1) : (scheda.ireUsate || 0);
                                       aggiorna({ inIra: v, ireUsate });
                                       registra({
-                                        etichetta: v ? '🔥 Entra in Ira' : '🔥 Fine Ira',
+                                        etichetta: v ? 'Entra in Ira' : 'Fine Ira',
                                         tipo: 'tattica',
                                         dettaglio: v
                                           ? `${scheda.nome || 'PG'} entra in Ira! (+${ira.bonusDanni} danni FOR, resistenza a contundente/perforante/tagliente, vantaggio a prove/TS FOR)`
@@ -14571,7 +14558,7 @@ export default function App() {
                                     }}
                                     title={lingua === 'en' ? `Rage (+${ira.bonusDanni} STR melee damage, physical resistances)` : `Ira Barbarica (+${ira.bonusDanni} danni mischia FOR, resistenze contundente/perforante/tagliente)`}
                                   >
-                                    🔥 {lingua === 'en' ? 'Rage' : 'Ira'} (+{ira.bonusDanni}) {scheda.inIra ? '🔥 attiva' : `(${Math.max(0, ira.utilizziMax - (scheda.ireUsate || 0))}/${ira.utilizziMax})`}
+                                    {lingua === 'en' ? 'Rage' : 'Ira'} (+{ira.bonusDanni}) {scheda.inIra ? 'attiva' : `(${Math.max(0, ira.utilizziMax - (scheda.ireUsate || 0))}/${ira.utilizziMax})`}
                                   </button>
                                 )}
 
@@ -14583,7 +14570,7 @@ export default function App() {
                                       const v = !scheda.smiteAttivo;
                                       aggiorna({ smiteAttivo: v, smiteSlot: 1 });
                                       if (v) {
-                                        registra({ etichetta: '✨ Punizione Divina', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} prepara Punizione Divina (+2d8 radiosi) sul prossimo colpo!` });
+                                        registra({ etichetta: 'Punizione Divina', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} prepara Punizione Divina (+2d8 radiosi) sul prossimo colpo!` });
                                       }
                                     }}
                                     style={{
@@ -14598,7 +14585,7 @@ export default function App() {
                                     }}
                                     title={lingua === 'en' ? 'Divine Smite (+2d8 radiant, +1d8/slot)' : 'Punizione Divina (+2d8 radiosi, scala con lo slot)'}
                                   >
-                                    ✨ Smite {scheda.smiteAttivo ? '● attivo' : '○'}
+                                    Smite {scheda.smiteAttivo ? '● attivo' : '○'}
                                   </button>
                                 )}
 
@@ -14610,14 +14597,14 @@ export default function App() {
                                       const d = tiraDado(bardo.facce);
                                       conAnimazione(() => {
                                         setTiro({
-                                          etichetta: '🎲 Ispirazione Bardica',
+                                          etichetta: 'Ispirazione Bardica',
                                           naturale: d,
                                           dadi: [d],
                                           bonus: 0,
                                           totale: d,
                                           modalita: 'normale',
                                         });
-                                        registra({ etichetta: '🎲 Ispirazione Bardica', tipo: 'dadi', totale: d, dettaglio: `1${bardo.dado} [${d}]` });
+                                        registra({ etichetta: 'Ispirazione Bardica', tipo: 'dadi', totale: d, dettaglio: `1${bardo.dado} [${d}]` });
                                       }, d);
                                     }}
                                     style={{
@@ -14632,7 +14619,7 @@ export default function App() {
                                     }}
                                     title={lingua === 'en' ? `Roll Bardic Inspiration (1${bardo.dado})` : `Tira dado Ispirazione Bardica (1${bardo.dado})`}
                                   >
-                                    🎲 {bardo.dado} {lingua === 'en' ? 'Inspiration' : 'Ispirazione'}
+                                    {bardo.dado} {lingua === 'en' ? 'Inspiration' : 'Ispirazione'}
                                   </button>
                                 )}
 
@@ -14643,7 +14630,7 @@ export default function App() {
                                     const v = !scheda.ispirazioneEroica;
                                     aggiorna({ ispirazioneEroica: v });
                                     if (v) {
-                                      registra({ etichetta: '✨ Ispirazione Eroica', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} ottiene Ispirazione Eroica (ritiro di un d20 a scelta)!` });
+                                      registra({ etichetta: 'Ispirazione Eroica', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} ottiene Ispirazione Eroica (ritiro di un d20 a scelta)!` });
                                     }
                                   }}
                                   style={{
@@ -14658,7 +14645,7 @@ export default function App() {
                                   }}
                                   title={lingua === 'en' ? 'Heroic Inspiration (reroll any d20)' : 'Ispirazione Eroica (ritira qualsiasi d20 prima o dopo il risultato)'}
                                 >
-                                  ⭐ {lingua === 'en' ? 'Heroic' : 'Eroica'} {scheda.ispirazioneEroica ? '✨ disponibile' : '○'}
+                                  {lingua === 'en' ? 'Heroic' : 'Eroica'} {scheda.ispirazioneEroica ? 'disponibile' : '○'}
                                 </button>
                               </div>
                             </div>
@@ -14868,7 +14855,7 @@ export default function App() {
                   const bloccaSpell = serveFocus && !haFocus;
                   const avvisoFocus = bloccaSpell ? (
                     <div style={{ fontSize: 12, color: C.red, background: 'rgba(200,40,40,0.10)', border: `1px solid ${C.red}`, borderRadius: 8, padding: '6px 10px', marginBottom: 10 }}>
-                      🪄 Nessun <strong>focus</strong> equipaggiato: per lanciare incantesimi equipaggia un focus arcano/druidico, un simbolo sacro o una borsa da componenti dall'<strong>Inventario</strong> (spunta “equip.”).
+                      Nessun <strong>focus</strong> equipaggiato: per lanciare incantesimi equipaggia un focus arcano/druidico, un simbolo sacro o una borsa da componenti dall'<strong>Inventario</strong> (spunta “equip.”).
                     </div>
                   ) : null;
                   return [avvisoFocus, ...['Azione', 'Bonus', 'Reazione'].map((cat) => {
@@ -14955,7 +14942,6 @@ export default function App() {
                                     }}
                                     title={lingua === 'en' ? 'View all available reactions and triggers' : 'Visualizza tutti gli inneschi e le reazioni disponibili'}
                                   >
-                                    <span>⚡</span>
                                     <span>{lingua === 'en' ? 'Triggers and reactions' : 'Inneschi e reazioni'}</span>
                                   </button>
                                 </>
@@ -14965,7 +14951,7 @@ export default function App() {
                         )}
                         {cat === 'Reazione' && arr.length === 0 ? (
                           <div style={{ padding: '8px 12px', background: C.panelLight, border: `1px dashed ${C.border}`, borderRadius: 8, fontSize: 12, color: C.inkDim, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-                            <span>⚡ {lingua === 'en' ? 'No reactions pinned to quick attacks.' : 'Nessuna reazione fissata negli attacchi rapidi (Attacco d\'Opportunità, Scudo, Schivata...).'}</span>
+                            <span>{lingua === 'en' ? 'No reactions pinned to quick attacks.' : 'Nessuna reazione fissata negli attacchi rapidi (Attacco d\'Opportunità, Scudo, Schivata...).'}</span>
                             <button
                               type="button"
                               onClick={() => setMostraModalReazioni(true)}
@@ -14976,7 +14962,7 @@ export default function App() {
                           </div>
                         ) : cat === 'Bonus' && arr.length === 0 ? (
                           <div style={{ padding: '8px 12px', background: C.panelLight, border: `1px dashed ${C.border}`, borderRadius: 8, fontSize: 12, color: C.inkDim }}>
-                            ⏳ {lingua === 'en'
+                            {lingua === 'en'
                               ? 'No bonus-action attack/spell equipped or prepared right now. One shows up here automatically as soon as a weapon or a damage bonus-action spell is equipped/prepared.'
                               : 'Nessun attacco/incantesimo ad azione bonus equipaggiato o preparato al momento. Comparirà qui da solo appena equipaggi un\'arma o prepari un incantesimo a danno con tempo di lancio "Azione Bonus".'}
                           </div>
@@ -15056,17 +15042,17 @@ export default function App() {
                               let testoAttacco = spiegazioneEffetto;
                               if (spSpell) {
                                 const dTags = [];
-                                if (spSpell.scuola) dTags.push(`🔮 ${lingua === 'en' ? 'School' : 'Scuola'}: ${traduciDato(spSpell.scuola)}`);
-                                if (spSpell.tempo) dTags.push(`⏱ ${lingua === 'en' ? 'Casting Time' : 'Tempo di lancio'}: ${traduciDato(spSpell.tempo)}`);
-                                if (spSpell.gittata) dTags.push(`🎯 ${lingua === 'en' ? 'Range' : 'Gittata'}: ${spSpell.gittata}`);
-                                if (spSpell.area) dTags.push(`📐 ${lingua === 'en' ? 'Area' : 'Area'}: ${spSpell.area}`);
-                                if (spSpell.danno || spSpell.tipoDanno) dTags.push(`💥 ${lingua === 'en' ? 'Damage' : 'Danno'}: ${spSpell.danno || ''} ${spSpell.tipoDanno ? `(${traduciDato(spSpell.tipoDanno)})` : ''}`.trim());
-                                if (spSpell.conc) dTags.push(`⏳ ${lingua === 'en' ? 'Concentration' : 'Concentrazione'}: ${lingua === 'en' ? 'Yes' : 'Sì'}`);
-                                if (spSpell.rituale) dTags.push(`📜 ${lingua === 'en' ? 'Ritual' : 'Rituale'}: ${lingua === 'en' ? 'Yes' : 'Sì'}`);
+                                if (spSpell.scuola) dTags.push(`${lingua === 'en' ? 'School' : 'Scuola'}: ${traduciDato(spSpell.scuola)}`);
+                                if (spSpell.tempo) dTags.push(`${lingua === 'en' ? 'Casting Time' : 'Tempo di lancio'}: ${traduciDato(spSpell.tempo)}`);
+                                if (spSpell.gittata) dTags.push(`${lingua === 'en' ? 'Range' : 'Gittata'}: ${spSpell.gittata}`);
+                                if (spSpell.area) dTags.push(`${lingua === 'en' ? 'Area' : 'Area'}: ${spSpell.area}`);
+                                if (spSpell.danno || spSpell.tipoDanno) dTags.push(`${lingua === 'en' ? 'Damage' : 'Danno'}: ${spSpell.danno || ''} ${spSpell.tipoDanno ? `(${traduciDato(spSpell.tipoDanno)})` : ''}`.trim());
+                                if (spSpell.conc) dTags.push(`${lingua === 'en' ? 'Concentration' : 'Concentrazione'}: ${lingua === 'en' ? 'Yes' : 'Sì'}`);
+                                if (spSpell.rituale) dTags.push(`${lingua === 'en' ? 'Ritual' : 'Rituale'}: ${lingua === 'en' ? 'Yes' : 'Sì'}`);
                                 if (dTags.length > 0) testoAttacco = (testoAttacco ? testoAttacco + '\n\n' : '') + dTags.join('\n');
                               }
                               if (a.note && a.note !== spiegazioneEffetto) {
-                                testoAttacco = (testoAttacco ? testoAttacco + '\n\n' : '') + `📝 ${lingua === 'en' ? 'Personal Notes' : 'Note personali'}: ${a.note}`;
+                                testoAttacco = (testoAttacco ? testoAttacco + '\n\n' : '') + `${lingua === 'en' ? 'Personal Notes' : 'Note personali'}: ${a.note}`;
                               }
                               
                               const titoloRiga = spiegazioneEffetto ? `${cleanNome}: ${spiegazioneEffetto}` : undefined;
@@ -15098,8 +15084,8 @@ export default function App() {
                                 : '⚡';
 
                               const apriInfoReazione = () => {
-                                const tCond = a.innescoIt ? `🎯 ${lingua === 'en' ? 'Trigger' : 'Innesco'}: ${lingua === 'en' ? (a.innescoEn || a.innescoIt) : a.innescoIt}\n\n` : '';
-                                const tEff = a.effettoIt ? `🛡️ ${lingua === 'en' ? 'Effect' : 'Effetto'}: ${lingua === 'en' ? (a.effettoEn || a.effettoIt) : a.effettoIt}` : '';
+                                const tCond = a.innescoIt ? `${lingua === 'en' ? 'Trigger' : 'Innesco'}: ${lingua === 'en' ? (a.innescoEn || a.innescoIt) : a.innescoIt}\n\n` : '';
+                                const tEff = a.effettoIt ? `${lingua === 'en' ? 'Effect' : 'Effetto'}: ${lingua === 'en' ? (a.effettoEn || a.effettoIt) : a.effettoIt}` : '';
                                 setInfo({
                                   titolo: `${iconaReazione} ${cleanNome}`,
                                   testo: (tCond + tEff) || testoAttacco || spiegazioneEffetto || (lingua === 'en' ? 'No description available.' : 'Nessuna descrizione disponibile.')
@@ -15163,10 +15149,10 @@ export default function App() {
                                           {cat === 'Bonus' ? (
                                             <>
                                               <optgroup label={lingua === 'en' ? 'Bonus actions and weapons' : 'Azioni bonus e armi'}>
-                                                {AZIONI_BONUS_5E.filter((x) => x.tipo === 'combattimento' || x.tipo === 'talento' || x.tipo === 'privilegio').map((b) => <option key={b.nome} value={b.nome} title={b.note || spiegaPrivilegio(b.nome)}>⚔️ {traduciDato(b.nome)}</option>)}
+                                                {AZIONI_BONUS_5E.filter((x) => x.tipo === 'combattimento' || x.tipo === 'talento' || x.tipo === 'privilegio').map((b) => <option key={b.nome} value={b.nome} title={b.note || spiegaPrivilegio(b.nome)}>{traduciDato(b.nome)}</option>)}
                                               </optgroup>
                                               <optgroup label={lingua === 'en' ? 'Bonus Action Spells' : 'Incantesimi Azione Bonus'}>
-                                                {AZIONI_BONUS_5E.filter((x) => x.tipo === 'incantesimo').map((b) => <option key={b.nome} value={b.nome} title={b.note || spiegaIncantesimo(b.nome)}>📖 {traduciDato(b.nome)}</option>)}
+                                                {AZIONI_BONUS_5E.filter((x) => x.tipo === 'incantesimo').map((b) => <option key={b.nome} value={b.nome} title={b.note || spiegaIncantesimo(b.nome)}>{traduciDato(b.nome)}</option>)}
                                               </optgroup>
                                             </>
                                           ) : (
@@ -15212,7 +15198,7 @@ export default function App() {
                                           colore={a.tipoDanno === 'Guarigione' ? coloreCategoria('guarigione', notteAttiva) : undefined}
                                           critico={!!isUltimoCrit}
                                           disabled={castBloccato}
-                                          title={castBloccato ? 'Equipaggia un focus per lanciare questo incantesimo' : isUltimoCrit ? `⚔️ Tira i danni del critico (${a.danno} ×2)` : `Tira i danni (${a.danno})`}
+                                          title={castBloccato ? 'Equipaggia un focus per lanciare questo incantesimo' : isUltimoCrit ? `Tira i danni del critico (${a.danno} ×2)` : `Tira i danni (${a.danno})`}
                                           onRoll={() => {
                                             tiraDanniPerAttacco(a, !!isUltimoCrit);
                                             setUltimoAttaccoCritico(null);
@@ -15259,7 +15245,7 @@ export default function App() {
                                         style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria('tempo', notteAttiva)}1f`, border: `1px solid ${coloreCategoria('tempo', notteAttiva)}`, color: coloreCategoria('tempo', notteAttiva), fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
                                         title={lingua === 'en' ? `Casting time: ${cat === 'Azione' ? '1 Action' : cat === 'Bonus' ? 'Bonus Action' : 'Reaction'}` : `Tempo di lancio: ${cat === 'Azione' ? '1 Azione' : cat === 'Bonus' ? 'Azione Bonus' : 'Reazione'}`}
                                       >
-                                        ⏱ {cat === 'Azione' ? (lingua === 'en' ? '1 Action' : '1 Azione') : cat === 'Bonus' ? (lingua === 'en' ? 'Bonus Action' : 'Azione Bonus') : (lingua === 'en' ? 'Reaction' : 'Reazione')}
+                                        {cat === 'Azione' ? (lingua === 'en' ? '1 Action' : '1 Azione') : cat === 'Bonus' ? (lingua === 'en' ? 'Bonus Action' : 'Azione Bonus') : (lingua === 'en' ? 'Reaction' : 'Reazione')}
                                       </span>
                                       {gittataRiga && (
                                         <span
@@ -15267,7 +15253,7 @@ export default function App() {
                                           style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria('gittata', notteAttiva)}1f`, border: `1px solid ${coloreCategoria('gittata', notteAttiva)}`, color: coloreCategoria('gittata', notteAttiva), fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
                                           title={lingua === 'en' ? `Range: ${gittataRiga}` : `Gittata: ${gittataRiga}`}
                                         >
-                                          🎯 {gittataRiga}
+                                          {gittataRiga}
                                         </span>
                                       )}
                                       {hasReach && (
@@ -15288,7 +15274,7 @@ export default function App() {
                                           }}
                                           title={lingua === 'en' ? 'Reach Weapon: 3m (10 ft) melee reach for attacks & opportunity attacks' : 'Arma con Portata: minaccia ed estensione attacchi a 3m'}
                                         >
-                                          📏 3m
+                                          {lingua === 'en' ? 'Reach 3m' : 'Portata 3m'}
                                         </span>
                                       )}
                                       {infoMunizioni.usaMunizioni && (
@@ -15311,7 +15297,7 @@ export default function App() {
                                               ? (lingua === 'en' ? `${infoMunizioni.totale} ${infoMunizioni.nomeMunizione} in inventory` : `${infoMunizioni.totale} ${infoMunizioni.nomeMunizione} disponibili nello zaino`)
                                               : (lingua === 'en' ? `Out of ammunition (0 in inventory)` : `Munizioni esaurite (0 nell'inventario)`)}
                                           >
-                                            🏹 {infoMunizioni.totale} {infoMunizioni.totale === 0 ? (lingua === 'en' ? 'empty' : 'esaurite') : ''}
+                                            {infoMunizioni.nomeMunizione || (lingua === 'en' ? 'Ammo' : 'Munizioni')}: {infoMunizioni.totale} {infoMunizioni.totale === 0 ? (lingua === 'en' ? 'empty' : 'esaurite') : ''}
                                           </span>
                                           {infoMunizioni.totale > 0 && (
                                             <button
@@ -15331,7 +15317,7 @@ export default function App() {
                                               onClick={() => {
                                                 consumaMunizione(a.nome);
                                                 registra({
-                                                  etichetta: `🏹 ${infoMunizioni.nomeMunizione}`,
+                                                  etichetta: `${infoMunizioni.nomeMunizione}`,
                                                   tipo: 'tattica',
                                                   dettaglio: `${scheda.nome || 'PG'} usa 1 ${infoMunizioni.nomeMunizione} (rimaste: ${Math.max(0, infoMunizioni.totale - 1)})`
                                                 });
@@ -15355,12 +15341,12 @@ export default function App() {
                                           <>
                                             {a.innescoIt && (
                                               <span style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria('innesco', notteAttiva)}1f`, border: `1px solid ${coloreCategoria('innesco', notteAttiva)}`, color: coloreCategoria('innesco', notteAttiva), fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3, maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={`${lingua === 'en' ? 'Trigger' : 'Innesco'}: ${lingua === 'en' ? (a.innescoEn || a.innescoIt) : a.innescoIt}`}>
-                                                🎯 {lingua === 'en' ? (a.innescoEn || a.innescoIt) : a.innescoIt}
+                                                {lingua === 'en' ? (a.innescoEn || a.innescoIt) : a.innescoIt}
                                               </span>
                                             )}
                                             {a.effettoIt && (
                                               <span style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria('effetto', notteAttiva)}1f`, border: `1px solid ${coloreCategoria('effetto', notteAttiva)}`, color: coloreCategoria('effetto', notteAttiva), fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3, maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={`${lingua === 'en' ? 'Effect' : 'Effetto'}: ${lingua === 'en' ? (a.effettoEn || a.effettoIt) : a.effettoIt}`}>
-                                                🛡️ {lingua === 'en' ? (a.effettoEn || a.effettoIt) : a.effettoIt}
+                                                {lingua === 'en' ? (a.effettoEn || a.effettoIt) : a.effettoIt}
                                               </span>
                                             )}
                                           </>
@@ -15370,7 +15356,7 @@ export default function App() {
                                             style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria(c.categoria, notteAttiva)}1f`, border: `1px solid ${coloreCategoria(c.categoria, notteAttiva)}`, color: coloreCategoria(c.categoria, notteAttiva), fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3, whiteSpace: 'nowrap' }}
                                             title={c.etichetta}
                                           >
-                                            {c.icona} {c.testo}
+                                            {c.testo}
                                           </span>
                                         ))}
                                         {!notaRidondante && (
@@ -15404,7 +15390,7 @@ export default function App() {
                                             if (nuovoStato) {
                                               const desc = lingua === 'en' ? (a.effettoEn || a.innescoEn || a.note) : (a.effettoIt || a.innescoIt || a.note);
                                               registra({
-                                                etichetta: `⚡ ${a.nome}`,
+                                                etichetta: `${a.nome}`,
                                                 tipo: 'reazione',
                                                 dettaglio: `${a.nome}: ${desc || 'Reazione attivata'}`
                                               });
@@ -15412,7 +15398,6 @@ export default function App() {
                                             }
                                           }}
                                         >
-                                          <span>{scheda.reazioneUsata ? '🔴' : '⚡'}</span>
                                           <span>{scheda.reazioneUsata ? (lingua === 'en' ? 'Used' : 'Usata') : (lingua === 'en' ? 'Use' : 'Usa')}</span>
                                         </button>
                                       )}
@@ -15482,7 +15467,7 @@ export default function App() {
                     disabled={Boolean(caratteristicaIncantatorePerClasse(scheda.classe, scheda.sottoclasse))}
                     title={caratteristicaIncantatorePerClasse(scheda.classe, scheda.sottoclasse) ? 'Determinata automaticamente dalla classe' : undefined}
                   >
-                    <option value="">🚫 {t('spell.non_incantatore')}</option>
+                    <option value="">{t('spell.non_incantatore')}</option>
                     {CARATTERISTICHE.map((c) => (
                       <option key={c.key} value={c.key}>{formattaVoceConIcona(c.key, () => t('attr.' + c.key))}</option>
                     ))}
@@ -15501,7 +15486,7 @@ export default function App() {
                       {/* Concentrazione: riquadro quadrato, in linea con gli altri tre */}
                       <div style={{ ...styles.vitalBox, padding: '30px 6px 8px', gap: 5, justifyContent: 'flex-start', background: attivo ? 'rgba(201,162,39,0.15)' : C.panelLight, borderColor: attivo ? C.goldDark : C.border }}>
                         <div style={{ ...styles.vitalLabel, color: attivo ? C.goldDark : C.inkDim, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
-                          <span>🧠</span> {t('conc.label')}
+                          {t('conc.label')}
                         </div>
                         <select
                           value={scheda.concentrazione || ''}
@@ -15509,9 +15494,9 @@ export default function App() {
                           style={{ ...styles.inlineInput, fontSize: 12, width: '100%', maxWidth: '100%', padding: '3px 6px', height: 28, textAlign: 'center', fontWeight: attivo ? 700 : 400, color: attivo ? C.goldDark : C.ink }}
                           title={t('conc.scegli')}
                         >
-                          <option value="">🚫 {t('conc.nessuna')}</option>
-                          {attivo && !conc.includes(scheda.concentrazione) && <option value={scheda.concentrazione}>✨ {scheda.concentrazione}</option>}
-                          {[...conc].sort((a, b) => a.localeCompare(b, lingua)).map((n) => <option key={n} value={n}>✨ {n}</option>)}
+                          <option value="">{t('conc.nessuna')}</option>
+                          {attivo && !conc.includes(scheda.concentrazione) && <option value={scheda.concentrazione}>{scheda.concentrazione}</option>}
+                          {[...conc].sort((a, b) => a.localeCompare(b, lingua)).map((n) => <option key={n} value={n}>{n}</option>)}
                         </select>
                         <button
                           className="tirabile"
@@ -15544,7 +15529,7 @@ export default function App() {
                             }
                           }}
                         >
-                          🎲 TS {conSegno(bonusCon)}
+                          TS {conSegno(bonusCon)}
                         </button>
                         {attivo && (
                           <button style={{ ...styles.buttonMini, position: 'absolute', top: 4, right: 4, fontSize: 11, padding: '0 5px', height: 20, color: C.red, background: C.panel }} title={t('conc.termina')} aria-label={t('conc.termina')} onClick={() => aggiorna({ concentrazione: '' })}>✕</button>
@@ -15569,7 +15554,7 @@ export default function App() {
                                 title={t('spell.tira_attacco')}
                                 onClick={() => lanciaD20(t('spell.attacco_inc'), scheda.bonusCompetenza + modIncantatore, { magia: true, tipoTiro: 'attacco' })}
                               >
-                                🎲 {conSegno(scheda.bonusCompetenza + modIncantatore)}
+                                {conSegno(scheda.bonusCompetenza + modIncantatore)}
                               </span>
                             </div>
                           </div>
@@ -15650,7 +15635,7 @@ export default function App() {
                           }}
                           title={lingua === 'en' ? 'Automatically unprepare excess spells' : 'Deprepara automaticamente gli incantesimi in eccesso'}
                         >
-                          ⚡ {lingua === 'en' ? `Auto-unprepare ${nIncantiScelti - maxIncantesimi} excess` : `Deprepara ${nIncantiScelti - maxIncantesimi} in eccesso`}
+                          {lingua === 'en' ? `Auto-unprepare ${nIncantiScelti - maxIncantesimi} excess` : `Deprepara ${nIncantiScelti - maxIncantesimi} in eccesso`}
                         </button>
                       )}
                     </div>
@@ -15663,7 +15648,7 @@ export default function App() {
                       )}
                       {trucMancanti && (
                         <div>
-                          🟢 <strong>{t('spell.trucchetti')} ({nTrucchetti}/{maxTrucchetti})</strong>: mancano <strong>{maxTrucchetti - nTrucchetti} trucchett{maxTrucchetti - nTrucchetti > 1 ? 'i' : 'o'} da scegliere</strong>. Seleziona dai menu a tendina verdi <strong style={{ color: '#2e9d4d' }}>✨ ➕ Scegli mancanti</strong> nella sezione Trucchetti qui sotto.
+                          <strong>{t('spell.trucchetti')} ({nTrucchetti}/{maxTrucchetti})</strong>: mancano <strong>{maxTrucchetti - nTrucchetti} trucchett{maxTrucchetti - nTrucchetti > 1 ? 'i' : 'o'} da scegliere</strong>. Seleziona dai menu a tendina verdi <strong style={{ color: '#2e9d4d' }}>Aggiungi… (da scegliere)</strong> nella sezione Trucchetti qui sotto.
                         </div>
                       )}
                       {incInEccesso && (
@@ -15673,7 +15658,7 @@ export default function App() {
                       )}
                       {incMancanti && (
                         <div>
-                          🟢 <strong>{t('spell.incantesimi')} ({nIncantiScelti}/{maxIncantesimi})</strong>: puoi {classePreparata ? 'preparare o scegliere' : 'scegliere'} altri <strong>{maxIncantesimi - nIncantiScelti} incantesim{maxIncantesimi - nIncantiScelti > 1 ? 'i' : 'o'}</strong>. Usa i selettori verdi <strong style={{ color: '#2e9d4d' }}>✨ ➕ Scegli mancanti</strong> sotto ciascun livello {classePreparata ? 'o clicca ✨ Prepara su quelli nel libro.' : '.'}
+                          <strong>{t('spell.incantesimi')} ({nIncantiScelti}/{maxIncantesimi})</strong>: puoi {classePreparata ? 'preparare o scegliere' : 'scegliere'} altri <strong>{maxIncantesimi - nIncantiScelti} incantesim{maxIncantesimi - nIncantiScelti > 1 ? 'i' : 'o'}</strong>. Usa i selettori verdi <strong style={{ color: '#2e9d4d' }}>Aggiungi… (da scegliere)</strong> sotto ciascun livello {classePreparata ? 'o clicca Prep. su quelli nel libro.' : '.'}
                         </div>
                       )}
                       {incDuplicati.length > 0 && (
@@ -15703,15 +15688,15 @@ export default function App() {
                   />
                   <select value={filtroLivelloInc} onChange={(e) => setFiltroLivelloInc(e.target.value)} style={{ ...styles.inlineInput, padding: '6px 7px' }} aria-label={t('spell.filtro_livello')}>
                     <option value="">{t('spell.tutti_livelli')}</option>
-                    <option value="0">✨ {t('spell.trucchetti')}</option>
-                    {Array.from({ length: 9 }, (_, i) => <option key={i + 1} value={String(i + 1)}>📖 {i + 1}° {lingua === 'en' ? 'Level' : 'Livello'}</option>)}
+                    <option value="0">{t('spell.trucchetti')}</option>
+                    {Array.from({ length: 9 }, (_, i) => <option key={i + 1} value={String(i + 1)}>{i + 1}° {lingua === 'en' ? 'Level' : 'Livello'}</option>)}
                   </select>
                   <select value={filtroScuolaInc} onChange={(e) => setFiltroScuolaInc(e.target.value)} style={{ ...styles.inlineInput, padding: '6px 7px' }} aria-label={t('spell.filtro_scuola')}>
                     <option value="">{t('spell.tutte_scuole')}</option>
                     {[...new Set(incantesimiVisualizzati.map((s) => s.scuola || datiIncantesimo(s.nome)?.scuola).filter(Boolean))].sort((a, b) => traduciDato(a).localeCompare(traduciDato(b), lingua)).map((scuola) => <option key={scuola} value={scuola}>{formattaVoceConIcona(scuola)}</option>)}
                   </select>
                   <select value={filtroClasseInc} onChange={(e) => setFiltroClasseInc(e.target.value)} style={{ ...styles.inlineInput, padding: '6px 7px' }} aria-label={t('spell.filtro_classe')}>
-                    <option value="">🧙 {t('spell.tutte_classi')}</option>
+                    <option value="">{t('spell.tutte_classi')}</option>
                     {['Bardo', 'Chierico', 'Druido', 'Mago', 'Paladino', 'Ranger', 'Stregone', 'Warlock', 'Artefice'].map((classe) => <option key={classe} value={classe}>{formattaVoceConIcona(classe)}</option>)}
                   </select>
                 </div>
@@ -15767,7 +15752,7 @@ export default function App() {
                         fontWeight: soloPreparatiInc ? 700 : 500,
                       }}
                     >
-                      ⭐ {lingua === 'en' ? 'Prepared only' : 'Solo Preparati'}
+                      {lingua === 'en' ? 'Prepared only' : 'Solo Preparati'}
                     </button>
 
                     <button
@@ -15851,7 +15836,7 @@ export default function App() {
                         fontWeight: soloConcInc ? 700 : 500,
                       }}
                     >
-                      🧠 {lingua === 'en' ? 'Concentration' : 'Concentrazione'}
+                      {lingua === 'en' ? 'Concentration' : 'Concentrazione'}
                     </button>
 
                     <button
@@ -15872,7 +15857,7 @@ export default function App() {
                         fontWeight: soloRitualiInc ? 700 : 500,
                       }}
                     >
-                      📜 {lingua === 'en' ? 'Rituals' : 'Rituali'}
+                      {lingua === 'en' ? 'Rituals' : 'Rituali'}
                     </button>
                   </div>
 
@@ -15917,7 +15902,7 @@ export default function App() {
                   // anche se il catalogo non lo associa alla classe del filtro attivo (es. un trucchetto
                   // multiclasse, o mancante nel catalogo per quella classe).
                   if (filtroClasseInc && s.catalogo && !(d.classi || []).includes(filtroClasseInc)) return false;
-                  if (soloRitualiInc && !(s.rituale === true || d.rituale === true)) return false;
+                  if (soloRitualiInc && !(s.rituale === true || d.rituale === true || separaNotaIncantesimo(s.note).rituale)) return false;
                   if (soloPreparatiInc && !isPrep) return false;
                   if (soloConcInc && !isConc) return false;
                   if (filtroTempoInc === 'azione' && !isAzione) return false;
@@ -15970,7 +15955,6 @@ export default function App() {
                     if (!(isLivMancante && numMancanti > 0)) return null;
                     return (
                       <div style={{ fontSize: 11, fontWeight: 700, color: '#2e9d4d', display: 'flex', alignItems: 'center', gap: 4, marginTop: 8 }}>
-                        <span>🟢</span>
                         <span>
                           {lingua === 'en'
                             ? `${numMancanti} cantrip${numMancanti > 1 ? 's' : ''} to choose: pick ${numMancanti > 1 ? 'them' : 'it'} when you level up`
@@ -15985,7 +15969,6 @@ export default function App() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 8 }}>
                       {isLivMancante && numMancanti > 0 && (
                         <div style={{ fontSize: 11, fontWeight: 700, color: '#2e9d4d', display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <span>🟢</span>
                           <span>
                             {lingua === 'en'
                               ? `${numMancanti} ${liv === 0 ? 'cantrip' : 'spell'}${numMancanti > 1 ? 's' : ''} to choose: select from class suggestions below`
@@ -16013,13 +15996,13 @@ export default function App() {
                         >
                           <option value="">
                             {isLivMancante
-                              ? `✨ ➕ ${t('spell.aggiungi')} (${numMancanti} ${lingua === 'en' ? 'missing' : 'da scegliere'})…`
-                              : `➕ ${t('spell.aggiungi')}…`}
+                              ? `${t('spell.aggiungi')} (${numMancanti} ${lingua === 'en' ? 'missing' : 'da scegliere'})…`
+                              : `${t('spell.aggiungi')}…`}
                           </option>
                           <option value="__manuale__">{t('spell.scrivi_mano')}</option>
                           {suggeriti.length > 0 && (
                             <optgroup label={t('spell.incantesimi_da', { classe: scheda.classe })}>
-                              {[...suggeriti].sort((a, b) => a.localeCompare(b, lingua)).map((n) => <option key={n} value={n} disabled={gia.has(n.toLowerCase())}>{gia.has(n.toLowerCase()) ? `✓ ${n} (${lingua === 'en' ? 'already added' : 'già presente'})` : `✨ ${n}`}</option>)}
+                              {[...suggeriti].sort((a, b) => a.localeCompare(b, lingua)).map((n) => <option key={n} value={n} disabled={gia.has(n.toLowerCase())}>{gia.has(n.toLowerCase()) ? `✓ ${n} (${lingua === 'en' ? 'already added' : 'già presente'})` : `${n}`}</option>)}
                             </optgroup>
                           )}
                         </select>
@@ -16063,7 +16046,7 @@ export default function App() {
                         >
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                             <span style={{ color: C.goldDark, fontSize: 13, fontWeight: 800 }}>{chiuso ? '▸' : '▾'}</span>
-                            <span style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, color: C.ink }}>
+                            <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 0.3, color: C.ink }}>
                               {t('spell.n_livello', { n: liv })}
                             </span>
                             {slot && slot.totale > 0 && (
@@ -16113,12 +16096,12 @@ export default function App() {
                             )}
                             {isEccessoLiv && (
                               <span style={{ fontSize: 11, fontWeight: 700, color: '#fff', background: '#ef4444', border: '1px solid #ef4444', borderRadius: 6, padding: '1px 6px' }}>
-                                🔴 {lingua === 'en' ? 'Over the limit' : 'Oltre il limite'}
+                                {lingua === 'en' ? 'Over the limit' : 'Oltre il limite'}
                               </span>
                             )}
                             {isMancanteLiv && (
                               <span style={{ fontSize: 11, fontWeight: 700, color: '#2e9d4d', background: 'rgba(46,157,77,0.15)', border: '1px solid #2e9d4d', borderRadius: 6, padding: '1px 6px' }}>
-                                🟢 {lingua === 'en' ? 'Choices available' : 'Scelte disponibili'}
+                                {lingua === 'en' ? 'Choices available' : 'Scelte disponibili'}
                               </span>
                             )}
                           </div>
@@ -16161,8 +16144,10 @@ export default function App() {
                             const gittata = valoreIncantesimoPerEdizione(s, 'gittata', versione);
                             const scuola = s.scuola || d?.scuola || '';
                             const area = s.area || d?.area || '';
-                            const isConcRow = Boolean(s.conc || d?.conc);
-                            const isRitualeRow = Boolean(s.rituale || d?.rituale);
+                            // "Conc."/"Rituale" scritti nella nota diventano solo il chip dedicato.
+                            const notaSeparata = separaNotaIncantesimo(s.note);
+                            const isConcRow = Boolean(s.conc || d?.conc || notaSeparata.conc);
+                            const isRitualeRow = Boolean(s.rituale || d?.rituale || notaSeparata.rituale);
                             // Trucchetti: stesso danno di Combattimento (dannoTrucchettoScalato: livello,
                             // e per Randello Incantato dado per edizione + mod da incantatore).
                             const dannoBaseInc = valoreIncantesimoPerEdizione(s, 'danno', versione);
@@ -16173,7 +16158,7 @@ export default function App() {
                               : tipoDanno === 'Guarigione'
                                 ? dannoCuraConModificatore(s.nome, dannoBaseInc, modIncantatore || 0)
                                 : dannoBaseInc;
-                            const note = s.note || '';
+                            const note = notaSeparata.nota;
                             // Incantesimo a tiro salvezza: badge della CD al posto del tiro per colpire.
                             const classeInc = classificaIncantesimoCombattimento(s);
                             const isTSInc = Boolean(danno) && tipoDanno !== 'Guarigione' && classeInc.isTS;
@@ -16188,32 +16173,33 @@ export default function App() {
                             const isRowUnpreparedMancante = isMancanteLiv && classePreparata && liv >= 1 && s.preparato === false;
 
                             const dettagliTecnici = [];
-                            if (scuola) dettagliTecnici.push(`🔮 ${lingua === 'en' ? 'School' : 'Scuola'}: ${traduciDato(scuola)}`);
-                            if (tempoLabel) dettagliTecnici.push(`⏱ ${lingua === 'en' ? 'Casting Time' : 'Tempo di lancio'}: ${tempoLabel}`);
-                            if (gittata) dettagliTecnici.push(`🎯 ${lingua === 'en' ? 'Range' : 'Gittata'}: ${gittata}`);
-                            if (area) dettagliTecnici.push(`📐 ${lingua === 'en' ? 'Area' : 'Area'}: ${area}`);
-                            if (danno || tipoDanno) dettagliTecnici.push(`💥 ${lingua === 'en' ? 'Damage' : 'Danno'}: ${danno || ''} ${tipoDanno ? `(${traduciDato(tipoDanno)})` : ''}`.trim());
-                            if (d?.conc || /concentrazione/i.test(spieg)) dettagliTecnici.push(`⏳ ${lingua === 'en' ? 'Concentration' : 'Concentrazione'}: ${lingua === 'en' ? 'Yes' : 'Sì'}`);
-                            if (d?.rituale) dettagliTecnici.push(`📜 ${lingua === 'en' ? 'Ritual' : 'Rituale'}: ${lingua === 'en' ? 'Yes' : 'Sì'}`);
-                            if (d?.classi && d.classi.length > 0) dettagliTecnici.push(`🧙‍♂️ ${lingua === 'en' ? 'Classes' : 'Classi'}: ${d.classi.join(', ')}`);
+                            if (scuola) dettagliTecnici.push(`${lingua === 'en' ? 'School' : 'Scuola'}: ${traduciDato(scuola)}`);
+                            if (tempoLabel) dettagliTecnici.push(`${lingua === 'en' ? 'Casting Time' : 'Tempo di lancio'}: ${tempoLabel}`);
+                            if (gittata) dettagliTecnici.push(`${lingua === 'en' ? 'Range' : 'Gittata'}: ${gittata}`);
+                            if (area) dettagliTecnici.push(`${lingua === 'en' ? 'Area' : 'Area'}: ${area}`);
+                            if (danno || tipoDanno) dettagliTecnici.push(`${lingua === 'en' ? 'Damage' : 'Danno'}: ${danno || ''} ${tipoDanno ? `(${traduciDato(tipoDanno)})` : ''}`.trim());
+                            if (isConcRow || /concentrazione/i.test(spieg)) dettagliTecnici.push(`${lingua === 'en' ? 'Concentration' : 'Concentrazione'}: ${lingua === 'en' ? 'Yes' : 'Sì'}`);
+                            if (isRitualeRow) dettagliTecnici.push(`${lingua === 'en' ? 'Ritual' : 'Rituale'}: ${lingua === 'en' ? 'Yes' : 'Sì'}`);
+                            if (d?.classi && d.classi.length > 0) dettagliTecnici.push(`${lingua === 'en' ? 'Classes' : 'Classi'}: ${d.classi.join(', ')}`);
 
                             let testoModal = spieg;
                             if (dettagliTecnici.length > 0) {
                               testoModal = (testoModal ? testoModal + '\n\n' : '') + dettagliTecnici.join('\n');
                             }
-                            if (s.note && s.note !== spieg) {
-                              testoModal = (testoModal ? testoModal + '\n\n' : '') + `📝 ${lingua === 'en' ? 'Personal Notes' : 'Note personali'}: ${s.note}`;
+                            if (note && s.note !== spieg) {
+                              testoModal = (testoModal ? testoModal + '\n\n' : '') + `${lingua === 'en' ? 'Personal Notes' : 'Note personali'}: ${note}`;
                             }
 
-                            const chip = (icona, label, val, colore) => val ? (
+                            const chip = (icona, label, val, colore, classe) => val ? (
                               <span
                                 key={label}
+                                className={classe}
                                 style={colore
                                   ? { fontSize: 11, background: `${colore}1f`, border: `1px solid ${colore}`, borderRadius: 4, padding: '1px 5px', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 3, color: colore, fontWeight: 700 }
                                   : { fontSize: 11, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: '1px 5px', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 3 }}
                                 title={`${label}: ${val}`}
                               >
-                                <span>{icona}</span>
+                                {icona && <span aria-hidden="true">{icona}</span>}
                                 <span style={colore ? undefined : { color: C.inkDim }}>{val}</span>
                               </span>
                             ) : null;
@@ -16262,7 +16248,7 @@ export default function App() {
                                   <button
                                     style={{ background: 'transparent', border: 'none', color: isRowInEccesso ? '#ef4444' : C.ink, fontWeight: 700, cursor: 'help', textAlign: 'left', padding: 0, fontSize: 14, lineHeight: 1.2, textDecoration: 'underline dotted', textUnderlineOffset: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
                                     title={spieg || t('tip.cosa_fa_inc')}
-                                    onClick={() => setInfo({ titolo: `${s.nome || 'Incantesimo'}${s.livello === 0 ? ' · Trucchetto' : ` · ${s.livello}° livello`}`, testo: testoModal || (lingua === 'en' ? 'No description available for this spell. Click ✎ to add notes.' : 'Nessuna descrizione disponibile per questo incantesimo. Aprilo con ✎ per aggiungere delle note.') })}
+                                    onClick={() => setInfo({ titolo: `${s.nome || 'Incantesimo'}${s.livello === 0 ? ' · Trucchetto' : ` · ${s.livello}° livello`}`, testo: testoModal || (lingua === 'en' ? 'No description available for this spell. Click to add notes.' : 'Nessuna descrizione disponibile per questo incantesimo. Aprilo con per aggiungere delle note.') })}
                                   >
                                     {s.nome || t('menu.senza_nome')}
                                   </button>
@@ -16284,7 +16270,7 @@ export default function App() {
                                       }}
                                       title={lingua === 'en' ? 'Duplicate spell: remove one copy' : 'Incantesimo duplicato: rimuovine una copia'}
                                     >
-                                      🔴 {lingua === 'en' ? 'Duplicate' : 'Duplicato'}
+                                      {lingua === 'en' ? 'Duplicate' : 'Duplicato'}
                                     </span>
                                   )}
                                   {isTroppoAlto && (
@@ -16305,7 +16291,7 @@ export default function App() {
                                       }}
                                       title={lingua === 'en' ? `Level too high: you only have slots up to level ${maxSlotLiv}` : `Livello troppo alto: disponi di slot solo fino al ${maxSlotLiv}° livello`}
                                     >
-                                      🔴 {lingua === 'en' ? 'No slot' : 'Senza slot'}
+                                      {lingua === 'en' ? 'No slot' : 'Senza slot'}
                                     </span>
                                   )}
                                   {isRowInEccesso && !isDuplicato && !isTroppoAlto && (
@@ -16326,7 +16312,7 @@ export default function App() {
                                       }}
                                       title={classePreparata && s.livello >= 1 ? (lingua === 'en' ? 'Excess spell: unprepare or delete' : 'Incantesimo in eccesso: deprepara o elimina') : (lingua === 'en' ? 'Excess spell: remove one' : 'Incantesimo in eccesso: rimuovine uno')}
                                     >
-                                      🔴 {lingua === 'en' ? 'In excess' : 'In eccesso'}
+                                      {lingua === 'en' ? 'In excess' : 'In eccesso'}
                                     </span>
                                   )}
                                   {isRowUnpreparedMancante && (
@@ -16347,7 +16333,7 @@ export default function App() {
                                       }}
                                       title={lingua === 'en' ? 'Available to prepare' : 'Disponibile da preparare'}
                                     >
-                                      🟢 {lingua === 'en' ? 'To prepare' : 'Da preparare'}
+                                      {lingua === 'en' ? 'To prepare' : 'Da preparare'}
                                     </span>
                                   )}
                                   {s.catalogo && (
@@ -16363,7 +16349,7 @@ export default function App() {
                                         whiteSpace: 'nowrap',
                                         flexShrink: 0,
                                       }}
-                                    >📖 {lingua === 'en' ? 'Catalog' : 'Catalogo'}</span>
+                                    >{lingua === 'en' ? 'Catalog' : 'Catalogo'}</span>
                                   )}
                                   {s.bonus && (
                                     <span
@@ -16373,15 +16359,15 @@ export default function App() {
                                     >✦ {t('spell.bonus_badge')}</span>
                                   )}
                                   <div className="spell-chips" style={{ display: 'flex', flexWrap: 'nowrap', gap: 4, alignItems: 'center', overflowX: 'auto', flex: '1 1 auto', minWidth: 0 }}>
-                                    {chip('⏱', t('spell.chip_tempo'), tempoLabel, coloreCategoria('tempo', notteAttiva))}
-                                    {chip('🎯', t('spell.chip_gittata'), gittata, coloreCategoria('gittata', notteAttiva))}
-                                    {area && chip('📐', 'Area', area, coloreCategoria('gittata', notteAttiva))}
-                                    {isConcRow && chip('🧠', lingua === 'en' ? 'Concentration' : 'Concentrazione', lingua === 'en' ? 'Concentration' : 'Concentrazione', coloreCategoria('concentrazione', notteAttiva))}
-                                    {isRitualeRow && chip('📜', lingua === 'en' ? 'Ritual' : 'Rituale', lingua === 'en' ? 'Ritual' : 'Rituale', coloreCategoria('rituale', notteAttiva))}
+                                    {chip('', t('spell.chip_tempo'), tempoLabel, coloreCategoria('tempo', notteAttiva), 'chip-tempo')}
+                                    {chip('', t('spell.chip_gittata'), gittata, coloreCategoria('gittata', notteAttiva), 'chip-gittata')}
+                                    {area && chip('', 'Area', area, coloreCategoria('gittata', notteAttiva), 'chip-area')}
+                                    {isConcRow && chip('', lingua === 'en' ? 'Concentration' : 'Concentrazione', lingua === 'en' ? 'Concentration' : 'Concentrazione', coloreCategoria('concentrazione', notteAttiva), 'chip-concentrazione')}
+                                    {isRitualeRow && chip('', lingua === 'en' ? 'Ritual' : 'Rituale', lingua === 'en' ? 'Ritual' : 'Rituale', coloreCategoria('rituale', notteAttiva), 'chip-rituale')}
                                     {(danno || tipoDanno) && !parseEspressioneDado(danno) && (
-                                      chip(tipoDanno === 'Guarigione' ? '💚' : '💥', 'Danno', [danno, tipoDanno].filter(Boolean).join(' '), coloreCategoria(tipoDanno === 'Guarigione' ? 'guarigione' : 'danno', notteAttiva))
+                                      chip(iconaTipoDanno(tipoDanno), 'Danno', [danno, tipoDanno].filter(Boolean).join(' '), coloreCategoria(tipoDanno === 'Guarigione' ? 'guarigione' : 'danno', notteAttiva))
                                     )}
-                                    {note && chip('📝', t('spell.chip_note'), note)}
+                                    {note && chip('', t('spell.chip_note'), note, undefined, 'chip-nota')}
                                   </div>
                                   {scuola && (
                                     <span
@@ -16424,7 +16410,7 @@ export default function App() {
                                         tipoDanno={tipoDanno}
                                         colore={tipoDanno === 'Guarigione' ? coloreCategoria('guarigione', notteAttiva) : undefined}
                                         critico={!!isUltimoCritInc}
-                                        title={isUltimoCritInc ? `⚔️ Critico attivo: tira i danni del critico (${danno} ×2)` : t('tip.tira_danno_inc')}
+                                        title={isUltimoCritInc ? `Critico attivo: tira i danni del critico (${danno} ×2)` : t('tip.tira_danno_inc')}
                                         onRoll={() => {
                                           tiraDanniPerAttacco({ id: s.id, nome: s.nome, danno, tipoDanno, isSpell: true }, !!isUltimoCritInc);
                                           setUltimoAttaccoCritico(null);
@@ -16438,13 +16424,14 @@ export default function App() {
                                         type="button"
                                         style={{ ...styles.buttonRiga, color: C.goldDark, borderColor: C.gold, background: 'rgba(201,162,39,0.12)' }}
                                         title={lingua === 'en' ? 'Open the summon/companion catalog for this spell' : 'Apri il catalogo evocazioni/compagni per questo incantesimo'}
+                                        aria-label={lingua === 'en' ? 'Summon: open the catalog' : 'Evoca: apri il catalogo'}
                                         onClick={() => {
                                           setFiltroCompagnoCat(/animal|bestie|beast/i.test(s.nome || '') ? 'bestie' : 'evocazioni');
                                           setCercaCompagnoText('');
                                           setMostraModalAggiungiCompagno(true);
                                         }}
                                       >
-                                        🐾 {lingua === 'en' ? 'Summon' : 'Evoca'}
+                                        {lingua === 'en' ? 'Summon' : 'Evoca'}
                                       </button>
                                     )}
                                     {/metamorfosi|polymorph/i.test(s.nome || '') && (
@@ -16452,9 +16439,10 @@ export default function App() {
                                         type="button"
                                         style={{ ...styles.buttonRiga, color: C.goldDark, borderColor: C.gold, background: 'rgba(201,162,39,0.12)' }}
                                         title={lingua === 'en' ? 'Open the polymorph catalog (choose the creature to become)' : 'Apri il catalogo Metamorfosi (scegli la creatura da assumere)'}
+                                        aria-label={lingua === 'en' ? 'Polymorph: open the catalog' : 'Metamorfosi: apri il catalogo'}
                                         onClick={() => setTabTrasformazione('metamorfosi')}
                                       >
-                                        🔮 {lingua === 'en' ? 'Polymorph' : 'Metamorfosi'}
+                                        {lingua === 'en' ? 'Polymorph' : 'Metamorfosi'}
                                       </button>
                                     )}
                                     {/ingrandire|ridurre|enlarge|reduce/i.test(s.nome || '') && (
@@ -16470,7 +16458,7 @@ export default function App() {
                                           title="Attiva Ingrandire: +1 taglia, +1d4 danni armi, vantaggio prove/TS FOR, carico raddoppiato"
                                           onClick={() => aggiorna({ effettoTaglia: scheda.effettoTaglia === 'ingrandito' ? null : 'ingrandito' })}
                                         >
-                                          {scheda.effettoTaglia === 'ingrandito' ? '✨ Ingrandito' : '⬆️ Ingrandisci'}
+                                          {scheda.effettoTaglia === 'ingrandito' ? 'Ingrandito' : 'Ingrandisci'}
                                         </button>
                                         <button
                                           type="button"
@@ -16483,7 +16471,7 @@ export default function App() {
                                           title="Attiva Ridurre: -1 taglia, -1d4 danni armi, svantaggio prove/TS FOR, carico dimezzato"
                                           onClick={() => aggiorna({ effettoTaglia: scheda.effettoTaglia === 'ridotto' ? null : 'ridotto' })}
                                         >
-                                          {scheda.effettoTaglia === 'ridotto' ? '✨ Ridotto' : '⬇️ Riduci'}
+                                          {scheda.effettoTaglia === 'ridotto' ? 'Ridotto' : 'Riduci'}
                                         </button>
                                       </div>
                                     )}
@@ -16500,7 +16488,7 @@ export default function App() {
                                         title={lingua === 'en' ? 'Add this spell to your character sheet' : 'Aggiungi questo incantesimo alla tua scheda'}
                                         onClick={() => cambiaPreparazione(s)}
                                       >
-                                        {isRowCatalogoMancante ? '✨ ➕ ' : '➕ '}{lingua === 'en' ? 'Add' : 'Aggiungi'}
+                                        {lingua === 'en' ? 'Add' : 'Aggiungi'}
                                       </button>
                                     ) : (
                                       <>
@@ -16518,17 +16506,20 @@ export default function App() {
                                             disabled={s.preparato === false && preparatiPieni && !s.bonus}
                                             onClick={() => cambiaPreparazione(s)}
                                           >
-                                            {isRowUnpreparedMancante ? '✨ ☆ ' : (s.preparato !== false ? '⭐ ' : '☆ ')}
                                             {s.preparato !== false ? (lingua === 'en' ? 'Prep.' : 'Prep.') : (isRowUnpreparedMancante ? (lingua === 'en' ? 'Prepare' : 'Prepara') : (lingua === 'en' ? 'Not prep.' : 'Non prep.'))}
                                           </button>
                                         )}
                                         <button
                                           type="button"
+                                          className={isRowInEccesso ? undefined : 'btn-elimina-riga'}
                                           style={{
                                             ...styles.buttonRiga,
-                                            color: isRowInEccesso ? '#fff' : C.red,
+                                            // Staccato dagli altri pulsanti e neutro finché non serve:
+                                            // il rosso pieno resta solo se l'incantesimo è in eccesso.
+                                            marginLeft: 8,
+                                            color: isRowInEccesso ? '#fff' : C.inkDim,
                                             background: isRowInEccesso ? '#ef4444' : 'transparent',
-                                            borderColor: isRowInEccesso ? '#ef4444' : C.red,
+                                            borderColor: isRowInEccesso ? '#ef4444' : C.border,
                                             boxShadow: isRowInEccesso ? '0 0 6px rgba(239,68,68,0.4)' : 'none',
                                           }}
                                           title={t('tip.elimina_inc')}
@@ -16536,12 +16527,12 @@ export default function App() {
                                           onClick={() => {
                                             setConferma({
                                               titolo: t('spell.elimina_titolo') || 'Elimina incantesimo',
-                                              testo: `Vuoi eliminare "${s.nome}" dalla lista incantesimi?`,
+                                              testo: t('spell.elimina_testo', { nome: s.nome }),
                                               onConferma: () => aggiorna({ incantesimiLista: scheda.incantesimiLista.filter((x) => x.id !== s.id) }),
                                             });
                                           }}
                                         >
-                                          🗑{isRowInEccesso ? ` ${lingua === 'en' ? 'Remove' : 'Rimuovi'}` : ''}
+                                          {isRowInEccesso ? t('spell.rimuovi_btn') : t('spell.elimina_btn')}
                                         </button>
                                       </>
                                     )}
@@ -16652,12 +16643,12 @@ export default function App() {
                         style={{ ...styles.buttonMini, borderColor: C.goldDark, color: C.goldDark, marginBottom: 10 }}
                         title="Aggiunge i Punti Stregoneria (compaiono anche in Risorse di classe)"
                         onClick={() => aggiorna({ risorse: [...risorse, { id: 'auto-punti-stregoneria', nome: 'Punti Stregoneria', attuali: L, max: L, reset: 'lungo' }] })}
-                      >✨ Aggiungi Punti Stregoneria</button>
+                      >Aggiungi Punti Stregoneria</button>
                     );
                   }
                   return (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, flexWrap: 'wrap', fontSize: 13 }}>
-                      <span style={{ ...styles.detail, fontWeight: 700, color: C.goldDark }}>✨ Punti Stregoneria</span>
+                      <span style={{ ...styles.detail, fontWeight: 700, color: C.goldDark }}>Punti Stregoneria</span>
                       <button style={{ ...styles.buttonMini, padding: '1px 7px' }} title="Spendi 1 punto" onClick={() => modR({ attuali: Math.max(0, r.attuali - 1) })}>−</button>
                       <strong style={{ minWidth: 18, textAlign: 'center', color: r.attuali === 0 ? C.inkDim : C.ink }}>{r.attuali}</strong>
                       <button style={{ ...styles.buttonMini, padding: '1px 7px' }} title="Recupera 1 punto" onClick={() => modR({ attuali: Math.min(r.max, r.attuali + 1) })}>+</button>
@@ -16675,7 +16666,7 @@ export default function App() {
                     if (idx < 0) return null;
                     const r = risorse[idx];
                     const applica = (esito) => {
-                      if (!esito.ok) { setInfo({ titolo: '✨ Fonte di Magia', testo: esito.motivo }); return; }
+                      if (!esito.ok) { setInfo({ titolo: 'Fonte di Magia', testo: esito.motivo }); return; }
                       aggiorna({
                         slotIncantesimo: esito.slotIncantesimo,
                         risorse: risorse.map((x, i) => (i === idx ? { ...x, attuali: esito.punti } : x)),
@@ -16684,7 +16675,7 @@ export default function App() {
                     const slotOra = scheda.slotIncantesimo || {};
                     return (
                       <div style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', background: C.panelLight, display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
-                        <div style={{ ...styles.detail, fontWeight: 700, marginBottom: 2 }}>🔄 Fonte di Magia</div>
+                        <div style={{ ...styles.detail, fontWeight: 700, marginBottom: 2 }}>Fonte di Magia</div>
                         <div style={{ ...styles.detail, fontSize: 11, marginBottom: 8 }}>
                           Converti i punti in uno slot già speso, o brucia uno slot per riavere punti.
                         </div>
@@ -16728,7 +16719,7 @@ export default function App() {
                   {/* Opzioni Metamagia apprese: a destra */}
                   <div style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', background: C.panelLight, display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <div style={{ ...styles.detail, fontWeight: 700 }}>✨ Opzioni Metamagia</div>
+                      <div style={{ ...styles.detail, fontWeight: 700 }}>Opzioni Metamagia</div>
                       <span style={{ fontSize: 11, color: C.inkDim }}>
                         {((scheda.metamagie || '').split(',').map((s) => s.trim()).filter(Boolean)).length} {lingua === 'en' ? 'chosen' : 'scelte'}
                       </span>
@@ -16749,7 +16740,7 @@ export default function App() {
                       if (!scelte.length) {
                         return (
                           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.inkDim, fontSize: 12, fontStyle: 'italic', padding: '12px 0' }}>
-                            {lingua === 'en' ? 'No Metamagic selected. Click ➕ to add.' : 'Nessuna metamagia selezionata. Clicca ➕ per aggiungerne.'}
+                            {lingua === 'en' ? 'No Metamagic selected. Click to add.' : 'Nessuna metamagia selezionata. Clicca per aggiungerne.'}
                           </div>
                         );
                       }
@@ -16778,7 +16769,7 @@ export default function App() {
                                 title={spieg ? (lingua === 'en' ? 'Click for full description' : 'Clicca per la spiegazione completa') : undefined}
                               >
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                  <strong style={{ color: C.goldDark, fontSize: 12 }}>✨ {traduciDato(m)}</strong>
+                                  <strong style={{ color: C.goldDark, fontSize: 12 }}>{traduciDato(m)}</strong>
                                   {spieg && <span style={{ fontSize: 11, color: C.inkDim }}>info ℹ️</span>}
                                 </div>
                                 {spieg && (
@@ -16800,7 +16791,7 @@ export default function App() {
             {/* Invocazioni Occulte (solo Warlock se livello >= 1): subito dopo Magia */}
             {(/(warlock|fattucchiere)/i.test(scheda.classe || '') || /(warlock|fattucchiere)/i.test(scheda.multiclasseClasse2 || '') || /(warlock|fattucchiere)/i.test(scheda.multiclasseClasse3 || '')) && (
               <Sezione
-                titolo={lingua === 'en' ? '📜 Eldritch Invocations' : '📜 Invocazioni Occulte'}
+                titolo={lingua === 'en' ? 'Eldritch Invocations' : 'Invocazioni Occulte'}
                 {...apertoProps('invocazioni', true)}
               >
                 {(() => {
@@ -16812,7 +16803,7 @@ export default function App() {
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
                         <div>
                           <div style={{ ...styles.detail, fontWeight: 700, fontSize: 13, color: C.goldDark }}>
-                            🔮 {lingua === 'en' ? 'Eldritch Invocations' : 'Suppliche occulte'}
+                            {lingua === 'en' ? 'Eldritch Invocations' : 'Suppliche occulte'}
                           </div>
                           <div style={{ ...styles.detail, fontSize: 11, color: C.inkDim }}>
                             {lingua === 'en'
@@ -16841,7 +16832,7 @@ export default function App() {
                         if (!scelte.length) {
                           return (
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.inkDim, fontSize: 12, fontStyle: 'italic', padding: '12px 0' }}>
-                              {lingua === 'en' ? 'No Invocations selected. Click ➕ to add.' : 'Nessuna invocazione selezionata. Clicca ➕ per aggiungerne.'}
+                              {lingua === 'en' ? 'No Invocations selected. Click to add.' : 'Nessuna invocazione selezionata. Clicca per aggiungerne.'}
                             </div>
                           );
                         }
@@ -16870,7 +16861,7 @@ export default function App() {
                                   title={spieg ? (lingua === 'en' ? 'Click for full description' : 'Clicca per la spiegazione completa') : undefined}
                                 >
                                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <strong style={{ color: C.goldDark, fontSize: 12 }}>📜 {traduciDato(inv)}</strong>
+                                    <strong style={{ color: C.goldDark, fontSize: 12 }}>{traduciDato(inv)}</strong>
                                     {spieg && <span style={{ fontSize: 11, color: C.inkDim }}>info ℹ️</span>}
                                   </div>
                                   {spieg && (
@@ -16893,7 +16884,7 @@ export default function App() {
             {/* Infusioni dell'Artefice (solo Artefice se livello >= 2): subito dopo Invocazioni */}
             {(/(artefice|artificer)/i.test(scheda.classe || '') || /(artefice|artificer)/i.test(scheda.multiclasseClasse2 || '') || /(artefice|artificer)/i.test(scheda.multiclasseClasse3 || '')) && (
               <Sezione
-                titolo={lingua === 'en' ? '⚙️ Artificer Infusions' : '⚙️ Infusioni dell’Artefice'}
+                titolo={lingua === 'en' ? 'Artificer Infusions' : 'Infusioni dell’Artefice'}
                 {...apertoProps('infusioni', true)}
               >
                 {(() => {
@@ -16909,7 +16900,7 @@ export default function App() {
                     } else {
                       if (attive.length >= maxAttivi) {
                         setInfo({
-                          titolo: lingua === 'en' ? '⚙️ Infusion Limit Reached' : '⚙️ Limite Infusioni Raggiunto',
+                          titolo: lingua === 'en' ? 'Infusion Limit Reached' : 'Limite Infusioni Raggiunto',
                           testo: lingua === 'en'
                             ? `You can have at most ${maxAttivi} active infused items at level ${lvArtefice}. Deactivate one to activate another.`
                             : `Puoi avere al massimo ${maxAttivi} oggetti infusi contemporaneamente al livello ${lvArtefice}. Disattiva un'infusione per attivarne un'altra.`,
@@ -16931,7 +16922,7 @@ export default function App() {
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
                         <div>
                           <div style={{ ...styles.detail, fontWeight: 700, fontSize: 13, color: C.goldDark }}>
-                            ⚙️ {lingua === 'en' ? 'Infusions and infused items' : 'Infusioni e oggetti infusi'}
+                            {lingua === 'en' ? 'Infusions and infused items' : 'Infusioni e oggetti infusi'}
                           </div>
                           <div style={{ ...styles.detail, fontSize: 11, color: C.inkDim }}>
                             {lvArtefice < 2
@@ -16946,7 +16937,7 @@ export default function App() {
                             {scelte.length} / {maxNote} {lingua === 'en' ? 'known' : 'note'}
                           </span>
                           <span style={{ fontSize: 12, fontWeight: 'bold', color: attive.length > maxAttivi ? '#ef4444' : '#10b981', background: C.panel, padding: '3px 8px', borderRadius: 6, border: `1px solid ${C.border}` }}>
-                            ⚡ {attive.length} / {maxAttivi} {lingua === 'en' ? 'active' : 'attivi'}
+                            {attive.length} / {maxAttivi} {lingua === 'en' ? 'active' : 'attivi'}
                           </span>
                         </div>
                       </div>
@@ -16967,7 +16958,7 @@ export default function App() {
                         if (!scelte.length) {
                           return (
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.inkDim, fontSize: 12, fontStyle: 'italic', padding: '12px 0' }}>
-                              {lingua === 'en' ? 'No Infusions learned. Click ➕ to add.' : 'Nessuna infusione appresa. Clicca ➕ per aggiungerne.'}
+                              {lingua === 'en' ? 'No Infusions learned. Click to add.' : 'Nessuna infusione appresa. Clicca per aggiungerne.'}
                             </div>
                           );
                         }
@@ -17002,7 +16993,7 @@ export default function App() {
                                       title={spieg ? (lingua === 'en' ? 'Click for description' : 'Clicca per la spiegazione') : undefined}
                                     >
                                       <strong style={{ color: eAttiva ? '#059669' : C.goldDark, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                        ⚙️ {traduciDato(inf)}
+                                        {traduciDato(inf)}
                                       </strong>
                                       {spieg && <span style={{ fontSize: 11, color: C.inkDim }}>ℹ️</span>}
                                     </div>
@@ -17019,7 +17010,7 @@ export default function App() {
                                         cursor: 'pointer',
                                       }}
                                     >
-                                      {eAttiva ? (lingua === 'en' ? '⚡ Active' : '⚡ Attiva') : (lingua === 'en' ? '○ Inactive' : '○ Inattiva')}
+                                      {eAttiva ? (lingua === 'en' ? 'Active' : 'Attiva') : (lingua === 'en' ? '○ Inactive' : '○ Inattiva')}
                                     </button>
                                   </div>
 
@@ -17086,8 +17077,8 @@ export default function App() {
                   }}>
                     {/* Card 1: Privilegi di Classe */}
                     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', marginBottom: 8, letterSpacing: 0.5, textAlign: 'center' }}>
-                        🛡️ {t('priv.classe_titolo')}{scheda.classe ? ` (${traduciDato(scheda.classe)})` : ''}
+                      <div style={{ fontSize: 13.5, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
+                        {t('priv.classe_titolo')}{scheda.classe ? ` (${traduciDato(scheda.classe)})` : ''}
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, justifyContent: 'center' }}>
                         <button
@@ -17095,7 +17086,7 @@ export default function App() {
                           onClick={() => setMostraPrivilegi(true)}
                           title={t('tip.panoramica_priv')}
                         >
-                          📖 {t("priv.panoramica_btn")} ({scheda.classe || t('profilo.nessuna')} Liv. {scheda.livello || 1})
+                          {t("priv.panoramica_btn")} ({scheda.classe || t('profilo.nessuna')} Liv. {scheda.livello || 1})
                         </button>
                         {(scheda.multiclasse || []).map((m, mIdx) => (
                           <button
@@ -17104,7 +17095,7 @@ export default function App() {
                             onClick={() => setMostraPrivilegi(true)}
                             title={t('tip.panoramica_priv')}
                           >
-                            📖 {t("priv.panoramica_btn")} ({traduciDato(m.classe)} Liv. {m.livello || 1})
+                            {t("priv.panoramica_btn")} ({traduciDato(m.classe)} Liv. {m.livello || 1})
                           </button>
                         ))}
                       </div>
@@ -17112,8 +17103,8 @@ export default function App() {
 
                     {/* Card 2: Privilegi di Sottoclasse */}
                     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', marginBottom: 8, letterSpacing: 0.5, textAlign: 'center' }}>
-                        🔮 {t('priv.sub_titolo')}{scheda.sottoclasse ? ` (${traduciDato(scheda.sottoclasse)})` : ''}
+                      <div style={{ fontSize: 13.5, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
+                        {t('priv.sub_titolo')}{scheda.sottoclasse ? ` (${traduciDato(scheda.sottoclasse)})` : ''}
                       </div>
                       {(() => {
                         const tutteLeSub = [
@@ -17163,7 +17154,7 @@ export default function App() {
                                   onClick={() => setMostraPrivilegiSub(subItem.sottoclasse || true)}
                                   title={t('tip.panoramica_priv_sub')}
                                 >
-                                  📖 {traduciDato(subItem.sottoclasse)} ({traduciDato(subItem.classe)} Liv. {subItem.livello})
+                                  {traduciDato(subItem.sottoclasse)} ({traduciDato(subItem.classe)} Liv. {subItem.livello})
                                 </button>
                               ))
                             ) : (
@@ -17184,8 +17175,8 @@ export default function App() {
                     gap: 10
                   }}>
                     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', marginBottom: 8, letterSpacing: 0.5, textAlign: 'center' }}>
-                        🧬 {t("sez.tratti_specie")}{scheda.specie ? ` (${traduciDato(scheda.specie)})` : ''}
+                      <div style={{ fontSize: 13.5, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
+                        {t("sez.tratti_specie")}{scheda.specie ? ` (${traduciDato(scheda.specie)})` : ''}
                       </div>
                       <ListaQuadratini
                         value={scheda.trattiSpecie}
@@ -17196,8 +17187,8 @@ export default function App() {
                     </div>
 
                     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', marginBottom: 8, letterSpacing: 0.5, textAlign: 'center' }}>
-                        ⭐ {t("sez.talenti")}
+                      <div style={{ fontSize: 13.5, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
+                        {t("sez.talenti")}
                       </div>
                       <ListaQuadratini
                         value={scheda.talenti}
@@ -17257,8 +17248,8 @@ export default function App() {
                         <div style={{ ...styles.detail, fontSize: 12, marginBottom: 8, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
                           <span>
                             Grado di Sfida Max: <strong>GS {lim?.gsMax === 0.25 ? '1/4' : lim?.gsMax === 0.5 ? '1/2' : lim?.gsMax || '1/4'}</strong>
-                            {lim?.nuoto && ' · 🏊 Nuoto'}
-                            {lim?.volo && ' · 🦅 Volo'}
+                            {lim?.nuoto && ' · Nuoto'}
+                            {lim?.volo && ' · Volo'}
                           </span>
                           <span style={{ opacity: 0.8 }}>{disp.length} {tabTrasformazione === 'metamorfosi' ? 'creature utilizzabili' : 'bestie utilizzabili'}</span>
                         </div>
@@ -17267,7 +17258,7 @@ export default function App() {
                         {listaPref.length > 0 && (
                           <div style={{ marginBottom: 12, padding: '8px 10px', background: 'rgba(214,169,15,0.08)', borderRadius: 8, border: `1px solid ${C.gold}` }}>
                             <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 4 }}>
-                              ⭐ {lingua === 'en' ? 'Favorite Wild Shapes (Quick Access)' : 'Forme Preferite (Accesso Rapido)'}
+                              {lingua === 'en' ? 'Favorite Wild Shapes (Quick Access)' : 'Forme Preferite (Accesso Rapido)'}
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))', gap: 6 }}>
                               {listaPref.map((b) => (
@@ -17298,7 +17289,7 @@ export default function App() {
                                     </button>
                                   </div>
                                   <div style={{ fontSize: 11, color: C.inkDim }}>
-                                    🛡️ CA {b.ca} · ❤️ {b.pf} PF · GS {b.gs}
+                                    CA {b.ca} · {b.pf} PF · GS {b.gs}
                                   </div>
                                 </div>
                               ))}
@@ -17359,10 +17350,10 @@ export default function App() {
                                         </button>
                                       </div>
                                       <div style={{ fontSize: 11, color: C.inkDim }}>
-                                        🛡️ CA {b.ca} · ❤️ {b.pf} PF
+                                        CA {b.ca} · {b.pf} PF
                                       </div>
                                       <div style={{ fontSize: 11, color: C.inkDim, opacity: 0.85 }}>
-                                        {b.taglia} · {b.velocita.volo ? `🦅 ${b.velocita.volo}m` : b.velocita.nuoto ? `🏊 ${b.velocita.nuoto}m` : `🐾 ${b.velocita.terra}m`}
+                                        {b.taglia} · {b.velocita.volo ? `${b.velocita.volo}m` : b.velocita.nuoto ? `${b.velocita.nuoto}m` : `${b.velocita.terra}m`}
                                       </div>
                                     </div>
                                   );
@@ -17414,7 +17405,7 @@ export default function App() {
                   };
                   aggiorna({ alleati: [...alleati, nuovo] });
                   setMostraModalAggiungiCompagno(false);
-                  registra({ etichetta: `🐾 ${creatura.nome}`, tipo: 'evoca', dettaglio: `Evocato/aggiunto compagno: ${creatura.nome} (${pfCalc} PF, CA ${creatura.ca})` });
+                  registra({ etichetta: `${creatura.nome}`, tipo: 'evoca', dettaglio: `Evocato/aggiunto compagno: ${creatura.nome} (${pfCalc} PF, CA ${creatura.ca})` });
                 };
 
                 const modificaPfAlleato = (idx, delta) => {
@@ -17456,7 +17447,7 @@ export default function App() {
                           onClick={() => setMostraModalAggiungiCompagno(true)}
                           style={{ ...styles.buttonMini, fontSize: 12, padding: '3px 10px', color: C.goldDark, borderColor: C.gold, background: 'rgba(201,162,39,0.12)', fontWeight: 700 }}
                         >
-                          ➕ {lingua === 'en' ? 'Summon / Add Companion' : 'Evoca / Aggiungi Compagno'}
+                          {lingua === 'en' ? 'Summon / Add Companion' : 'Evoca / Aggiungi Compagno'}
                         </button>
                       </div>
                     </div>
@@ -17488,7 +17479,6 @@ export default function App() {
                               {/* Intestazione Compagno */}
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                  <span style={{ fontSize: 18 }}>🐾</span>
                                   <div>
                                     <div style={{ fontWeight: 700, fontSize: 14, color: C.goldDark, display: 'flex', alignItems: 'center', gap: 6 }}>
                                       <Editable
@@ -17514,7 +17504,7 @@ export default function App() {
 
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                                   <span style={{ fontSize: 12, fontWeight: 700, color: C.ink, background: C.panel, padding: '3px 8px', borderRadius: 6, border: `1px solid ${C.border}` }}>
-                                    🛡️ CA <Editable value={all.ca ?? 10} tipo="numero" width={24} onChange={(v) => {
+                                    CA <Editable value={all.ca ?? 10} tipo="numero" width={24} onChange={(v) => {
                                       const lista = [...alleati];
                                       lista[idx] = { ...lista[idx], ca: v };
                                       aggiorna({ alleati: lista });
@@ -17522,7 +17512,7 @@ export default function App() {
                                   </span>
                                   {all.velocita && (
                                     <span style={{ fontSize: 11, color: C.inkDim, background: C.panel, padding: '3px 6px', borderRadius: 6, border: `1px solid ${C.border}` }}>
-                                      👟 {all.velocita}
+                                      {all.velocita}
                                     </span>
                                   )}
                                   {creatureMatch && (
@@ -17532,7 +17522,7 @@ export default function App() {
                                       style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 7px' }}
                                       title={lingua === 'en' ? 'View complete statblock' : 'Vedi statblock completo'}
                                     >
-                                      ℹ️ {lingua === 'en' ? 'Statblock' : 'Scheda'}
+                                      {lingua === 'en' ? 'Statblock' : 'Scheda'}
                                     </button>
                                   )}
                                   <button
@@ -17549,7 +17539,7 @@ export default function App() {
                                     style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 7px', color: '#10b981', borderColor: '#10b981' }}
                                     title={lingua === 'en' ? 'Send to combat tracker' : 'Invia allo scontro'}
                                   >
-                                    ⚔️ Combat
+                                    Combat
                                   </button>
                                   <button
                                     type="button"
@@ -17566,7 +17556,7 @@ export default function App() {
                               <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 6, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 6 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 12 }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                    <span style={{ fontWeight: 700, color: C.ink }}>❤️ PF:</span>
+                                    <span style={{ fontWeight: 700, color: C.ink }}>PF:</span>
                                     <Editable value={pfAttuali} tipo="numero" width={32} onChange={(v) => {
                                       const lista = [...alleati];
                                       lista[idx] = { ...lista[idx], pfAttuali: v };
@@ -17584,7 +17574,7 @@ export default function App() {
                                     <button type="button" onClick={() => modificaPfAlleato(idx, -1)} style={{ ...styles.buttonMini, fontSize: 11, padding: '1px 5px', color: C.red }}>−1</button>
                                     <button type="button" onClick={() => modificaPfAlleato(idx, 1)} style={{ ...styles.buttonMini, fontSize: 11, padding: '1px 5px', color: '#10b981' }}>+1</button>
                                     <button type="button" onClick={() => modificaPfAlleato(idx, 5)} style={{ ...styles.buttonMini, fontSize: 11, padding: '1px 5px', color: '#10b981' }}>+5</button>
-                                    <button type="button" onClick={() => resetPfAlleato(idx)} style={{ ...styles.buttonMini, fontSize: 11, padding: '1px 6px', color: C.goldDark }} title="Ripristina PF Max">❤️ Max</button>
+                                    <button type="button" onClick={() => resetPfAlleato(idx)} style={{ ...styles.buttonMini, fontSize: 11, padding: '1px 6px', color: C.goldDark }} title="Ripristina PF Max">Max</button>
                                   </div>
                                 </div>
 
@@ -17596,8 +17586,8 @@ export default function App() {
                               {/* Attacchi & Azioni con Tiri Dadi */}
                               {all.azioni && all.azioni.length > 0 && (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                                  <div style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                                    ⚔️ {lingua === 'en' ? 'Actions and attacks' : 'Azioni e attacchi'}:
+                                  <div style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, letterSpacing: 0.5 }}>
+                                    {lingua === 'en' ? 'Actions and attacks' : 'Azioni e attacchi'}:
                                   </div>
                                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 6 }}>
                                     {all.azioni.map((az, azIdx) => (
@@ -17623,7 +17613,7 @@ export default function App() {
                                               style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 6px', color: C.goldDark, borderColor: C.goldDark }}
                                               title={lingua === 'en' ? 'Roll attack' : 'Tiro per colpire'}
                                             >
-                                              🎲 {conSegno(az.bonusAttacco || 0)}
+                                              {conSegno(az.bonusAttacco || 0)}
                                             </button>
                                             {az.danno && (
                                               <button
@@ -17632,7 +17622,7 @@ export default function App() {
                                                 style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 6px', color: C.red, borderColor: C.red }}
                                                 title={lingua === 'en' ? 'Roll damage' : 'Tiro danni'}
                                               >
-                                                💥 {az.danno}
+                                                {az.danno}
                                               </button>
                                             )}
                                           </div>
@@ -17668,7 +17658,7 @@ export default function App() {
                                         }}
                                         title={tr}
                                       >
-                                        ✨ {titoloTratto} ℹ️
+                                        {titoloTratto} ℹ️
                                       </span>
                                     );
                                   })}
@@ -17682,8 +17672,8 @@ export default function App() {
 
                     {/* Catalogo Rapido Bestiario & Evocazioni per consultazione */}
                     <div style={{ marginTop: 4 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', marginBottom: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span>📖 {lingua === 'en' ? 'Bestiary and summons catalog' : 'Catalogo di bestie ed evocazioni'}</span>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, marginBottom: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span>{lingua === 'en' ? 'Bestiary and summons catalog' : 'Catalogo di bestie ed evocazioni'}</span>
                         <span style={{ fontSize: 11, color: C.inkDim, fontWeight: 400 }}>{FAMIGLI.length + EVOCAZIONI.length} creature</span>
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))', gap: 6 }}>
@@ -17707,7 +17697,7 @@ export default function App() {
                               {lingua === 'en' ? c.nomeEn : c.nome}
                             </div>
                             <div style={{ fontSize: 11, color: C.inkDim }}>
-                              🛡️ CA {c.ca} · ❤️ {c.pf} PF
+                              CA {c.ca} · {c.pf} PF
                             </div>
                           </div>
                         ))}
@@ -17807,7 +17797,7 @@ export default function App() {
                     {filtroCompagnoCat === 'custom' ? (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: 12, background: C.panelLight, borderRadius: 8, border: `1px solid ${C.border}` }}>
                         <div style={{ fontWeight: 700, fontSize: 13, color: C.goldDark }}>
-                          ✏️ {lingua === 'en' ? 'Create Custom Creature / Ally' : 'Crea Creatura / Alleato Personalizzato'}
+                          {lingua === 'en' ? 'Create Custom Creature / Ally' : 'Crea Creatura / Alleato Personalizzato'}
                         </div>
                         <button
                           type="button"
@@ -17829,7 +17819,7 @@ export default function App() {
                           }}
                           style={{ ...styles.buttonMini, fontSize: 12, padding: '6px 14px', background: C.goldDark, color: '#fff', alignSelf: 'flex-start', fontWeight: 700 }}
                         >
-                          ➕ {lingua === 'en' ? 'Add Empty Custom Creature' : 'Aggiungi Creatura Vuota'}
+                          {lingua === 'en' ? 'Add Empty Custom Creature' : 'Aggiungi Creatura Vuota'}
                         </button>
                       </div>
                     ) : (
@@ -17875,7 +17865,7 @@ export default function App() {
                                   {lingua === 'en' ? c.nomeEn : c.nome}
                                 </div>
                                 <div style={{ fontSize: 11, color: C.inkDim }}>
-                                  🛡️ CA {c.ca} · ❤️ {pfCalc} PF {c.pfFormula ? `(${c.pfFormula})` : ''} · 👟 {typeof c.velocita === 'object' ? Object.entries(c.velocita).map(([k, v]) => `${k} ${v}m`).join(', ') : c.velocita}
+                                  CA {c.ca} · {pfCalc} PF {c.pfFormula ? `(${c.pfFormula})` : ''} · {typeof c.velocita === 'object' ? Object.entries(c.velocita).map(([k, v]) => `${k} ${v}m`).join(', ') : c.velocita}
                                 </div>
                                 {c.tipo && (
                                   <div style={{ fontSize: 11, color: C.goldDark, marginTop: 1 }}>
@@ -17909,18 +17899,18 @@ export default function App() {
                                     };
                                     aggiorna({ alleati: [...(scheda.alleati || []), nuovo] });
                                     setMostraModalAggiungiCompagno(false);
-                                    registra({ etichetta: `🐾 ${c.nome}`, tipo: 'evoca', dettaglio: `Evocato/aggiunto compagno: ${c.nome} (${pfCalc} PF, CA ${c.ca})` });
+                                    registra({ etichetta: `${c.nome}`, tipo: 'evoca', dettaglio: `Evocato/aggiunto compagno: ${c.nome} (${pfCalc} PF, CA ${c.ca})` });
                                   }}
                                   style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px', background: C.goldDark, color: '#fff', fontWeight: 700, flex: 1 }}
                                 >
-                                  ➕ {lingua === 'en' ? 'Summon / Add' : 'Evoca / Aggiungi'}
+                                  {lingua === 'en' ? 'Summon / Add' : 'Evoca / Aggiungi'}
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => setBestiaDettaglio(c)}
                                   style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px' }}
                                 >
-                                  ℹ️ {lingua === 'en' ? 'Info' : 'Dettagli'}
+                                  {lingua === 'en' ? 'Info' : 'Dettagli'}
                                 </button>
                               </div>
                             </div>
@@ -18146,12 +18136,12 @@ export default function App() {
                     {/* Riepilogo ingombro automatico */}
                     <div style={{ marginBottom: 10 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, ...styles.detail, flexWrap: 'wrap' }}>
-                        <span style={{ fontWeight: 700 }}>⚖️ {t('inv.ingombro')}: <span style={{ color: colore }}>{pesoTot.toFixed(1)} / {cap.toFixed(0)} kg</span></span>
+                        <span style={{ fontWeight: 700 }}>{t('inv.ingombro')}: <span style={{ color: colore }}>{pesoTot.toFixed(1)} / {cap.toFixed(0)} kg</span></span>
                         {stato !== 'ok' && <span style={{ color: colore, fontWeight: 700 }}>{t('inv.stato_' + stato)}</span>}
                       </div>
                       <div style={{ ...styles.detail, marginTop: 2, fontSize: 11, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
                         <span>Taglia {tagliaAttiva} ×{moltiTaglia} · Spazio: {SPAZIO_TAGLIA_5E[tagliaAttiva]} · Spingi/trascina/solleva {spingiTrascina.toFixed(0)} kg (Lotta fino a: {LOTTA_MAX_TAGLIA_5E[tagliaAttiva]})</span>
-                        <span>🛡️ Indossato: <strong>{pesoEquipTot.toFixed(1)} kg</strong> · 🎒 Zaino: <strong>{pesoZainoTot.toFixed(1)} kg</strong></span>
+                        <span>Indossato: <strong>{pesoEquipTot.toFixed(1)} kg</strong> · Zaino: <strong>{pesoZainoTot.toFixed(1)} kg</strong></span>
                       </div>
                       <div style={{ height: 6, borderRadius: 3, background: C.border, overflow: 'hidden', marginTop: 3 }} title={`Capacità: ${pesoTot.toFixed(1)} / ${cap.toFixed(0)} kg (${perc.toFixed(0)}%)`}>
                         <div style={{ width: `${perc}%`, height: '100%', background: colore, transition: 'width 0.25s ease' }} />
@@ -18255,7 +18245,7 @@ export default function App() {
                       return (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', padding: '6px 10px', background: 'rgba(201,162,39,0.09)', borderRadius: 8, border: `1px dashed ${C.goldDark}`, marginBottom: 10, fontSize: 12 }}>
                           <span style={{ color: C.goldDark, fontWeight: 700 }}>
-                            💡 {lingua === 'en' ? 'Add from 5e compendium:' : 'Aggiungi direttamente dal compendio:'}
+                            {lingua === 'en' ? 'Add from 5e compendium:' : 'Aggiungi direttamente dal compendio:'}
                           </span>
                           {nonPresenti.map((itemNome) => (
                             <button
@@ -18345,8 +18335,8 @@ export default function App() {
                                     pfAttuali: Math.min(s.pfMax, (s.pfAttuali || 0) + tot),
                                     inventario: scalaInventario(s.inventario),
                                   }));
-                                  registra({ etichetta: `🧪 ${o.nome}`, tipo: 'cura', totale: tot, dettaglio: `Bevi ${o.nome}: recuperi ${tot} PF (${eff.formula})` });
-                                  setInfo({ titolo: `🧪 ${o.nome}`, testo: `${lingua === 'en' ? eff.descEn : eff.descIt} (Recuperati: ${tot} PF · Rimasti: ×${qtaRimanente})` });
+                                  registra({ etichetta: `${o.nome}`, tipo: 'cura', totale: tot, dettaglio: `Bevi ${o.nome}: recuperi ${tot} PF (${eff.formula})` });
+                                  setInfo({ titolo: `${o.nome}`, testo: `${lingua === 'en' ? eff.descEn : eff.descIt} (Recuperati: ${tot} PF · Rimasti: ×${qtaRimanente})` });
                                   if (suoniEffOn) eseguiEffettoSonoro('magia', volumeEffetti);
                                 } else if (eff.tipo === 'buff') {
                                   setScheda((s) => {
@@ -18360,8 +18350,8 @@ export default function App() {
                                     }
                                     return { ...s, ...patch };
                                   });
-                                  registra({ etichetta: `🧪 ${o.nome}`, tipo: 'buff', dettaglio: lingua === 'en' ? eff.descEn : eff.descIt });
-                                  setInfo({ titolo: `🧪 ${o.nome}`, testo: `${lingua === 'en' ? eff.descEn : eff.descIt} (Rimasti: ×${qtaRimanente})` });
+                                  registra({ etichetta: `${o.nome}`, tipo: 'buff', dettaglio: lingua === 'en' ? eff.descEn : eff.descIt });
+                                  setInfo({ titolo: `${o.nome}`, testo: `${lingua === 'en' ? eff.descEn : eff.descIt} (Rimasti: ×${qtaRimanente})` });
                                   if (suoniEffOn) eseguiEffettoSonoro('magia', volumeEffetti);
                                 } else if (eff.tipo === 'cura_stato' || eff.tipo === 'cura_max') {
                                   setScheda((s) => {
@@ -18375,16 +18365,16 @@ export default function App() {
                                     }
                                     return { ...s, ...patch };
                                   });
-                                  registra({ etichetta: `🧪 ${o.nome}`, tipo: 'cura', dettaglio: lingua === 'en' ? eff.descEn : eff.descIt });
-                                  setInfo({ titolo: `🧪 ${o.nome}`, testo: `${lingua === 'en' ? eff.descEn : eff.descIt} (Rimasti: ×${qtaRimanente})` });
+                                  registra({ etichetta: `${o.nome}`, tipo: 'cura', dettaglio: lingua === 'en' ? eff.descEn : eff.descIt });
+                                  setInfo({ titolo: `${o.nome}`, testo: `${lingua === 'en' ? eff.descEn : eff.descIt} (Rimasti: ×${qtaRimanente})` });
                                   if (suoniEffOn) eseguiEffettoSonoro('magia', volumeEffetti);
                                 } else {
                                   setScheda((s) => ({
                                     ...s,
                                     inventario: scalaInventario(s.inventario),
                                   }));
-                                  registra({ etichetta: `🧪 ${o.nome}`, tipo: 'usa', dettaglio: `Usato/bevuto ${o.nome}` });
-                                  setInfo({ titolo: `🧪 ${o.nome}`, testo: `${lingua === 'en' ? eff.descEn : eff.descIt} (Rimasti: ×${qtaRimanente})` });
+                                  registra({ etichetta: `${o.nome}`, tipo: 'usa', dettaglio: `Usato/bevuto ${o.nome}` });
+                                  setInfo({ titolo: `${o.nome}`, testo: `${lingua === 'en' ? eff.descEn : eff.descIt} (Rimasti: ×${qtaRimanente})` });
                                   if (suoniEffOn) eseguiEffettoSonoro('arma', volumeEffetti);
                                 }
                               };
@@ -18433,7 +18423,7 @@ export default function App() {
                                           }}
                                           title={isContainerAperto ? t('inv.chiudi_contenitore') : t('inv.apri_contenitore')}
                                         >
-                                          🎒 {isContainerAperto ? '▲' : '▼'} {subContenuto.length} {subContenuto.length === 1 ? t('inv.oggetto_dentro') : t('inv.oggetti_dentro')}
+                                          {isContainerAperto ? '▲' : '▼'} {subContenuto.length} {subContenuto.length === 1 ? t('inv.oggetto_dentro') : t('inv.oggetti_dentro')}
                                         </button>
                                       )}
                                       {isPotion && (
@@ -18451,7 +18441,7 @@ export default function App() {
                                           }}
                                           title={t('inv.bevi_pozione_tip')}
                                         >
-                                          🧪 {lingua === 'en' ? 'Drink' : 'Bevi'}
+                                          {lingua === 'en' ? 'Drink' : 'Bevi'}
                                         </button>
                                       )}
                                     </div>
@@ -18568,8 +18558,8 @@ export default function App() {
                                     <td colSpan={5} style={{ ...styles.td, borderTop: 'none', padding: '6px 10px 10px' }}>
                                       <div style={{ borderLeft: `3px solid ${C.goldDark}`, paddingLeft: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
-                                          <span style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                                            🎒 {t('inv.contenuto_titolo')} · {o.nome} ({subContenuto.length} {subContenuto.length === 1 ? t('inv.oggetto_dentro') : t('inv.oggetti_dentro')})
+                                          <span style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, letterSpacing: 0.5 }}>
+                                            {t('inv.contenuto_titolo')} · {o.nome} ({subContenuto.length} {subContenuto.length === 1 ? t('inv.oggetto_dentro') : t('inv.oggetti_dentro')})
                                           </span>
                                           <button
                                             type="button"
@@ -18582,7 +18572,7 @@ export default function App() {
                                               }
                                             }}
                                           >
-                                            ➕ {t('inv.aggiungi_dentro')}
+                                            {t('inv.aggiungi_dentro')}
                                           </button>
                                         </div>
 
@@ -18666,7 +18656,7 @@ export default function App() {
                                                       title={t('inv.estrai_tip')}
                                                       onClick={estraiSub}
                                                     >
-                                                      ↗ {t('inv.estrai')}
+                                                      {t('inv.estrai')}
                                                     </button>
                                                     <button
                                                       type="button"
@@ -18694,7 +18684,7 @@ export default function App() {
                                         {mostraEffetto && (
                                           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                                             <span style={{ fontWeight: 700, color: C.goldDark, fontSize: 12 }}>
-                                              ✨ {t('inv.effetto')}:
+                                              {t('inv.effetto')}:
                                             </span>
                                             <select
                                               value={o.effettoMeccanico || ''}
@@ -18708,7 +18698,7 @@ export default function App() {
                                             </select>
                                             {!!o.effettoMeccanico && (
                                               <span style={{ ...styles.detail, fontSize: 11, display: 'inline-flex', alignItems: 'center', gap: 3 }} title={t('inv.richiede_sintonia_tip')}>
-                                                <span>🔗 {t('inv.richiede_sintonia')}</span>
+                                                <span>{t('inv.richiede_sintonia')}</span>
                                                 <span style={{ color: effettoAttivo ? C.green : C.inkDim, fontSize: 13, lineHeight: 1 }}>
                                                   {effettoAttivo ? '●' : '○'}
                                                 </span>
@@ -18724,7 +18714,7 @@ export default function App() {
                                         {mostraUtilizzi && (
                                           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                                             <span style={{ fontWeight: 700, color: C.goldDark, fontSize: 12 }}>
-                                              ⚡ {t('inv.utilizzi')}:
+                                              {t('inv.utilizzi')}:
                                             </span>
                                             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
                                               <button
@@ -18810,7 +18800,7 @@ export default function App() {
                                                     : `Perla del Potere usata: recuperato 1 slot incantesimo di ${livDaRecuperare}° livello.`);
                                                 }}
                                               >
-                                                🔮 {lingua === 'en' ? 'Recover Slot (1-3)' : 'Recupera Slot (1°-3°)'}
+                                                {lingua === 'en' ? 'Recover Slot (1-3)' : 'Recupera Slot (1°-3°)'}
                                               </button>
                                             )}
                                           </div>
@@ -18894,7 +18884,7 @@ export default function App() {
                             }
                           }}
                         >
-                          ➕ {t('comune.aggiungi') || 'Aggiungi'}
+                          {t('comune.aggiungi') || 'Aggiungi'}
                         </button>
                       </div>
 
@@ -18924,8 +18914,8 @@ export default function App() {
                               gap: 2,
                             }}
                           >
-                            <div style={{ padding: '4px 8px', fontSize: 11, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', letterSpacing: 0.5, borderBottom: `1px solid ${C.border}` }}>
-                              💡 {lingua === 'en' ? 'Click to add directly to inventory:' : 'Clicca per caricare direttamente nell’inventario:'}
+                            <div style={{ padding: '4px 8px', fontSize: 11, fontWeight: 700, color: C.goldDark, letterSpacing: 0.5, borderBottom: `1px solid ${C.border}` }}>
+                              {lingua === 'en' ? 'Click to add directly to inventory:' : 'Clicca per caricare direttamente nell’inventario:'}
                             </div>
                             {matches.map((itemNome) => {
                               const peso = pesoStimato(itemNome);
@@ -19098,7 +19088,7 @@ export default function App() {
                         </div>
                         {scheda.background && (
                           <span style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, background: 'rgba(201,162,39,0.15)', border: `1px solid ${C.gold}`, borderRadius: 6, padding: '2px 8px' }}>
-                            📜 {traduciDato(scheda.background)}
+                            {traduciDato(scheda.background)}
                           </span>
                         )}
                       </div>
@@ -19119,7 +19109,7 @@ export default function App() {
 
                     {/* Tratto Caratteriale (d8) */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, marginBottom: 4, flexWrap: 'wrap', gap: 6 }}>
-                      <div style={{ ...styles.moduloLabel, margin: 0 }}>👤 {t("aspetto.tratti_caratteriali")}</div>
+                      <div style={{ ...styles.moduloLabel, margin: 0 }}>{t("aspetto.tratti_caratteriali")}</div>
                       {bgDati && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <button
@@ -19128,7 +19118,7 @@ export default function App() {
                             onClick={() => tiraTabellaBackground('trattiCaratteriali')}
                             title={`Tira 1d8 dalla tabella ${bgDati.nome}`}
                           >
-                            🎲 d8
+                            {lingua === 'en' ? 'Roll' : 'Tira'} d8
                           </button>
                           <select
                             style={{ ...styles.inlineInput, fontSize: 11, padding: '2px 6px', maxWidth: 160, color: C.inkDim }}
@@ -19154,7 +19144,7 @@ export default function App() {
 
                     {/* Ideale (d6) */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, marginBottom: 4, flexWrap: 'wrap', gap: 6 }}>
-                      <div style={{ ...styles.moduloLabel, margin: 0 }}>⚖️ {t("aspetto.ideali")}</div>
+                      <div style={{ ...styles.moduloLabel, margin: 0 }}>{t("aspetto.ideali")}</div>
                       {bgDati && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <button
@@ -19163,7 +19153,7 @@ export default function App() {
                             onClick={() => tiraTabellaBackground('ideali')}
                             title={`Tira 1d6 dalla tabella ${bgDati.nome}`}
                           >
-                            🎲 d6
+                            {lingua === 'en' ? 'Roll' : 'Tira'} d6
                           </button>
                           <select
                             style={{ ...styles.inlineInput, fontSize: 11, padding: '2px 6px', maxWidth: 160, color: C.inkDim }}
@@ -19189,7 +19179,7 @@ export default function App() {
 
                     {/* Legame (d6) */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, marginBottom: 4, flexWrap: 'wrap', gap: 6 }}>
-                      <div style={{ ...styles.moduloLabel, margin: 0 }}>🔗 {t("aspetto.legami")}</div>
+                      <div style={{ ...styles.moduloLabel, margin: 0 }}>{t("aspetto.legami")}</div>
                       {bgDati && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <button
@@ -19198,7 +19188,7 @@ export default function App() {
                             onClick={() => tiraTabellaBackground('legami')}
                             title={`Tira 1d6 dalla tabella ${bgDati.nome}`}
                           >
-                            🎲 d6
+                            {lingua === 'en' ? 'Roll' : 'Tira'} d6
                           </button>
                           <select
                             style={{ ...styles.inlineInput, fontSize: 11, padding: '2px 6px', maxWidth: 160, color: C.inkDim }}
@@ -19224,7 +19214,7 @@ export default function App() {
 
                     {/* Difetto (d6) */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, marginBottom: 4, flexWrap: 'wrap', gap: 6 }}>
-                      <div style={{ ...styles.moduloLabel, margin: 0 }}>⚡ {t("aspetto.difetti")}</div>
+                      <div style={{ ...styles.moduloLabel, margin: 0 }}>{t("aspetto.difetti")}</div>
                       {bgDati && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <button
@@ -19233,7 +19223,7 @@ export default function App() {
                             onClick={() => tiraTabellaBackground('difetti')}
                             title={`Tira 1d6 dalla tabella ${bgDati.nome}`}
                           >
-                            🎲 d6
+                            {lingua === 'en' ? 'Roll' : 'Tira'} d6
                           </button>
                           <select
                             style={{ ...styles.inlineInput, fontSize: 11, padding: '2px 6px', maxWidth: 160, color: C.inkDim }}
@@ -19258,7 +19248,7 @@ export default function App() {
                     />
 
                     {/* Nemici */}
-                    <div style={{ ...styles.moduloLabel, marginTop: 12 }}>⚔️ {t("aspetto.nemici")}</div>
+                    <div style={{ ...styles.moduloLabel, marginTop: 12 }}>{t("aspetto.nemici")}</div>
                     <AreaTesto
                       value={scheda.nemici}
                       placeholder={t("aspetto.nemici_ph")}
@@ -19267,7 +19257,7 @@ export default function App() {
 
                     {/* Alleati & Compagni */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 14, marginBottom: 6 }}>
-                      <div style={{ ...styles.moduloLabel, margin: 0 }}>🛡️ {t("aspetto.alleati")}</div>
+                      <div style={{ ...styles.moduloLabel, margin: 0 }}>{t("aspetto.alleati")}</div>
                       <button
                         type="button"
                         style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 8px', color: C.goldDark, border: `1px solid ${C.gold}`, background: 'rgba(201,162,39,0.12)', fontWeight: 700 }}
@@ -19302,7 +19292,6 @@ export default function App() {
                             }}
                           >
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
-                              <span style={{ fontSize: 13 }}>🛡️</span>
                               <strong style={{ fontSize: 13, color: C.ink }}>
                                 <Editable
                                   value={all.nome}
@@ -19423,7 +19412,7 @@ export default function App() {
             {/* Header Hub */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${C.border}`, paddingBottom: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 24, lineHeight: 1 }}>🧭</span>
+                
                 <div>
                   <h2 style={{ ...styles.title, margin: 0, fontSize: 18, letterSpacing: 0.3, color: C.ink }}>
                     {lingua === 'en' ? 'Menu and tools' : 'Menu e strumenti'}
@@ -19445,8 +19434,8 @@ export default function App() {
 
             {/* Sezione 1: Scheda Personaggio */}
             <div>
-              <div style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.6, color: C.goldDark, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
-                <span>👤</span> <span>{lingua === 'en' ? 'Character Sheet' : 'Scheda Personaggio'}</span>
+              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, color: C.goldDark, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <span>{lingua === 'en' ? 'Character sheet' : 'Scheda personaggio'}</span>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
                 <button
@@ -19486,7 +19475,7 @@ export default function App() {
                     setMostraMenuHubMobile(false);
                   }}
                 >
-                  <span style={{ fontSize: 16 }}>🆙</span>
+                  
                   <span>{t('tip.levelup')}</span>
                 </button>
 
@@ -19498,7 +19487,7 @@ export default function App() {
                     setMostraMenuHubMobile(false);
                   }}
                 >
-                  <span style={{ fontSize: 16 }}>🗑</span>
+                  
                   <span>{t('tip.elimina_pg')}</span>
                 </button>
               </div>
@@ -19506,8 +19495,8 @@ export default function App() {
 
             {/* Sezione 2: Sistema & Dati */}
             <div>
-              <div style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.6, color: C.goldDark, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
-                <span>⚙️</span> <span>{lingua === 'en' ? 'System and data' : 'Sistema e dati'}</span>
+              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, color: C.goldDark, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <span>{lingua === 'en' ? 'System and data' : 'Sistema e dati'}</span>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
                 <button
@@ -19518,7 +19507,7 @@ export default function App() {
                     setMostraMenuHubMobile(false);
                   }}
                 >
-                  <span style={{ fontSize: 16 }}>🏠</span>
+                  
                   <span>{t('tip.menu_iniziale')}</span>
                 </button>
 
@@ -19530,7 +19519,7 @@ export default function App() {
                     setMostraMenuHubMobile(false);
                   }}
                 >
-                  <span style={{ fontSize: 16 }}>🔔</span>
+                  
                   <span>
                     {t('notifiche.titolo')}{' '}
                     {controlliAttivi.length > 0 ? `(${controlliAttivi.length})` : ''}
@@ -19544,7 +19533,7 @@ export default function App() {
                     setLingua((l) => (l === 'it' ? 'en' : 'it'));
                   }}
                 >
-                  <span style={{ fontSize: 16 }}>{lingua === 'it' ? '🇮🇹' : '🇬🇧'}</span>
+                  
                   <span>{lingua === 'it' ? 'Italiano (IT)' : 'English (EN)'}</span>
                 </button>
 
@@ -19557,7 +19546,7 @@ export default function App() {
                     setMostraMenuHubMobile(false);
                   }}
                 >
-                  <span style={{ fontSize: 16 }}>📂</span>
+                  
                   <span>{t('import_export.btn')}</span>
                 </button>
 
@@ -19586,7 +19575,7 @@ export default function App() {
                     setMostraMenuHubMobile(false);
                   }}
                 >
-                  <span style={{ fontSize: 16 }}>☁️</span>
+                  
                   <span>
                     {lingua === 'en' ? 'Backup & sync' : 'Backup e sincronizzazione'}
                   </span>
@@ -19596,8 +19585,8 @@ export default function App() {
 
             {/* Sezione 3: Sessione & Strumenti */}
             <div>
-              <div style={{ fontSize: 12, fontWeight: 800, textTransform: 'uppercase', letterSpacing: 0.6, color: C.goldDark, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
-                <span>🧭</span> <span>{lingua === 'en' ? 'Session and tools' : 'Sessione e strumenti'}</span>
+              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, color: C.goldDark, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 5 }}>
+                <span>{lingua === 'en' ? 'Session and tools' : 'Sessione e strumenti'}</span>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
                 <button
@@ -19608,7 +19597,7 @@ export default function App() {
                     setMostraMenuHubMobile(false);
                   }}
                 >
-                  <span style={{ fontSize: 16 }}>🎲</span>
+                  
                   <span>{t('roll.tavolo_dadi')}</span>
                 </button>
 
@@ -19620,7 +19609,7 @@ export default function App() {
                     setMostraMenuHubMobile(false);
                   }}
                 >
-                  <span style={{ fontSize: 16 }}>🔍</span>
+                  
                   <span>{t('compendio.titolo')}</span>
                 </button>
 
@@ -19631,7 +19620,7 @@ export default function App() {
                     setTema(tema === 'auto' ? 'chiaro' : tema === 'chiaro' ? 'scuro' : 'auto');
                   }}
                 >
-                  <span style={{ fontSize: 16 }}>{tema === 'auto' ? '🌗' : tema === 'chiaro' ? '☀️' : '🌙'}</span>
+                  
                   <span>{tema === 'auto' ? 'Tema: Auto' : tema === 'chiaro' ? 'Tema: Chiaro' : 'Tema: Scuro'}</span>
                 </button>
 
@@ -19644,7 +19633,6 @@ export default function App() {
                     setMostraMenuHubMobile(false);
                   }}
                 >
-                  <span style={{ fontSize: 16 }}>{iconaAmbientazione(presetColori)}</span>
                   <span>{t('luogo.tooltip')}</span>
                 </button>
 
@@ -19656,7 +19644,7 @@ export default function App() {
                     setMostraMenuHubMobile(false);
                   }}
                 >
-                  <span style={{ fontSize: 16 }}>📜</span>
+                  
                   <span>{t('sez.diario')} ({(Array.isArray(scheda.diario) ? scheda.diario.length : 0)})</span>
                 </button>
 
@@ -19670,7 +19658,7 @@ export default function App() {
                     setMostraMenuHubMobile(false);
                   }}
                 >
-                  <span style={{ fontSize: 16 }}>🗺️</span>
+                  
                   <span>{mappaCampagna ? (mappaAperta ? t('mappa.chiudi') : t('mappa.apri')) : t('mappa.carica')}</span>
                 </button>
 
@@ -19685,7 +19673,7 @@ export default function App() {
                     setMostraMenuHubMobile(false);
                   }}
                 >
-                  <span style={{ fontSize: 16 }}>⚔️</span>
+                  
                   <span>{lingua === 'en' ? 'Combat' : 'Combattimento'}</span>
                 </button>
               </div>
@@ -19742,7 +19730,6 @@ export default function App() {
               {/* Header Modale */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, borderBottom: `1px solid ${C.border}`, paddingBottom: 10 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontSize: 28, lineHeight: 1 }}>🎲</span>
                   <div>
                     <h2 style={{ ...styles.title, margin: 0, fontSize: 18, letterSpacing: 0.5, color: C.ink }}>
                       {t('aspetto.ispirazione_titolo')}
@@ -19765,7 +19752,7 @@ export default function App() {
               {/* Selettore Background & Azione Rapida Tira Tutto */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 14, background: 'rgba(0,0,0,0.03)', padding: '10px 12px', borderRadius: 8, border: `1px solid ${C.border}` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>📜 {t('aspetto.background')}:</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>{t('aspetto.background')}:</span>
                   <select
                     style={{ ...styles.inlineInput, fontSize: 13, padding: '4px 8px', fontWeight: 600, minWidth: 160 }}
                     value={bgIspirazioneScelto || scheda.background || 'Accolito'}
@@ -19806,7 +19793,7 @@ export default function App() {
                   {/* Card 1: Tratto Caratteriale (d8) */}
                   <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: C.goldDark }}>👤 {t('aspetto.tratti_caratteriali')} (d8)</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: C.goldDark }}>{t('aspetto.tratti_caratteriali')} (d8)</span>
                       <button
                         type="button"
                         style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 8px', color: C.goldDark, border: `1px solid ${C.gold}`, background: 'rgba(201,162,39,0.12)', fontWeight: 700 }}
@@ -19815,7 +19802,7 @@ export default function App() {
                           setBozzaIspirazione((b) => ({ ...b, tratto: bgDati.tratti[r - 1] || '' }));
                         }}
                       >
-                        🎲 {t('aspetto.tira_dado')} d8
+                        {t('aspetto.tira_dado')} d8
                       </button>
                     </div>
                     <textarea
@@ -19853,7 +19840,7 @@ export default function App() {
                   {/* Card 2: Ideale (d6) */}
                   <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: C.goldDark }}>⚖️ {t('aspetto.ideali')} (d6)</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: C.goldDark }}>{t('aspetto.ideali')} (d6)</span>
                       <button
                         type="button"
                         style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 8px', color: C.goldDark, border: `1px solid ${C.gold}`, background: 'rgba(201,162,39,0.12)', fontWeight: 700 }}
@@ -19862,7 +19849,7 @@ export default function App() {
                           setBozzaIspirazione((b) => ({ ...b, ideale: bgDati.ideali[r - 1] || '' }));
                         }}
                       >
-                        🎲 {t('aspetto.tira_dado')} d6
+                        {t('aspetto.tira_dado')} d6
                       </button>
                     </div>
                     <textarea
@@ -19900,7 +19887,7 @@ export default function App() {
                   {/* Card 3: Legame (d6) */}
                   <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: C.goldDark }}>🔗 {t('aspetto.legami')} (d6)</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: C.goldDark }}>{t('aspetto.legami')} (d6)</span>
                       <button
                         type="button"
                         style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 8px', color: C.goldDark, border: `1px solid ${C.gold}`, background: 'rgba(201,162,39,0.12)', fontWeight: 700 }}
@@ -19909,7 +19896,7 @@ export default function App() {
                           setBozzaIspirazione((b) => ({ ...b, legame: bgDati.legami[r - 1] || '' }));
                         }}
                       >
-                        🎲 {t('aspetto.tira_dado')} d6
+                        {t('aspetto.tira_dado')} d6
                       </button>
                     </div>
                     <textarea
@@ -19947,7 +19934,7 @@ export default function App() {
                   {/* Card 4: Difetto (d6) */}
                   <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: C.goldDark }}>⚡ {t('aspetto.difetti')} (d6)</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: C.goldDark }}>{t('aspetto.difetti')} (d6)</span>
                       <button
                         type="button"
                         style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 8px', color: C.goldDark, border: `1px solid ${C.gold}`, background: 'rgba(201,162,39,0.12)', fontWeight: 700 }}
@@ -19956,7 +19943,7 @@ export default function App() {
                           setBozzaIspirazione((b) => ({ ...b, difetto: bgDati.difetti[r - 1] || '' }));
                         }}
                       >
-                        🎲 {t('aspetto.tira_dado')} d6
+                        {t('aspetto.tira_dado')} d6
                       </button>
                     </div>
                     <textarea
@@ -20048,7 +20035,6 @@ export default function App() {
             {/* Header Modale Diario */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, borderBottom: `1px solid ${C.border}`, paddingBottom: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 28, lineHeight: 1 }}>📜</span>
                 <div>
                   <h2 style={{ ...styles.title, margin: 0, fontSize: 20, letterSpacing: 0.5, color: C.ink }}>
                     {t('sez.diario')}
@@ -20108,21 +20094,21 @@ export default function App() {
               };
 
               const TEMPLATE_DIARIO = [
-                '🗺️ Luogo: ',
+                'Luogo: ',
                 '',
-                '👑 Mandante: ',
+                'Mandante: ',
                 '',
-                '📜 Obiettivo: ',
+                'Obiettivo: ',
                 '',
-                '👤 PNG: ',
+                'PNG: ',
                 '',
-                '💡 Indizio: ',
+                'Indizio: ',
                 '',
-                '⚔️ Combattimento: ',
+                'Combattimento: ',
                 '',
-                '💰 Bottino: ',
+                'Bottino: ',
                 '',
-                '📝 Note: ',
+                'Note: ',
               ].join('\n');
 
               const toggleTutteVoci = () => {
@@ -20151,7 +20137,7 @@ export default function App() {
                           setVociDiarioChiuse((prev) => ({ ...prev, [newId]: false }));
                         }}
                       >
-                        <span>✍️</span> <strong>{lingua === 'en' ? 'New Chronicle' : 'Nuova Cronaca'}</strong>
+                        <strong>{lingua === 'en' ? 'New Chronicle' : 'Nuova Cronaca'}</strong>
                       </button>
                       {diario.length > 0 && (
                         <>
@@ -20161,7 +20147,7 @@ export default function App() {
                             onClick={toggleTutteVoci}
                             title="Espandi o comprimi tutte le sessioni"
                           >
-                            {diario.every((v) => vociDiarioChiuse[v.id]) ? '📂 Espandi tutte' : '📁 Comprimi tutte'}
+                            {diario.every((v) => vociDiarioChiuse[v.id]) ? 'Espandi tutte' : 'Comprimi tutte'}
                           </button>
                           <button
                             className="no-stampa"
@@ -20169,7 +20155,7 @@ export default function App() {
                             onClick={copiaDiario}
                             title={t('diario.copia_tip')}
                           >
-                            📋 {lingua === 'en' ? 'Copy all' : 'Copia'}
+                            {lingua === 'en' ? 'Copy all' : 'Copia'}
                           </button>
                           <button
                             className="no-stampa"
@@ -20177,7 +20163,7 @@ export default function App() {
                             onClick={scaricaDiario}
                             title={t('diario.scarica_md_tip')}
                           >
-                            📥 {lingua === 'en' ? 'Download' : 'Scarica'}
+                            {lingua === 'en' ? 'Download' : 'Scarica'}
                           </button>
                         </>
                       )}
@@ -20220,7 +20206,7 @@ export default function App() {
                           aggiorna({ diario: [{ id: newId, data: oggi, titolo: '', testo: TEMPLATE_DIARIO }] });
                         }}
                       >
-                        ✍️ {lingua === 'en' ? 'Start First Session' : 'Inizia la Prima Sessione'}
+                        {lingua === 'en' ? 'Start First Session' : 'Inizia la Prima Sessione'}
                       </button>
                     </div>
                   )}
@@ -20386,7 +20372,7 @@ export default function App() {
               tipoDanno: spell.tipoDanno || '',
             };
             aggiorna({ incantesimiLista: [...(scheda.incantesimiLista || []), nuovo] });
-            registra({ etichetta: `✨ ${nomeSpell}`, tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} aggiunge "${nomeSpell}" (${spell.livello === 0 ? 'Trucchetto' : `${spell.livello}° livello`}) al grimorio.` });
+            registra({ etichetta: `${nomeSpell}`, tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} aggiunge "${nomeSpell}" (${spell.livello === 0 ? 'Trucchetto' : `${spell.livello}° livello`}) al grimorio.` });
           }
         }}
         onAggiungiInventario={(item) => {
@@ -20400,17 +20386,17 @@ export default function App() {
             note: item.desc || '',
           });
           aggiorna({ inventario: [...(scheda.inventario || []), nuovo] });
-          registra({ etichetta: `🎒 ${item.nome}`, tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} aggiunge "${item.nome}" all'inventario.` });
+          registra({ etichetta: `${item.nome}`, tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} aggiunge "${item.nome}" all'inventario.` });
         }}
         onAggiungiAttacco={(weapon) => {
           const nuovoAttacco = attaccoDaArma(weapon, scheda);
           aggiorna({ attacchi: [...(scheda.attacchi || []), nuovoAttacco] });
-          registra({ etichetta: `⚔️ ${weapon.nome}`, tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} aggiunge "${weapon.nome}" agli attacchi rapidi.` });
+          registra({ etichetta: `${weapon.nome}`, tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} aggiunge "${weapon.nome}" agli attacchi rapidi.` });
         }}
         onApplicaCondizione={(condizione) => {
           if (!scheda.condizioni.includes(condizione)) {
             aggiorna({ condizioni: [...scheda.condizioni, condizione] });
-            registra({ etichetta: `🩸 ${condizione}`, tipo: 'condizione', dettaglio: `${scheda.nome || 'PG'} subisce la condizione "${condizione}".` });
+            registra({ etichetta: `${condizione}`, tipo: 'condizione', dettaglio: `${scheda.nome || 'PG'} subisce la condizione "${condizione}".` });
           }
         }}
         onAggiungiTalento={(talento) => {
@@ -20422,7 +20408,7 @@ export default function App() {
             testo: talento.desc || '',
           };
           aggiorna({ privilegi: [...(scheda.privilegi || []), nuovo] });
-          registra({ etichetta: `⭐ ${talento.nome}`, tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} aggiunge il talento/privilegio "${talento.nome}".` });
+          registra({ etichetta: `${talento.nome}`, tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} aggiunge il talento/privilegio "${talento.nome}".` });
         }}
       />
 
@@ -20461,7 +20447,6 @@ export default function App() {
             {/* Header Modale Dadi */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${C.border}`, paddingBottom: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 28, lineHeight: 1 }}>🎲</span>
                 <div>
                   <h2 style={{ ...styles.title, margin: 0, fontSize: 18, color: C.ink }}>
                     {t('roll.tavolo_dadi')}
@@ -20589,7 +20574,7 @@ export default function App() {
                     setMostraDadiModal(false);
                   }}
                 >
-                  🎲 {t('roll.tira')}
+                  {t('roll.tira')}
                 </button>
               </div>
               {erroreEspressione && (
@@ -20607,7 +20592,7 @@ export default function App() {
                 </div>
                 {storico.length > 0 && (
                   <button style={{ ...styles.buttonMini, color: C.red, fontSize: 11, padding: '2px 8px' }} onClick={() => setStorico([])}>
-                    🧹 {t('log.svuota')}
+                    {t('log.svuota')}
                   </button>
                 )}
               </div>
@@ -20658,13 +20643,13 @@ export default function App() {
             style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: C.panel, borderBottom: `1px solid ${C.border}` }}
             onClick={(e) => e.stopPropagation()}
           >
-            <strong style={{ color: 'var(--c-title)', fontSize: 15 }}>🗺️ {t('mappa.titolo')}</strong>
+            <strong style={{ color: 'var(--c-title)', fontSize: 15 }}>{t('mappa.titolo')}</strong>
             <span style={{ flex: 1 }} />
-            <button style={{ ...styles.buttonMini, ...(mappaScala === 0 ? { borderColor: C.gold, color: C.gold } : {}) }} onClick={() => setMappaScala(0)} title={t('mappa.adatta_tip')}>🖥 {t('mappa.adatta')}</button>
+            <button style={{ ...styles.buttonMini, ...(mappaScala === 0 ? { borderColor: C.gold, color: C.gold } : {}) }} onClick={() => setMappaScala(0)} title={t('mappa.adatta_tip')}>{t('mappa.adatta')}</button>
             <button style={styles.buttonMini} onClick={() => setMappaScala((s) => Math.max(0.5, (s === 0 ? 1 : s) - 0.5))} title={t('mappa.riduci')}>➖</button>
             <span style={{ fontSize: 12, minWidth: 42, textAlign: 'center', fontWeight: 'bold' }}>{mappaScala === 0 ? 'fit' : `${Math.round(mappaScala * 100)}%`}</span>
             <button style={styles.buttonMini} onClick={() => setMappaScala((s) => Math.min(6, (s === 0 ? 1 : s) + 0.5))} title={t('mappa.ingrandisci')}>➕</button>
-            <button style={styles.buttonMini} onClick={() => mappaRef.current?.click()} title={t('mappa.cambia_tip')}>🔁 {t('mappa.cambia')}</button>
+            <button style={styles.buttonMini} onClick={() => mappaRef.current?.click()} title={t('mappa.cambia_tip')}>{t('mappa.cambia')}</button>
             <button style={{ ...styles.buttonMini, color: C.red, borderColor: C.red }} onClick={() => { if (window.confirm(t('mappa.rimuovi_conferma'))) { setMappaCampagna(''); setMappaAperta(false); } }} title={t('mappa.rimuovi_tip')}>🗑 {t('mappa.rimuovi')}</button>
             <button style={styles.buttonMini} onClick={() => setMappaAperta(false)} title={t('mappa.chiudi')} aria-label={t('mappa.chiudi')}>✕</button>
           </div>
@@ -20708,14 +20693,14 @@ export default function App() {
               {/* Gruppo 1: Round & Turno */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(214,169,15,0.18)', border: `1.5px solid ${C.goldDark}`, color: C.goldDark, padding: '3px 8px', borderRadius: 8, fontWeight: 800, fontSize: 13, letterSpacing: 0.5, whiteSpace: 'nowrap' }}>
-                  ⚔️ {t('ct.round').toUpperCase()} {combat.round}
+                  {t('ct.round').toUpperCase()} {combat.round}
                 </span>
                 <button
                   style={{ ...styles.buttonMini, padding: '4px 8px', fontSize: 12, whiteSpace: 'nowrap' }}
                   onClick={turnoPrecedente}
                   title={t('ct.prec')}
                 >
-                  ◀ {t('ct.prec')}
+                  {t('ct.prec')}
                 </button>
                 <button
                   style={{ ...styles.buttonMini, background: 'var(--c-gold-dark)', color: '#ffffff', borderColor: 'var(--c-gold-dark)', fontWeight: 800, padding: '4px 10px', fontSize: 12, whiteSpace: 'nowrap' }}
@@ -20753,7 +20738,7 @@ export default function App() {
                     style={{ ...styles.inlineInput, fontSize: 12, padding: '3px 6px', maxWidth: 125, height: 26, fontWeight: 700, background: 'rgba(46,139,87,0.1)', color: '#2e8b57', borderColor: '#2e8b57' }}
                     title="Aggiungi un alleato salvato nella scheda o creane uno nuovo"
                   >
-                    <option value="">🛡️ ＋ {t('ct.alleato')}...</option>
+                    <option value="">+ {t('ct.alleato')}...</option>
                     <option value="__nuovo">＋ {t('ct.alleato')} (Nuovo)</option>
                     {scheda.alleati.map((a) => (
                       <option key={a.id || a.nome} value={a.id || a.nome}>
@@ -20798,33 +20783,33 @@ export default function App() {
                   style={{ ...styles.inlineInput, fontSize: 12, padding: '3px 6px', maxWidth: 120, height: 26, fontWeight: 600 }}
                   title={lingua === 'it' ? "Aggiungi un mostro o creatura dal bestiario allo scontro" : "Add a monster or creature from the bestiary to combat"}
                 >
-                  <option value="">👹 + Mostro...</option>
-                  <optgroup label="💀 Non-Morti">
+                  <option value="">+ {lingua === 'en' ? 'Monster' : 'Mostro'}...</option>
+                  <optgroup label="Non-Morti">
                     {MOSTRI_5E.filter((m) => m.categoria === 'Non-Morti').map((b) => (
                       <option key={b.nome} value={b.nome}>{b.nome} (GS {b.gs})</option>
                     ))}
                   </optgroup>
-                  <optgroup label="👹 Goblinoidi & Orchi">
+                  <optgroup label="Goblinoidi & Orchi">
                     {MOSTRI_5E.filter((m) => m.categoria === 'Umanoidi & Mostri').map((b) => (
                       <option key={b.nome} value={b.nome}>{b.nome} (GS {b.gs})</option>
                     ))}
                   </optgroup>
-                  <optgroup label="🗡️ Umanoidi & PNG">
+                  <optgroup label="Umanoidi & PNG">
                     {MOSTRI_5E.filter((m) => m.categoria === 'Umanoidi & PNG').map((b) => (
                       <option key={b.nome} value={b.nome}>{b.nome} (GS {b.gs})</option>
                     ))}
                   </optgroup>
-                  <optgroup label="🐲 Mostruosità & Draghi">
+                  <optgroup label="Mostruosità & Draghi">
                     {MOSTRI_5E.filter((m) => m.categoria === 'Mostruosità & Draghi').map((b) => (
                       <option key={b.nome} value={b.nome}>{b.nome} (GS {b.gs})</option>
                     ))}
                   </optgroup>
-                  <optgroup label="🔥 Elementali & Immondi">
+                  <optgroup label="Elementali & Immondi">
                     {MOSTRI_5E.filter((m) => m.categoria === 'Elementali & Immondi').map((b) => (
                       <option key={b.nome} value={b.nome}>{b.nome} (GS {b.gs})</option>
                     ))}
                   </optgroup>
-                  <optgroup label="🐾 Bestie & Animali">
+                  <optgroup label="Bestie & Animali">
                     {BESTIE.map((b) => (
                       <option key={b.nome} value={b.nome}>{b.nome} (GS {b.gs})</option>
                     ))}
@@ -20839,14 +20824,14 @@ export default function App() {
                   title={lingua === 'it' ? "Tira l'iniziativa per tutti i combattenti e ordina il turno" : "Roll initiative for all combatants and order turn"}
                   onClick={tiraIniziativeTutti}
                 >
-                  🎲 {lingua === 'it' ? 'Iniziative' : 'Initiatives'}
+                  {lingua === 'it' ? 'Iniziative' : 'Initiatives'}
                 </button>
                 <button
                   style={{ ...styles.buttonMini, whiteSpace: 'nowrap', padding: '3px 8px' }}
                   onClick={ordinaIniziativa}
                   title="Ordina i combattenti per iniziativa decrescente"
                 >
-                  🔃 Ordina
+                  Ordina
                 </button>
                 <button
                   style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, whiteSpace: 'nowrap', padding: '3px 8px' }}
@@ -20861,7 +20846,7 @@ export default function App() {
                     }
                   }}
                 >
-                  💥 Area
+                  Area
                 </button>
                 <button
                   style={{ ...styles.buttonMini, padding: '3px 7px' }}
@@ -20883,7 +20868,7 @@ export default function App() {
             {/* LISTA COMBATTENTI (Ordinati a scorrimento naturale: PG in turno -> Prossimo -> Successivi) */}
             {combat.combattenti.length === 0 ? (
               <div style={{ ...styles.detail, padding: '16px 8px', textAlign: 'center', background: 'rgba(0,0,0,0.02)', borderRadius: 8, border: `1px dashed ${C.border}`, color: C.inkDim }}>
-                ⚔️ <strong>Nessun combattente in questo scontro.</strong> Usa i pulsanti sopra (<strong>＋ Alleato</strong>, <strong>＋ Nemico</strong> o <strong>Mostro</strong>) per iniziare.
+                <strong>Nessun combattente in questo scontro.</strong> Usa i pulsanti sopra (<strong>＋ Alleato</strong>, <strong>＋ Nemico</strong> o <strong>Mostro</strong>) per iniziare.
               </div>
             ) : (() => {
               // Master list ordinata per iniziativa decrescente
@@ -20954,11 +20939,11 @@ export default function App() {
                           </div>
                         ) : offset > 0 && roundRelativo > combat.round ? (
                           <div style={{ background: 'rgba(0,0,0,0.06)', color: C.inkDim, fontSize: 11, fontWeight: 700, textAlign: 'center', padding: '2px 6px' }}>
-                            🔄 Round {roundRelativo} · {cb.tipo === 'pg' ? '👤 Personaggio' : cb.tipo === 'alleato' ? '🛡️ Alleato' : '⚔️ Nemico'}
+                            Round {roundRelativo} · {cb.tipo === 'pg' ? 'Personaggio' : cb.tipo === 'alleato' ? 'Alleato' : 'Nemico'}
                           </div>
                         ) : (
                           <div style={{ background: colBg, color: col, fontSize: 11, fontWeight: 700, textAlign: 'center', padding: '2px 6px', textTransform: 'uppercase', letterSpacing: 0.4 }}>
-                            {cb.tipo === 'pg' ? '👤 Personaggio' : cb.tipo === 'alleato' ? '🛡️ Alleato' : '⚔️ Nemico'}
+                            {cb.tipo === 'pg' ? 'Personaggio' : cb.tipo === 'alleato' ? 'Alleato' : 'Nemico'}
                           </div>
                         )}
 
@@ -21060,7 +21045,7 @@ export default function App() {
                           {/* Riga 2: CA e Concentrazione */}
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 12, color: C.inkDim, background: 'rgba(0,0,0,0.02)', padding: '2px 6px', borderRadius: 6 }}>
                             <span title={t("vital.ca")} style={{ fontWeight: 700, color: C.ink }}>
-                              🛡️ CA <Editable value={cb.ca} tipo="numero" width={22} onChange={(v) => modCombat(cb.id, { ca: v })} />
+                              CA <Editable value={cb.ca} tipo="numero" width={22} onChange={(v) => modCombat(cb.id, { ca: v })} />
                             </span>
                             <span
                               className="tirabile"
@@ -21075,7 +21060,7 @@ export default function App() {
                               title={t('ct.concentrazione')}
                               onClick={() => modCombat(cb.id, { concentrazione: !cb.concentrazione })}
                             >
-                              🧠 {cb.concentrazione ? t('ct.conc_on') : t('ct.conc_off')}
+                              {cb.concentrazione ? t('ct.conc_on') : t('ct.conc_off')}
                             </span>
                           </div>
 
@@ -21187,7 +21172,7 @@ export default function App() {
                                 }
                               }}
                             >
-                              🛡️ Temp
+                              Temp
                             </button>
                           </div>
 
@@ -21222,7 +21207,7 @@ export default function App() {
                               onChange={(e) => { if (e.target.value) modCombat(cb.id, { condizioni: [...cb.condizioni, e.target.value] }); }}
                               style={{ ...styles.inlineInput, fontSize: 11, padding: '1px 3px', height: 20 }}
                             >
-                              <option value="">＋ {t('ct.condizione')}</option>
+                              <option value="">+ {t('ct.condizione')}</option>
                               {CONDIZIONI_5E.filter((c) => !cb.condizioni.includes(c)).sort((a, b) => traduciDato(a).localeCompare(traduciDato(b), lingua)).map((c) => (
                                 <option key={c} value={c}>{c}</option>
                               ))}
@@ -21264,7 +21249,6 @@ export default function App() {
           }}
           title={t('ct.apri')}
         >
-          <span style={{ fontSize: 14 }}>⚔️</span>
           <span>
             {t('ct.round')} {combat.round} · {t('ct.in_turno')}: {combat.combattenti[combat.turno]?.nome || 'PG'}
           </span>

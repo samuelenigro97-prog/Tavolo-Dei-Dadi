@@ -9,7 +9,7 @@ test.describe('Poteri', () => {
   });
 
   test('il titolo della sezione specifica "regole homebrew"', async ({ page }) => {
-    await expect(page.getByText('✨ Poteri', { exact: false })).toBeVisible();
+    await expect(page.locator('div, span, h3, h4').filter({ hasText: /^\s*Poteri\s*\(regole homebrew\)\s*$/ }).last()).toBeVisible();
     await expect(page.getByText('(regole homebrew)')).toBeVisible();
   });
 

@@ -827,3 +827,29 @@ test('estraiCategorieNota: la proprietà si ferma alla parentesi/due punti (nien
   assert.deepEqual(testi('Versatile (1d10)'), ['Versatile (1d10)']);
   assert.deepEqual(testi('Maestria: Atterrare (Topple)'), ['Maestria: Atterrare (Topple)']);
 });
+
+test('separaNotaIncantesimo: "Conc."/"Rituale" nella nota diventano solo il chip, il resto resta', async () => {
+  const { separaNotaIncantesimo } = await import('../src/rules/scheda.js');
+  assert.deepEqual(separaNotaIncantesimo('Conc.'), { nota: '', conc: true, rituale: false });
+  assert.deepEqual(separaNotaIncantesimo('Rituale, Conc.'), { nota: '', conc: true, rituale: true });
+  assert.deepEqual(separaNotaIncantesimo('Concentrazione'), { nota: '', conc: true, rituale: false });
+  assert.deepEqual(separaNotaIncantesimo('V S M, Concentration, Ritual'), { nota: 'V S M', conc: true, rituale: true });
+  // Un segmento che dice di più ("Rituale (Razza)") resta com'è.
+  assert.deepEqual(separaNotaIncantesimo('V S M, Rituale (Razza)'), { nota: 'V S M, Rituale (Razza)', conc: false, rituale: false });
+  // Nessun segmento tolto: la nota non viene toccata, separatori compresi.
+  assert.deepEqual(separaNotaIncantesimo('Attacco · 9m'), { nota: 'Attacco · 9m', conc: false, rituale: false });
+  assert.deepEqual(separaNotaIncantesimo(''), { nota: '', conc: false, rituale: false });
+  assert.deepEqual(separaNotaIncantesimo(undefined), { nota: '', conc: false, rituale: false });
+});
+
+test('coloreCategoria: Concentrazione e Rituale hanno una tinta propria, diversa da scuola e dagli altri chip', async () => {
+  const { coloreCategoria, COLORE_CATEGORIA_INFO } = await import('../src/rules/scheda.js');
+  for (const scuro of [false, true]) {
+    const conc = coloreCategoria('concentrazione', scuro);
+    assert.equal(coloreCategoria('rituale', scuro), conc);
+    for (const k of Object.keys(COLORE_CATEGORIA_INFO)) {
+      if (k === 'concentrazione' || k === 'rituale') continue;
+      assert.notEqual(coloreCategoria(k, scuro), conc, `${k} (${scuro ? 'scuro' : 'chiaro'}) uguale a Concentrazione`);
+    }
+  }
+});
