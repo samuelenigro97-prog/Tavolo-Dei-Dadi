@@ -2,6 +2,49 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.47.0] – 2026-10-03
+
+### Cambiato
+- **Concentrazione e Rituale con un colore proprio**: fucsia (`#a21caf` sul
+  tema chiaro, `#f0abfc` sullo scuro; contrasto ≈6,6:1 e ≈11:1), una tinta
+  non usata da altri chip né dalle scuole. Prima erano grigio neutro come
+  scuola e proprietà. Nuova costante `LANCIO` in `src/rules/scheda.js`.
+- **Regola sulle icone, applicata a tutta l'app**: un'icona resta solo se si
+  riconosce prima del testo o se manca lo spazio. Restano: i pulsanti solo
+  icona della barra in alto (con `aria-label`), l'icona del tipo di danno o
+  cura sui riquadri di tiro, i pallini degli slot incantesimo, il cestino
+  solo dentro un menu o dietro conferma. Tolte: ⏱️/🎯 su tempo di lancio e
+  gittata, le icone sui chip con etichetta (Prep., Concentrazione, Conc.,
+  Evoca, Metamorfosi, Aggiungi, Catalogo), le emoji decorative dei titoli
+  di sezione e dei gruppi del menu, le emoji nelle voci di menu e nelle
+  opzioni dei selettori, quelle all'inizio di messaggi, avvisi e voci del
+  registro (circa 100 testi in `i18n.js` e 250 righe in JSX). In una riga
+  incantesimo resta al massimo un'icona: il tipo di danno.
+- **Riquadri di tiro**: il tiro per colpire mostra "Attacco +9" invece di 🎯;
+  il danno usa l'icona del suo tipo (🔥, ❄️, 💀…, 💚 per la cura) e perde il
+  🎲 finale; il tiro salvezza perde il 🎲.
+- **Titoli in maiuscoletto anziché tutto maiuscolo**: titoli dei pannelli,
+  intestazioni di livello ("4° livello"), sottotitoli di Privilegi, Poteri e
+  dei gruppi del menu, titoli dorati delle sottosezioni. Le piccole
+  etichette dei campi (CA, PF, intestazioni di tabella) restano maiuscole.
+- In Combattimento "📏 3m" diventa "Portata 3m" e "🏹 12" diventa
+  "Frecce: 12".
+
+### Corretto
+- **"Conc." non compare più due volte**: se la nota di un incantesimo
+  contiene solo "Conc."/"Concentrazione"/"Rituale" (anche in inglese), il
+  segmento viene tolto dalla nota e l'incantesimo è trattato come
+  concentrazione/rituale (chip, filtro Rituali, scheda informativa). Nuova
+  funzione `separaNotaIncantesimo`.
+- **Eliminare un incantesimo è più difficile per sbaglio**: il pulsante dice
+  "Elimina" (o "Rimuovi" se in eccesso), è neutro e diventa rosso solo al
+  passaggio/focus, è distanziato da Prep. e chiede sempre conferma con testo
+  tradotto.
+- `aria-label` tradotte per "Cloud Sync" e "Combat Tracker"; aggiunte
+  `aria-label` ai pulsanti solo icona dell'intestazione e a Evoca/Metamorfosi.
+- I campi numerici vuoti mostrano "—" invece di "-", che sembrava un segno
+  meno (anche il GS vuoto nel Compendio).
+
 ## [4.46.1] – 2026-10-03
 
 ### Corretto

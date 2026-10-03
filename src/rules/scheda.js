@@ -96,10 +96,10 @@ export function punteggioCaratteristica(scheda, caratteristica) {
 }
 
 export const TIPI_COPERTURA_5E = [
-  { key: 'nessuna', labelIt: '🛡️ Nessuna Copertura', labelEn: '🛡️ No Cover', ca: 0, tsDes: 0, descIt: 'Bersaglio in campo aperto, nessuna protezione.', descEn: 'Target in open field, no protection.' },
-  { key: 'mezza', labelIt: '🛡️ Mezza (+2 CA/TS)', labelEn: '🛡️ Half Cover (+2)', ca: 2, tsDes: 2, descIt: '+2 a CA e TS Destrezza (muretto, cassa, tronco o altra creatura).', descEn: '+2 to AC and Dex saves (low wall, crate, tree trunk, or another creature).' },
-  { key: 'tre_quarti', labelIt: '🏰 Tre Quarti (+5 CA/TS)', labelEn: '🏰 Three-Quarters (+5)', ca: 5, tsDes: 5, descIt: '+5 a CA e TS Destrezza (feritoia, saracinesca, muro parziale).', descEn: '+5 to AC and Dex saves (arrow slit, portcullis, partial wall).' },
-  { key: 'totale', labelIt: '🧱 Copertura Totale', labelEn: '🧱 Total Cover', ca: 0, tsDes: 0, descIt: 'Completamente celato da ostacoli: non bersagliabile direttamente da attacchi o incantesimi.', descEn: 'Completely concealed: cannot be targeted directly by attacks or spells.' },
+  { key: 'nessuna', labelIt: 'Nessuna Copertura', labelEn: 'No Cover', ca: 0, tsDes: 0, descIt: 'Bersaglio in campo aperto, nessuna protezione.', descEn: 'Target in open field, no protection.' },
+  { key: 'mezza', labelIt: 'Mezza (+2 CA/TS)', labelEn: 'Half Cover (+2)', ca: 2, tsDes: 2, descIt: '+2 a CA e TS Destrezza (muretto, cassa, tronco o altra creatura).', descEn: '+2 to AC and Dex saves (low wall, crate, tree trunk, or another creature).' },
+  { key: 'tre_quarti', labelIt: 'Tre Quarti (+5 CA/TS)', labelEn: 'Three-Quarters (+5)', ca: 5, tsDes: 5, descIt: '+5 a CA e TS Destrezza (feritoia, saracinesca, muro parziale).', descEn: '+5 to AC and Dex saves (arrow slit, portcullis, partial wall).' },
+  { key: 'totale', labelIt: 'Copertura Totale', labelEn: 'Total Cover', ca: 0, tsDes: 0, descIt: 'Completamente celato da ostacoli: non bersagliabile direttamente da attacchi o incantesimi.', descEn: 'Completely concealed: cannot be targeted directly by attacks or spells.' },
 ];
 
 export function bonusCopertura(scheda) {
@@ -486,6 +486,11 @@ export function analizzaMunizioniArma(attacco, inventario = [], armaDb = null) {
 // Coppie chiaro/scuro perché un solo hex non regge sfondo bianco e quasi-nero.
 const NEUTRO = { chiaro: '#57534e', scuro: '#d6d3d1' };
 const QUANDO = { chiaro: '#15803d', scuro: '#4ade80' };
+// "Come si lancia": Concentrazione e Rituale. Fucsia, una tinta che nessun altro
+// chip usa (né le scuole, che sono neutre): con il grigio neutro la
+// Concentrazione si confondeva con la scuola di magia accanto. Contrasto del
+// testo: ~6,6:1 su bianco (#a21caf) e ~11:1 sul pannello scuro (#f0abfc).
+const LANCIO = { chiaro: '#a21caf', scuro: '#f0abfc' };
 
 /** Palette per tipo di informazione, condivisa da Combattimento e Incantesimi. */
 export const COLORE_CATEGORIA_INFO = {
@@ -500,10 +505,37 @@ export const COLORE_CATEGORIA_INFO = {
   modificato:   { chiaro: '#2563eb', scuro: '#93c5fd' }, // valore modificato da Poteri/Sfinimento
   proprieta:    NEUTRO,                                   // descrittivo: Magico, Versatile, Maestria
   effetto:      NEUTRO,                                   // descrittivo: effetto di una reazione
-  concentrazione: NEUTRO,                                 // descrittivo: l'icona 🧠 lo distingue
-  rituale:      NEUTRO,                                   // descrittivo: l'icona 📜 lo distingue
+  concentrazione: LANCIO,                                 // come si lancia: Concentrazione
+  rituale:      LANCIO,                                   // come si lancia: Rituale
   scuola:       NEUTRO,                                   // descrittivo: il nome della scuola basta
 };
+
+// Segmenti della nota di un incantesimo che dicono solo "Concentrazione" o
+// "Rituale": all'aggiunta dal catalogo finiscono nella nota ("Rituale, Conc."),
+// ma la riga mostra già i chip dedicati, quindi qui si tolgono per non
+// ripetere la stessa informazione due volte.
+const RE_SEGMENTO_CONC = /^(?:conc\.?|concentrazione|concentration)$/i;
+const RE_SEGMENTO_RITUALE = /^(?:rituale|ritual)$/i;
+
+/**
+ * Separa da una nota di incantesimo i segmenti "Conc."/"Concentrazione" e
+ * "Rituale" (separati da virgola, punto e virgola o punto medio).
+ * Restituisce la nota restante e se quei segmenti c'erano, così la riga può
+ * mostrare il chip una sola volta anche quando il dato viene solo dalla nota.
+ */
+export function separaNotaIncantesimo(nota) {
+  const segmenti = String(nota || '').split(/\s*[,;·]\s*/).map((x) => x.trim()).filter(Boolean);
+  let conc = false;
+  let rituale = false;
+  const resto = segmenti.filter((seg) => {
+    if (RE_SEGMENTO_CONC.test(seg)) { conc = true; return false; }
+    if (RE_SEGMENTO_RITUALE.test(seg)) { rituale = true; return false; }
+    return true;
+  });
+  // Nessun segmento tolto: la nota resta identica (anche nei separatori).
+  if (!conc && !rituale) return { nota: String(nota || '').trim(), conc, rituale };
+  return { nota: resto.join(', '), conc, rituale };
+}
 
 /** Risolve il colore fisso di una categoria per il tema attivo (chiaro/scuro). */
 export function coloreCategoria(categoria, scuro) {

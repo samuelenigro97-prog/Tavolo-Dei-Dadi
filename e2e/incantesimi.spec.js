@@ -32,9 +32,41 @@ test.describe('Incantesimi', () => {
   });
 
   test('cliccando il bottone Metamorfosi sulla riga dell\'incantesimo si apre il catalogo', async ({ page }) => {
-    const bottone = page.getByRole('button', { name: /^🔮 Metamorfosi$/ });
+    const bottone = page.getByRole('button', { name: /^Metamorfosi: apri il catalogo$/ });
     if (await bottone.count() === 0) test.skip(true, 'Il PG di esempio non ha Metamorfosi in lista');
     await bottone.first().click();
     await expect(page.getByText(/Grado di Sfida Max/)).toBeVisible();
+  });
+
+  test('Concentrazione compare una volta sola anche se la nota dice "Conc." (niente chip nota doppio)', async ({ page }) => {
+    // Come un incantesimo aggiunto dal catalogo: la nota salvata è "Conc.".
+    await page.evaluate(() => {
+      const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+      const pg = r.personaggi[r.attivo];
+      const inc = (pg.incantesimiLista || []).find((x) => x.nome === 'Metamorfosi');
+      if (inc) inc.note = 'Conc.';
+      localStorage.setItem('scheda-interattiva:v1', JSON.stringify(r));
+    });
+    await page.reload();
+    await page.waitForTimeout(600);
+    const riga = page.locator('.spell-row').filter({ has: page.getByRole('button', { name: 'Metamorfosi', exact: true }) });
+    if (await riga.count() === 0) test.skip(true, 'Il PG di esempio non ha Metamorfosi in lista');
+    // La nota salvata è davvero "Conc." (il ricaricamento non l'ha sovrascritta).
+    const notaSalvata = await page.evaluate(() => {
+      const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+      return (r.personaggi[r.attivo].incantesimiLista || []).find((x) => x.nome === 'Metamorfosi')?.note;
+    });
+    expect(notaSalvata).toBe('Conc.');
+    await expect(riga.locator('.chip-concentrazione')).toHaveCount(1);
+    await expect(riga.getByText('Conc.', { exact: true })).toHaveCount(0);
+  });
+
+  test('il cestino della riga chiede conferma prima di eliminare l\'incantesimo', async ({ page }) => {
+    const riga = page.locator('.spell-row').filter({ has: page.getByRole('button', { name: 'Metamorfosi', exact: true }) });
+    if (await riga.count() === 0) test.skip(true, 'Il PG di esempio non ha Metamorfosi in lista');
+    await riga.getByRole('button', { name: /Elimina incantesimo: Metamorfosi/ }).click();
+    await expect(page.getByText('Vuoi eliminare "Metamorfosi" dalla lista incantesimi?')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.spell-row').filter({ has: page.getByRole('button', { name: 'Metamorfosi', exact: true }) })).toHaveCount(1);
   });
 });

@@ -242,7 +242,7 @@ export function Editable({ value, valoreModifica, onChange, onRoll, tipo = 'test
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
     >
-      {soloIcona ? '✏️' : (String(value ?? '') === '' ? '-' : String(value))}
+      {soloIcona ? '✏️' : (String(value ?? '') === '' ? (tipo === 'numero' ? '—' : '-') : String(value))}
     </span>
   );
 }
@@ -746,6 +746,13 @@ export function CampoBloccato({ valore, title, style }) {
  * Bonus e Reazioni. 1 click = tiro. Il colore arriva dal chiamante
  * (coloreCategoria('attacco', notte): giallo fisso, non tinto dalla classe).
  */
+/** Icona del tipo di danno per badge e chip (⚔️ critico, 💚 cura, 💥 se il tipo non è noto). */
+export function iconaTipoDanno(tipoDanno, critico = false) {
+  if (critico) return '⚔️';
+  if (tipoDanno === 'Guarigione' || tipoDanno === 'Healing') return '💚';
+  return ICONE_5E[tipoDanno] || '💥';
+}
+
 export function BadgeTiroColpire({ bonus, colore, onRoll, disabled = false, title }) {
   return (
     <button
@@ -766,18 +773,18 @@ export function BadgeTiroColpire({ bonus, colore, onRoll, disabled = false, titl
       disabled={disabled}
       onClick={() => { if (!disabled) onRoll?.(); }}
     >
-      🎯 {conSegno(Number(bonus) || 0)}
+      {t('badge.attacco')} {conSegno(Number(bonus) || 0)}
     </button>
   );
 }
 
 /**
- * Badge "pillola" del TIRO DEI DANNI (💥 1d6 Perforante 🎲), condiviso tra
- * Trucchetti/Incantesimi e Combattimento/Azioni Bonus/Reazioni. Con
- * `critico` diventa pieno (sfondo oro) con ⚔️: il prossimo tiro raddoppia i dadi.
+ * Badge "pillola" del TIRO DEI DANNI (🗡️ 1d6 Perforante), condiviso tra
+ * Trucchetti/Incantesimi e Combattimento/Azioni Bonus/Reazioni. L'unica
+ * icona è quella del tipo di danno (💚 per le cure, 💥 se il tipo non è noto).
+ * Con `critico` diventa pieno (sfondo oro) con ⚔️: il prossimo tiro raddoppia i dadi.
  */
 export function BadgeTiroDanno({ danno, tipoDanno, critico = false, onRoll, disabled = false, title, colore }) {
-  const cura = tipoDanno === 'Guarigione';
   const tinta = colore || C.red;
   return (
     <button
@@ -799,14 +806,13 @@ export function BadgeTiroDanno({ danno, tipoDanno, critico = false, onRoll, disa
       disabled={disabled}
       onClick={() => { if (!disabled) onRoll?.(); }}
     >
-      {critico ? '⚔️' : cura ? '💚' : '💥'} {danno}{tipoDanno ? ` ${tipoDanno}` : ''}
-      <span aria-hidden style={{ fontSize: 11, opacity: 0.6 }}>🎲</span>
+      <span aria-hidden="true">{iconaTipoDanno(tipoDanno, critico)}</span> {danno}{tipoDanno ? ` ${tipoDanno}` : ''}
     </button>
   );
 }
 
 /**
- * Badge "pillola" della CD di un incantesimo a TIRO SALVEZZA (🎲 Costituzione
+ * Badge "pillola" della CD di un incantesimo a TIRO SALVEZZA (Costituzione
  * · CD 17): lo tira il bersaglio, non chi lancia, quindi non è cliccabile e
  * prende il posto del tiro per colpire (che per questi incantesimi non esiste).
  */
@@ -827,7 +833,7 @@ export function BadgeTiroSalvezza({ cd, caratteristica, colore, title }) {
       }}
       title={title || `Tiro salvezza${caratteristica ? ` su ${caratteristica}` : ''}: CD ${cd}`}
     >
-      🎲 {caratteristica ? `${caratteristica} · ` : ''}CD {cd}
+      {caratteristica ? `${caratteristica} · ` : ''}CD {cd}
     </span>
   );
 }

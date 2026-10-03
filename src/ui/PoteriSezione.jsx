@@ -126,14 +126,14 @@ function PotereCard({ potere, scheda, indice, totale, onApri, lingua }) {
               style={{ ...styles.buttonMini, fontSize: 11 }}
               onClick={() => { onApri(potere.id, { tipo: 'aggiungi-contatore' }); setSceltaEffetto(false); }}
             >
-              ➕ {lingua === 'en' ? 'Counter' : 'Contatore'}
+              {lingua === 'en' ? 'Counter' : 'Contatore'}
             </button>
             <button
               type="button"
               style={{ ...styles.buttonMini, fontSize: 11 }}
               onClick={() => { onApri(potere.id, { tipo: 'aggiungi-modificatore' }); setSceltaEffetto(false); }}
             >
-              ➕ {lingua === 'en' ? 'Modifier' : 'Modificatore'}
+              {lingua === 'en' ? 'Modifier' : 'Modificatore'}
             </button>
           </span>
         ) : (
@@ -143,7 +143,7 @@ function PotereCard({ potere, scheda, indice, totale, onApri, lingua }) {
             onClick={(e) => { e.stopPropagation(); setSceltaEffetto(true); }}
             title={lingua === 'en' ? 'Add an effect (counter or modifier)' : 'Aggiungi un effetto (contatore o modificatore)'}
           >
-            ➕ {lingua === 'en' ? 'Add…' : 'Aggiungi…'}
+            {lingua === 'en' ? 'Add…' : 'Aggiungi…'}
           </button>
         )}
       </div>
@@ -227,7 +227,7 @@ function PotereModal({ potere, indice, totale, onChiudi, onAggiorna, onElimina, 
             </div>
           ))}
           <button type="button" style={{ ...styles.buttonMini, borderStyle: 'dashed' }} onClick={aggiungiContatore}>
-            ➕ {lingua === 'en' ? 'Add counter' : 'Aggiungi contatore'}
+            {lingua === 'en' ? 'Add counter' : 'Aggiungi contatore'}
           </button>
         </div>
 
@@ -270,7 +270,7 @@ function PotereModal({ potere, indice, totale, onChiudi, onAggiorna, onElimina, 
             </div>
           ))}
           <button type="button" style={{ ...styles.buttonMini, borderStyle: 'dashed' }} onClick={aggiungiModificatore}>
-            ➕ {lingua === 'en' ? 'Add modifier' : 'Aggiungi modificatore'}
+            {lingua === 'en' ? 'Add modifier' : 'Aggiungi modificatore'}
           </button>
         </div>
 
@@ -354,11 +354,11 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it' }) {
     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px' }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(28px, 1fr) auto minmax(28px, 1fr)', alignItems: 'center', columnGap: 6, marginBottom: 8 }}>
         <div />
-        <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'center' }} title={lingua === 'en' ? 'For rules invented at the table (not in the official books): pacts, blessings, curses, magic items with custom effects...' : 'Per le regole inventate al tavolo (non nei manuali ufficiali): patti, benedizioni, maledizioni, oggetti magici con effetti custom...'}>
-          ✨ {lingua === 'en' ? 'Powers' : 'Poteri'} <span style={{ textTransform: 'none', fontWeight: 500, letterSpacing: 'normal', color: C.inkDim, fontSize: 11 }}>({lingua === 'en' ? 'homebrew rules' : 'regole homebrew'})</span>
+        <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, letterSpacing: 0.5, textAlign: 'center' }} title={lingua === 'en' ? 'For rules invented at the table (not in the official books): pacts, blessings, curses, magic items with custom effects...' : 'Per le regole inventate al tavolo (non nei manuali ufficiali): patti, benedizioni, maledizioni, oggetti magici con effetti custom...'}>
+          {lingua === 'en' ? 'Powers' : 'Poteri'} <span style={{ textTransform: 'none', fontWeight: 500, letterSpacing: 'normal', color: C.inkDim, fontSize: 11 }}>({lingua === 'en' ? 'homebrew rules' : 'regole homebrew'})</span>
         </div>
         <button type="button" style={{ ...styles.buttonMini, borderStyle: 'dashed', justifySelf: 'end' }} onClick={aggiungiPotere}>
-          ➕ {lingua === 'en' ? 'Add power' : 'Aggiungi potere'}
+          {lingua === 'en' ? 'Add power' : 'Aggiungi potere'}
         </button>
       </div>
 
