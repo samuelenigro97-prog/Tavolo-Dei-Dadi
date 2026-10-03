@@ -25,9 +25,16 @@ const scriveVersionJson = {
   },
 };
 
+// Base dell'app. Su GitHub Pages l'app vive in /<nome del repo>/ e il percorso
+// distingue le maiuscole (oggi /Tavolo-Dei-Dadi/). In GitHub Actions la base si
+// ricava da GITHUB_REPOSITORY, che riporta sempre il nome attuale del repo: così
+// una rinomina non lascia più la pagina bianca e vale anche se BASE_PATH nel
+// workflow è rimasto quello vecchio. In locale ./ funziona ovunque.
+const nomeRepo = (process.env.GITHUB_ACTIONS && process.env.GITHUB_REPOSITORY || '').split('/')[1];
+const BASE = nomeRepo ? `/${nomeRepo}/` : (process.env.BASE_PATH || './');
+
 export default defineConfig({
-  // su GitHub Pages l'app vive in /tavolo-dei-dadi/ o root, con ./ funziona ovunque
-  base: process.env.BASE_PATH || './',
+  base: BASE,
   define: { __BUILD_ID__: JSON.stringify(BUILD_ID) },
   build: {
     chunkSizeWarningLimit: 600,

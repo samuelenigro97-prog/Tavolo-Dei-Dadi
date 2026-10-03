@@ -227,6 +227,14 @@ ricarica con query cache-busting (soluzione "nucleare" per client bloccati su
 una versione vecchia). Manifest e service worker sono generati alla build; le
 richieste `/api` sono escluse dalla cache. Icone in `public/icona-*.png`.
 
+Indirizzo: https://samuelenigro97-prog.github.io/Tavolo-Dei-Dadi/ (repo
+rinominato in `Tavolo-Dei-Dadi` il 03/10/2026). Il percorso di Pages distingue
+le maiuscole: la base della build deve coincidere esattamente con il nome
+del repo, altrimenti la pagina resta bianca (asset 404). In GitHub Actions
+`vite.config.js` la ricava da `GITHUB_REPOSITORY` (ha la precedenza su
+`BASE_PATH` del workflow, che è ancora `/tavolo-dei-dadi/`: modificarlo
+richiede un token con scope `workflow`).
+
 Distribuzione attuale: solo **PWA via web** (GitHub Pages), non è pubblicata
 su Google Play / Apple App Store. Portarla su uno store richiederebbe un
 wrapper nativo (es. Trusted Web Activity su Android via Bubblewrap, o Capacitor

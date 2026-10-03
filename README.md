@@ -1,12 +1,12 @@
 # 🎲 Tavolo dei Dadi
 
-[![Licenza MIT](https://img.shields.io/github/license/samuelenigro97-prog/tavolo-dei-dadi)](LICENSE.md)
-[![Deploy](https://github.com/samuelenigro97-prog/tavolo-dei-dadi/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/samuelenigro97-prog/tavolo-dei-dadi/actions/workflows/deploy.yml)
-[![Release](https://img.shields.io/github/v/release/samuelenigro97-prog/tavolo-dei-dadi?display_name=tag&sort=semver)](https://github.com/samuelenigro97-prog/tavolo-dei-dadi/releases)
+[![Licenza MIT](https://img.shields.io/github/license/samuelenigro97-prog/Tavolo-Dei-Dadi)](LICENSE.md)
+[![Deploy](https://github.com/samuelenigro97-prog/Tavolo-Dei-Dadi/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/samuelenigro97-prog/Tavolo-Dei-Dadi/actions/workflows/deploy.yml)
+[![Release](https://img.shields.io/github/v/release/samuelenigro97-prog/Tavolo-Dei-Dadi?display_name=tag&sort=semver)](https://github.com/samuelenigro97-prog/Tavolo-Dei-Dadi/releases)
 
 Scheda del personaggio D&D 5e interattiva con tiratore di dadi integrato, nel
 formato della scheda ufficiale 2024, tema "vecchio manuale" (chiaro o scuro).
-Provala online: <https://samuelenigro97-prog.github.io/tavolo-dei-dadi/>.
+Provala online: <https://samuelenigro97-prog.github.io/Tavolo-Dei-Dadi/>.
 
 La scheda È l'interfaccia: **1 click modifica un valore, tieni premuto (o
 doppio click/tap) tira il dado**.

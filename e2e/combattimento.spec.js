@@ -58,12 +58,16 @@ test.describe('Combattimento', () => {
     await expect(page.getByText(/Nessun attacco\/incantesimo ad azione bonus/)).toHaveCount(0);
   });
 
-  test('la gittata è sempre il primo chip dopo il nome (anche per Inaridire, che ha solo la CD nella nota)', async ({ page }) => {
-    const primoChip = (nome) => page.locator('tr.attacchi-riga').filter({ hasText: nome }).locator('.attacchi-note span').first();
-    await expect(primoChip('Inaridire')).toHaveText(/🎯\s*9m/);
-    await expect(primoChip('Randello Incantato')).toHaveText(/🎯\s*Tocco/);
-    await expect(primoChip('Morsa del Gelo')).toHaveText(/🎯\s*18m/);
-    await expect(primoChip('Parola di Guarigione')).toHaveText(/🎯\s*18m/);
+  test('il tempo di lancio è il primo chip dopo il nome, subito seguito dalla gittata (anche per Inaridire, che ha solo la CD nella nota)', async ({ page }) => {
+    const chip = (nome, i) => page.locator('tr.attacchi-riga').filter({ hasText: nome }).locator('.attacchi-note span').nth(i);
+    await expect(chip('Inaridire', 0)).toHaveClass(/chip-tempo/);
+    await expect(chip('Inaridire', 1)).toHaveText(/🎯\s*9m/);
+    await expect(chip('Randello Incantato', 0)).toHaveText(/⏱\s*Azione Bonus/);
+    await expect(chip('Randello Incantato', 1)).toHaveText(/🎯\s*Tocco/);
+    await expect(chip('Morsa del Gelo', 0)).toHaveClass(/chip-tempo/);
+    await expect(chip('Morsa del Gelo', 1)).toHaveText(/🎯\s*18m/);
+    await expect(chip('Parola di Guarigione', 0)).toHaveClass(/chip-tempo/);
+    await expect(chip('Parola di Guarigione', 1)).toHaveText(/🎯\s*18m/);
   });
 
   test('tiro per colpire e danni usano gli stessi badge di Trucchetti/Incantesimi', async ({ page }) => {

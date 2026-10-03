@@ -1,7 +1,7 @@
 # Continua qui — stato reale di Tavolo dei Dadi
 
 Aggiornato il **03 settembre 2026**. Ultima versione pubblicata e verificata online: **v4.0.80**.
-App: https://samuelenigro97-prog.github.io/tavolo-dei-dadi/
+App: https://samuelenigro97-prog.github.io/Tavolo-Dei-Dadi/
 
 > Si lavora anche con altre IA sul repository. Prima di modificare o pubblicare:
 > controllare branch, modifiche locali e ultimo `main`; non sovrascrivere lavoro
@@ -255,7 +255,8 @@ riproducibili; non va riaperto soltanto per prudenza.
 - Diario di sessione.
 - QR code facoltativo per link o codice stanza.
 - Valutare il nuovo nome pubblico dell'app solo dopo che l'utente avrà scelto
-  quello definitivo; il repository può restare `tavolo-dei-dadi`.
+  quello definitivo; il repository può restare `Tavolo-Dei-Dadi` (rinominato
+  così il 03/10/2026, prima era `tavolo-dei-dadi`).
 - Verificare e documentare l'attivazione online del Worker PDF→JSON; non
   considerarla conclusa soltanto perché il codice del Worker è presente.
 

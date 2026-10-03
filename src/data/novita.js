@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.46.1',
+    voci: {
+      it: [
+        'Nuovo indirizzo dell\'app: https://samuelenigro97-prog.github.io/Tavolo-Dei-Dadi/ (con le maiuscole). Il vecchio indirizzo in minuscolo non funziona più: se avevi installato l\'app da lì, aprila dal nuovo indirizzo e reinstallala. Personaggi e impostazioni restano gli stessi.',
+      ],
+      en: [
+        'New app address: https://samuelenigro97-prog.github.io/Tavolo-Dei-Dadi/ (capitalized). The old lowercase address no longer works: if you installed the app from there, open it from the new address and install it again. Characters and settings stay the same.',
+      ],
+    },
+  },
+  {
     versione: '4.46.0',
     voci: {
       it: [

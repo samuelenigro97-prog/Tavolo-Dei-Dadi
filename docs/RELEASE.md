@@ -11,7 +11,7 @@ In attesa di poter automatizzare via GitHub Actions, usa questa checklist.
 2. `npm test`
 3. `npm run build`
 4. Se è una release visibile, verifica che `APP_VERSION` sia stato alzato.
-5. Verifica l'app deployata: https://samuelenigro97-prog.github.io/tavolo-dei-dadi/
+5. Verifica l'app deployata: https://samuelenigro97-prog.github.io/Tavolo-Dei-Dadi/
 6. Crea tag semver, es. `v2.89.0`.
 7. Crea la GitHub Release dal tag e carica `tavolo-dei-dadi-dist.zip`.
 8. Nel corpo release copia la sezione corrispondente da `CHANGELOG.md`.

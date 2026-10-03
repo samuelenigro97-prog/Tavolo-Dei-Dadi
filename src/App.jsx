@@ -1954,7 +1954,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.46.0';
+const APP_VERSION = '4.46.1';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -7948,7 +7948,7 @@ export default function App() {
                   <span>☕</span> <span>{t('menu.sostieni')}</span>
                 </button>
                 <a
-                  href="https://github.com/samuelenigro97-prog/tavolo-dei-dadi"
+                  href="https://github.com/samuelenigro97-prog/Tavolo-Dei-Dadi"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ ...styles.button, textDecoration: 'none', width: '100%', height: 38, minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0 6px', fontSize: 13, boxSizing: 'border-box' }}

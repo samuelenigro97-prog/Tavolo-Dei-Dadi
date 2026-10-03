@@ -2,6 +2,25 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.46.1] – 2026-10-03
+
+### Corretto
+- **Sito di nuovo online dopo la rinomina del repository** in
+  `Tavolo-Dei-Dadi`: GitHub Pages ora serve l'app da
+  `/Tavolo-Dei-Dadi/` (il percorso distingue le maiuscole), ma la build
+  cercava ancora i file in `/tavolo-dei-dadi/` e la pagina restava bianca.
+  Ora `vite.config.js`, in GitHub Actions, ricava la base dal nome attuale
+  del repo (`GITHUB_REPOSITORY`), con precedenza sul `BASE_PATH` del
+  workflow: una futura rinomina non rompe più il sito. Aggiornati anche i link a
+  repository e sito (README, link GitHub nel menu, documenti in `docs/`).
+  Il vecchio indirizzo in minuscolo non funziona più: chi aveva installato
+  la PWA da lì deve aprirla dal nuovo indirizzo e reinstallarla. I dati
+  (localStorage e IndexedDB) sono legati all'origine
+  `samuelenigro97-prog.github.io`, non al percorso, quindi restano.
+- Test e2e riallineati alle modifiche del 02/10: il pulsante della guida
+  iniziale ora si chiama "Inizia a giocare" e in Combattimento il chip del
+  tempo di lancio precede quello della gittata.
+
 ## [4.46.0] – 2026-09-30
 
 Applicate a Combattimento e Incantesimi le indicazioni del mockup
