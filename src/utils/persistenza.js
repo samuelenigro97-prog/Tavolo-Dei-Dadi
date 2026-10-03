@@ -18,6 +18,53 @@ export function salvaJson(storage, chiave, valore) {
   }
 }
 
+export const CHIAVE_SNAPSHOT = 'scheda-interattiva:snapshots';
+export const GIORNI_PROMEMORIA_BACKUP = 7;
+
+function eQuotaEsaurita(nome) {
+  return nome === 'QuotaExceededError' || nome === 'NS_ERROR_DOM_QUOTA_REACHED';
+}
+
+/**
+ * Come salvaJson, ma se il browser è pieno libera spazio sacrificando gli
+ * snapshot automatici più vecchi (sono copie di emergenza, il roster vale di
+ * più) e riprova. Restituisce anche quanti snapshot sono stati rimossi.
+ */
+export function salvaJsonLiberandoSpazio(storage, chiave, valore, chiaveSnapshot = CHIAVE_SNAPSHOT) {
+  let esito = salvaJson(storage, chiave, valore);
+  if (esito.ok || !eQuotaEsaurita(esito.errore)) return esito;
+  let snapshot;
+  try { snapshot = JSON.parse(storage.getItem(chiaveSnapshot) || '[]'); } catch { snapshot = []; }
+  if (!Array.isArray(snapshot)) snapshot = [];
+  let rimossi = 0;
+  while (snapshot.length > 0) {
+    const tieni = Math.floor(snapshot.length / 2);
+    rimossi += snapshot.length - tieni;
+    snapshot = snapshot.slice(0, tieni);
+    try {
+      if (snapshot.length) storage.setItem(chiaveSnapshot, JSON.stringify(snapshot));
+      else storage.removeItem(chiaveSnapshot);
+    } catch { /* se nemmeno questo riesce, si prova comunque a salvare */ }
+    esito = salvaJson(storage, chiave, valore);
+    if (esito.ok) return { ...esito, snapshotRimossi: rimossi };
+  }
+  return { ...esito, snapshotRimossi: rimossi };
+}
+
+/**
+ * Decide se mostrare il promemoria "fai un backup". Con la sincronizzazione
+ * cloud attiva i dati hanno già una copia altrove, quindi non serve; senza,
+ * lo si ricorda ogni GIORNI_PROMEMORIA_BACKUP giorni, rispettando il "Più tardi".
+ */
+export function deveRicordareBackup({ ultimoBackup = 0, snoozeFino = 0, primoAvvio = 0, ora = Date.now(), pgReali = 0, syncAttivo = false, giorni = GIORNI_PROMEMORIA_BACKUP } = {}) {
+  if (syncAttivo || pgReali < 1) return false;
+  if (ora < (Number(snoozeFino) || 0)) return false;
+  // Mai fatto un backup: si conta dal primo avvio (chi ha appena installato
+  // l'app non ha ancora nulla da perdere); senza data, si ricorda subito.
+  const riferimento = Number(ultimoBackup) || Number(primoAvvio) || 0;
+  return !riferimento || (ora - riferimento) > giorni * 24 * 3600 * 1000;
+}
+
 /**
  * Gli snapshot sono copie di emergenza frequenti: duplicare al loro interno le
  * immagini base64 esaurirebbe rapidamente la quota del browser. Le immagini

@@ -1,7 +1,7 @@
 // Componenti di presentazione riusabili (campi editabili, tendine, liste, sezioni).
 // Estratti da App.jsx: ricevono tutto via props, non conoscono lo stato dell'app.
 import { useEffect, useId, useRef, useState } from 'react';
-import { t, traduciDato } from '../i18n';
+import { t, tr, traduciDato, traduciCaratteristica } from '../i18n';
 import { C } from './tema.js';
 import { styles } from './stili.js';
 import { formattaTitoloVoce } from '../rules/scheda.js';
@@ -226,7 +226,7 @@ export function Editable({ value, valoreModifica, onChange, onRoll, tipo = 'test
   }
 
   return (
-    <span
+    <span role="button" tabIndex={0}
       className={[onRoll ? 'tirabile' : '', carica ? 'carica' : ''].filter(Boolean).join(' ') || undefined}
       style={{
         ...styles.editable,
@@ -234,7 +234,7 @@ export function Editable({ value, valoreModifica, onChange, onRoll, tipo = 'test
         textAlign: tipo === 'numero' ? 'center' : 'left',
         ...style,
       }}
-      title={title || (onRoll ? 'Clic: modifica · tieni premuto o doppio clic: tira' : 'Clicca per modificare')}
+      title={title || (onRoll ? tr('Clic: modifica · tieni premuto o doppio clic: tira', 'Click: edit · long-press or double-click: roll') : tr('Clicca per modificare', 'Click to edit'))}
       onPointerDown={onRoll ? pointerDown : undefined}
       onPointerUp={onRoll ? pointerUp : undefined}
       onPointerLeave={onRoll ? pointerAnnulla : undefined}
@@ -295,7 +295,7 @@ export function Rollable({ onRoll, children, style, title, as: Tag = 'span' }) {
         display: Tag === 'span' ? 'inline-block' : undefined,
         ...style,
       }}
-      title={title || 'Tieni premuto e rilascia (o doppio clic): tira'}
+      title={title || tr('Tieni premuto e rilascia (o doppio clic): tira', 'Long-press and release (or double-click): roll')}
       onSelectStart={(e) => e.preventDefault()}
       onPointerDown={inizia}
       onPointerUp={rilascia}
@@ -364,7 +364,7 @@ export function CampoConTendina({ value, opzioni, onChange, width, title, lookup
         const sp = lookup && setInfo ? lookup(t) : null;
         return (
         <span key={t} title={sp || t} style={chip}>
-          <span
+          <span role={sp ? 'button' : undefined} tabIndex={sp ? 0 : undefined}
             style={{ overflow: 'hidden', textOverflow: 'ellipsis', ...(sp ? { cursor: 'help', textDecoration: 'underline dotted', textUnderlineOffset: 3 } : {}) }}
             onClick={sp ? () => setInfo({ titolo: traduciDato(t), testo: sp }) : undefined}
           >{mostraVoce(t)}</span>
@@ -372,7 +372,7 @@ export function CampoConTendina({ value, opzioni, onChange, width, title, lookup
             type="button"
             style={{ background: 'transparent', border: 'none', color: '#c0392b', cursor: 'pointer', padding: 0, fontSize: 13, lineHeight: 1, fontWeight: 'bold' }}
             onClick={() => rimuovi(t)}
-            title={`Rimuovi ${t}`}
+            title={tr(`Rimuovi ${t}`, `Remove ${t}`)}
           >
             ×
           </button>
@@ -556,7 +556,7 @@ export function ListaQuadratini({ value, onChange, lookup, placeholder, opzioni,
   return (
     <>
       <div style={{ display: 'flex', flexWrap: unicaRiga ? 'nowrap' : 'wrap', gap: 6, overflowX: unicaRiga ? 'auto' : 'visible', paddingBottom: unicaRiga ? 4 : 0 }}>
-        {righe.length === 0 && <span style={{ ...styles.detail, fontStyle: 'italic' }}>{placeholder || 'Nessuna voce.'}</span>}
+        {righe.length === 0 && <span style={{ ...styles.detail, fontStyle: 'italic' }}>{placeholder || tr('Nessuna voce.', 'No entries.')}</span>}
         {righe.map((r, i) => {
           const { nome, desc } = estraiNomeVoce(r);
           const cleanNome = nome.replace(/\s*\(.*$/, '').trim();
@@ -574,7 +574,7 @@ export function ListaQuadratini({ value, onChange, lookup, placeholder, opzioni,
               {isMagiaSelvaggia && (
                 <button
                   style={{ ...chip, background: C.gold, color: '#fff', borderLeft: '1px solid rgba(0,0,0,0.1)', borderTopLeftRadius: 0, borderBottomLeftRadius: 0, paddingLeft: 6, paddingRight: 6 }}
-                  title="Tira 1d100 (Impulso di Magia Selvaggia)"
+                  title={tr('Tira 1d100 (Impulso di Magia Selvaggia)', 'Roll 1d100 (Wild Magic Surge)')}
                   onClick={(e) => {
                     e.stopPropagation();
                     onRoll("Impulso di Magia Selvaggia", "1d100");
@@ -595,7 +595,7 @@ export function ListaQuadratini({ value, onChange, lookup, placeholder, opzioni,
         >
           <div style={{ ...styles.panel, maxWidth: 420, width: '100%' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <strong style={{ color: C.goldDark, fontSize: 16 }}>{edit.index === -1 ? 'Nuova voce' : 'Voce'}</strong>
+              <strong style={{ color: C.goldDark, fontSize: 16 }}>{edit.index === -1 ? tr('Nuova voce', 'New entry') : tr('Voce', 'Entry')}</strong>
               <button style={styles.buttonMini} onClick={() => setEdit(null)} title={t('tip.chiudi')}>✕</button>
             </div>
             {spEdit && (
@@ -615,7 +615,7 @@ export function ListaQuadratini({ value, onChange, lookup, placeholder, opzioni,
                     value={listaOpzioni.some((o) => o.nome === edit.valore) ? edit.valore : ''}
                     onChange={(e) => setEdit({ ...edit, valore: e.target.value })}
                   >
-                    <option value="">(Scegli dalla lista)</option>
+                    <option value="">{tr('(Scegli dalla lista)', '(Pick from the list)')}</option>
                     {listaOpzioni.map((o) => (
                       <option key={o.nome} value={o.nome}>{o.desc ? `${o.nome}: ${o.desc}` : o.nome}</option>
                     ))}
@@ -625,7 +625,7 @@ export function ListaQuadratini({ value, onChange, lookup, placeholder, opzioni,
                   autoFocus={listaOpzioni.length === 0}
                   style={{ ...styles.inlineInput, width: '100%', padding: '8px 10px', fontSize: 15, boxSizing: 'border-box' }}
                   value={edit.valore}
-                  placeholder={listaOpzioni.length > 0 ? '…oppure scrivi un nome libero' : 'Nome della voce'}
+                  placeholder={listaOpzioni.length > 0 ? tr('…oppure scrivi un nome libero', '…or type any name') : tr('Nome della voce', 'Entry name')}
                   list={listaOpzioni.length > 0 ? listId : undefined}
                   onChange={(e) => setEdit({ ...edit, valore: e.target.value })}
                   onKeyDown={(e) => { if (e.key === 'Enter') conferma(); }}
@@ -806,7 +806,7 @@ export function BadgeTiroDanno({ danno, tipoDanno, critico = false, onRoll, disa
       disabled={disabled}
       onClick={() => { if (!disabled) onRoll?.(); }}
     >
-      <span aria-hidden="true">{iconaTipoDanno(tipoDanno, critico)}</span> {danno}{tipoDanno ? ` ${tipoDanno}` : ''}
+      <span aria-hidden="true">{iconaTipoDanno(tipoDanno, critico)}</span> {danno}{tipoDanno ? ` ${traduciDato(tipoDanno)}` : ''}
     </button>
   );
 }
@@ -831,9 +831,11 @@ export function BadgeTiroSalvezza({ cd, caratteristica, colore, title }) {
         whiteSpace: 'nowrap',
         cursor: 'help',
       }}
-      title={title || `Tiro salvezza${caratteristica ? ` su ${caratteristica}` : ''}: CD ${cd}`}
+      title={title || (caratteristica
+        ? tr(`Tiro salvezza su ${caratteristica}: CD ${cd}`, `${traduciCaratteristica(caratteristica)} saving throw: DC ${cd}`)
+        : tr(`Tiro salvezza: CD ${cd}`, `Saving throw: DC ${cd}`))}
     >
-      {caratteristica ? `${caratteristica} · ` : ''}CD {cd}
+      {caratteristica ? `${traduciCaratteristica(caratteristica)} · ` : ''}{tr('CD', 'DC')} {cd}
     </span>
   );
 }

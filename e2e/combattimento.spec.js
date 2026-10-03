@@ -161,7 +161,9 @@ test.describe('Combattimento', () => {
   });
 
   test('Assorbire Elementi (danno sul prossimo colpo in mischia) non ha il badge del tiro per colpire', async ({ page }) => {
-    const riga = page.getByRole('button', { name: 'Assorbire Elementi', exact: true }).locator('xpath=ancestor::*[.//*[contains(@class, "badge-tiro-danno")]][1]');
+    // Solo il vero <button> del nome: dalla v4.48.0 anche il campo modificabile
+    // (span role="button") ha lo stesso nome accessibile.
+    const riga = page.getByRole('button', { name: 'Assorbire Elementi', exact: true }).and(page.locator('button')).locator('xpath=ancestor::*[.//*[contains(@class, "badge-tiro-danno")]][1]');
     await expect(riga.locator('.badge-tiro-danno')).toHaveCount(1);
     await expect(riga.locator('.badge-tiro-colpire')).toHaveCount(0);
   });

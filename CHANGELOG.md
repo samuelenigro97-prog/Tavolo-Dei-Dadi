@@ -2,6 +2,67 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.48.0] – 2026-10-03
+
+### Aggiunto
+- **Promemoria backup visibile quando la sincronizzazione è spenta**: un
+  banner in alto (non più solo nel pannello Avvisi) ricorda di scaricare un
+  backup se non se ne fa uno da oltre 7 giorni, con "Scarica backup",
+  "Attiva la sincronizzazione", "Più tardi" (3 giorni) e ✕ (fino al
+  prossimo avvio). Con la sincronizzazione attiva tace; si ricontrolla ogni
+  ora; per chi installa l'app ora il conto parte dal primo avvio. Logica in
+  `deveRicordareBackup` (`src/utils/persistenza.js`).
+- **Spazio del browser pieno**: se il salvataggio fallisce per quota
+  esaurita, l'app sacrifica prima gli snapshot automatici più vecchi e
+  riprova (`salvaJsonLiberandoSpazio`); se ancora non basta mostra un avviso
+  rosso (`role="alert"`) con "Scarica backup". Prima l'errore veniva
+  calcolato ma mai mostrato. All'avvio si chiede anche
+  `navigator.storage.persist()`, così il browser non svuota i dati quando lo
+  spazio scarseggia.
+- **Tastiera**: Escape chiude il livello in cima (Menu Hub, menu iniziale,
+  modali, menu a tendina) come un tocco sullo sfondo; nei campi di testo il
+  primo Escape esce dal campo. Chip, badge e intestazioni cliccabili (circa
+  40 elementi `span`/`div`) hanno `role="button"`, sono raggiungibili con
+  Tab e si attivano con Invio/Spazio (`src/utils/accessibilita.js`).
+
+### Cambiato
+- **App più leggera da installare**: audio (~9 MB) e sfondi delle
+  ambientazioni (~14 MB) non sono più nella precache del service worker
+  (da 71 voci / ~24,8 MB a 16 voci / ~2,2 MB). Si scaricano al primo uso e
+  restano in cache (CacheFirst, con supporto Range per l'audio); al primo
+  ascolto di un loop se ne scarica una copia completa in sottofondo così
+  funziona anche offline.
+- **Menu iniziale solo al primo avvio**: non si riapre più a ogni apertura
+  se il personaggio attivo è vuoto (flag
+  `scheda-interattiva:menu-iniziale-visto`); resta raggiungibile dal Menu.
+- **Pulsanti più grandi sulle righe incantesimo** su touch (Prep., Elimina,
+  Aggiungi, Evoca, Metamorfosi…): almeno 36×44 px e più distanziati.
+- **Traduzione inglese completata per l'interfaccia**: chip di lancio,
+  gittata e area ("1 Azione" → "1 Action", "Tocco" → "Touch", "Sfera" →
+  "Sphere"), tipo di danno e caratteristica dei riquadri di tiro
+  ("Costituzione · CD 17" → "Constitution · DC 17"), circa 240 messaggi,
+  toast, stati della sincronizzazione, titoli e aria-label rimasti in
+  italiano, monete (MO → GP), tooltip della taglia. Nuove funzioni `tr()` e
+  `traduciCaratteristica()` in `src/i18n.js`.
+
+### Corretto
+- **Combattimento su telefono**: i chip "Disponibile" e "Inneschi e
+  reazioni" non si sovrappongono più al titolo "Reazioni" (vanno su una
+  riga propria sotto il titolo); i chip di innesco ed effetto delle
+  reazioni vanno a capo invece di essere tagliati.
+
+### Manutenzione
+- Rimossi i file di istruzioni per agenti AI di terze parti aggiunti con
+  l'"antislop" (`skills/`, `anti-slop/`, `antislop.md`, script Python) e i
+  relativi blocchi in `CLAUDE.md`/`GEMINI.md`; le istruzioni proprie del
+  progetto restano.
+- `npm test` funziona anche con Node 20 (`node --test test/*.test.mjs`).
+- Ripristinati alcuni commenti esplicativi tolti in precedenza: regola dei
+  dadi vita, protezione dai conflitti di sincronizzazione, archivio DM,
+  mappa della campagna, effetti sonori.
+- Nuovi test: unitari per salvataggio con quota esaurita, promemoria
+  backup, Escape/tastiera, `tr()`; e2e in `e2e/robustezza.spec.js`.
+
 ## [4.47.0] – 2026-10-03
 
 ### Cambiato

@@ -73,3 +73,30 @@ test('i18n: nessuna etichetta finisce con ":" (i due punti li mette il layout)',
   const doppie = conDuePunti.filter((k) => new RegExp(`t\\(['"]${k.replace(/\./g, '\\.')}['"]\\)\\}\\s*:`).test(app));
   assert.deepEqual(doppie, [], `queste chiavi producono due volte i due punti: ${doppie.join(', ')}`);
 });
+
+test('i18n: tr() sceglie il testo nella lingua attiva', async () => {
+  const { tr, setLinguaAttuale } = await import('../src/i18n.js');
+  setLinguaAttuale('en');
+  assert.equal(tr('Salva', 'Save'), 'Save');
+  assert.equal(tr('Solo IT'), 'Solo IT', 'senza inglese resta l\'italiano');
+  setLinguaAttuale('it');
+  assert.equal(tr('Salva', 'Save'), 'Salva');
+});
+
+test('i18n: chip di lancio, gittata, area e caratteristiche tradotti in inglese', async () => {
+  const { traduciDato, traduciCaratteristica, setLinguaAttuale } = await import('../src/i18n.js');
+  setLinguaAttuale('en');
+  try {
+    assert.equal(traduciDato('1 Azione'), '1 Action');
+    assert.equal(traduciDato('Azione Bonus'), 'Bonus Action');
+    assert.equal(traduciDato('Reazione'), 'Reaction');
+    assert.equal(traduciDato('Tocco'), 'Touch');
+    assert.equal(traduciDato('Sfera'), 'Sphere');
+    assert.equal(traduciDato('Guarigione'), 'Healing');
+    assert.equal(traduciCaratteristica('Forza'), 'Strength');
+    assert.equal(traduciCaratteristica('Costituzione'), 'Constitution');
+  } finally {
+    setLinguaAttuale('it');
+  }
+  assert.equal(traduciCaratteristica('Forza'), 'Forza');
+});

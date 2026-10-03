@@ -2,7 +2,7 @@ import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from 'react-dom';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { ICONE_CLASSE, ICONE_SPECIE, GALLERIA_BESTIE_PRESET, generaAvatarBestia } from "./ritratti";
-import { t, setLinguaAttuale, traduciDato } from "./i18n";
+import { t, tr, setLinguaAttuale, traduciDato } from "./i18n";
 import { avviaAmbiente, fermaAmbiente, setVolumeAmbiente, eseguiEffettoSonoro, sbloccaAudio, precaricaSfx } from './utils/audioAmbiente';
 import { C, BASE_TEMA, PRESET_COLORI, ambientazioneCasuale } from "./ui/tema.js";
 import { styles, GLOBAL_CSS } from './ui/stili.js';
@@ -20,7 +20,8 @@ import { creaStanza, apriStanza, normalizzaCodiceStanza, formattaCodiceStanza, D
 import { generaCodiceSync, normalizzaCodiceSync, formattaCodiceSync, salvaSync, caricaSync, messaggioErroreSync } from './utils/sync.js';
 import { posizionePopover, stilePopover } from './utils/popover.js';
 import { improntaRoster, decidiSync, riepilogoConflitto, leggiBaseSync, salvaBaseSync, revisioneGist } from './utils/conflittiSync.js';
-import { salvaJson, rosterSenzaImmagini, riagganciaImmagini, salvaImmaginiRoster, caricaImmaginiRoster, rimuoviImmaginePersonaggio, preservaImmaginiSeMancanti } from './utils/persistenza.js';
+import { trovaBackdropInCima, eCampoModificabile, deveAttivareDaTastiera } from './utils/accessibilita.js';
+import { salvaJsonLiberandoSpazio, deveRicordareBackup, rosterSenzaImmagini, riagganciaImmagini, salvaImmaginiRoster, caricaImmaginiRoster, rimuoviImmaginePersonaggio, preservaImmaginiSeMancanti } from './utils/persistenza.js';
 import { datiTabelleBackground, TABELLE_BACKGROUND } from './data/tabelleBackground.js';
 import { CompendioModal } from './ui/CompendioModal.jsx';
 
@@ -100,7 +101,7 @@ function TendinaCompetenzaCustom({
 
   function renderItem(v, i) {
     return (
-      <div
+      <div role="button" tabIndex={0}
         key={v.id || i}
         onClick={() => {
           if (onToggle) onToggle(v.id);
@@ -1311,10 +1312,10 @@ function renderSpiegazioni(testo, lookup, setInfo) {
   if (trovate.length === 0) return null;
   return (
     <div style={{ marginTop: 8, fontSize: 12, borderTop: `1px solid ${C.border}`, paddingTop: 6 }}>
-      <div style={{ ...styles.detail, marginBottom: 3 }}>ⓘ Tocca per la spiegazione:</div>
+      <div style={{ ...styles.detail, marginBottom: 3 }}>{tr('ⓘ Tocca per la spiegazione:', 'ⓘ Tap for the explanation:')}</div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
         {trovate.map(({ r, sp }, i) => (
-          <span
+          <span role="button" tabIndex={0}
             key={i}
             style={{ cursor: 'help', background: 'rgba(0,0,0,0.04)', border: `1px solid ${C.border}`, borderRadius: 6, padding: '2px 7px' }}
             onClick={() => setInfo({ titolo: r, testo: sp })}
@@ -1383,11 +1384,11 @@ const COLORI_CONDIZIONI = {
 // `abbr` è la sigla ufficiale 5e: entra nei riquadri stretti senza troncarsi
 // (il nome per esteso resta nel tooltip).
 const DENARI = [
-  { key: 'mr', label: 'Monete di Rame', abbr: 'MR' },
-  { key: 'ma', label: "Monete d'Argento", abbr: 'MA' },
-  { key: 'me', label: 'Monete di Elettro', abbr: 'ME' },
-  { key: 'mo', label: "Monete d'Oro", abbr: 'MO' },
-  { key: 'mp', label: 'Monete di Platino', abbr: 'MP' },
+  { key: 'mr', label: 'Monete di Rame', abbr: 'MR', labelEn: 'Copper pieces', abbrEn: 'CP' },
+  { key: 'ma', label: "Monete d'Argento", abbr: 'MA', labelEn: 'Silver pieces', abbrEn: 'SP' },
+  { key: 'me', label: 'Monete di Elettro', abbr: 'ME', labelEn: 'Electrum pieces', abbrEn: 'EP' },
+  { key: 'mo', label: "Monete d'Oro", abbr: 'MO', labelEn: 'Gold pieces', abbrEn: 'GP' },
+  { key: 'mp', label: 'Monete di Platino', abbr: 'MP', labelEn: 'Platinum pieces', abbrEn: 'PP' },
 ];
 
 
@@ -1954,7 +1955,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.47.0';
+const APP_VERSION = '4.48.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -2342,6 +2343,8 @@ function loadState() {
   return rosterPredefinito();
 }
 
+const CHIAVE_MENU_INIZIALE_VISTO = 'scheda-interattiva:menu-iniziale-visto';
+
 function saveState(roster) {
   // Protezione di sicurezza: se il roster in memoria è vuoto ma nel localStorage ci sono
   // già personaggi salvati, non sovrascrivere per sbaglio con vuoto.
@@ -2356,7 +2359,8 @@ function saveState(roster) {
       }
     } catch { /* niente */ }
   }
-  return salvaJson(localStorage, STORAGE_KEY, rosterSenzaImmagini(roster));
+  // Se il browser è pieno, sacrifica gli snapshot più vecchi prima di arrendersi.
+  return salvaJsonLiberandoSpazio(localStorage, STORAGE_KEY, rosterSenzaImmagini(roster));
 }
 
 /** Ridimensiona e comprime un'immagine finché resta entro la quota indicata. */
@@ -2807,12 +2811,12 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
   const base = String(url || '').replace(/\/+$/, '');
 
   const carica = async (k) => {
-    if (!base) { setStato('Archivio non configurato in questa build.'); return; }
+    if (!base) { setStato(tr('Archivio non configurato in questa build.', 'Archive not configured in this build.')); return; }
     setStato('carico');
     try {
       const r = await fetch(`${base}/pg?key=${encodeURIComponent(k)}`);
       const d = await r.json();
-      if (!r.ok) { setStato(d.error || `Errore ${r.status}`); return; }
+      if (!r.ok) { setStato(d.error || tr(`Errore ${r.status}`, `Error ${r.status}`)); return; }
       setElenco(d.schede || []);
       setStato('');
       try { localStorage.setItem('scheda-interattiva:dm-key', k); } catch { /* niente */ }
@@ -2830,7 +2834,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
       try {
         const r = await fetch(`${base}/pg/${encodeURIComponent(id)}?key=${encodeURIComponent(chiave)}`);
         if (!r.ok) {
-          let errTxt = `Errore ${r.status}`;
+          let errTxt = tr(`Errore ${r.status}`, `Error ${r.status}`);
           try { const d = await r.json(); if (d?.error) errTxt = d.error; } catch {}
           setStato(errTxt);
           setAprendoId('');
@@ -2873,7 +2877,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
       try {
         const r = await fetch(`${base}/pg/${encodeURIComponent(id)}?key=${encodeURIComponent(chiave)}`);
         if (!r.ok) {
-          let errTxt = `Errore ${r.status}`;
+          let errTxt = tr(`Errore ${r.status}`, `Error ${r.status}`);
           try { const d = await r.json(); if (d?.error) errTxt = d.error; } catch {}
           setStato(errTxt);
           setAprendoId('');
@@ -2912,7 +2916,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
     try {
       const r = await fetch(`${base}/pg/${encodeURIComponent(id)}?key=${encodeURIComponent(chiave)}`);
       if (!r.ok) {
-        let errTxt = `Errore ${r.status}`;
+        let errTxt = tr(`Errore ${r.status}`, `Error ${r.status}`);
         try { const d = await r.json(); if (d?.error) errTxt = d.error; } catch {}
         setDettagliAperti((d2) => ({ ...d2, [id]: { errore: errTxt } }));
         return;
@@ -2932,9 +2936,9 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
       try {
         const r = await fetch(`${base}/pg/${encodeURIComponent(s.id)}?key=${encodeURIComponent(chiave)}`);
         if (!r.ok) {
-          let err = `Errore ${r.status}`;
+          let err = tr(`Errore ${r.status}`, `Error ${r.status}`);
           try { const j = await r.json(); if (j?.error) err = j.error; } catch {}
-          setStato(`Impossibile scaricare la scheda: ${err}`);
+          setStato(tr(`Impossibile scaricare la scheda: ${err}`, `Could not download the sheet: ${err}`));
           return;
         }
         raw = await r.json();
@@ -2965,16 +2969,16 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(dlUrl);
-      setStato(`Scheda "${formattaNomePg(normalized.nome || s.nome)}" esportata.`);
+      setStato(tr(`Scheda "${formattaNomePg(normalized.nome || s.nome)}" esportata.`, `Sheet "${formattaNomePg(normalized.nome || s.nome)}" exported.`));
       setTimeout(() => setStato(''), 4000);
     } catch (e) {
-      setStato(`Errore esportazione: ${e.message}`);
+      setStato(tr(`Errore esportazione: ${e.message}`, `Export error: ${e.message}`));
     }
   };
 
   const eliminaCopia = async (s) => {
-    const nomeFmt = formattaNomePg(s.nome) || 'questa scheda';
-    if (!window.confirm(`Eliminare "${nomeFmt}" (${quando(s.aggiornato)}) dall'Archivio del Master? L'operazione non può essere annullata.`)) return;
+    const nomeFmt = formattaNomePg(s.nome) || tr('questa scheda', 'this sheet');
+    if (!window.confirm(tr(`Eliminare "${nomeFmt}" (${quando(s.aggiornato)}) dall'Archivio del Master? L'operazione non può essere annullata.`, `Delete "${nomeFmt}" (${quando(s.aggiornato)}) from the DM Archive? This cannot be undone.`))) return;
     setStato('carico');
     try {
       const r = await fetch(`${base}/pg/${encodeURIComponent(s.id)}?key=${encodeURIComponent(chiave)}`, {
@@ -2982,7 +2986,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
       });
       if (!r.ok) {
         const d = await r.json().catch(() => ({}));
-        setStato(d.error || `Errore ${r.status}`);
+        setStato(d.error || tr(`Errore ${r.status}`, `Error ${r.status}`));
         return;
       }
       setElenco((el) => (el || []).filter((x) => x.id !== s.id));
@@ -3031,11 +3035,11 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
     >
       <div style={{ ...styles.panel, maxWidth: 640, width: '100%', maxHeight: '88vh', overflowY: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <strong style={{ color: C.goldDark, fontSize: 18 }}>Archivio del Master</strong>
+          <strong style={{ color: C.goldDark, fontSize: 18 }}>{tr('Archivio del Master', 'DM Archive')}</strong>
           <button style={styles.buttonMini} onClick={onChiudi} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
         </div>
         <p style={{ ...styles.detail, marginTop: 0 }}>
-          Le schede inviate dai giocatori. Clicca su <strong>Apri</strong> per consultarne una in sola lettura oppure su <strong>Esporta</strong> per scaricarne il file JSON.
+          {tr('Le schede inviate dai giocatori. Clicca su Apri per consultarne una in sola lettura oppure su Esporta per scaricarne il file JSON.', 'Sheets sent by the players. Click Open to view one read-only, or Export to download its JSON file.')}
         </p>
         <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
           <input
@@ -3047,7 +3051,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
             style={{ ...styles.inlineInput, flex: 1, minWidth: 160, padding: '8px 10px', boxSizing: 'border-box' }}
           />
           <button style={styles.buttonPrimary} onClick={() => carica(chiave)} disabled={stato === 'carico'}>
-            {stato === 'carico' ? '…' : 'Apri elenco'}
+            {stato === 'carico' ? '…' : tr('Apri elenco', 'Open list')}
           </button>
         </div>
         {stato && stato !== 'carico' && (
@@ -3058,12 +3062,12 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
               <span style={styles.detail}>
                 {gruppi.length} {gruppi.length === 1 ? 'personaggio' : 'personaggi'} in archivio
-                {nDuplicati > 0 && <> · {nDuplicati} {nDuplicati === 1 ? 'copia precedente' : 'copie precedenti'} nascoste</>}
+                {nDuplicati > 0 && <> · {nDuplicati} {nDuplicati === 1 ? tr('copia precedente nascosta', 'older copy hidden') : tr('copie precedenti nascoste', 'older copies hidden')}</>}
               </span>
               <input
                 value={filtro}
                 onChange={(e) => setFiltro(e.target.value)}
-                placeholder="Filtra per nome, classe, specie..."
+                placeholder={tr('Filtra per nome, classe, specie...', 'Filter by name, class, species...')}
                 style={{ ...styles.inlineInput, flex: '1 1 180px', minWidth: 140, padding: '5px 8px', fontSize: 12 }}
               />
             </div>
@@ -3081,7 +3085,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
                         <div style={{ minWidth: 0, flex: '1 1 180px' }}>
                           <div style={{ fontWeight: 700, fontSize: 14, color: C.ink }}>{formattaNomePg(s.nome) || '(senza nome)'}</div>
                           <div style={{ ...styles.detail, fontSize: 11, marginTop: 1 }}>
-                            {[s.classe, s.sottoclasse, s.specie, s.livello ? `Liv. ${s.livello}` : ''].filter(Boolean).join(' · ')}
+                            {[s.classe, s.sottoclasse, s.specie, s.livello ? tr(`Liv. ${s.livello}`, `Lvl ${s.livello}`) : ''].filter(Boolean).join(' · ')}
                             {s.pfMax ? ` · PF ${s.pfAttuali ?? '?'}/${s.pfMax}` : ''}
                           </div>
                           <div style={{ ...styles.detail, fontSize: 11, opacity: 0.75, marginTop: 2 }}>
@@ -3093,46 +3097,46 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
                             style={{ ...styles.buttonMini, fontWeight: 700, borderColor: C.goldDark, color: '#fff', background: C.goldDark, minWidth: 68 }}
                             disabled={aprendoId === s.id}
                             onClick={() => apriInSolaLettura(s)}
-                            title="Apri e consulta la scheda completa nel tavolo in sola lettura (senza modificarla)"
+                            title={tr('Apri e consulta la scheda completa nel tavolo in sola lettura (senza modificarla)', 'Open the full sheet read-only (without changing it)')}
                           >
                             {aprendoId === s.id ? '…' : 'Apri'}
                           </button>
                           <button
                             style={{ ...styles.buttonMini, fontWeight: 600, background: '#2e9d4d', color: '#fff', borderColor: '#2e9d4d' }}
                             onClick={() => esportaScheda(s)}
-                            title="Esporta e scarica il file JSON di questo personaggio"
+                            title={tr('Esporta e scarica il file JSON di questo personaggio', 'Export and download this character as JSON')}
                           >
-                            Esporta
+                            {tr('Esporta', 'Export')}
                           </button>
                           <button
                             style={{ ...styles.buttonMini, fontWeight: 500 }}
                             disabled={aprendoId === s.id}
                             onClick={() => apri(s.id)}
-                            title="Carica questo personaggio nella tua scheda per poterlo modificare"
+                            title={tr('Carica questo personaggio nella tua scheda per poterlo modificare', 'Load this character into your sheets so you can edit it')}
                           >
                             {aprendoId === s.id ? 'Importo…' : 'Importa'}
                           </button>
                           <button
                             style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '3px 6px' }}
                             onClick={() => eliminaCopia(s)}
-                            title="Elimina definitivamente questa copia dall'Archivio del Master"
+                            title={tr('Elimina definitivamente questa copia dall\'Archivio del Master', 'Permanently delete this copy from the DM Archive')}
                           >
                             🗑️
                           </button>
                         </div>
                       </div>
-                      {dett === 'carico' && <div style={{ ...styles.detail, fontSize: 12, marginTop: 8 }}>Caricamento scheda in corso…</div>}
+                      {dett === 'carico' && <div style={{ ...styles.detail, fontSize: 12, marginTop: 8 }}>{tr('Caricamento scheda in corso…', 'Loading sheet…')}</div>}
                       {dett && dett.errore && <div style={{ ...styles.detail, fontSize: 12, marginTop: 8, color: C.red }}>{dett.errore}</div>}
                       {completa && (
                         <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${C.border}`, fontSize: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
                           {/* Banner sola lettura */}
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6, background: C.panelLight, padding: '6px 10px', borderRadius: 6 }}>
                             <div>
-                              <strong style={{ fontSize: 12, color: C.goldDark }}>Visualizzazione scheda (Sola lettura)</strong>
-                              <span style={{ fontSize: 11, color: C.inkDim, marginLeft: 6 }}>Nessuna modifica ai dati</span>
+                              <strong style={{ fontSize: 12, color: C.goldDark }}>{tr('Visualizzazione scheda (sola lettura)', 'Sheet view (read-only)')}</strong>
+                              <span style={{ fontSize: 11, color: C.inkDim, marginLeft: 6 }}>{tr('Nessuna modifica ai dati', 'No changes to your data')}</span>
                             </div>
                             <button style={{ ...styles.buttonMini, background: '#2e9d4d', color: '#fff', borderColor: '#2e9d4d', fontSize: 11, fontWeight: 700 }} onClick={() => esportaScheda(s)}>
-                              Scarica file JSON
+                              {tr('Scarica file JSON', 'Download JSON file')}
                             </button>
                           </div>
 
@@ -3198,7 +3202,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
                               <div>
                                 <strong>Incantesimi ({completa.incantesimiLista.length}):</strong>{' '}
                                 {completa.incantesimiLista.slice(0, 10).map((inc) => inc.nome).join(', ')}
-                                {completa.incantesimiLista.length > 10 ? ` + altri ${completa.incantesimiLista.length - 10}...` : ''}
+                                {completa.incantesimiLista.length > 10 ? tr(` + altri ${completa.incantesimiLista.length - 10}...`, ` + ${completa.incantesimiLista.length - 10} more...`) : ''}
                               </div>
                             )}
                             {completa.inventario && completa.inventario.length > 0 && (
@@ -3230,16 +3234,16 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
                       <button
                         style={{ ...styles.buttonMini, alignSelf: 'flex-start', marginLeft: 16, fontSize: 11 }}
                         onClick={() => setCopieAperte((c) => ({ ...c, [g.chiave]: !c[g.chiave] }))}
-                        title="Stesso personaggio depositato da un altro dispositivo o prima di un re-import"
+                        title={tr('Stesso personaggio depositato da un altro dispositivo o prima di un re-import', 'Same character sent from another device or before a re-import')}
                       >
-                        {aperte ? '▲ nascondi' : '▼ mostra'} {vecchie.length} {vecchie.length === 1 ? 'copia precedente' : 'copie precedenti'}
+                        {aperte ? tr('▲ nascondi', '▲ hide') : tr('▼ mostra', '▼ show')} {vecchie.length} {vecchie.length === 1 ? tr('copia precedente', 'older copy') : tr('copie precedenti', 'older copies')}
                       </button>
                     )}
                     {aperte && vecchie.map((s) => riga(s, true))}
                   </div>
                 );
               })}
-              {gruppi.length === 0 && <div style={styles.detail}>{elenco.length === 0 ? 'Ancora nessuna scheda depositata.' : 'Nessuna scheda corrisponde al filtro.'}</div>}
+              {gruppi.length === 0 && <div style={styles.detail}>{elenco.length === 0 ? tr('Ancora nessuna scheda depositata.', 'No sheets sent yet.') : tr('Nessuna scheda corrisponde al filtro.', 'No sheet matches the filter.')}</div>}
             </div>
           </>
         )}
@@ -3431,6 +3435,8 @@ export default function App() {
     try { localStorage.setItem('scheda-interattiva:transcribe-url', transcribeUrl); } catch { /* niente */ }
   }, [transcribeUrl]);
   const [pdfStato, setPdfStato] = useState(''); // '' | 'loading'
+  // Archivio schede del DM. Identificativo casuale e anonimo del dispositivo:
+  // serve solo a tenere separate le schede di persone diverse nell'elenco del DM.
   const idDispositivo = useMemo(() => {
     try {
       let v = localStorage.getItem('scheda-interattiva:id-dispositivo');
@@ -3577,9 +3583,12 @@ export default function App() {
     return ordinato;
   });
   const [sezTrascinata, setSezTrascinata] = useState(null);
-  // menu iniziale: si mostra solo al primo avvio (nessun PG reale); poi carica la scheda
+  // Menu iniziale: si mostra solo al primo avvio. Una volta chiuso (o se ci
+  // sono già PG reali) resta un flag, così una scheda vuota non lo fa
+  // ricomparire a ogni apertura dell'app: si riapre dal Menu Hub.
   const [mostraMenu, setMostraMenu] = useState(() => {
     try {
+      if (localStorage.getItem(CHIAVE_MENU_INIZIALE_VISTO)) return false;
       const r = JSON.parse(localStorage.getItem(STORAGE_KEY));
       const s = r?.personaggi?.[r?.attivo];
       if (s && (s.nome || s.classe)) return false;
@@ -3588,7 +3597,12 @@ export default function App() {
     }
     return true;
   });
+  useEffect(() => {
+    if (mostraMenu) return;
+    try { localStorage.setItem(CHIAVE_MENU_INIZIALE_VISTO, '1'); } catch { /* niente */ }
+  }, [mostraMenu]);
   const [promemoriaBackup, setPromemoriaBackup] = useState(false); // banner "fai un backup"
+  const [bannerBackupChiuso, setBannerBackupChiuso] = useState(false); // ✕ sul banner: nascosto fino al prossimo avvio
   const [mostraGuida, setMostraGuida] = useState(false); // guida rapida al primo avvio
   const [mostraControlliScheda, setMostraControlliScheda] = useState(false);
   // Pannello Avvisi: raccoglie i promemoria (backup, controlli scheda) e le
@@ -3741,18 +3755,26 @@ export default function App() {
     return () => window.removeEventListener('pointerdown', warm);
   }, []);
 
-  // Promemoria backup: se ci sono personaggi reali e non si fa un backup da oltre
-  // 7 giorni (e non è in "snooze"), mostra un avviso per non rischiare di perdere i dati.
+  // Tastiera: Escape chiude il livello in cima (menu, Menu Hub, modali) come
+  // un tocco sullo sfondo; Invio/Spazio attivano chip e badge role="button".
   useEffect(() => {
-    try {
-      const ultimo = Number(localStorage.getItem('scheda-interattiva:ultimo-backup') || 0);
-      const snooze = Number(localStorage.getItem('scheda-interattiva:snooze-backup') || 0);
-      const pgReali = Object.values(roster.personaggi || {}).filter((s) => s && ((s.nome || '').trim() || (s.classe || '').trim())).length;
-      const seiGiorni = 7 * 24 * 3600 * 1000;
-      const vecchio = !ultimo || (Date.now() - ultimo) > seiGiorni;
-      if (pgReali >= 1 && vecchio && Date.now() > snooze) setPromemoriaBackup(true);
-    } catch { /* niente */ }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const onKey = (e) => {
+      if (e.defaultPrevented || e.isComposing) return;
+      const el = e.target;
+      if (e.key === 'Escape') {
+        // Nei campi di testo il primo Escape esce dal campo (e annulla la modifica in linea).
+        if (eCampoModificabile(el)) { el.blur?.(); return; }
+        const sfondo = trovaBackdropInCima();
+        if (sfondo) { e.preventDefault(); sfondo.click(); }
+        return;
+      }
+      if (el instanceof HTMLElement && deveAttivareDaTastiera({ key: e.key, tagName: el.tagName, role: el.getAttribute('role') })) {
+        e.preventDefault();
+        el.click();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
   }, []);
 
   // Guida rapida: si apre una sola volta, al primo avvio dell'app.
@@ -3789,7 +3811,7 @@ export default function App() {
       // ripulisce subito il link, così un ricaricamento non riapre la richiesta
       try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch { /* niente */ }
       if (dati) { setMostraGuida(false); setMostraMenu(false); setPgDaLink(dati); }
-      else setErroreImport('Il link del personaggio non e\u0300 leggibile: potrebbe essere incompleto.');
+      else setErroreImport(tr('Il link del personaggio non e\u0300 leggibile: potrebbe essere incompleto.', 'The character link cannot be read: it may be incomplete.'));
     });
     return () => { annullato = true; };
   }, []);
@@ -3856,6 +3878,48 @@ export default function App() {
 
   const isCloudAttivo = Boolean(((githubToken && gistId && autoSync) || (codiceSync && autoSyncCodice)) && !conflittoSync);
   const isCloudConfigurato = Boolean((githubToken && gistId) || codiceSync);
+
+  // Promemoria backup: con la sincronizzazione spenta i dati vivono solo su
+  // questo dispositivo. Se ci sono personaggi reali e non si fa un backup da
+  // oltre 7 giorni (e non è in "snooze"), mostra un avviso; ricontrolla ogni
+  // ora perché l'app resta spesso aperta per giorni. Col sync attivo tace.
+  // Chi installa l'app ora non viene accolto subito dal promemoria: il conto dei
+  // 7 giorni parte dal primo avvio. Chi aveva già dati salvati resta com'era.
+  const primoAvvioRef = useRef(null);
+  if (primoAvvioRef.current === null) {
+    try {
+      let v = Number(localStorage.getItem('scheda-interattiva:primo-avvio') || 0);
+      if (!v) {
+        v = localStorage.getItem(STORAGE_KEY) ? 1 : Date.now();
+        localStorage.setItem('scheda-interattiva:primo-avvio', String(v));
+      }
+      primoAvvioRef.current = v;
+    } catch { primoAvvioRef.current = 0; }
+  }
+  const pgRealiPerBackup = Object.values(roster.personaggi || {})
+    .filter((s) => s && ((s.nome || '').trim() || (s.classe || '').trim())).length;
+  useEffect(() => {
+    const controlla = () => {
+      try {
+        setPromemoriaBackup(deveRicordareBackup({
+          ultimoBackup: localStorage.getItem('scheda-interattiva:ultimo-backup'),
+          snoozeFino: localStorage.getItem('scheda-interattiva:snooze-backup'),
+          primoAvvio: primoAvvioRef.current,
+          pgReali: pgRealiPerBackup,
+          syncAttivo: isCloudAttivo,
+        }));
+      } catch { /* niente */ }
+    };
+    controlla();
+    const timer = setInterval(controlla, 3600 * 1000);
+    return () => clearInterval(timer);
+  }, [isCloudAttivo, pgRealiPerBackup]);
+
+  // Chiede al browser di non sfrattare i dati locali quando lo spazio scarseggia
+  // (su Safari/Chrome lo storage "best effort" può essere svuotato).
+  useEffect(() => {
+    try { navigator.storage?.persist?.().catch(() => {}); } catch { /* niente */ }
+  }, []);
   const statoColoreCloud = sincronizzando
     ? '#f59e0b'
     : isCloudAttivo
@@ -4254,9 +4318,16 @@ export default function App() {
       // Ignora silenziosamente su browser o modalità anonima con restrizioni IndexedDB
       console.warn('Salvataggio permanente immagini non disponibile:', err);
     });
+    if (esito.ok && esito.snapshotRimossi) {
+      console.warn(`Spazio quasi esaurito: rimossi ${esito.snapshotRimossi} snapshot automatici per salvare.`);
+    }
+    const mb = esito.bytes >= 100 * 1024 ? ` (${(esito.bytes / 1048576).toFixed(1)} MB)` : '';
     setErroreSalvataggio(esito.ok
       ? ''
-      : `Spazio del browser esaurito: le ultime modifiche non sono state salvate (${(esito.bytes / 1048576).toFixed(1)} MB). Esporta subito il personaggio.`);
+      : tr(
+        `Spazio del browser esaurito: le ultime modifiche non sono state salvate${mb}. Scarica subito un backup, poi libera spazio (es. rimuovi ritratti o mappe pesanti).`,
+        `Browser storage is full: your latest changes were not saved${mb}. Download a backup now, then free up space (e.g. remove large portraits or maps).`,
+      ));
   }, [roster]);
 
   /**
@@ -4418,6 +4489,9 @@ export default function App() {
     scheda?.alleati,
   ]);
 
+  // Archivio DM: deposita una copia della scheda attiva ~45 secondi dopo l'ultima
+  // modifica effettiva (per non sprecare scritture su Cloudflare KV), e solo se la
+  // scheda ha un nome vero e i dati sono davvero cambiati.
   const ultimoInvioDmRef = useRef('');
   useEffect(() => {
     if (!URL_ARCHIVIO_PG || !scheda || isSolaLettura) return;
@@ -4440,6 +4514,9 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [scheda, roster.attivo, idDispositivo]);
 
+  // Mappa della campagna, legata al PG: immagine e segnalino sono salvati NELLA
+  // scheda, così la mappa resta col personaggio a cui la carichi (e segue
+  // export e cloud).
   const mappaCampagna = scheda?.mappaCampagna || '';
   const setMappaCampagna = (v) => {
     aggiorna({ mappaCampagna: v || '' });
@@ -4726,7 +4803,7 @@ export default function App() {
   }
 
   function duplicaPersonaggio() {
-    nuovoPersonaggio({ ...scheda, nome: `${formattaNomePg(scheda.nome)} (copia)` });
+    nuovoPersonaggio({ ...scheda, nome: `${formattaNomePg(scheda.nome)} ${tr('(copia)', '(copy)')}` });
   }
 
   function eliminaPersonaggio() {
@@ -4847,9 +4924,9 @@ export default function App() {
           reazioneUsata: false,
         });
         registra({
-          etichetta: 'Turno',
+          etichetta: tr('Turno', 'Turn'),
           tipo: 'turno',
-          dettaglio: `Inizio turno Round ${combat.round}: tocca a ${scheda?.nome || 'te'}! Azioni e movimento ripristinati automaticamente.`,
+          dettaglio: tr(`Inizio turno Round ${combat.round}: tocca a ${scheda?.nome || 'te'}! Azioni e movimento ripristinati automaticamente.`, `Round ${combat.round} turn start: ${scheda?.nome || 'your'} turn! Actions and movement reset automatically.`),
         });
       }
     } else {
@@ -5041,8 +5118,8 @@ export default function App() {
               etichetta: esitoPf0.istantaneo ? 'Morte' : 'TS Morte',
               tipo: 'tattica',
               dettaglio: esitoPf0.istantaneo
-                ? `${scheda.nome || 'PG'} muore: danno subito a 0 PF con eccesso pari o superiore ai PF massimi.`
-                : `${scheda.nome || 'PG'} subisce danno mentre è a 0 PF: fallimento automatico (${esitoPf0.tsMorteDopo.fallimenti}/3).`,
+                ? tr(`${scheda.nome || 'PG'} muore: danno subito a 0 PF con eccesso pari o superiore ai PF massimi.`, `${scheda.nome || 'PC'} dies: damage taken at 0 HP with leftover equal to or above max HP.`)
+                : tr(`${scheda.nome || 'PG'} subisce danno mentre è a 0 PF: fallimento automatico (${esitoPf0.tsMorteDopo.fallimenti}/3).`, `${scheda.nome || 'PC'} takes damage at 0 HP: automatic failure (${esitoPf0.tsMorteDopo.fallimenti}/3).`),
             });
           }
         }
@@ -5289,7 +5366,7 @@ export default function App() {
           : 'arma';
     const etichettaPresa = attacco?.aDueMani ? (lingua === 'en' ? ' (Two-Handed)' : ' (2 Mani)') : '';
     conAnimazione(() => {
-      setDanni({ etichetta: `${critico ? 'Danni critici' : 'Danni'}: ${nome}${etichettaPresa}${notaExtra}`, ...esito, critico });
+      setDanni({ etichetta: `${critico ? tr('Danni critici', 'Critical damage') : tr('Danni', 'Damage')}: ${nome}${etichettaPresa}${notaExtra}`, ...esito, critico });
       registra({ etichetta: `${critico ? 'CRITICO ' : ''}${t('log.danni')}: ${nome}${etichettaPresa}${notaExtra}`, tipo: 'danni', totale: esito.totale, dettaglio: esito.dettaglio, critico });
     }, esito.totale, maxFacce || 20, false, suonoDanno);
   }
@@ -5423,7 +5500,7 @@ export default function App() {
       setDanni({
         etichetta: 'Dadi vita',
         totale: 0,
-        dettaglio: 'hai già speso tutti i dadi vita (recuperi con un riposo lungo)',
+        dettaglio: tr('hai già speso tutti i dadi vita (recuperi con un riposo lungo)', 'all Hit Dice already spent (you regain them on a long rest)'),
         guarigione: true,
       });
       return;
@@ -5512,7 +5589,7 @@ export default function App() {
     if (facce === 20) return lanciaD20(t('roll.tiro_libero'), 0);
     const valore = tiraDado(facce);
     conAnimazione(() => {
-      setDanni({ etichetta: 'Tiro libero', totale: valore, dettaglio: `1d${facce} [${valore}]`, libero: true });
+      setDanni({ etichetta: tr('Tiro libero', 'Free roll'), totale: valore, dettaglio: `1d${facce} [${valore}]`, libero: true });
       registra({ etichetta: `d${facce}`, tipo: 'libero', totale: valore, dettaglio: `1d${facce} [${valore}]` });
     }, valore, facce);
   }
@@ -5529,7 +5606,7 @@ export default function App() {
     const maxFacce = Math.max(...parsata.termini.map((p) => p.facce).filter(Boolean));
     const esito = tiraDanni(parsata, false);
     conAnimazione(() => {
-      setDanni({ etichetta: `Tiro libero: ${testo}`, ...esito, libero: true });
+      setDanni({ etichetta: tr(`Tiro libero: ${testo}`, `Free roll: ${testo}`), ...esito, libero: true });
       registra({ etichetta: testo, tipo: 'libero', totale: esito.totale, dettaglio: esito.dettaglio });
     }, esito.totale, maxFacce || 20);
   }
@@ -5625,7 +5702,7 @@ export default function App() {
     };
     img.onerror = () => {
       URL.revokeObjectURL(url);
-      setErroreImport('Immagine non riconosciuta: usa un file JPG o PNG.');
+      setErroreImport(tr('Immagine non riconosciuta: usa un file JPG o PNG.', 'Image not recognized: use a JPG or PNG file.'));
     };
     img.src = url;
   }
@@ -5652,7 +5729,7 @@ export default function App() {
     };
     img.onerror = () => {
       URL.revokeObjectURL(url);
-      setErroreImport('Immagine non riconosciuta: usa un file JPG o PNG.');
+      setErroreImport(tr('Immagine non riconosciuta: usa un file JPG o PNG.', 'Image not recognized: use a JPG or PNG file.'));
     };
     img.src = url;
   }
@@ -5673,7 +5750,7 @@ export default function App() {
     };
     img.onerror = () => {
       URL.revokeObjectURL(url);
-      setErroreImport('Immagine non riconosciuta: usa un file JPG o PNG.');
+      setErroreImport(tr('Immagine non riconosciuta: usa un file JPG o PNG.', 'Image not recognized: use a JPG or PNG file.'));
     };
     img.src = url;
   }
@@ -5745,6 +5822,10 @@ export default function App() {
   }
 
   /** Segna che è stato fatto un backup (esportazione o sync cloud): azzera il promemoria. */
+  function rimandaBackup() {
+    try { localStorage.setItem('scheda-interattiva:snooze-backup', String(Date.now() + 3 * 24 * 3600 * 1000)); } catch { /* niente */ }
+    setPromemoriaBackup(false);
+  }
   function segnaBackupFatto() {
     try { localStorage.setItem('scheda-interattiva:ultimo-backup', String(Date.now())); } catch { /* niente */ }
     setPromemoriaBackup(false);
@@ -5773,7 +5854,7 @@ export default function App() {
     aRoster.click();
     URL.revokeObjectURL(urlRoster);
     segnaBackupFatto();
-    setSyncCodiceStatus({ text: `Backup esportato (${ids.length} personaggi).`, type: 'success' });
+    setSyncCodiceStatus({ text: tr(`Backup esportato (${ids.length} personaggi).`, `Backup exported (${ids.length} characters).`), type: 'success' });
   }
 
   /** Ripristina l'archivio locale da un file JSON (supporta backup multipli o singoli). */
@@ -5801,7 +5882,7 @@ export default function App() {
             });
             return { attivo: ultimo, personaggi: base };
           });
-          setSyncCodiceStatus({ text: `Ripristinati ${lista.length} personaggi.`, type: 'success' });
+          setSyncCodiceStatus({ text: tr(`Ripristinati ${lista.length} personaggi.`, `Restored ${lista.length} characters.`), type: 'success' });
           segnaBackupFatto();
           return;
         }
@@ -5813,10 +5894,10 @@ export default function App() {
         const base = (r?.personaggi && Object.keys(r.personaggi).length > 0) ? { ...r.personaggi } : {};
         return { attivo: id, personaggi: { ...base, [id]: norm } };
       });
-      setSyncCodiceStatus({ text: `Personaggio "${formattaNomePg(norm.nome) || 'PG'}" importato.`, type: 'success' });
+      setSyncCodiceStatus({ text: tr(`Personaggio "${formattaNomePg(norm.nome) || 'PG'}" importato.`, `Character "${formattaNomePg(norm.nome) || 'PC'}" imported.`), type: 'success' });
       segnaBackupFatto();
     } catch (e) {
-      setSyncCodiceStatus({ text: `File JSON non valido: ${e.message}`, type: 'error' });
+      setSyncCodiceStatus({ text: tr(`File JSON non valido: ${e.message}`, `Invalid JSON file: ${e.message}`), type: 'error' });
     }
   }
 
@@ -5902,7 +5983,7 @@ export default function App() {
           }
 
           if (file.size === 0) {
-            throw new Error(`Il file "${file.name}" risulta di 0 byte (se si trova su iCloud Drive, clicca sulla nuvoletta nel Finder per scaricarlo sul Mac prima di importarlo)`);
+            throw new Error(tr(`Il file "${file.name}" risulta di 0 byte (se si trova su iCloud Drive, clicca sulla nuvoletta nel Finder per scaricarlo sul Mac prima di importarlo)`, `The file "${file.name}" is 0 bytes (if it is on iCloud Drive, click the cloud icon in Finder to download it to the Mac before importing)`));
           }
           let fileBase64 = '';
           try {
@@ -5913,7 +5994,7 @@ export default function App() {
                 const comma = res.indexOf(',');
                 risolvi(comma >= 0 ? res.slice(comma + 1).trim() : res.trim());
               };
-              fr.onerror = () => rifiuta(new Error('lettura del file fallita'));
+              fr.onerror = () => rifiuta(new Error(tr('lettura del file fallita', 'could not read the file')));
               fr.readAsDataURL(file);
             });
           } catch (err) {
@@ -5937,7 +6018,7 @@ export default function App() {
             }
           }
           if (!fileBase64) {
-            throw new Error(`Il file "${file.name}" non ha restituito dati leggibili. Prova a convertirlo o fare uno screenshot PNG/JPG.`);
+            throw new Error(tr(`Il file "${file.name}" non ha restituito dati leggibili. Prova a convertirlo o fare uno screenshot PNG/JPG.`, `The file "${file.name}" returned no readable data. Try converting it or taking a PNG/JPG screenshot.`));
           }
           const mediaType = (() => {
             if (file.type) return file.type;
@@ -5984,7 +6065,7 @@ export default function App() {
                 break;
               } else if (r.status !== 404) {
                 const err = await r.json().catch(() => ({}));
-                lastErr = new Error(err.error || `errore ${r.status} su ${file.name}`);
+                lastErr = new Error(err.error || tr(`errore ${r.status} su ${file.name}`, `error ${r.status} on ${file.name}`));
                 break;
               }
             } catch (err) {
@@ -6026,7 +6107,7 @@ export default function App() {
       } catch (e) {
         setPdfStato('');
         const dove = (transcribeUrl || URL_ARCHIVIO_PG || URL_STANZE || '').trim() ? 'Controlla endpoint IA.' : 'Configura endpoint IA.';
-        setErroreImport(`Import da file fallito: ${e.message}. ${dove}`);
+        setErroreImport(tr(`Import da file fallito: ${e.message}. ${dove}`, `Import from file failed: ${e.message}. ${dove}`));
         return;
       }
     }
@@ -6052,7 +6133,7 @@ export default function App() {
                 ultimo = id;
                 nuovi++;
               });
-              if (duplicati) setErroreImport(`Import: ${nuovi} nuovi, ${duplicati} già esistenti ignorati.`);
+              if (duplicati) setErroreImport(tr(`Import: ${nuovi} nuovi, ${duplicati} già esistenti ignorati.`, `Import: ${nuovi} new, ${duplicati} already present skipped.`));
               setSchedaSolaLettura(null);
               return { attivo: ultimo, personaggi };
             });
@@ -6072,13 +6153,17 @@ export default function App() {
         });
         setMostraMenu(false);
       } catch {
-        setErroreImport(`File JSON non valido: ${file.name} — usa un file esportato da Tavolo dei Dadi.`);
+        setErroreImport(tr(`File JSON non valido: ${file.name}. Usa un file esportato da Tavolo dei Dadi.`, `Invalid JSON file: ${file.name}. Use a file exported from Tavolo dei Dadi.`));
       }
     }
   }
 
 
 
+  // Protezione dai conflitti (v4.40.0): ogni canale ricorda la versione online da
+  // cui partono le modifiche locali (la "base"). Prima di inviare si rilegge la
+  // copia online: se un altro dispositivo l'ha cambiata, non si sovrascrive mai
+  // in silenzio.
   const CANALI_SYNC = {
     gist: { base: 'scheda-interattiva:sync-base', ts: 'scheda-interattiva:sync-ts' },
     codice: { base: 'scheda-interattiva:sync-codice-base', ts: 'scheda-interattiva:sync-codice-ts' },
@@ -6175,7 +6260,7 @@ export default function App() {
   async function salvaSuCloud(silenzioso = false, opzioni = {}) {
     const { forza = false, soloLettura = false } = opzioni;
     if (!tokenSyncRef.current) {
-      if (!silenzioso) setCloudStatus({ text: 'Inserisci il token di accesso GitHub per attivare la sincronizzazione.', type: 'error' });
+      if (!silenzioso) setCloudStatus({ text: tr('Inserisci il token di accesso GitHub per attivare la sincronizzazione.', 'Enter your GitHub access token to turn on sync.'), type: 'error' });
       return;
     }
     // Conflitto aperto: niente invii automatici finché l'utente non sceglie.
@@ -6207,7 +6292,7 @@ export default function App() {
           cache: 'no-store',
         }).catch(() => null);
         if (!resAttuale || !resAttuale.ok) {
-          if (!silenzioso) setCloudStatus({ text: 'Connessione assente: la sincronizzazione è rimandata per non sovrascrivere dati più recenti.', type: 'error' });
+          if (!silenzioso) setCloudStatus({ text: tr('Connessione assente: la sincronizzazione è rimandata per non sovrascrivere dati più recenti.', 'You are offline: sync is postponed so newer data is not overwritten.'), type: 'error' });
           return;
         }
         const outAttuale = await resAttuale.json();
@@ -6216,7 +6301,7 @@ export default function App() {
           parsedAttuale = await leggiContenutoFileGist(fileAttuale, tokenSyncRef.current);
           if (fileAttuale && !parsedAttuale) {
             // File presente ma illeggibile (troncato, rete a metà): non rischiare.
-            if (!silenzioso) setCloudStatus({ text: 'Connessione assente: la sincronizzazione è rimandata per non sovrascrivere dati più recenti.', type: 'error' });
+            if (!silenzioso) setCloudStatus({ text: tr('Connessione assente: la sincronizzazione è rimandata per non sovrascrivere dati più recenti.', 'You are offline: sync is postponed so newer data is not overwritten.'), type: 'error' });
             return;
           }
         }
@@ -6246,7 +6331,7 @@ export default function App() {
           headers: { 'Authorization': `token ${tokenSyncRef.current}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
           body: JSON.stringify(corpo),
         });
-        if (!res.ok) throw new Error('Errore aggiornamento Gist. Token o ID non validi.');
+        if (!res.ok) throw new Error(tr('Errore aggiornamento Gist. Token o ID non validi.', 'Gist update failed. Invalid token or ID.'));
         outScrittura = await res.json().catch(() => null);
       } else {
         const res = await fetch(`https://api.github.com/gists`, {
@@ -6254,7 +6339,7 @@ export default function App() {
           headers: { 'Authorization': `token ${tokenSyncRef.current}`, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
           body: JSON.stringify({ description: 'Salvataggio Cloud - Tavolo dei Dadi', public: false, ...corpo }),
         });
-        if (!res.ok) throw new Error('Errore creazione Gist. Token non valido.');
+        if (!res.ok) throw new Error(tr('Errore creazione Gist. Token non valido.', 'Gist creation failed. Invalid token.'));
         outScrittura = await res.json();
         nuovoId = outScrittura.id;
         gistSyncRef.current = outScrittura.id;
@@ -6268,7 +6353,7 @@ export default function App() {
       setUltimoSync(orario);
       localStorage.setItem('scheda-interattiva:ultimo-sync', orario);
       segnaBackupFatto(); // il sync sul cloud conta come backup: azzera il promemoria
-      setCloudStatus({ text: `Sincronizzato · ${orario}`, type: 'success' });
+      setCloudStatus({ text: tr(`Sincronizzato · ${orario}`, `Synced · ${orario}`), type: 'success' });
       return nuovoId;
     } catch (err) {
       setCloudStatus({ text: err.message, type: 'error' });
@@ -6290,12 +6375,12 @@ export default function App() {
       headers: { 'Authorization': `token ${tokenUsato}`, 'Accept': 'application/vnd.github.v3+json' },
       cache: 'no-store',
     });
-    if (!res.ok) throw new Error('Errore caricamento. Token o ID non validi.');
+    if (!res.ok) throw new Error(tr('Errore caricamento. Token o ID non validi.', 'Loading failed. Invalid token or ID.'));
     const out = await res.json();
     const file = out.files?.['roster_tavolo_dei_dadi.json'];
-    if (!file) throw new Error('Il file "roster_tavolo_dei_dadi.json" non è presente nel Gist.');
+    if (!file) throw new Error(tr('Il file "roster_tavolo_dei_dadi.json" non è presente nel Gist.', 'The file "roster_tavolo_dei_dadi.json" is not in the Gist.'));
     const parsed = await leggiContenutoFileGist(file, tokenUsato);
-    if (!parsed || !parsed.personaggi) throw new Error('Contenuto del backup GitHub non valido o danneggiato.');
+    if (!parsed || !parsed.personaggi) throw new Error(tr('Contenuto del backup GitHub non valido o danneggiato.', 'The GitHub backup content is invalid or damaged.'));
     // Il caricamento esplicito vince sempre: chiude un eventuale conflitto aperto.
     conflittoPausaRef.current.gist = false;
     setConflittoSync((c) => (c?.canale === 'gist' ? null : c));
@@ -6311,13 +6396,13 @@ export default function App() {
   async function attivaBackupAuto() {
     const token = githubToken.trim();
     if (!token) {
-      setCloudStatus({ text: 'Crea il token di accesso GitHub e incollalo nel campo qui sopra.', type: 'error' });
+      setCloudStatus({ text: tr('Crea il token di accesso GitHub e incollalo nel campo qui sopra.', 'Create a GitHub access token and paste it in the field above.'), type: 'error' });
       return;
     }
     if (!gistSyncRef.current) {
       try {
         setSincronizzando(true);
-        setCloudStatus({ text: 'Ricerca di backup esistenti…', type: 'info' });
+        setCloudStatus({ text: tr('Ricerca di backup esistenti…', 'Looking for existing backups…'), type: 'info' });
         const res = await fetchConTimeout('https://api.github.com/gists', {
           headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' },
         });
@@ -6325,13 +6410,13 @@ export default function App() {
           const lista = await res.json();
           const esistente = lista.find((g) => g.files && g.files['roster_tavolo_dei_dadi.json']);
           if (esistente) {
-            const usaEsistente = window.confirm('Su questo account GitHub esiste già un backup, creato da un altro dispositivo.\n\nVuoi caricarlo su questo dispositivo invece di crearne uno nuovo e vuoto?');
+            const usaEsistente = window.confirm(tr('Su questo account GitHub esiste già un backup, creato da un altro dispositivo.\n\nVuoi caricarlo su questo dispositivo invece di crearne uno nuovo e vuoto?', 'This GitHub account already has a backup, created from another device.\n\nDo you want to load it on this device instead of creating a new, empty one?'));
             if (usaEsistente) {
               gistSyncRef.current = esistente.id;
               setGistId(esistente.id);
               localStorage.setItem('scheda-interattiva:gist-id', esistente.id);
               await caricaGistById(esistente.id, token);
-              setCloudStatus({ text: 'Backup esistente caricato e sincronizzato.', type: 'success' });
+              setCloudStatus({ text: tr('Backup esistente caricato e sincronizzato.', 'Existing backup loaded and synced.'), type: 'success' });
               setAutoSync(true);
               localStorage.setItem('scheda-interattiva:auto-sync', 'on');
               return;
@@ -6378,7 +6463,7 @@ export default function App() {
       } catch {
         // Offline, GitHub lento o IndexedDB bloccato: il roster locale resta
         // già disponibile e l'overlay deve sempre scomparire.
-        setCloudStatus({ text: 'Servizio online non raggiungibile: vengono usati i personaggi salvati sul dispositivo.', type: 'error' });
+        setCloudStatus({ text: tr('Servizio online non raggiungibile: vengono usati i personaggi salvati sul dispositivo.', 'Online service unreachable: using the characters saved on this device.'), type: 'error' });
       }
       finally { setCaricandoCloud(false); }
     })();
@@ -6387,14 +6472,14 @@ export default function App() {
 
   async function caricaDaCloud() {
     if (!githubToken || !gistId) {
-      setCloudStatus({ text: 'Inserisci il token di accesso e l’ID del Gist per caricare i personaggi.', type: 'error' });
+      setCloudStatus({ text: tr('Inserisci il token di accesso e l’ID del Gist per caricare i personaggi.', 'Enter the access token and the Gist ID to load your characters.'), type: 'error' });
       return;
     }
     try {
       setCaricandoCloud(true);
-      setCloudStatus({ text: 'Caricamento in corso…', type: 'info' });
+      setCloudStatus({ text: tr('Caricamento in corso…', 'Loading…'), type: 'info' });
       await caricaGistById(gistId, githubToken);
-      setCloudStatus({ text: 'Personaggi caricati e sincronizzati.', type: 'success' });
+      setCloudStatus({ text: tr('Personaggi caricati e sincronizzati.', 'Characters loaded and synced.'), type: 'success' });
     } catch (err) {
       setCloudStatus({ text: err.message, type: 'error' });
     } finally {
@@ -6434,7 +6519,7 @@ export default function App() {
         // senza il confronto: per qualsiasi altro errore (rete, rate limit...)
         // scrivere alla cieca rischierebbe di sovrascrivere dati più recenti.
         if (errAttuale.message !== 'SYNC_NOT_FOUND') {
-          if (!silenzioso) setSyncCodiceStatus({ text: 'Connessione assente: la sincronizzazione è rimandata per non sovrascrivere dati più recenti.', type: 'error' });
+          if (!silenzioso) setSyncCodiceStatus({ text: tr('Connessione assente: la sincronizzazione è rimandata per non sovrascrivere dati più recenti.', 'You are offline: sync is postponed so newer data is not overwritten.'), type: 'error' });
           return;
         }
       }
@@ -6462,7 +6547,7 @@ export default function App() {
       setUltimoSyncCodice(orario);
       localStorage.setItem('scheda-interattiva:ultimo-sync-codice', orario);
       segnaBackupFatto();
-      setSyncCodiceStatus({ text: `Sincronizzato · ${orario}`, type: 'success' });
+      setSyncCodiceStatus({ text: tr(`Sincronizzato · ${orario}`, `Synced · ${orario}`), type: 'success' });
     } catch (err) {
       if (!silenzioso) {
         setSyncCodiceStatus({ text: messaggioErroreSync(err.message), type: 'error' });
@@ -6488,7 +6573,7 @@ export default function App() {
     }
     // Se il server non ha personaggi sotto questo codice, preserva il roster locale
     if (Object.keys(caricato.personaggi).length === 0) {
-      setSyncCodiceStatus({ text: 'Nessun personaggio trovato nel cloud per questo codice. Mantengo i personaggi attuali.', type: 'info' });
+      setSyncCodiceStatus({ text: tr('Nessun personaggio trovato nel cloud per questo codice. Mantengo i personaggi attuali.', 'No characters found online for this code. Keeping the current ones.'), type: 'info' });
       return updatedAt;
     }
     if (!caricato.attivo || !caricato.personaggi[caricato.attivo]) caricato.attivo = Object.keys(caricato.personaggi)[0] || '';
@@ -6583,14 +6668,14 @@ export default function App() {
 
   async function caricaDaCodiceSync() {
     if (!codiceSyncRef.current) {
-      setSyncCodiceStatus({ text: 'Nessun codice attivo su questo dispositivo.', type: 'error' });
+      setSyncCodiceStatus({ text: tr('Nessun codice attivo su questo dispositivo.', 'No active code on this device.'), type: 'error' });
       return;
     }
     try {
       setCaricandoCloud(true);
-      setSyncCodiceStatus({ text: 'Caricamento in corso…', type: 'info' });
+      setSyncCodiceStatus({ text: tr('Caricamento in corso…', 'Loading…'), type: 'info' });
       await caricaDaCodiceSyncPer(codiceSyncRef.current);
-      setSyncCodiceStatus({ text: 'Personaggi caricati e sincronizzati.', type: 'success' });
+      setSyncCodiceStatus({ text: tr('Personaggi caricati e sincronizzati.', 'Characters loaded and synced.'), type: 'success' });
     } catch (err) {
       setSyncCodiceStatus({ text: messaggioErroreSync(err.message), type: 'error' });
     } finally {
@@ -6620,7 +6705,7 @@ export default function App() {
     }
     try {
       setCaricandoCloud(true);
-      setSyncCodiceStatus({ text: 'Caricamento in corso…', type: 'info' });
+      setSyncCodiceStatus({ text: tr('Caricamento in corso…', 'Loading…'), type: 'info' });
       await caricaDaCodiceSyncPer(pulito);
       codiceSyncRef.current = pulito;
       setCodiceSync(pulito);
@@ -6628,7 +6713,7 @@ export default function App() {
       setAutoSyncCodice(true);
       localStorage.setItem('scheda-interattiva:auto-sync-codice', 'on');
       setCodiceSyncInput('');
-      setSyncCodiceStatus({ text: 'Personaggi caricati e sincronizzati.', type: 'success' });
+      setSyncCodiceStatus({ text: tr('Personaggi caricati e sincronizzati.', 'Characters loaded and synced.'), type: 'success' });
     } catch (err) {
       setSyncCodiceStatus({ text: messaggioErroreSync(err.message), type: 'error' });
     } finally {
@@ -7057,6 +7142,38 @@ export default function App() {
 
 
 
+      {(erroreSalvataggio || (avvisoBackup && !mostraMenu && !bannerBackupChiuso)) && (
+        <div className="banner-dati" style={{ position: 'fixed', top: 'max(52px, calc(env(safe-area-inset-top, 0px) + 48px))', left: 8, right: 8, zIndex: 990, display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', pointerEvents: 'none' }}>
+          {erroreSalvataggio && (
+            <div role="alert" data-testid="banner-spazio-pieno" style={{ pointerEvents: 'auto', maxWidth: 560, width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 10, border: '1px solid #ef4444', background: 'color-mix(in srgb, var(--c-panel) 86%, #ef4444)', color: C.ink, fontSize: 13, lineHeight: 1.45, boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }}>
+              <div style={{ marginBottom: 8 }}><strong>⚠️ {tr('Salvataggio non riuscito', 'Save failed')}</strong><br />{erroreSalvataggio}</div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <button style={{ ...styles.buttonPrimary, fontSize: 12, padding: '6px 12px', minHeight: 36 }} onClick={esportaBackupCompleto}>{tr('Scarica backup', 'Download backup')}</button>
+                {!isCloudAttivo && (
+                  <button style={{ ...styles.buttonMini, fontSize: 12, minHeight: 36 }} onClick={() => { setCloudStatus({ text: '', type: '' }); setMostraCloud(true); }}>{tr('Attiva la sincronizzazione', 'Turn on sync')}</button>
+                )}
+              </div>
+            </div>
+          )}
+          {!erroreSalvataggio && avvisoBackup && !mostraMenu && !bannerBackupChiuso && (
+            <div role="status" data-testid="banner-backup" style={{ pointerEvents: 'auto', maxWidth: 560, width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 10, border: `1px solid ${C.gold}`, background: 'color-mix(in srgb, var(--c-panel) 88%, #c88c14)', color: C.ink, fontSize: 13, lineHeight: 1.45, boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'flex-start', marginBottom: 8 }}>
+                <div>
+                  <strong>💾 {tr('Fai un backup dei tuoi personaggi', 'Back up your characters')}</strong><br />
+                  {tr('La sincronizzazione è spenta: i dati esistono solo su questo dispositivo.', 'Sync is off: your data exists only on this device.')}
+                </div>
+                <button style={{ ...styles.buttonMini, minWidth: 36, minHeight: 36 }} onClick={() => setBannerBackupChiuso(true)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <button style={{ ...styles.buttonPrimary, fontSize: 12, padding: '6px 12px', minHeight: 36 }} onClick={esportaBackupCompleto}>{tr('Scarica backup', 'Download backup')}</button>
+                <button style={{ ...styles.buttonMini, fontSize: 12, minHeight: 36 }} onClick={() => { setBannerBackupChiuso(true); setCloudStatus({ text: '', type: '' }); setMostraCloud(true); }}>{tr('Attiva la sincronizzazione', 'Turn on sync')}</button>
+                <button style={{ ...styles.buttonMini, fontSize: 12, minHeight: 36 }} onClick={rimandaBackup} title={tr('Ricordamelo tra qualche giorno', 'Remind me in a few days')}>{tr('Più tardi', 'Later')}</button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {info && (
         <div
           style={{ position: 'fixed', inset: 0, zIndex: 3100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)' }}
@@ -7209,7 +7326,7 @@ export default function App() {
                                     suono: 'arma',
                                   });
                                 }}
-                                title={`Tira per Colpire: 1d20 ${conSegno(az.bonus)}`}
+                                title={tr(`Tira per colpire: 1d20 ${conSegno(az.bonus)}`, `Attack roll: 1d20 ${conSegno(az.bonus)}`)}
                               >
                                 <span>{lingua === 'en' ? 'Attack' : 'Colpisci'} ({conSegno(az.bonus)})</span>
                               </button>
@@ -7219,9 +7336,9 @@ export default function App() {
                                 type="button"
                                 style={{ ...styles.button, fontSize: 11, padding: '3px 8px', borderRadius: 4, fontWeight: 800, borderColor: C.red, color: C.red, background: 'transparent', display: 'inline-flex', alignItems: 'center', gap: 3 }}
                                 onClick={() => {
-                                  lanciaDanniDiretti(`Danni (${bestiaDettaglio.nome}): ${az.nome}`, az.danno);
+                                  lanciaDanniDiretti(tr(`Danni (${bestiaDettaglio.nome}): ${az.nome}`, `Damage (${bestiaDettaglio.nome}): ${az.nome}`), az.danno);
                                 }}
-                                title={`Tira Danni: ${az.danno}`}
+                                title={tr(`Tira danni: ${az.danno}`, `Roll damage: ${az.danno}`)}
                               >
                                 <span>{lingua === 'en' ? 'Damage' : 'Danni'} ({az.danno})</span>
                               </button>
@@ -8046,7 +8163,7 @@ export default function App() {
                 }}
                 onClick={() => { setTabBackup('locale'); setSyncCodiceStatus({ text: '', type: '' }); }}
               >
-                Su questo dispositivo
+                {tr('Su questo dispositivo', 'On this device')}
               </button>
               <button
                 type="button"
@@ -8073,12 +8190,12 @@ export default function App() {
                   Backup su file
                 </div>
                 <p style={{ ...styles.detail, fontSize: 12, marginTop: 0, marginBottom: 12, lineHeight: 1.5 }}>
-                  Esporta in un unico file JSON tutti i personaggi salvati su questo dispositivo, oppure ripristina un backup precedente.
+                  {tr('Esporta in un unico file JSON tutti i personaggi salvati su questo dispositivo, oppure ripristina un backup precedente.', 'Export every character saved on this device into a single JSON file, or restore an earlier backup.')}
                 </p>
 
                 <div style={{ background: 'rgba(201,162,39,0.08)', border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 10px', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 12, color: C.ink, fontWeight: 600 }}>
-                    Personaggi salvati:
+                    {tr('Personaggi salvati:', 'Saved characters:')}
                   </span>
                   <strong style={{ color: C.goldDark, fontSize: 14 }}>
                     {Object.keys(roster.personaggi || {}).length}
@@ -8091,7 +8208,7 @@ export default function App() {
                     style={{ ...styles.buttonPrimary, width: '100%', padding: '9px 12px', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
                     onClick={esportaBackupCompleto}
                   >
-                    Esporta backup (JSON)
+                    {tr('Esporta backup (JSON)', 'Export backup (JSON)')}
                   </button>
 
                   <button
@@ -8133,7 +8250,7 @@ export default function App() {
                     alignItems: 'center',
                     gap: 4,
                   }}>
-                    {sincronizzando ? '🟠 Sincronizzazione…' : conflittoSync ? '🟠 In pausa' : isCloudAttivo ? '🟢 Attiva' : isCloudConfigurato ? '🟠 In attesa' : '🔴 Non attiva'}
+                    {sincronizzando ? tr('Sincronizzazione…', 'Syncing…') : conflittoSync ? tr('In pausa', 'Paused') : isCloudAttivo ? tr('Attiva', 'On') : isCloudConfigurato ? tr('In attesa', 'Waiting') : tr('Non attiva', 'Off')}
                   </span>
                 </div>
                 {codiceSync && autoSyncCodice ? (
@@ -8228,7 +8345,7 @@ export default function App() {
             <div style={{ ...styles.panel, maxWidth: 520, width: '100%', maxHeight: '88vh', overflowY: 'auto' }}>
               <h1 style={{ ...styles.title, textAlign: 'center', marginBottom: 4 }}>{t('priv.panoramica')}</h1>
               <div style={{ textAlign: 'center', ...styles.detail, marginBottom: 12 }}>
-                {traduciDato(scheda.classe) || '—'}{scheda.sottoclasse ? ` · ${traduciDato(scheda.sottoclasse)}` : ''} · Liv. {liv} · {versione === '2024' ? 'D&D 5.5' : 'D&D 5.0'}
+                {traduciDato(scheda.classe) || '—'}{scheda.sottoclasse ? ` · ${traduciDato(scheda.sottoclasse)}` : ''} · {tr('Liv.', 'Lvl')} {liv} · {versione === '2024' ? 'D&D 5.5' : 'D&D 5.0'}
               </div>
               {righe.length === 0 && <p style={styles.detail}>{t('priv.nessuno')}</p>}
               {righe.map(({ L, feat, asi, sub, futuro }) => (
@@ -8242,7 +8359,7 @@ export default function App() {
                       return (
                         <div key={i}>
                           • {sp ? (
-                            <span
+                            <span role="button" tabIndex={0}
                               style={{ cursor: 'help', textDecoration: 'underline dotted', textUnderlineOffset: 3 }}
                               title={sp}
                               onClick={() => setInfo({ titolo: r, testo: sp })}
@@ -8333,7 +8450,7 @@ export default function App() {
                             return (
                               <div key={i}>
                                 • {sp ? (
-                                  <span
+                                  <span role="button" tabIndex={0}
                                     style={{ cursor: 'help', textDecoration: 'underline dotted', textUnderlineOffset: 3 }}
                                     title={sp}
                                     onClick={() => setInfo({ titolo: r, testo: sp })}
@@ -9072,7 +9189,7 @@ export default function App() {
                       {lingua === 'en' ? infoAb.nomeEn : infoAb.nomeIt}
                     </strong>
                     <span style={{ fontSize: 11, color: C.inkDim, marginLeft: 8 }}>
-                      ({carAbbr}) • {liv === 3 ? '✦ Maestria (Expertise)' : liv === 2 ? 'Competenza Razza/Classe' : liv === 1 ? '● Competente' : '○ Non Competente'}
+                      ({carAbbr}) • {liv === 3 ? tr('✦ Maestria', '✦ Expertise') : liv === 2 ? tr('★ Competenza razza/classe', '★ Species/class proficiency') : liv === 1 ? tr('● Competente', '● Proficient') : tr('○ Non competente', '○ Not proficient')}
                     </span>
                   </div>
                 </div>
@@ -9427,7 +9544,7 @@ export default function App() {
                 {t('levelup.desc_hp', { cos: conSegno(modCos) })}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <div
+                <div role="button" tabIndex={0}
                   style={{
                     ...styles.button,
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '10px 8px', cursor: 'pointer',
@@ -9442,7 +9559,7 @@ export default function App() {
                   <div style={{ fontSize: 11, color: C.inkDim }}>({Math.floor(facceTargetDV / 2) + 1} {modCos !== 0 ? conSegno(modCos) : ''})</div>
                 </div>
 
-                <div
+                <div role="button" tabIndex={0}
                   style={{
                     ...styles.button,
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '10px 8px', cursor: 'pointer',
@@ -10114,7 +10231,7 @@ export default function App() {
                             onChange={(e) => setB({ asiTalenti: { ...bozzaCrea.asiTalenti, [lv]: e.target.value } })}
                             style={{ ...styles.inlineInput, fontSize: 11, padding: '2px 4px', flex: '1 1 150px', minWidth: 0 }}
                           >
-                            <option value="">— o scegli un talento —</option>
+                            <option value="">{tr('o scegli un talento…', 'or pick a feat…')}</option>
                             {talentiOrdinati.map((tl) => <option key={tl.nome} value={tl.nome}>{tl.nome}</option>)}
                           </select>
                         </div>
@@ -10178,7 +10295,7 @@ export default function App() {
                     {add && (
                       <div>
                         <strong>{lingua === 'it' ? 'Competenze' : 'Proficiencies'}:</strong> {add.armi}
-                        {add.armature?.pesanti ? ' · Tutte le armature e scudi' : add.armature?.medie ? ' · Armature leggere, medie e scudi' : add.armature?.leggere ? ' · Armature leggere' : ' · Nessuna armatura'}
+                        {add.armature?.pesanti ? tr(' · Tutte le armature e scudi', ' · All armor and shields') : add.armature?.medie ? tr(' · Armature leggere, medie e scudi', ' · Light and medium armor, shields') : add.armature?.leggere ? tr(' · Armature leggere', ' · Light armor') : tr(' · Nessuna armatura', ' · No armor')}
                       </div>
                     )}
                   </div>
@@ -10291,9 +10408,9 @@ export default function App() {
                 );
               })()}
 
-              <label style={{ ...styles.detail, display: 'block', marginBottom: 6, fontWeight: 'bold' }}>Caratteristiche</label>
+              <label style={{ ...styles.detail, display: 'block', marginBottom: 6, fontWeight: 'bold' }}>{tr('Caratteristiche', 'Ability scores')}</label>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
-                {[['auto', 'Tira e assegna'], ['assegna', 'Tira e scelgo io'], ['manuale', 'A mano']].map(([m, etichetta]) => (
+                {[['auto', tr('Tira e assegna', 'Roll and assign')], ['assegna', tr('Tira e scelgo io', 'Roll, I choose')], ['manuale', tr('A mano', 'Manual')]].map(([m, etichetta]) => (
                   <button
                     key={m}
                     style={{ ...styles.modeButton(bozzaCrea.metodo === m), fontSize: 12, padding: '4px 10px' }}
@@ -10305,12 +10422,12 @@ export default function App() {
               </div>
               {bozzaCrea.metodo === 'auto' && (
                 <div style={{ ...styles.detail, fontSize: 11, marginBottom: 16 }}>
-                  Tira 4d6 (scarta il più basso) e mette il valore più alto sulla caratteristica chiave della classe.
+                  {tr('Tira 4d6 (scarta il più basso) e mette il valore più alto sulla caratteristica chiave della classe.', 'Rolls 4d6 (drops the lowest) and puts the highest value on the class key ability.')}
                 </div>
               )}
               {bozzaCrea.metodo === 'manuale' && (
                 <div style={{ ...styles.detail, fontSize: 11, marginBottom: 16 }}>
-                  Le caratteristiche partono da 10: le imposti tu sulla scheda (o tiri i dadi fisicamente).
+                  {tr('Le caratteristiche partono da 10: le imposti tu sulla scheda (o tiri i dadi fisicamente).', 'Ability scores start at 10: you set them on the sheet (or roll real dice).')}
                 </div>
               )}
               {bozzaCrea.metodo === 'assegna' && (
@@ -10319,7 +10436,7 @@ export default function App() {
                     style={{ ...styles.button, marginBottom: 8 }}
                     onClick={() => setB({ pool: Array.from({ length: 6 }, tira4d6ScartaMinimo).sort((a, b) => b - a), assegna: {} })}
                   >
-                    {bozzaCrea.pool ? 'Ritira i valori' : 'Tira i 6 valori'}
+                    {bozzaCrea.pool ? tr('Ritira i valori', 'Reroll the values') : tr('Tira i 6 valori', 'Roll the 6 values')}
                   </button>
                   {bozzaCrea.pool && (
                     <>
@@ -10367,8 +10484,8 @@ export default function App() {
                   </div>
                   <div style={{ ...styles.detail, fontSize: 11, color: C.inkDim, marginTop: 3 }}>
                     {bozzaCrea.dotazione === 'oro'
-                      ? 'Parti con solo oro per comprarti l’equipaggiamento (armi/armatura da impostare a mano).'
-                      : 'Parti con armi, armatura e oggetti già pronti (consigliato).'}
+                      ? tr('Parti con solo oro per comprarti l’equipaggiamento (armi/armatura da impostare a mano).', 'Start with gold only to buy your gear (set weapons/armor by hand).')
+                      : tr('Parti con armi, armatura e oggetti già pronti (consigliato).', 'Start with weapons, armor and items ready (recommended).')}
                   </div>
                 </div>
               )}
@@ -10465,7 +10582,7 @@ export default function App() {
                             if (dati) {
                               const normalizzata = normalizeImported(dati);
                               aggiorna(normalizzata);
-                              setInfo({ titolo: 'Importazione completata', testo: `Scheda "${normalizzata.nome || 'Personaggio'}" importata dal link.` });
+                              setInfo({ titolo: tr('Importazione completata', 'Import complete'), testo: tr(`Scheda "${normalizzata.nome || 'Personaggio'}" importata dal link.`, `Sheet "${normalizzata.nome || 'Character'}" imported from the link.`) });
                             }
                           });
                           return;
@@ -10474,9 +10591,9 @@ export default function App() {
                       const obj = JSON.parse(str);
                       const normalizzata = normalizeImported(obj);
                       aggiorna(normalizzata);
-                      setInfo({ titolo: 'Importazione completata', testo: `Scheda "${normalizzata.nome || 'Personaggio'}" importata dal testo.` });
+                      setInfo({ titolo: tr('Importazione completata', 'Import complete'), testo: tr(`Scheda "${normalizzata.nome || 'Personaggio'}" importata dal testo.`, `Sheet "${normalizzata.nome || 'Character'}" imported from the text.`) });
                     } catch (err) {
-                      setInfo({ titolo: 'Importazione non riuscita', testo: 'Il testo incollato non è un JSON valido o il link non contiene una scheda valida.' });
+                      setInfo({ titolo: tr('Importazione non riuscita', 'Import failed'), testo: tr('Il testo incollato non è un JSON valido o il link non contiene una scheda valida.', 'The pasted text is not valid JSON, or the link does not contain a valid sheet.') });
                     }
                   }
                 }, 50);
@@ -10732,18 +10849,18 @@ export default function App() {
             {avvisoBackup && (
               <div style={{ border: `1px solid ${C.gold}`, borderRadius: 8, padding: '8px 10px', marginBottom: 12, background: 'color-mix(in srgb, var(--c-panel) 88%, #c88c14)' }}>
                 <div style={{ fontSize: 12, color: C.ink, marginBottom: 6 }}>
-                  <strong>Fai un backup dei tuoi personaggi.</strong> I dati sono salvati solo su questo
-                  dispositivo: un backup ti protegge se cambi telefono o svuoti la cache.
+                  <strong>{tr('Fai un backup dei tuoi personaggi.', 'Back up your characters.')}</strong>{' '}
+                  {tr('I dati sono salvati solo su questo dispositivo: un backup ti protegge se cambi telefono o svuoti la cache.', 'Your data is stored only on this device: a backup protects you if you change phone or clear the cache.')}
                 </div>
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   <button style={{ ...styles.buttonPrimary, fontSize: 11, padding: '4px 10px' }} onClick={esportaBackupCompleto}>
-                    Scarica backup
+                    {tr('Scarica backup', 'Download backup')}
                   </button>
                   <button
                     style={{ ...styles.buttonMini, fontSize: 11 }}
-                    onClick={() => { try { localStorage.setItem('scheda-interattiva:snooze-backup', String(Date.now() + 3 * 24 * 3600 * 1000)); } catch { /* niente */ } setPromemoriaBackup(false); }}
-                    title="Ricordamelo tra qualche giorno"
-                  >Più tardi</button>
+                    onClick={rimandaBackup}
+                    title={tr('Ricordamelo tra qualche giorno', 'Remind me in a few days')}
+                  >{tr('Più tardi', 'Later')}</button>
                 </div>
               </div>
             )}
@@ -10900,7 +11017,7 @@ export default function App() {
                     style={{ display: 'block' }}
                   />
                 </div>
-                <div style={{ ...styles.detail, fontSize: 11, color: C.inkDim, marginBottom: 8 }}>Inquadra con la fotocamera per aprire al volo</div>
+                <div style={{ ...styles.detail, fontSize: 11, color: C.inkDim, marginBottom: 8 }}>{tr('Inquadra con la fotocamera per aprire al volo', 'Scan with the camera to open it right away')}</div>
 
                 <button style={styles.buttonMini} onClick={() => navigator.clipboard?.writeText(formattaCodiceStanza(stanzaUi.creato))}>{t('stanze.copia')}</button>
                 <div style={{ ...styles.detail, fontSize: 11, marginTop: 6 }}>{t('stanze.scade')}</div>
@@ -10996,10 +11113,10 @@ export default function App() {
                 <button style={styles.buttonMini} onClick={() => setMostraRipristino(false)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
               </div>
               <p style={{ ...styles.detail, marginTop: 0 }}>
-                Ripristini automatici salvati su questo dispositivo (senza immagini). Utile per annullare
-                una cancellazione o una modifica sbagliata. Ripristinando, lo stato attuale viene comunque salvato.
+                {tr('Ripristini automatici salvati su questo dispositivo (senza immagini). Utile per annullare una cancellazione o una modifica sbagliata. Ripristinando, lo stato attuale viene comunque salvato.', 'Automatic restore points saved on this device (without images). Useful to undo a deletion or a wrong change. Restoring still saves the current state first.')}
+                
               </p>
-              {snaps.length === 0 && <p style={styles.detail}>Nessuna versione salvata.</p>}
+              {snaps.length === 0 && <p style={styles.detail}>{tr('Nessuna versione salvata.', 'No saved versions.')}</p>}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {snaps.map((s, i) => {
                   const nomi = Object.values(s.roster?.personaggi || {}).map((p) => p.nome || '—').slice(0, 4).join(', ');
@@ -11013,8 +11130,8 @@ export default function App() {
                       <button
                         style={{ ...styles.buttonMini, borderColor: C.gold, color: C.goldDark, flexShrink: 0 }}
                         onClick={() => setConferma({
-                          titolo: 'Ripristinare questa versione?',
-                          testo: `Sostituirai i personaggi attuali con la versione del ${quando}. Lo stato di adesso verrà salvato tra le versioni, così puoi tornare indietro.`,
+                          titolo: tr('Ripristinare questa versione?', 'Restore this version?'),
+                          testo: tr(`Sostituirai i personaggi attuali con la versione del ${quando}. Lo stato di adesso verrà salvato tra le versioni, così puoi tornare indietro.`, `Your current characters will be replaced with the version from ${quando}. The current state is saved among the versions, so you can go back.`),
                           onConferma: () => ripristinaSnapshot(s),
                         })}
                       >Ripristina</button>
@@ -11343,7 +11460,7 @@ export default function App() {
                 {GALLERIA_BESTIE_PRESET.map((g) => {
                   const avatarSvg = generaAvatarBestia({ nome: g.bestia });
                   return (
-                    <div
+                    <div role="button" tabIndex={0}
                       key={g.id}
                       onClick={() => {
                         if (formaAttiva) {
@@ -11482,7 +11599,7 @@ export default function App() {
             <button
               style={{ ...styles.btnMini }}
               onClick={() => setMostraPannelloAudio(false)}
-              aria-label="Chiudi pannello audio"
+              aria-label={tr('Chiudi pannello audio', 'Close audio panel')}
             >✕</button>
           </div>
           {/* Volume del sottofondo */}
@@ -11493,7 +11610,7 @@ export default function App() {
               value={volumeAudio}
               onChange={(e) => setVolumeAudio(e.target.value)}
               style={{ flex: 1, accentColor: C.gold }}
-              title="Volume del sottofondo"
+              title={tr('Volume del sottofondo', 'Background volume')}
             />
             <span style={{ minWidth: 38, textAlign: 'right', fontSize: 12, fontWeight: 'bold' }}>{Math.round(volumeAudio * 100)}%</span>
           </div>
@@ -11512,7 +11629,7 @@ export default function App() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 4 }}>
             <button
               onClick={() => setEffettiSonoriAttivi((v) => !v)}
-              title="Attiva/disattiva i suoni dei tiri di dado. La barra qui sopra regola invece il volume del sottofondo ambientale."
+              title={tr('Attiva/disattiva i suoni dei tiri di dado. La barra qui sopra regola invece il volume del sottofondo ambientale.', 'Turn dice roll sounds on/off. The slider above sets the background ambience volume.')}
               style={{
                 padding: '6px 4px', minHeight: 32, borderRadius: 6,
                 border: `1px solid ${effettiSonoriAttivi ? C.goldDark : C.border}`,
@@ -12083,8 +12200,8 @@ export default function App() {
                         marginRight: 2,
                       }}
                       onClick={() => setMostraMenuHubMobile((v) => !v)}
-                      title="Apri Menu Hub"
-                      aria-label="Apri Menu Hub"
+                      title={tr('Apri Menu Hub', 'Open Menu Hub')}
+                      aria-label={tr('Apri menu e strumenti', 'Open menu and tools')}
                     >
                       <span style={{ fontSize: 13, lineHeight: 1 }}>☰</span>
                       <span>Menu</span>
@@ -12144,7 +12261,7 @@ export default function App() {
                     </div>
                     <div style={{ fontSize: 24, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 8 }}>
                       {danni.libero || danni.tabella || /magia selvaggia/i.test(danni.etichetta) ? '✨' : danni.guarigione ? '✚' : '💥'} <strong>{danni.totale}</strong>
-                      {danni.libero || danni.tabella || /magia selvaggia/i.test(danni.etichetta) ? '' : danni.guarigione ? ' PF recuperati' : ' danni'}
+                      {danni.libero || danni.tabella || /magia selvaggia/i.test(danni.etichetta) ? '' : danni.guarigione ? tr(' PF recuperati', ' HP regained') : tr(' danni', ' damage')}
                       {danni.critico && <span style={styles.badge(C.goldDark)}>CRITICO!</span>}
                     </div>
                     <div style={{ ...styles.detail, marginTop: 4 }}>
@@ -12155,7 +12272,7 @@ export default function App() {
               </div>
               <button
                 style={{ ...styles.buttonMini, color: C.inkDim, alignSelf: 'flex-start', padding: '4px 8px' }}
-                title="Chiudi risultato tiro"
+                title={tr('Chiudi risultato tiro', 'Close roll result')}
                 onClick={() => { setTiro(null); setDanni(null); }}
               >✖</button>
             </div>
@@ -12299,7 +12416,7 @@ export default function App() {
                   const val = punteggioCaratteristica(scheda, car);
                   const mod = modificatore(val);
                   return (
-                    <div
+                    <div role="button" tabIndex={0}
                       key={car}
                       style={{ cursor: 'pointer', padding: '4px', borderRadius: 6, transition: 'all 0.15s ease', opacity: sostituita ? 1 : 0.6 }}
                       onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.05)'; }}
@@ -12390,7 +12507,7 @@ export default function App() {
                                     gap: 4,
                                   }}
                                   onClick={() => {
-                                    lanciaD20(`Attacco (${formaAttiva.dati.nome}): ${az.nome}`, az.bonus, {
+                                    lanciaD20(tr(`Attacco (${formaAttiva.dati.nome}): ${az.nome}`, `Attack (${formaAttiva.dati.nome}): ${az.nome}`), az.bonus, {
                                       attacco: {
                                         nome: `${formaAttiva.dati.nome}: ${az.nome}`,
                                         danno: az.danno,
@@ -12399,7 +12516,7 @@ export default function App() {
                                       tipoTiro: 'attacco',
                                     });
                                   }}
-                                  title={`Tira per Colpire: 1d20 ${conSegno(az.bonus)}`}
+                                  title={tr(`Tira per colpire: 1d20 ${conSegno(az.bonus)}`, `Attack roll: 1d20 ${conSegno(az.bonus)}`)}
                                 >
                                   <span>{lingua === 'en' ? 'Attack Roll' : 'Tiro per Colpire'} ({conSegno(az.bonus)})</span>
                                 </button>
@@ -12421,9 +12538,9 @@ export default function App() {
                                     gap: 4,
                                   }}
                                   onClick={() => {
-                                    lanciaDanniDiretti(`Danni (${formaAttiva.dati.nome}): ${az.nome}`, az.danno);
+                                    lanciaDanniDiretti(tr(`Danni (${formaAttiva.dati.nome}): ${az.nome}`, `Damage (${formaAttiva.dati.nome}): ${az.nome}`), az.danno);
                                   }}
-                                  title={`Tira Danni: ${az.danno}`}
+                                  title={tr(`Tira danni: ${az.danno}`, `Roll damage: ${az.danno}`)}
                                 >
                                   <span>{lingua === 'en' ? 'Damage' : 'Danni'} ({az.danno})</span>
                                 </button>
@@ -12458,7 +12575,7 @@ export default function App() {
                 )}
                 {(scheda.sezioniAperte?.ritratto ?? true) && (
                   <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div
+                    <div role="button" tabIndex={0}
                       className="ritratto-box"
                       style={{
                         borderRadius: 14, overflow: 'hidden',
@@ -12470,7 +12587,7 @@ export default function App() {
                         border: isTrasformato ? '2.5px solid #52b788' : `2px solid ${coloreClasse(scheda.classe) ? C.gold : C.border}`,
                         cursor: 'pointer', position: 'relative',
                       }}
-                      title={isTrasformato ? `${formaAttiva.dati.nome}: clicca per cambiare illustrazione o caricare un'immagine` : (scheda.ritratto ? 'Clic: cambia immagine' : 'Clic: carica l’immagine del personaggio')}
+                      title={isTrasformato ? tr(`${formaAttiva.dati.nome}: clicca per cambiare illustrazione o caricare un'immagine`, `${formaAttiva.dati.nome}: click to change the art or upload an image`) : (scheda.ritratto ? tr('Clic: cambia immagine', 'Click: change image') : tr('Clic: carica l’immagine del personaggio', 'Click: upload the character image'))}
                       onClick={() => {
                         if (isTrasformato) {
                           setMostraModalRitrattoBestia(true);
@@ -12483,7 +12600,7 @@ export default function App() {
                       <button
                         type="button"
                         className="ritratto-collassa"
-                        title="Riduci il ritratto"
+                        title={tr('Riduci il ritratto', 'Collapse the portrait')}
                         aria-expanded
                         onClick={(e) => { e.stopPropagation(); aggiorna({ sezioniAperte: { ...(scheda.sezioniAperte || {}), ritratto: false } }); }}
                       >▾</button>
@@ -12526,7 +12643,7 @@ export default function App() {
                         <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
                           <img
                             src={generaAvatarBestia(formaAttiva.dati)}
-                            alt={`${campoForma === 'metamorfosi' ? 'Metamorfosi' : 'Forma Selvatica'}: ${formaAttiva.dati.nome}`}
+                            alt={`${campoForma === 'metamorfosi' ? tr('Metamorfosi', 'Polymorph') : tr('Forma Selvatica', 'Wild Shape')}: ${formaAttiva.dati.nome}`}
                             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                           />
                           <div style={{ position: 'absolute', top: 6, right: 6, zIndex: 3, background: 'rgba(8, 28, 21, 0.92)', color: '#d8f3dc', border: '1px solid #52b788', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 6px', textTransform: 'uppercase', letterSpacing: 0.5, boxShadow: '0 2px 6px rgba(0,0,0,0.4)' }}>
@@ -12543,7 +12660,7 @@ export default function App() {
                               boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
                             }}
                             onClick={(e) => { e.stopPropagation(); setMostraModalRitrattoBestia(true); }}
-                            title="Cambia immagine o illustrazione della forma bestiale"
+                            title={tr('Cambia immagine o illustrazione della forma bestiale', 'Change the image or art of the beast form')}
                           >
                             <span>{lingua === 'en' ? 'Art' : 'Arte'}</span>
                           </button>
@@ -12552,7 +12669,7 @@ export default function App() {
                         scheda.ritratto ? (
                           <img
                             src={scheda.ritratto}
-                            alt={`Ritratto di ${scheda.nome}`}
+                            alt={tr(`Ritratto di ${scheda.nome}`, `Portrait of ${scheda.nome}`)}
                             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
                             onError={(e) => {
                               if (!e.currentTarget.dataset.fallback) {
@@ -12565,7 +12682,7 @@ export default function App() {
                           <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} title={t('tip.carica_img')}>
                             <img
                               src={generaAvatar(scheda.classe, scheda.specie, scheda.nome)}
-                              alt={`Ritratto di ${scheda.nome}`}
+                              alt={tr(`Ritratto di ${scheda.nome}`, `Portrait of ${scheda.nome}`)}
                               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                             />
                             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.35)', color: '#fff', fontSize: 11, letterSpacing: 1, textAlign: 'center', padding: '2px 0' }}>{t("profilo.ritratto")}</div>
@@ -12839,7 +12956,7 @@ export default function App() {
                       opacity: 0.9,
                       letterSpacing: 0.6,
                     }}
-                    title={`Versione Regole D&D: ${(scheda.versione || '2024') === '2024' ? '5.5 (2024)' : '5.0 (2014)'}`}
+                    title={`${tr('Versione regole D&D', 'D&D rules version')}: ${(scheda.versione || '2024') === '2024' ? '5.5 (2024)' : '5.0 (2014)'}`}
                   >
                     {(scheda.versione || '2024') === '2024' ? '5.5' : '5.0'}
                   </div>
@@ -12883,7 +13000,10 @@ export default function App() {
                             padding: '1px 0',
                             cursor: 'help',
                           }}
-                          title={`Taglia modificata da ${isTrasformato ? `${campoForma === 'metamorfosi' ? 'Metamorfosi' : 'Forma Selvatica'} (${formaAttiva.dati.nome})` : 'Effetto Taglia'}: ${tagliaEffettiva(scheda)} (Taglia naturale: ${scheda.taglia || 'Media'}) · Spazio: ${SPAZIO_TAGLIA_5E[tagliaEffettiva(scheda)] || '1,5m'} · Lotta fino a: ${LOTTA_MAX_TAGLIA_5E[tagliaEffettiva(scheda)] || 'Grande'}`}
+                          title={tr(
+                            `Taglia modificata da ${isTrasformato ? `${campoForma === 'metamorfosi' ? 'Metamorfosi' : 'Forma Selvatica'} (${formaAttiva.dati.nome})` : 'Effetto Taglia'}: ${tagliaEffettiva(scheda)} (Taglia naturale: ${scheda.taglia || 'Media'}) · Spazio: ${SPAZIO_TAGLIA_5E[tagliaEffettiva(scheda)] || '1,5m'} · Lotta fino a: ${LOTTA_MAX_TAGLIA_5E[tagliaEffettiva(scheda)] || 'Grande'}`,
+                            `Size changed by ${isTrasformato ? `${campoForma === 'metamorfosi' ? 'Polymorph' : 'Wild Shape'} (${formaAttiva.dati.nome})` : 'size effect'}: ${traduciDato(tagliaEffettiva(scheda))} (natural size: ${traduciDato(scheda.taglia || 'Media')}) · Space: ${SPAZIO_TAGLIA_5E[tagliaEffettiva(scheda)] || '1,5m'} · Grapple up to: ${traduciDato(LOTTA_MAX_TAGLIA_5E[tagliaEffettiva(scheda)] || 'Grande')}`,
+                          )}
                         >
                           <span style={{ fontWeight: 800, color: '#2e7d32', fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
                             <span>{isTrasformato ? '🐾' : '✨'}</span>
@@ -12909,7 +13029,10 @@ export default function App() {
                           value={scheda.taglia}
                           opzioni={TAGLIE_5E}
                           onChange={(v) => aggiorna({ taglia: v })}
-                          title={`Taglia: ${scheda.taglia || 'Media'} · Spazio: ${SPAZIO_TAGLIA_5E[scheda.taglia || 'Media'] || '1,5m'} · Lotta fino a: ${LOTTA_MAX_TAGLIA_5E[scheda.taglia || 'Media'] || 'Grande'}`}
+                          title={tr(
+                            `Taglia: ${scheda.taglia || 'Media'} · Spazio: ${SPAZIO_TAGLIA_5E[scheda.taglia || 'Media'] || '1,5m'} · Lotta fino a: ${LOTTA_MAX_TAGLIA_5E[scheda.taglia || 'Media'] || 'Grande'}`,
+                            `Size: ${traduciDato(scheda.taglia || 'Media')} · Space: ${SPAZIO_TAGLIA_5E[scheda.taglia || 'Media'] || '1,5m'} · Grapple up to: ${traduciDato(LOTTA_MAX_TAGLIA_5E[scheda.taglia || 'Media'] || 'Grande')}`,
+                          )}
                         />
                       )}
                     </CampoModulo>
@@ -12945,7 +13068,7 @@ export default function App() {
                       })}
                     </CampoModulo>
                     <CampoModulo label={t("profilo.pe")}>
-                      <div
+                      <div role="button" tabIndex={0}
                         onClick={() => setMostraModalPe(true)}
                         style={{
                           cursor: 'pointer',
@@ -13109,8 +13232,8 @@ export default function App() {
                         style={{ ...styles.buttonMini, color: C.red, height: 26, marginBottom: 4 }}
                         title={t('modal.elimina')}
                         onClick={() => setConferma({
-                          titolo: 'Elimina classe secondaria',
-                          testo: `Vuoi rimuovere ${m.classe || 'questa classe'} dal multiclasse?`,
+                          titolo: tr('Elimina classe secondaria', 'Remove secondary class'),
+                          testo: tr(`Vuoi rimuovere ${m.classe || 'questa classe'} dal multiclasse?`, `Remove ${traduciDato(m.classe) || 'this class'} from your multiclass?`),
                           onConferma: () => setMc(mc.filter((_, j) => j !== i)),
                         })}
                       >
@@ -13126,13 +13249,13 @@ export default function App() {
                   </button>
                   <button
                     style={{ ...styles.button, fontSize: 12, padding: '4px 12px' }}
-                    title="Applica e compila automaticamente bonus di competenza, dadi vita, slot combinati e privilegi di classe/sottoclasse"
+                    title={tr('Applica e compila automaticamente bonus di competenza, dadi vita, slot combinati e privilegi di classe/sottoclasse', 'Apply and fill in proficiency bonus, hit dice, combined slots and class/subclass features')}
                     onClick={() => applicaTuttoMc(mc)}
                   >
                     {t('mc.applica')}
                   </button>
                   <span style={{ ...styles.detail, fontSize: 11, opacity: 0.8 }}>
-                    Aggiorna competenza, DV, slot e compila i privilegi di tutte le classi.
+                    {tr('Aggiorna competenza, DV, slot e compila i privilegi di tutte le classi.', 'Updates proficiency, hit dice, slots and fills in the features of every class.')}
                   </span>
                 </div>
               </div>
@@ -13306,8 +13429,8 @@ export default function App() {
                               etichetta: esitoPf0.istantaneo ? 'Morte' : 'TS Morte',
                               tipo: 'tattica',
                               dettaglio: esitoPf0.istantaneo
-                                ? `${scheda.nome || 'PG'} muore: danno subito a 0 PF con eccesso pari o superiore ai PF massimi.`
-                                : `${scheda.nome || 'PG'} subisce danno mentre è a 0 PF: fallimento automatico (${esitoPf0.tsMorteDopo.fallimenti}/3).`,
+                                ? tr(`${scheda.nome || 'PG'} muore: danno subito a 0 PF con eccesso pari o superiore ai PF massimi.`, `${scheda.nome || 'PC'} dies: damage taken at 0 HP with leftover equal to or above max HP.`)
+                                : tr(`${scheda.nome || 'PG'} subisce danno mentre è a 0 PF: fallimento automatico (${esitoPf0.tsMorteDopo.fallimenti}/3).`, `${scheda.nome || 'PC'} takes damage at 0 HP: automatic failure (${esitoPf0.tsMorteDopo.fallimenti}/3).`),
                             });
                           }
                           aggiorna(patch);
@@ -13498,7 +13621,7 @@ export default function App() {
                             style={{ ...styles.buttonMini, fontSize: 12, color: C.red, borderColor: C.red, fontWeight: 700, padding: '3px 8px', borderRadius: 6, background: 'rgba(231,76,60,0.08)' }}
                             onClick={tiroSalvezzaMorte}
                             disabled={rolling || (scheda.tsMorte?.successi || 0) >= 3 || (scheda.tsMorte?.fallimenti || 0) >= 3}
-                            title="Tira 1d20 TS Morte"
+                            title={tr('Tira 1d20 TS contro morte', 'Roll 1d20 death save')}
                           >
                             {lingua === 'en' ? 'Roll' : 'Tira'}
                           </button>
@@ -13554,15 +13677,15 @@ export default function App() {
                 </select>
                 <div style={{ fontSize: 11, color: C.inkDim, display: 'flex', gap: 5, alignItems: 'center', justifyContent: 'center', marginTop: 4, flexWrap: 'wrap' }}>
                   {(scheda.armatura.tipo === 'leggera' || scheda.armatura.tipo === 'media' || scheda.armatura.tipo === 'pesante') && (
-                    <span title={`CA base dell'armatura. Esempi: ${ESEMPI_ARMATURA[scheda.armatura.tipo]}`}>base <Editable value={scheda.armatura.base} tipo="numero" width={24} onChange={(v) => aggiorna({ armatura: { ...scheda.armatura, base: Math.max(0, v) } })} /></span>
+                    <span title={tr(`CA base dell'armatura. Esempi: ${ESEMPI_ARMATURA[scheda.armatura.tipo]}`, `Base armor AC. Examples: ${ESEMPI_ARMATURA[scheda.armatura.tipo]}`)}>base <Editable value={scheda.armatura.base} tipo="numero" width={24} onChange={(v) => aggiorna({ armatura: { ...scheda.armatura, base: Math.max(0, v) } })} /></span>
                   )}
                   {(() => {
                     const scudiOk = !!scheda.addestramento?.armature?.scudi;
                     return (
-                      <span
+                      <span role="button" tabIndex={0}
                         className="tirabile"
                         style={{ cursor: scudiOk || scheda.armatura.scudo ? 'pointer' : 'not-allowed', opacity: scudiOk || scheda.armatura.scudo ? 1 : 0.5 }}
-                        title={scudiOk ? 'Scudo: +2 alla CA' : 'Non sei competente con gli scudi (attivala in “Addestramento…”)'}
+                        title={scudiOk ? tr('Scudo: +2 alla CA', 'Shield: +2 AC') : tr('Non sei competente con gli scudi (attivala in “Addestramento…”)', 'You are not proficient with shields (turn it on in “Training…”)')}
                         onClick={() => {
                           // Blocco: non puoi imbracciare uno scudo senza competenza (ma puoi sempre toglierlo).
                           if (!scudiOk && !scheda.armatura.scudo) return;
@@ -13597,7 +13720,7 @@ export default function App() {
                 </div>
                 {(!competenteInArmatura(scheda, scheda.armatura.tipo) || (scheda.armatura.scudo && !scheda.addestramento?.armature?.scudi)) && (
                   <div style={{ fontSize: 11, color: C.red, marginTop: 3, lineHeight: 1.2 }} title={t('tip.senza_comp_armatura')}>
-                    Non competente{!competenteInArmatura(scheda, scheda.armatura.tipo) ? ` (${scheda.armatura.tipo})` : ''}{scheda.armatura.scudo && !scheda.addestramento?.armature?.scudi ? ' (scudo)' : ''}
+                    {tr('Non competente', 'Not proficient')}{!competenteInArmatura(scheda, scheda.armatura.tipo) ? ` (${traduciDato(scheda.armatura.tipo)})` : ''}{scheda.armatura.scudo && !scheda.addestramento?.armature?.scudi ? tr(' (scudo)', ' (shield)') : ''}
                   </div>
                 )}
               </div>
@@ -13620,8 +13743,8 @@ export default function App() {
                   const bcAtteso = bonusCompetenzaDaLivello(livTot);
                   if (scheda.bonusCompetenza !== bcAtteso) {
                     return (
-                      <span className="tirabile" style={{ fontSize: 11, color: C.goldDark, cursor: 'pointer', marginTop: 1 }}
-                        title={`Bonus corretto per liv. ${livTot}: ${conSegno(bcAtteso)}`}
+                      <span role="button" tabIndex={0} className="tirabile" style={{ fontSize: 11, color: C.goldDark, cursor: 'pointer', marginTop: 1 }}
+                        title={tr(`Bonus corretto per liv. ${livTot}: ${conSegno(bcAtteso)}`, `Correct bonus for level ${livTot}: ${conSegno(bcAtteso)}`)}
                         onClick={() => aggiorna({ bonusCompetenza: bcAtteso })}>
                         auto {conSegno(bcAtteso)}
                       </span>
@@ -13699,7 +13822,7 @@ export default function App() {
                     );
                   })()
                 )}
-                <div
+                <div role="button" tabIndex={0}
                   onClick={() => setMostraModalMovimento(true)}
                   style={{
                     fontSize: 11,
@@ -13734,7 +13857,7 @@ export default function App() {
                   <button style={{ ...styles.buttonMini, padding: '1px 5px', fontSize: 13 }} onClick={() => aggiorna({ sfinimento: Math.min(6, scheda.sfinimento + 1) })} title={t('tip.aumenta')}>+</button>
                 </div>
                 {scheda.sfinimento > 0 && (
-                  <div style={{ fontSize: 11, color: C.red }} title={versione === '2024' ? 'Regole 2024: −2 ai tiri di d20 per livello' : `Regole 2014: ${SFINIMENTO_2014[scheda.sfinimento]}`}>
+                  <div style={{ fontSize: 11, color: C.red }} title={versione === '2024' ? tr('Regole 2024: −2 ai tiri di d20 per livello', '2024 rules: −2 to d20 rolls per level') : `${tr('Regole 2014', '2014 rules')}: ${SFINIMENTO_2014[scheda.sfinimento]}`}>
                     {versione === '2024' ? `−${scheda.sfinimento * 2}` : SFINIMENTO_2014[scheda.sfinimento]}
                   </div>
                 )}
@@ -13751,7 +13874,7 @@ export default function App() {
                 <div style={styles.vitalLabel}>{t("vital.visione")}</div>
                 <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                   {isTrasformato && formaAttiva.dati.sensi ? (
-                    <div style={{ fontSize: 12, fontWeight: 700, color: '#2e7d32', textAlign: 'center', padding: '0 4px', lineHeight: 1.25 }} title={`Sensi della Bestia: ${formaAttiva.dati.sensi}`}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#2e7d32', textAlign: 'center', padding: '0 4px', lineHeight: 1.25 }} title={`${tr('Sensi della bestia', 'Beast senses')}: ${traduciDato(formaAttiva.dati.sensi)}`}>
                       {formaAttiva.dati.sensi}
                     </div>
                   ) : (
@@ -13813,8 +13936,8 @@ export default function App() {
                         <button
                           type="button"
                           style={{ background: 'transparent', border: 'none', color: '#c0392b', cursor: 'pointer', padding: 0, fontSize: 13, lineHeight: 1, fontWeight: 'bold' }}
-                          title="Rimuovi effetto taglia"
-                          aria-label="Rimuovi effetto taglia"
+                          title={tr('Rimuovi effetto taglia', 'Remove size effect')}
+                          aria-label={tr('Rimuovi effetto taglia', 'Remove size effect')}
                           onClick={() => aggiorna({ effettoTaglia: null })}
                         >✕</button>
                       </span>
@@ -13913,7 +14036,7 @@ export default function App() {
                       {conSegno(mod)}
                     </Rollable>
                     <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 3 }}>
-                      <div
+                      <div role="button" tabIndex={0}
                         className="car-header-label"
                         style={{ minWidth: 0, fontSize: 12, color: C.ink, letterSpacing: 0.2, fontWeight: 'bold', cursor: 'help', textDecoration: 'underline dotted', textUnderlineOffset: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                         title={t('tip.cosa_governa')}
@@ -14141,14 +14264,14 @@ export default function App() {
                     },
                     reazioneUsata: false,
                   });
-                  registra({ etichetta: 'Turno', tipo: 'turno', dettaglio: `Inizio nuovo turno di combattimento (${scheda.nome || 'PG'})` });
+                  registra({ etichetta: tr('Turno', 'Turn'), tipo: 'turno', dettaglio: tr(`Inizio nuovo turno di combattimento (${scheda.nome || 'PG'})`, `New combat turn starts (${scheda.nome || 'PC'})`) });
                 };
 
                 const applicaTattica = (nomeTattica) => {
                   if (nomeTattica === 'schivata') {
                     setTurno({ azione: true, tatticaAttiva: 'schivata' });
-                    registra({ etichetta: 'Schivata', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} compie l'azione di Schivata: gli attacchi contro di te hanno svantaggio e hai vantaggio ai TS su Destrezza.` });
-                    setInfo({ titolo: 'Schivata (Dodge)', testo: 'Fino all\'inizio del tuo prossimo turno, ogni tiro per colpire contro di te ha svantaggio (se puoi vedere l\'attaccante) e hai vantaggio ai tiri salvezza su Destrezza.' });
+                    registra({ etichetta: tr('Schivata', 'Dodge'), tipo: 'tattica', dettaglio: tr(`${scheda.nome || 'PG'} compie l'azione di Schivata: gli attacchi contro di te hanno svantaggio e hai vantaggio ai TS su Destrezza.`, `${scheda.nome || 'PC'} takes the Dodge action: attacks against you have disadvantage and you have advantage on Dexterity saves.`) });
+                    setInfo({ titolo: tr('Schivata (Dodge)', 'Dodge'), testo: tr('Fino all\'inizio del tuo prossimo turno, ogni tiro per colpire contro di te ha svantaggio (se puoi vedere l\'attaccante) e hai vantaggio ai tiri salvezza su Destrezza.', 'Until the start of your next turn, any attack roll against you has disadvantage (if you can see the attacker) and you have advantage on Dexterity saving throws.') });
                   } else if (nomeTattica === 'disimpegno') {
                     const usaBonus = turno.haAzioneScaltra && !turno.bonusUsato;
                     if (usaBonus) {
@@ -14156,8 +14279,8 @@ export default function App() {
                     } else {
                       setTurno({ azione: true, tatticaAttiva: 'disimpegno' });
                     }
-                    registra({ etichetta: 'Disimpegno', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} compie l'azione di Disimpegno: il tuo movimento non provoca attacchi di opportunità per il resto del turno.` });
-                    setInfo({ titolo: 'Disimpegno (Disengage)', testo: 'Per il resto del tuo turno, il tuo movimento non provoca attacchi di opportunità da parte delle creature nemiche.' });
+                    registra({ etichetta: tr('Disimpegno', 'Disengage'), tipo: 'tattica', dettaglio: tr(`${scheda.nome || 'PG'} compie l'azione di Disimpegno: il tuo movimento non provoca attacchi di opportunità per il resto del turno.`, `${scheda.nome || 'PC'} takes the Disengage action: your movement does not provoke opportunity attacks for the rest of the turn.`) });
+                    setInfo({ titolo: tr('Disimpegno (Disengage)', 'Disengage'), testo: tr('Per il resto del tuo turno, il tuo movimento non provoca attacchi di opportunità da parte delle creature nemiche.', 'For the rest of your turn, your movement does not provoke opportunity attacks from enemies.') });
                   } else if (nomeTattica === 'scatto') {
                     const usaBonus = turno.haAzioneScaltra && !turno.bonusUsato;
                     if (usaBonus) {
@@ -14165,7 +14288,7 @@ export default function App() {
                     } else {
                       setTurno({ azione: true, tatticaAttiva: 'scatto' });
                     }
-                    registra({ etichetta: 'Scatto', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} compie l'azione di Scatto: movimento massimo del turno raddoppiato a ${turno.velBase * 2} m.` });
+                    registra({ etichetta: tr('Scatto', 'Dash'), tipo: 'tattica', dettaglio: tr(`${scheda.nome || 'PG'} compie l'azione di Scatto: movimento massimo del turno raddoppiato a ${turno.velBase * 2} m.`, `${scheda.nome || 'PC'} takes the Dash action: movement this turn doubled to ${turno.velBase * 2} m.`) });
                   } else if (nomeTattica === 'nascondersi') {
                     const usaBonus = turno.haAzioneScaltra && !turno.bonusUsato;
                     if (usaBonus) {
@@ -14180,12 +14303,12 @@ export default function App() {
                     const totBonus = modDes + (comp === 1 || comp === 2 ? bonusComp : comp === 3 ? bonusComp * 2 : 0);
                     const d20 = tiraDado(20);
                     const tot = d20 + totBonus;
-                    registra({ etichetta: 'Nascondersi', tipo: 'prova', totale: tot, dettaglio: `Prova di Furtività (Nascondersi): 1d20 [${d20}] ${conSegno(totBonus)} = ${tot}` });
-                    setInfo({ titolo: `Furtività: ${tot}`, testo: `Hai tentato di nasconderti con un risultato di ${tot} (d20 [${d20}] ${conSegno(totBonus)}). Confrontalo con la Percezione Passiva dei nemici.` });
+                    registra({ etichetta: tr('Nascondersi', 'Hide'), tipo: 'prova', totale: tot, dettaglio: tr(`Prova di Furtività (Nascondersi): 1d20 [${d20}] ${conSegno(totBonus)} = ${tot}`, `Stealth check (Hide): 1d20 [${d20}] ${conSegno(totBonus)} = ${tot}`) });
+                    setInfo({ titolo: tr(`Furtività: ${tot}`, `Stealth: ${tot}`), testo: tr(`Hai tentato di nasconderti con un risultato di ${tot} (d20 [${d20}] ${conSegno(totBonus)}). Confrontalo con la Percezione Passiva dei nemici.`, `You tried to hide with a result of ${tot} (d20 [${d20}] ${conSegno(totBonus)}). Compare it with the enemies' Passive Perception.`) });
                   } else if (nomeTattica === 'aiuto') {
                     setTurno({ azione: true, tatticaAttiva: 'aiuto' });
-                    registra({ etichetta: 'Aiuto', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} compie l'azione di Aiuto: concede vantaggio al prossimo tiro per colpire o prova di caratteristica di un alleato.` });
-                    setInfo({ titolo: 'Azione di Aiuto (Help)', testo: 'Concedi vantaggio alla prossima prova di caratteristica di un alleato, oppure al prossimo tiro per colpire di un alleato contro un nemico entro 1,5 m da te prima dell\'inizio del tuo prossimo turno.' });
+                    registra({ etichetta: tr('Aiuto', 'Help'), tipo: 'tattica', dettaglio: tr(`${scheda.nome || 'PG'} compie l'azione di Aiuto: concede vantaggio al prossimo tiro per colpire o prova di caratteristica di un alleato.`, `${scheda.nome || 'PC'} takes the Help action: an ally gets advantage on their next attack roll or ability check.`) });
+                    setInfo({ titolo: tr('Azione di Aiuto (Help)', 'Help action'), testo: tr('Concedi vantaggio alla prossima prova di caratteristica di un alleato, oppure al prossimo tiro per colpire di un alleato contro un nemico entro 1,5 m da te prima dell\'inizio del tuo prossimo turno.', 'Give an ally advantage on their next ability check, or on their next attack roll against an enemy within 1.5 m of you, before the start of your next turn.') });
                   }
                 };
 
@@ -14339,7 +14462,7 @@ export default function App() {
                     </div>
 
                     {/* Interruttore "Altre opzioni": Interazione Oggetto, Tattiche, Copertura, Poteri di Classe */}
-                    <div
+                    <div role="button" tabIndex={0}
                       onClick={() => setAzioniAltreAperte((v) => !v)}
                       style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', userSelect: 'none', padding: '2px 2px' }}
                       title={azioniAltreAperte
@@ -14511,7 +14634,7 @@ export default function App() {
                                       const v = !scheda.applicaFurtivo;
                                       aggiorna({ applicaFurtivo: v });
                                       if (v) {
-                                        registra({ etichetta: 'Attacco Furtivo', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} attiva Attacco Furtivo (+${furtivo.formula}) sul prossimo colpo!` });
+                                        registra({ etichetta: tr('Attacco Furtivo', 'Sneak Attack'), tipo: 'tattica', dettaglio: tr(`${scheda.nome || 'PG'} attiva Attacco Furtivo (+${furtivo.formula}) sul prossimo colpo!`, `${scheda.nome || 'PC'} readies Sneak Attack (+${furtivo.formula}) on the next hit!`) });
                                       }
                                     }}
                                     style={{
@@ -14539,11 +14662,11 @@ export default function App() {
                                       const ireUsate = v ? Math.min(ira.utilizziMax, (scheda.ireUsate || 0) + 1) : (scheda.ireUsate || 0);
                                       aggiorna({ inIra: v, ireUsate });
                                       registra({
-                                        etichetta: v ? 'Entra in Ira' : 'Fine Ira',
+                                        etichetta: v ? tr('Entra in Ira', 'Enter Rage') : tr('Fine Ira', 'End Rage'),
                                         tipo: 'tattica',
                                         dettaglio: v
-                                          ? `${scheda.nome || 'PG'} entra in Ira! (+${ira.bonusDanni} danni FOR, resistenza a contundente/perforante/tagliente, vantaggio a prove/TS FOR)`
-                                          : `${scheda.nome || 'PG'} termina l'Ira Barbarica.`,
+                                          ? tr(`${scheda.nome || 'PG'} entra in Ira! (+${ira.bonusDanni} danni FOR, resistenza a contundente/perforante/tagliente, vantaggio a prove/TS FOR)`, `${scheda.nome || 'PC'} rages! (+${ira.bonusDanni} STR damage, resistance to bludgeoning/piercing/slashing, advantage on STR checks/saves)`)
+                                          : tr(`${scheda.nome || 'PG'} termina l'Ira Barbarica.`, `${scheda.nome || 'PC'} ends the Rage.`),
                                       });
                                     }}
                                     style={{
@@ -14570,7 +14693,7 @@ export default function App() {
                                       const v = !scheda.smiteAttivo;
                                       aggiorna({ smiteAttivo: v, smiteSlot: 1 });
                                       if (v) {
-                                        registra({ etichetta: 'Punizione Divina', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} prepara Punizione Divina (+2d8 radiosi) sul prossimo colpo!` });
+                                        registra({ etichetta: tr('Punizione Divina', 'Divine Smite'), tipo: 'tattica', dettaglio: tr(`${scheda.nome || 'PG'} prepara Punizione Divina (+2d8 radiosi) sul prossimo colpo!`, `${scheda.nome || 'PC'} readies Divine Smite (+2d8 radiant) on the next hit!`) });
                                       }
                                     }}
                                     style={{
@@ -14630,7 +14753,7 @@ export default function App() {
                                     const v = !scheda.ispirazioneEroica;
                                     aggiorna({ ispirazioneEroica: v });
                                     if (v) {
-                                      registra({ etichetta: 'Ispirazione Eroica', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} ottiene Ispirazione Eroica (ritiro di un d20 a scelta)!` });
+                                      registra({ etichetta: tr('Ispirazione Eroica', 'Heroic Inspiration'), tipo: 'tattica', dettaglio: tr(`${scheda.nome || 'PG'} ottiene Ispirazione Eroica (ritiro di un d20 a scelta)!`, `${scheda.nome || 'PC'} gains Heroic Inspiration (reroll any one d20)!`) });
                                     }
                                   }}
                                   style={{
@@ -14855,7 +14978,7 @@ export default function App() {
                   const bloccaSpell = serveFocus && !haFocus;
                   const avvisoFocus = bloccaSpell ? (
                     <div style={{ fontSize: 12, color: C.red, background: 'rgba(200,40,40,0.10)', border: `1px solid ${C.red}`, borderRadius: 8, padding: '6px 10px', marginBottom: 10 }}>
-                      Nessun <strong>focus</strong> equipaggiato: per lanciare incantesimi equipaggia un focus arcano/druidico, un simbolo sacro o una borsa da componenti dall'<strong>Inventario</strong> (spunta “equip.”).
+                      {tr('Nessun focus equipaggiato: per lanciare incantesimi equipaggia un focus arcano/druidico, un simbolo sacro o una borsa da componenti dall\'Inventario (spunta “equip.”).', 'No focus equipped: to cast spells, equip an arcane/druidic focus, a holy symbol or a component pouch from the Inventory (tick “equip.”).')}
                     </div>
                   ) : null;
                   return [avvisoFocus, ...['Azione', 'Bonus', 'Reazione'].map((cat) => {
@@ -14901,7 +15024,11 @@ export default function App() {
                             <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 15 }}>
                               {cat === 'Bonus' ? t('combat.azioni_bonus') : t('combat.reazioni')}
                             </h3>
-                            <div style={{ justifySelf: 'end', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                            {/* I chip della reazione vanno su una riga propria sotto il titolo:
+                                accanto a "Reazioni" si sovrapponevano al titolo sui telefoni. */}
+                            <div className={cat === 'Reazione' ? 'reazioni-chip' : undefined} style={cat === 'Reazione'
+                              ? { gridColumn: '1 / -1', justifySelf: 'center', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 6, marginTop: 6 }
+                              : { justifySelf: 'end', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                               {cat === 'Reazione' && (
                                 <>
                                   <button
@@ -15165,7 +15292,7 @@ export default function App() {
                                         width={130}
                                         onChange={(v) => aggiornaAttacco({ nome: v })}
                                         onRoll={castBloccato ? undefined : () => tiraColpoArma(a)}
-                                        title={titoloRiga || (castBloccato ? 'Equipaggia un focus per lanciare questo incantesimo' : undefined)}
+                                        title={titoloRiga || (castBloccato ? tr('Equipaggia un focus per lanciare questo incantesimo', 'Equip a focus to cast this spell') : undefined)}
                                       />
                                     </div>
                                   </td>
@@ -15183,7 +15310,7 @@ export default function App() {
                                         bonus={a.bonus}
                                         colore={coloreCategoria('attacco', notteAttiva)}
                                         disabled={castBloccato}
-                                        title={castBloccato ? 'Equipaggia un focus per lanciare questo incantesimo' : `Tira per colpire con ${a.nome}`}
+                                        title={castBloccato ? tr('Equipaggia un focus per lanciare questo incantesimo', 'Equip a focus to cast this spell') : tr(`Tira per colpire con ${a.nome}`, `Attack roll with ${a.nome}`)}
                                         onRoll={() => tiraColpoArma(a)}
                                       />
                                     )}
@@ -15198,7 +15325,7 @@ export default function App() {
                                           colore={a.tipoDanno === 'Guarigione' ? coloreCategoria('guarigione', notteAttiva) : undefined}
                                           critico={!!isUltimoCrit}
                                           disabled={castBloccato}
-                                          title={castBloccato ? 'Equipaggia un focus per lanciare questo incantesimo' : isUltimoCrit ? `Tira i danni del critico (${a.danno} ×2)` : `Tira i danni (${a.danno})`}
+                                          title={castBloccato ? tr('Equipaggia un focus per lanciare questo incantesimo', 'Equip a focus to cast this spell') : isUltimoCrit ? tr(`Tira i danni del critico (${a.danno} ×2)`, `Roll critical damage (${a.danno} ×2)`) : tr(`Tira i danni (${a.danno})`, `Roll damage (${a.danno})`)}
                                           onRoll={() => {
                                             tiraDanniPerAttacco(a, !!isUltimoCrit);
                                             setUltimoAttaccoCritico(null);
@@ -15251,9 +15378,9 @@ export default function App() {
                                         <span
                                           className="chip-gittata"
                                           style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria('gittata', notteAttiva)}1f`, border: `1px solid ${coloreCategoria('gittata', notteAttiva)}`, color: coloreCategoria('gittata', notteAttiva), fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
-                                          title={lingua === 'en' ? `Range: ${gittataRiga}` : `Gittata: ${gittataRiga}`}
+                                          title={lingua === 'en' ? `Range: ${traduciDato(gittataRiga)}` : `Gittata: ${gittataRiga}`}
                                         >
-                                          {gittataRiga}
+                                          {traduciDato(gittataRiga)}
                                         </span>
                                       )}
                                       {hasReach && (
@@ -15319,7 +15446,7 @@ export default function App() {
                                                 registra({
                                                   etichetta: `${infoMunizioni.nomeMunizione}`,
                                                   tipo: 'tattica',
-                                                  dettaglio: `${scheda.nome || 'PG'} usa 1 ${infoMunizioni.nomeMunizione} (rimaste: ${Math.max(0, infoMunizioni.totale - 1)})`
+                                                  dettaglio: tr(`${scheda.nome || 'PG'} usa 1 ${infoMunizioni.nomeMunizione} (rimaste: ${Math.max(0, infoMunizioni.totale - 1)})`, `${scheda.nome || 'PC'} uses 1 ${traduciDato(infoMunizioni.nomeMunizione)} (left: ${Math.max(0, infoMunizioni.totale - 1)})`)
                                                 });
                                               }}
                                             >
@@ -15340,12 +15467,12 @@ export default function App() {
                                         {cat === 'Reazione' && (a.innescoIt || a.effettoIt) ? (
                                           <>
                                             {a.innescoIt && (
-                                              <span style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria('innesco', notteAttiva)}1f`, border: `1px solid ${coloreCategoria('innesco', notteAttiva)}`, color: coloreCategoria('innesco', notteAttiva), fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3, maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={`${lingua === 'en' ? 'Trigger' : 'Innesco'}: ${lingua === 'en' ? (a.innescoEn || a.innescoIt) : a.innescoIt}`}>
+                                              <span className="chip-reazione-testo" style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria('innesco', notteAttiva)}1f`, border: `1px solid ${coloreCategoria('innesco', notteAttiva)}`, color: coloreCategoria('innesco', notteAttiva), fontWeight: 700, display: 'inline-block', maxWidth: '100%', boxSizing: 'border-box', whiteSpace: 'normal', overflowWrap: 'anywhere', lineHeight: 1.3, textAlign: 'left' }} title={`${lingua === 'en' ? 'Trigger' : 'Innesco'}: ${lingua === 'en' ? (a.innescoEn || a.innescoIt) : a.innescoIt}`}>
                                                 {lingua === 'en' ? (a.innescoEn || a.innescoIt) : a.innescoIt}
                                               </span>
                                             )}
                                             {a.effettoIt && (
-                                              <span style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria('effetto', notteAttiva)}1f`, border: `1px solid ${coloreCategoria('effetto', notteAttiva)}`, color: coloreCategoria('effetto', notteAttiva), fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3, maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={`${lingua === 'en' ? 'Effect' : 'Effetto'}: ${lingua === 'en' ? (a.effettoEn || a.effettoIt) : a.effettoIt}`}>
+                                              <span className="chip-reazione-testo" style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria('effetto', notteAttiva)}1f`, border: `1px solid ${coloreCategoria('effetto', notteAttiva)}`, color: coloreCategoria('effetto', notteAttiva), fontWeight: 700, display: 'inline-block', maxWidth: '100%', boxSizing: 'border-box', whiteSpace: 'normal', overflowWrap: 'anywhere', lineHeight: 1.3, textAlign: 'left' }} title={`${lingua === 'en' ? 'Effect' : 'Effetto'}: ${lingua === 'en' ? (a.effettoEn || a.effettoIt) : a.effettoIt}`}>
                                                 {lingua === 'en' ? (a.effettoEn || a.effettoIt) : a.effettoIt}
                                               </span>
                                             )}
@@ -15405,11 +15532,11 @@ export default function App() {
                                         <button
                                           type="button"
                                           style={{ ...styles.buttonRiga, color: C.red, borderColor: C.red }}
-                                          title={a.isSpell ? "Nascondi questo incantesimo dalla sezione Armi e attacchi" : "Elimina attacco"}
-                                          aria-label={a.isSpell ? `Nascondi ${a.nome} dagli attacchi` : `Elimina ${a.nome}`}
+                                          title={a.isSpell ? tr('Nascondi questo incantesimo dalla sezione Armi e attacchi', 'Hide this spell from Weapons and attacks') : tr('Elimina attacco', 'Delete attack')}
+                                          aria-label={a.isSpell ? tr(`Nascondi ${a.nome} dagli attacchi`, `Hide ${a.nome} from attacks`) : tr(`Elimina ${a.nome}`, `Delete ${a.nome}`)}
                                           onClick={() => {
                                             setConferma({
-                                              titolo: a.isSpell ? 'Nascondi attacco' : 'Elimina attacco',
+                                              titolo: a.isSpell ? tr('Nascondi attacco', 'Hide attack') : tr('Elimina attacco', 'Delete attack'),
                                               testo: a.isSpell ? `Nascondere "${a.nome}" dalla lista attacchi?` : `Vuoi eliminare l'attacco "${a.nome}"?`,
                                               onConferma: () => {
                                                 if (a.idIncantesimo) {
@@ -15548,7 +15675,7 @@ export default function App() {
                           <div style={{ ...styles.vitalBox, padding: '30px 6px 10px' }}>
                             <div style={styles.vitalLabel}>{t("vital.attacco_incantesimi")}</div>
                             <div style={styles.vitalValue}>
-                              <span
+                              <span role="button" tabIndex={0}
                                 className="tirabile"
                                 style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}
                                 title={t('spell.tira_attacco')}
@@ -16034,7 +16161,7 @@ export default function App() {
                     <div key={liv} style={{ marginBottom: 12 }}>
                       {/* Intestazione livello collassabile (solo per livelli >= 1, trucchetti ha la sua intestazione principale) */}
                       {liv >= 1 && (
-                        <div
+                        <div role="button" tabIndex={0}
                           onClick={() => setLivelliIncChiusi((prev) => ({ ...prev, [liv]: !prev[liv] }))}
                           title={chiuso ? (lingua === 'en' ? 'Click to show all spells (including unprepared)' : 'Clicca per mostrare tutti gli incantesimi (inclusi i non preparati)') : (lingua === 'en' ? 'Click to minimize and show only prepared spells' : 'Clicca per minimizzare e mostrare solo i preparati')}
                           style={{
@@ -16352,7 +16479,7 @@ export default function App() {
                                     >{lingua === 'en' ? 'Catalog' : 'Catalogo'}</span>
                                   )}
                                   {s.bonus && (
-                                    <span
+                                    <span role="button" tabIndex={0}
                                       title={t('spell.bonus_badge_tooltip')}
                                       style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, border: `1px solid ${C.goldDark}`, borderRadius: 6, padding: '0 4px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
                                       onClick={() => aggiorna({ incantesimiLista: scheda.incantesimiLista.map((x) => (x.id === s.id ? { ...x, bonus: false } : x)) })}
@@ -16360,8 +16487,8 @@ export default function App() {
                                   )}
                                   <div className="spell-chips" style={{ display: 'flex', flexWrap: 'nowrap', gap: 4, alignItems: 'center', overflowX: 'auto', flex: '1 1 auto', minWidth: 0 }}>
                                     {chip('', t('spell.chip_tempo'), tempoLabel, coloreCategoria('tempo', notteAttiva), 'chip-tempo')}
-                                    {chip('', t('spell.chip_gittata'), gittata, coloreCategoria('gittata', notteAttiva), 'chip-gittata')}
-                                    {area && chip('', 'Area', area, coloreCategoria('gittata', notteAttiva), 'chip-area')}
+                                    {chip('', t('spell.chip_gittata'), traduciDato(gittata), coloreCategoria('gittata', notteAttiva), 'chip-gittata')}
+                                    {area && chip('', 'Area', traduciDato(area), coloreCategoria('gittata', notteAttiva), 'chip-area')}
                                     {isConcRow && chip('', lingua === 'en' ? 'Concentration' : 'Concentrazione', lingua === 'en' ? 'Concentration' : 'Concentrazione', coloreCategoria('concentrazione', notteAttiva), 'chip-concentrazione')}
                                     {isRitualeRow && chip('', lingua === 'en' ? 'Ritual' : 'Rituale', lingua === 'en' ? 'Ritual' : 'Rituale', coloreCategoria('rituale', notteAttiva), 'chip-rituale')}
                                     {(danno || tipoDanno) && !parseEspressioneDado(danno) && (
@@ -16418,7 +16545,7 @@ export default function App() {
                                       />
                                     </div>
                                   )}
-                                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0, marginLeft: 'auto' }}>
+                                  <div className="spell-azioni" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0, marginLeft: 'auto' }}>
                                     {/famiglio|evoca|spiriti|spirit|elementale|summon|conjure|destriero|steed|trova|omuncolo|guardiano/i.test(s.nome || '') && (
                                       <button
                                         type="button"
@@ -16455,7 +16582,7 @@ export default function App() {
                                             background: scheda.effettoTaglia === 'ingrandito' ? (C.green || '#2e7d32') : 'transparent',
                                             borderColor: C.green || '#2e7d32',
                                           }}
-                                          title="Attiva Ingrandire: +1 taglia, +1d4 danni armi, vantaggio prove/TS FOR, carico raddoppiato"
+                                          title={tr('Attiva Ingrandire: +1 taglia, +1d4 danni armi, vantaggio prove/TS FOR, carico raddoppiato', 'Turn on Enlarge: +1 size, +1d4 weapon damage, advantage on STR checks/saves, carrying capacity doubled')}
                                           onClick={() => aggiorna({ effettoTaglia: scheda.effettoTaglia === 'ingrandito' ? null : 'ingrandito' })}
                                         >
                                           {scheda.effettoTaglia === 'ingrandito' ? 'Ingrandito' : 'Ingrandisci'}
@@ -16468,7 +16595,7 @@ export default function App() {
                                             background: scheda.effettoTaglia === 'ridotto' ? (C.red || '#c0392b') : 'transparent',
                                             borderColor: C.red || '#c0392b',
                                           }}
-                                          title="Attiva Ridurre: -1 taglia, -1d4 danni armi, svantaggio prove/TS FOR, carico dimezzato"
+                                          title={tr('Attiva Ridurre: -1 taglia, -1d4 danni armi, svantaggio prove/TS FOR, carico dimezzato', 'Turn on Reduce: -1 size, -1d4 weapon damage, disadvantage on STR checks/saves, carrying capacity halved')}
                                           onClick={() => aggiorna({ effettoTaglia: scheda.effettoTaglia === 'ridotto' ? null : 'ridotto' })}
                                         >
                                           {scheda.effettoTaglia === 'ridotto' ? 'Ridotto' : 'Riduci'}
@@ -16558,7 +16685,7 @@ export default function App() {
                 }
                 return (
                   <>
-                    <div
+                    <div role="button" tabIndex={0}
                       className="sottosezione-titolo"
                       onClick={() => setLivelliIncChiusi((prev) => ({ ...prev, [0]: !prev[0] }))}
                       title={livelliIncChiusi[0] ? (lingua === 'en' ? 'Click to expand cantrips' : 'Clicca per espandere i trucchetti') : (lingua === 'en' ? 'Click to collapse cantrips' : 'Clicca per comprimere i trucchetti')}
@@ -16641,9 +16768,9 @@ export default function App() {
                     return (
                       <button
                         style={{ ...styles.buttonMini, borderColor: C.goldDark, color: C.goldDark, marginBottom: 10 }}
-                        title="Aggiunge i Punti Stregoneria (compaiono anche in Risorse di classe)"
+                        title={tr('Aggiunge i Punti Stregoneria (compaiono anche in Risorse di classe)', 'Adds Sorcery Points (they also show in Class resources)')}
                         onClick={() => aggiorna({ risorse: [...risorse, { id: 'auto-punti-stregoneria', nome: 'Punti Stregoneria', attuali: L, max: L, reset: 'lungo' }] })}
-                      >Aggiungi Punti Stregoneria</button>
+                      >{tr('Aggiungi Punti Stregoneria', 'Add Sorcery Points')}</button>
                     );
                   }
                   return (
@@ -16653,7 +16780,7 @@ export default function App() {
                       <strong style={{ minWidth: 18, textAlign: 'center', color: r.attuali === 0 ? C.inkDim : C.ink }}>{r.attuali}</strong>
                       <button style={{ ...styles.buttonMini, padding: '1px 7px' }} title="Recupera 1 punto" onClick={() => modR({ attuali: Math.min(r.max, r.attuali + 1) })}>+</button>
                       <span style={styles.detail}>/ <Editable value={r.max} tipo="numero" width={30} onChange={(v) => modR({ max: Math.max(0, v), attuali: Math.min(Math.max(0, v), r.attuali) })} /></span>
-                      <span style={{ ...styles.detail, fontSize: 11, opacity: 0.75 }}>· sincronizzati con Risorse di classe</span>
+                      <span style={{ ...styles.detail, fontSize: 11, opacity: 0.75 }}>{tr('· sincronizzati con Risorse di classe', '· synced with Class resources')}</span>
                     </div>
                   );
                 })()}
@@ -16666,7 +16793,7 @@ export default function App() {
                     if (idx < 0) return null;
                     const r = risorse[idx];
                     const applica = (esito) => {
-                      if (!esito.ok) { setInfo({ titolo: 'Fonte di Magia', testo: esito.motivo }); return; }
+                      if (!esito.ok) { setInfo({ titolo: tr('Fonte di Magia', 'Font of Magic'), testo: esito.motivo }); return; }
                       aggiorna({
                         slotIncantesimo: esito.slotIncantesimo,
                         risorse: risorse.map((x, i) => (i === idx ? { ...x, attuali: esito.punti } : x)),
@@ -16675,11 +16802,11 @@ export default function App() {
                     const slotOra = scheda.slotIncantesimo || {};
                     return (
                       <div style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', background: C.panelLight, display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
-                        <div style={{ ...styles.detail, fontWeight: 700, marginBottom: 2 }}>Fonte di Magia</div>
+                        <div style={{ ...styles.detail, fontWeight: 700, marginBottom: 2 }}>{tr('Fonte di Magia', 'Font of Magic')}</div>
                         <div style={{ ...styles.detail, fontSize: 11, marginBottom: 8 }}>
-                          Converti i punti in uno slot già speso, o brucia uno slot per riavere punti.
+                          {tr('Converti i punti in uno slot già speso, o brucia uno slot per riavere punti.', 'Turn points into a spent slot, or burn a slot to get points back.')}
                         </div>
-                        <div style={{ ...styles.detail, fontSize: 11, marginBottom: 4 }}>Punti → slot (recupera uno slot speso):</div>
+                        <div style={{ ...styles.detail, fontSize: 11, marginBottom: 4 }}>{tr('Punti → slot (recupera uno slot speso):', 'Points → slot (recover a spent slot):')}</div>
                         <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 8 }}>
                           {LIVELLI_CONVERTIBILI.map((liv) => {
                             const costo = COSTO_SLOT_IN_PUNTI[liv];
@@ -16688,13 +16815,13 @@ export default function App() {
                               <button
                                 key={liv}
                                 style={{ ...styles.buttonMini, padding: '2px 7px', opacity: possibile ? 1 : 0.45 }}
-                                title={`Spendi ${costo} punti per recuperare uno slot di ${liv}° livello`}
+                                title={tr(`Spendi ${costo} punti per recuperare uno slot di ${liv}° livello`, `Spend ${costo} points to recover a level ${liv} slot`)}
                                 onClick={() => applica(puntiVersoSlot(slotOra, r.attuali, liv))}
                               >{liv}° <span style={{ opacity: 0.7 }}>({costo}p)</span></button>
                             );
                           })}
                         </div>
-                        <div style={{ ...styles.detail, fontSize: 11, marginBottom: 4 }}>Slot → punti (spendi uno slot disponibile):</div>
+                        <div style={{ ...styles.detail, fontSize: 11, marginBottom: 4 }}>{tr('Slot → punti (spendi uno slot disponibile):', 'Slot → points (spend an available slot):')}</div>
                         <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
                           {Object.keys(slotOra)
                             .map(Number)
@@ -16706,7 +16833,7 @@ export default function App() {
                                 <button
                                   key={liv}
                                   style={{ ...styles.buttonMini, padding: '2px 7px', opacity: possibile ? 1 : 0.45 }}
-                                  title={`Spendi uno slot di ${liv}° livello per ottenere ${liv} Punti Stregoneria`}
+                                  title={tr(`Spendi uno slot di ${liv}° livello per ottenere ${liv} Punti Stregoneria`, `Spend a level ${liv} slot to gain ${liv} Sorcery Points`)}
                                   onClick={() => applica(slotVersoPunti(slotOra, r.attuali, r.max, liv))}
                                 >{liv}° <span style={{ opacity: 0.7 }}>(+{liv}p)</span></button>
                               );
@@ -16749,7 +16876,7 @@ export default function App() {
                           {scelte.map((m) => {
                             const spieg = spiegaMetamagia(m);
                             return (
-                              <div
+                              <div role={spieg ? 'button' : undefined} tabIndex={spieg ? 0 : undefined}
                                 key={m}
                                 onClick={() => spieg && setInfo({ titolo: traduciDato(m), testo: spieg })}
                                 style={{
@@ -16841,7 +16968,7 @@ export default function App() {
                             {scelte.map((inv) => {
                               const spieg = spiegaInvocazione(inv);
                               return (
-                                <div
+                                <div role={spieg ? 'button' : undefined} tabIndex={spieg ? 0 : undefined}
                                   key={inv}
                                   onClick={() => spieg && setInfo({ titolo: traduciDato(inv), testo: spieg })}
                                   style={{
@@ -16987,7 +17114,7 @@ export default function App() {
                                   }}
                                 >
                                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
-                                    <div
+                                    <div role={spieg ? 'button' : undefined} tabIndex={spieg ? 0 : undefined}
                                       onClick={() => spieg && setInfo({ titolo: traduciDato(inf), testo: spieg })}
                                       style={{ cursor: spieg ? 'pointer' : 'default', display: 'flex', alignItems: 'center', gap: 4, flex: 1, minWidth: 0 }}
                                       title={spieg ? (lingua === 'en' ? 'Click for description' : 'Clicca per la spiegazione') : undefined}
@@ -17044,7 +17171,7 @@ export default function App() {
                                   )}
 
                                   {spieg && (
-                                    <div
+                                    <div role="button" tabIndex={0}
                                       onClick={() => setInfo({ titolo: traduciDato(inf), testo: spieg })}
                                       style={{ fontSize: 11, color: C.inkDim, lineHeight: 1.25, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', cursor: 'pointer' }}
                                     >
@@ -17262,7 +17389,7 @@ export default function App() {
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))', gap: 6 }}>
                               {listaPref.map((b) => (
-                                <div
+                                <div role="button" tabIndex={0}
                                   key={`pref-${b.nome}`}
                                   onClick={() => setBestiaDettaglio(b)}
                                   style={{
@@ -17283,7 +17410,7 @@ export default function App() {
                                       type="button"
                                       onClick={(e) => togglePref(e, b.nome)}
                                       style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: 0, fontSize: 13 }}
-                                      title="Rimuovi dai preferiti"
+                                      title={tr('Rimuovi dai preferiti', 'Remove from favorites')}
                                     >
                                       ⭐
                                     </button>
@@ -17321,7 +17448,7 @@ export default function App() {
                                 {gruppo.creature.map((b) => {
                                   const isFav = bestiePref.includes(b.nome);
                                   return (
-                                    <div
+                                    <div role="button" tabIndex={0}
                                       key={b.nome}
                                       onClick={() => setBestiaDettaglio(b)}
                                       style={{
@@ -17344,7 +17471,7 @@ export default function App() {
                                           type="button"
                                           onClick={(e) => togglePref(e, b.nome)}
                                           style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: 0, fontSize: 12, opacity: isFav ? 1 : 0.4 }}
-                                          title={isFav ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
+                                          title={isFav ? tr('Rimuovi dai preferiti', 'Remove from favorites') : tr('Aggiungi ai preferiti', 'Add to favorites')}
                                         >
                                           {isFav ? '⭐' : '☆'}
                                         </button>
@@ -17644,7 +17771,7 @@ export default function App() {
                                   {all.tratti.map((tr, trIdx) => {
                                     const titoloTratto = tr.split(':')[0] || tr;
                                     return (
-                                      <span
+                                      <span role="button" tabIndex={0}
                                         key={trIdx}
                                         onClick={() => setInfo({ titolo: `${all.nome}: ${titoloTratto}`, testo: tr })}
                                         style={{
@@ -17678,7 +17805,7 @@ export default function App() {
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))', gap: 6 }}>
                         {[...FAMIGLI, ...EVOCAZIONI].slice(0, 16).map((c) => (
-                          <div
+                          <div role="button" tabIndex={0}
                             key={c.nome}
                             onClick={() => setBestiaDettaglio(c)}
                             style={{
@@ -18143,7 +18270,7 @@ export default function App() {
                         <span>Taglia {tagliaAttiva} ×{moltiTaglia} · Spazio: {SPAZIO_TAGLIA_5E[tagliaAttiva]} · Spingi/trascina/solleva {spingiTrascina.toFixed(0)} kg (Lotta fino a: {LOTTA_MAX_TAGLIA_5E[tagliaAttiva]})</span>
                         <span>Indossato: <strong>{pesoEquipTot.toFixed(1)} kg</strong> · Zaino: <strong>{pesoZainoTot.toFixed(1)} kg</strong></span>
                       </div>
-                      <div style={{ height: 6, borderRadius: 3, background: C.border, overflow: 'hidden', marginTop: 3 }} title={`Capacità: ${pesoTot.toFixed(1)} / ${cap.toFixed(0)} kg (${perc.toFixed(0)}%)`}>
+                      <div style={{ height: 6, borderRadius: 3, background: C.border, overflow: 'hidden', marginTop: 3 }} title={`${tr('Capacità', 'Capacity')}: ${pesoTot.toFixed(1)} / ${cap.toFixed(0)} kg (${perc.toFixed(0)}%)`}>
                         <div style={{ width: `${perc}%`, height: '100%', background: colore, transition: 'width 0.25s ease' }} />
                       </div>
                     </div>
@@ -18158,7 +18285,7 @@ export default function App() {
                           type="text"
                           value={filtroInventario}
                           onChange={(e) => setFiltroInventario(e.target.value)}
-                          placeholder="🔍 Cerca nell'inventario..."
+                          placeholder={tr('🔍 Cerca nell\'inventario...', '🔍 Search the inventory...')}
                           style={{ ...styles.inlineInput, flex: 1, minWidth: 120, padding: '5px 8px', fontSize: 13 }}
                         />
                         {filtroInventario && (
@@ -18543,7 +18670,7 @@ export default function App() {
                                       style={{ ...styles.buttonMini, color: C.red }}
                                       title={t('modal.elimina')}
                                       onClick={() => setConferma({
-                                        titolo: 'Elimina oggetto',
+                                        titolo: tr('Elimina oggetto', 'Delete item'),
                                         testo: `Vuoi eliminare "${o.nome}" dall'inventario?`,
                                         onConferma: () => eliminaItem(o),
                                       })}
@@ -18774,7 +18901,7 @@ export default function App() {
                                               <button
                                                 type="button"
                                                 style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 8px', color: C.goldDark, borderColor: C.goldDark, background: 'rgba(201,162,39,0.14)', fontWeight: 600 }}
-                                                title="Recupera 1 slot incantesimo speso di 1°, 2° o 3° livello"
+                                                title={tr('Recupera 1 slot incantesimo speso di 1°, 2° o 3° livello', 'Recover 1 spent spell slot of level 1, 2 or 3')}
                                                 onClick={() => {
                                                   const curUsi = o.usi != null ? Number(o.usi) : 1;
                                                   if (curUsi <= 0) {
@@ -19061,9 +19188,9 @@ export default function App() {
                         );
                       })()}
                       <div className="griglia-monete" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 8, marginTop: 'auto' }}>
-                        {DENARI.map(({ key, label, abbr }) => (
-                          <div key={key} style={{ ...styles.vitalBox, minHeight: 'auto', padding: '26px 4px 6px', background: C.bg }} title={label}>
-                            <div style={{ ...styles.vitalLabel, fontSize: 11, height: 'auto', whiteSpace: 'nowrap' }}>{abbr}</div>
+                        {DENARI.map(({ key, label, abbr, labelEn, abbrEn }) => (
+                          <div key={key} style={{ ...styles.vitalBox, minHeight: 'auto', padding: '26px 4px 6px', background: C.bg }} title={tr(label, labelEn)}>
+                            <div style={{ ...styles.vitalLabel, fontSize: 11, height: 'auto', whiteSpace: 'nowrap' }}>{tr(abbr, abbrEn)}</div>
                             <div style={{ ...styles.vitalValue, fontSize: 18 }}>
                               <Editable value={scheda.denari[key]} tipo="numero" width={44} onChange={(v) => aggiorna({ denari: { ...scheda.denari, [key]: Math.max(0, v) } })} />
                             </div>
@@ -19116,7 +19243,7 @@ export default function App() {
                             type="button"
                             style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 8px', color: C.goldDark, border: `1px solid ${C.gold}`, background: 'rgba(201,162,39,0.12)', fontWeight: 700 }}
                             onClick={() => tiraTabellaBackground('trattiCaratteriali')}
-                            title={`Tira 1d8 dalla tabella ${bgDati.nome}`}
+                            title={tr(`Tira 1d8 dalla tabella ${bgDati.nome}`, `Roll 1d8 on the ${traduciDato(bgDati.nome)} table`)}
                           >
                             {lingua === 'en' ? 'Roll' : 'Tira'} d8
                           </button>
@@ -19126,7 +19253,7 @@ export default function App() {
                             onChange={(e) => {
                               if (e.target.value) aggiorna({ trattiCaratteriali: e.target.value });
                             }}
-                            title="Scegli un tratto dalla tabella del manuale"
+                            title={tr('Scegli un tratto dalla tabella del manuale', 'Pick a trait from the book table')}
                           >
                             <option value="">{t('aspetto.scegli_opzione')}</option>
                             {bgDati.tratti.map((tVoce, idx) => (
@@ -19151,7 +19278,7 @@ export default function App() {
                             type="button"
                             style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 8px', color: C.goldDark, border: `1px solid ${C.gold}`, background: 'rgba(201,162,39,0.12)', fontWeight: 700 }}
                             onClick={() => tiraTabellaBackground('ideali')}
-                            title={`Tira 1d6 dalla tabella ${bgDati.nome}`}
+                            title={tr(`Tira 1d6 dalla tabella ${bgDati.nome}`, `Roll 1d6 on the ${traduciDato(bgDati.nome)} table`)}
                           >
                             {lingua === 'en' ? 'Roll' : 'Tira'} d6
                           </button>
@@ -19161,7 +19288,7 @@ export default function App() {
                             onChange={(e) => {
                               if (e.target.value) aggiorna({ ideali: e.target.value });
                             }}
-                            title="Scegli un ideale dalla tabella del manuale"
+                            title={tr('Scegli un ideale dalla tabella del manuale', 'Pick an ideal from the book table')}
                           >
                             <option value="">{t('aspetto.scegli_opzione')}</option>
                             {bgDati.ideali.map((iVoce, idx) => (
@@ -19186,7 +19313,7 @@ export default function App() {
                             type="button"
                             style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 8px', color: C.goldDark, border: `1px solid ${C.gold}`, background: 'rgba(201,162,39,0.12)', fontWeight: 700 }}
                             onClick={() => tiraTabellaBackground('legami')}
-                            title={`Tira 1d6 dalla tabella ${bgDati.nome}`}
+                            title={tr(`Tira 1d6 dalla tabella ${bgDati.nome}`, `Roll 1d6 on the ${traduciDato(bgDati.nome)} table`)}
                           >
                             {lingua === 'en' ? 'Roll' : 'Tira'} d6
                           </button>
@@ -19196,7 +19323,7 @@ export default function App() {
                             onChange={(e) => {
                               if (e.target.value) aggiorna({ legami: e.target.value });
                             }}
-                            title="Scegli un legame dalla tabella del manuale"
+                            title={tr('Scegli un legame dalla tabella del manuale', 'Pick a bond from the book table')}
                           >
                             <option value="">{t('aspetto.scegli_opzione')}</option>
                             {bgDati.legami.map((lVoce, idx) => (
@@ -19221,7 +19348,7 @@ export default function App() {
                             type="button"
                             style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 8px', color: C.goldDark, border: `1px solid ${C.gold}`, background: 'rgba(201,162,39,0.12)', fontWeight: 700 }}
                             onClick={() => tiraTabellaBackground('difetti')}
-                            title={`Tira 1d6 dalla tabella ${bgDati.nome}`}
+                            title={tr(`Tira 1d6 dalla tabella ${bgDati.nome}`, `Roll 1d6 on the ${traduciDato(bgDati.nome)} table`)}
                           >
                             {lingua === 'en' ? 'Roll' : 'Tira'} d6
                           </button>
@@ -19231,7 +19358,7 @@ export default function App() {
                             onChange={(e) => {
                               if (e.target.value) aggiorna({ difetti: e.target.value });
                             }}
-                            title="Scegli un difetto dalla tabella del manuale"
+                            title={tr('Scegli un difetto dalla tabella del manuale', 'Pick a flaw from the book table')}
                           >
                             <option value="">{t('aspetto.scegli_opzione')}</option>
                             {bgDati.difetti.map((dVoce, idx) => (
@@ -19346,7 +19473,7 @@ export default function App() {
                               <button
                                 type="button"
                                 style={{ ...styles.buttonMini, color: C.red, padding: '2px 5px', fontSize: 11 }}
-                                title="Elimina alleato"
+                                title={tr('Elimina alleato', 'Delete ally')}
                                 onClick={() => {
                                   const lista = scheda.alleati.filter((_, i) => i !== idx);
                                   aggiorna({ alleati: lista });
@@ -19811,12 +19938,12 @@ export default function App() {
                       onChange={(e) => setBozzaIspirazione((b) => ({ ...b, tratto: e.target.value }))}
                       placeholder={t('aspetto.tratti_caratteriali_ph')}
                     />
-                    <div style={{ fontSize: 11, fontWeight: 600, color: C.inkDim, marginBottom: 4 }}>Opzioni della tabella (1-8):</div>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: C.inkDim, marginBottom: 4 }}>{tr('Opzioni della tabella (1-8):', 'Table options (1-8):')}</div>
                     <div style={{ maxHeight: 130, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4, paddingRight: 4 }}>
                       {bgDati.tratti.map((tVoce, idx) => {
                         const sel = bozzaIspirazione.tratto === tVoce;
                         return (
-                          <div
+                          <div role="button" tabIndex={0}
                             key={idx}
                             style={{
                               fontSize: 12,
@@ -19858,12 +19985,12 @@ export default function App() {
                       onChange={(e) => setBozzaIspirazione((b) => ({ ...b, ideale: e.target.value }))}
                       placeholder={t('aspetto.ideali_ph')}
                     />
-                    <div style={{ fontSize: 11, fontWeight: 600, color: C.inkDim, marginBottom: 4 }}>Opzioni della tabella (1-6):</div>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: C.inkDim, marginBottom: 4 }}>{tr('Opzioni della tabella (1-6):', 'Table options (1-6):')}</div>
                     <div style={{ maxHeight: 130, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4, paddingRight: 4 }}>
                       {bgDati.ideali.map((iVoce, idx) => {
                         const sel = bozzaIspirazione.ideale === iVoce;
                         return (
-                          <div
+                          <div role="button" tabIndex={0}
                             key={idx}
                             style={{
                               fontSize: 12,
@@ -19905,12 +20032,12 @@ export default function App() {
                       onChange={(e) => setBozzaIspirazione((b) => ({ ...b, legame: e.target.value }))}
                       placeholder={t('aspetto.legami_ph')}
                     />
-                    <div style={{ fontSize: 11, fontWeight: 600, color: C.inkDim, marginBottom: 4 }}>Opzioni della tabella (1-6):</div>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: C.inkDim, marginBottom: 4 }}>{tr('Opzioni della tabella (1-6):', 'Table options (1-6):')}</div>
                     <div style={{ maxHeight: 130, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4, paddingRight: 4 }}>
                       {bgDati.legami.map((lVoce, idx) => {
                         const sel = bozzaIspirazione.legame === lVoce;
                         return (
-                          <div
+                          <div role="button" tabIndex={0}
                             key={idx}
                             style={{
                               fontSize: 12,
@@ -19952,12 +20079,12 @@ export default function App() {
                       onChange={(e) => setBozzaIspirazione((b) => ({ ...b, difetto: e.target.value }))}
                       placeholder={t('aspetto.difetti_ph')}
                     />
-                    <div style={{ fontSize: 11, fontWeight: 600, color: C.inkDim, marginBottom: 4 }}>Opzioni della tabella (1-6):</div>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: C.inkDim, marginBottom: 4 }}>{tr('Opzioni della tabella (1-6):', 'Table options (1-6):')}</div>
                     <div style={{ maxHeight: 130, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4, paddingRight: 4 }}>
                       {bgDati.difetti.map((dVoce, idx) => {
                         const sel = bozzaIspirazione.difetto === dVoce;
                         return (
-                          <div
+                          <div role="button" tabIndex={0}
                             key={idx}
                             style={{
                               fontSize: 12,
@@ -20066,13 +20193,13 @@ export default function App() {
                 : diario;
 
               const copiaDiario = () => {
-                const testo = diario.map((v, i) => `=== Sessione ${diario.length - i}: ${v.titolo || 'Senza titolo'} (${v.data || 'Nessuna data'}) ===\n\n${v.testo || ''}\n`).join('\n---\n\n');
+                const testo = diario.map((v, i) => `=== ${tr('Sessione', 'Session')} ${diario.length - i}: ${v.titolo || tr('Senza titolo', 'Untitled')} (${v.data || tr('Nessuna data', 'No date')}) ===\n\n${v.testo || ''}\n`).join('\n---\n\n');
                 navigator.clipboard?.writeText(testo);
                 alert(lingua === 'en' ? 'Journal copied to the clipboard.' : 'Diario copiato negli appunti.');
               };
 
               const copiaVoce = (v) => {
-                const testo = `Sessione: ${v.titolo || 'Senza titolo'} (${v.data || 'Nessuna data'})\n\n${v.testo || ''}`;
+                const testo = `${tr('Sessione', 'Session')}: ${v.titolo || tr('Senza titolo', 'Untitled')} (${v.data || tr('Nessuna data', 'No date')})\n\n${v.testo || ''}`;
                 navigator.clipboard?.writeText(testo);
                 alert(lingua === 'en' ? 'Session copied to the clipboard.' : 'Sessione copiata negli appunti.');
               };
@@ -20081,9 +20208,9 @@ export default function App() {
                 const nomePG = (scheda.nome || 'Personaggio').replace(/[^a-zA-Z0-9_-]/g, '_');
                 const righe = diario.map((v, i) => {
                   const num = diario.length - i;
-                  return `# Sessione ${num}: ${v.titolo || 'Senza titolo'} (${v.data || 'Nessuna data'})\n\n${v.testo || ''}\n`;
+                  return `# ${tr('Sessione', 'Session')} ${num}: ${v.titolo || tr('Senza titolo', 'Untitled')} (${v.data || tr('Nessuna data', 'No date')})\n\n${v.testo || ''}\n`;
                 }).join('\n---\n\n');
-                const contenuto = `# Diario di Viaggio — ${scheda.nome || 'Personaggio'}\n\n${righe}`;
+                const contenuto = `# ${tr('Diario di viaggio', 'Travel journal')}: ${scheda.nome || tr('Personaggio', 'Character')}\n\n${righe}`;
                 const blob = new Blob([contenuto], { type: 'text/markdown;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -20145,9 +20272,9 @@ export default function App() {
                             className="no-stampa"
                             style={{ ...styles.buttonMini, fontSize: 12, padding: '5px 10px' }}
                             onClick={toggleTutteVoci}
-                            title="Espandi o comprimi tutte le sessioni"
+                            title={tr('Espandi o comprimi tutte le sessioni', 'Expand or collapse all sessions')}
                           >
-                            {diario.every((v) => vociDiarioChiuse[v.id]) ? 'Espandi tutte' : 'Comprimi tutte'}
+                            {diario.every((v) => vociDiarioChiuse[v.id]) ? tr('Espandi tutte', 'Expand all') : tr('Comprimi tutte', 'Collapse all')}
                           </button>
                           <button
                             className="no-stampa"
@@ -20235,7 +20362,7 @@ export default function App() {
                           }}
                         >
                           {/* Header Cronaca */}
-                          <div
+                          <div role="button" tabIndex={0}
                             style={{
                               display: 'flex',
                               alignItems: 'center',
@@ -20286,7 +20413,7 @@ export default function App() {
                                 type="button"
                                 className="no-stampa"
                                 style={{ ...styles.buttonMini, padding: '3px 7px', fontSize: 12 }}
-                                title="Copia testo di questa sessione"
+                                title={tr('Copia testo di questa sessione', 'Copy the text of this session')}
                                 onClick={() => copiaVoce(v)}
                               >
                                 📋
@@ -20309,7 +20436,7 @@ export default function App() {
 
                           {/* Anteprima compressa */}
                           {chiusa ? (
-                            <div
+                            <div role="button" tabIndex={0}
                               onClick={() => setVociDiarioChiuse((prev) => ({ ...prev, [v.id]: false }))}
                               style={{
                                 fontSize: 13,
@@ -20372,7 +20499,7 @@ export default function App() {
               tipoDanno: spell.tipoDanno || '',
             };
             aggiorna({ incantesimiLista: [...(scheda.incantesimiLista || []), nuovo] });
-            registra({ etichetta: `${nomeSpell}`, tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} aggiunge "${nomeSpell}" (${spell.livello === 0 ? 'Trucchetto' : `${spell.livello}° livello`}) al grimorio.` });
+            registra({ etichetta: `${nomeSpell}`, tipo: 'tattica', dettaglio: tr(`${scheda.nome || 'PG'} aggiunge "${nomeSpell}" (${spell.livello === 0 ? 'Trucchetto' : `${spell.livello}° livello`}) al grimorio.`, `${scheda.nome || 'PC'} adds "${nomeSpell}" (${spell.livello === 0 ? 'cantrip' : `level ${spell.livello}`}) to the spellbook.`) });
           }
         }}
         onAggiungiInventario={(item) => {
@@ -20386,17 +20513,17 @@ export default function App() {
             note: item.desc || '',
           });
           aggiorna({ inventario: [...(scheda.inventario || []), nuovo] });
-          registra({ etichetta: `${item.nome}`, tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} aggiunge "${item.nome}" all'inventario.` });
+          registra({ etichetta: `${item.nome}`, tipo: 'tattica', dettaglio: tr(`${scheda.nome || 'PG'} aggiunge "${item.nome}" all'inventario.`, `${scheda.nome || 'PC'} adds "${traduciDato(item.nome)}" to the inventory.`) });
         }}
         onAggiungiAttacco={(weapon) => {
           const nuovoAttacco = attaccoDaArma(weapon, scheda);
           aggiorna({ attacchi: [...(scheda.attacchi || []), nuovoAttacco] });
-          registra({ etichetta: `${weapon.nome}`, tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} aggiunge "${weapon.nome}" agli attacchi rapidi.` });
+          registra({ etichetta: `${weapon.nome}`, tipo: 'tattica', dettaglio: tr(`${scheda.nome || 'PG'} aggiunge "${weapon.nome}" agli attacchi rapidi.`, `${scheda.nome || 'PC'} adds "${traduciDato(weapon.nome)}" to quick attacks.`) });
         }}
         onApplicaCondizione={(condizione) => {
           if (!scheda.condizioni.includes(condizione)) {
             aggiorna({ condizioni: [...scheda.condizioni, condizione] });
-            registra({ etichetta: `${condizione}`, tipo: 'condizione', dettaglio: `${scheda.nome || 'PG'} subisce la condizione "${condizione}".` });
+            registra({ etichetta: `${condizione}`, tipo: 'condizione', dettaglio: tr(`${scheda.nome || 'PG'} subisce la condizione "${condizione}".`, `${scheda.nome || 'PC'} gains the "${traduciDato(condizione)}" condition.`) });
           }
         }}
         onAggiungiTalento={(talento) => {
@@ -20408,7 +20535,7 @@ export default function App() {
             testo: talento.desc || '',
           };
           aggiorna({ privilegi: [...(scheda.privilegi || []), nuovo] });
-          registra({ etichetta: `${talento.nome}`, tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'} aggiunge il talento/privilegio "${talento.nome}".` });
+          registra({ etichetta: `${talento.nome}`, tipo: 'tattica', dettaglio: tr(`${scheda.nome || 'PG'} aggiunge il talento/privilegio "${talento.nome}".`, `${scheda.nome || 'PC'} adds the feat/feature "${talento.nome}".`) });
         }}
       />
 
@@ -20513,7 +20640,7 @@ export default function App() {
                         tiroLibero(facce);
                         setMostraDadiModal(false);
                       }}
-                      title={`Tira 1d${facce}`}
+                      title={tr(`Tira 1d${facce}`, `Roll 1d${facce}`)}
                       style={{
                         position: 'relative', width: 44, height: 44, background: 'none', border: 'none', cursor: 'pointer',
                         padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.1s'
@@ -20671,7 +20798,7 @@ export default function App() {
               {/* Segnalino trascinabile: la punta indica il punto salvato. */}
               <div
                 onPointerDown={iniziaTrascinaMarker}
-                title="Trascina il segnalino · la posizione viene salvata"
+                title={tr('Trascina il segnalino · la posizione viene salvata', 'Drag the marker · the position is saved')}
                 style={{
                   position: 'absolute', left: `${mappaMarker.x}%`, top: `${mappaMarker.y}%`,
                   transform: 'translate(-50%, -100%)', cursor: 'grab', touchAction: 'none',
@@ -20736,7 +20863,7 @@ export default function App() {
                       e.target.value = '';
                     }}
                     style={{ ...styles.inlineInput, fontSize: 12, padding: '3px 6px', maxWidth: 125, height: 26, fontWeight: 700, background: 'rgba(46,139,87,0.1)', color: '#2e8b57', borderColor: '#2e8b57' }}
-                    title="Aggiungi un alleato salvato nella scheda o creane uno nuovo"
+                    title={tr('Aggiungi un alleato salvato nella scheda o creane uno nuovo', 'Add an ally saved on the sheet or create a new one')}
                   >
                     <option value="">+ {t('ct.alleato')}...</option>
                     <option value="__nuovo">＋ {t('ct.alleato')} (Nuovo)</option>
@@ -20829,15 +20956,15 @@ export default function App() {
                 <button
                   style={{ ...styles.buttonMini, whiteSpace: 'nowrap', padding: '3px 8px' }}
                   onClick={ordinaIniziativa}
-                  title="Ordina i combattenti per iniziativa decrescente"
+                  title={tr('Ordina i combattenti per iniziativa decrescente', 'Sort combatants by initiative, highest first')}
                 >
                   Ordina
                 </button>
                 <button
                   style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, whiteSpace: 'nowrap', padding: '3px 8px' }}
-                  title="Applica danni ad area (es. Palla di Fuoco) a tutti i nemici del combattimento"
+                  title={tr('Applica danni ad area (es. Palla di Fuoco) a tutti i nemici del combattimento', 'Apply area damage (e.g. Fireball) to every enemy in the fight')}
                   onClick={() => {
-                    const dmg = parseInt(window.prompt("Danni ad area da applicare a tutti i nemici:"), 10);
+                    const dmg = parseInt(window.prompt(tr('Danni ad area da applicare a tutti i nemici:', 'Area damage to apply to every enemy:')), 10);
                     if (dmg > 0) {
                       setCombat((c) => ({
                         ...c,
@@ -20868,7 +20995,7 @@ export default function App() {
             {/* LISTA COMBATTENTI (Ordinati a scorrimento naturale: PG in turno -> Prossimo -> Successivi) */}
             {combat.combattenti.length === 0 ? (
               <div style={{ ...styles.detail, padding: '16px 8px', textAlign: 'center', background: 'rgba(0,0,0,0.02)', borderRadius: 8, border: `1px dashed ${C.border}`, color: C.inkDim }}>
-                <strong>Nessun combattente in questo scontro.</strong> Usa i pulsanti sopra (<strong>＋ Alleato</strong>, <strong>＋ Nemico</strong> o <strong>Mostro</strong>) per iniziare.
+                <strong>{tr('Nessun combattente in questo scontro.', 'No combatants in this encounter.')}</strong> {tr('Usa i pulsanti sopra (+ Alleato, + Nemico o + Mostro) per iniziare.', 'Use the buttons above (+ Ally, + Enemy or + Monster) to start.')}
               </div>
             ) : (() => {
               // Master list ordinata per iniziativa decrescente
@@ -21047,7 +21174,7 @@ export default function App() {
                             <span title={t("vital.ca")} style={{ fontWeight: 700, color: C.ink }}>
                               CA <Editable value={cb.ca} tipo="numero" width={22} onChange={(v) => modCombat(cb.id, { ca: v })} />
                             </span>
-                            <span
+                            <span role="button" tabIndex={0}
                               className="tirabile"
                               style={{
                                 cursor: 'pointer',
@@ -21090,7 +21217,7 @@ export default function App() {
                                       fontSize: 11,
                                       fontWeight: 800,
                                     }}
-                                    title="PF Temporanei attivi (clicca per modificare o × per rimuovere)"
+                                    title={tr('PF temporanei attivi (clicca per modificare o × per rimuovere)', 'Temporary HP active (click to edit or × to remove)')}
                                   >
                                     <span>🛡️+</span>
                                     <Editable
@@ -21181,11 +21308,11 @@ export default function App() {
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 11, background: 'rgba(0,0,0,0.02)', padding: '2px 4px', borderRadius: 4 }} title={t('vital.ts_morte')}>
                               <span style={{ color: C.inkDim, fontSize: 11 }}>💀</span>
                               {[1, 2, 3].map((i) => (
-                                <span key={`s${i}`} style={styles.pip(cb.tsMorte.successi >= i, C.green)} onClick={() => modCombat(cb.id, { tsMorte: { ...cb.tsMorte, successi: cb.tsMorte.successi >= i ? i - 1 : i } })} />
+                                <span role="button" tabIndex={0} key={`s${i}`} style={styles.pip(cb.tsMorte.successi >= i, C.green)} onClick={() => modCombat(cb.id, { tsMorte: { ...cb.tsMorte, successi: cb.tsMorte.successi >= i ? i - 1 : i } })} />
                               ))}
                               <span style={{ color: C.border }}>|</span>
                               {[1, 2, 3].map((i) => (
-                                <span key={`f${i}`} style={styles.pip(cb.tsMorte.fallimenti >= i, C.red)} onClick={() => modCombat(cb.id, { tsMorte: { ...cb.tsMorte, fallimenti: cb.tsMorte.fallimenti >= i ? i - 1 : i } })} />
+                                <span role="button" tabIndex={0} key={`f${i}`} style={styles.pip(cb.tsMorte.fallimenti >= i, C.red)} onClick={() => modCombat(cb.id, { tsMorte: { ...cb.tsMorte, fallimenti: cb.tsMorte.fallimenti >= i ? i - 1 : i } })} />
                               ))}
                             </div>
                           )}
@@ -21193,7 +21320,7 @@ export default function App() {
                           {/* Condizioni */}
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center', marginTop: 'auto' }}>
                             {cb.condizioni.map((cond) => (
-                              <span
+                              <span role="button" tabIndex={0}
                                 key={cond}
                                 onClick={() => modCombat(cb.id, { condizioni: cb.condizioni.filter((x) => x !== cond) })}
                                 style={{ fontSize: 11, background: 'rgba(176,58,46,0.1)', color: C.red, border: `1px solid ${C.red}`, borderRadius: 4, padding: '0 4px', cursor: 'pointer', fontWeight: 600 }}
@@ -21223,7 +21350,7 @@ export default function App() {
           </div>
         </div>
       ) : combat.attivo && !combat.aperto && combat.combattenti.length > 0 ? (
-        <div
+        <div role="button" tabIndex={0}
           data-combat-toggle="true"
           onClick={() => setCombat((c) => ({ ...c, aperto: true }))}
           style={{
