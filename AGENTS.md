@@ -1,7 +1,7 @@
 # AGENTS.md
 
 Il contesto completo del progetto (stack, convenzioni, test, versionamento,
-lavoro multi-agente e regole antislop) è in [`CLAUDE.md`](CLAUDE.md): leggilo
+lavoro multi-agente) è in [`CLAUDE.md`](CLAUDE.md): leggilo
 per intero prima di iniziare qualsiasi modifica. Le regole ponytail qui sotto
 valgono sempre (sono le stesse riportate in `CLAUDE.md`).
 

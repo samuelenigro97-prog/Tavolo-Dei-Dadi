@@ -9,25 +9,25 @@ test.describe('Sezione Azioni', () => {
 
   test('Azione/Bonus/Reazione/Nuovo Turno sono sempre visibili', async ({ page }) => {
     // Stato di partenza (PG appena caricato): nessuna azione ancora usata, quindi tutti "🟢".
-    await expect(page.getByRole('button', { name: '⚔️ Azione 🟢' })).toBeVisible();
-    await expect(page.getByRole('button', { name: '⚡ Azione Bonus 🟢' })).toBeVisible();
-    await expect(page.getByRole('button', { name: '🛡️ Reazione 🟢' })).toBeVisible();
-    await expect(page.getByRole('button', { name: /🔄 Nuovo Turno/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Azione 🟢', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Azione Bonus 🟢', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Reazione 🟢', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Nuovo Turno/ })).toBeVisible();
   });
 
   test('Interazione Oggetto, Tattiche e Copertura sono dietro "Altre opzioni" (chiuso di default)', async ({ page }) => {
     await expect(page.getByRole('button', { name: /Interazione Oggetto/ })).not.toBeVisible();
-    await expect(page.getByRole('button', { name: /^🛡️ Schiva$/ })).not.toBeVisible();
+    await expect(page.getByRole('button', { name: /^Schiva$/ })).not.toBeVisible();
 
     await page.getByText(/Altre opzioni/).click();
 
     await expect(page.getByRole('button', { name: /Interazione Oggetto/ })).toBeVisible();
-    await expect(page.getByRole('button', { name: /^🛡️ Schiva$/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Schiva$/ })).toBeVisible();
     await expect(page.getByText(/Copertura:/)).toBeVisible();
   });
 
   test('il pallino dell\'Azione passa da verde a rosso al click', async ({ page }) => {
-    const azione = page.getByRole('button', { name: /^⚔️ Azione/ });
+    const azione = page.getByRole('button', { name: /^Azione (🟢|🔴)$/u });
     await expect(azione).toContainText('🟢');
     await azione.click();
     await expect(azione).toContainText('🔴');

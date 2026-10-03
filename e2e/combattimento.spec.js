@@ -61,18 +61,18 @@ test.describe('Combattimento', () => {
   test('il tempo di lancio è il primo chip dopo il nome, subito seguito dalla gittata (anche per Inaridire, che ha solo la CD nella nota)', async ({ page }) => {
     const chip = (nome, i) => page.locator('tr.attacchi-riga').filter({ hasText: nome }).locator('.attacchi-note span').nth(i);
     await expect(chip('Inaridire', 0)).toHaveClass(/chip-tempo/);
-    await expect(chip('Inaridire', 1)).toHaveText(/🎯\s*9m/);
-    await expect(chip('Randello Incantato', 0)).toHaveText(/⏱\s*Azione Bonus/);
-    await expect(chip('Randello Incantato', 1)).toHaveText(/🎯\s*Tocco/);
+    await expect(chip('Inaridire', 1)).toHaveText(/^\s*9m\s*$/);
+    await expect(chip('Randello Incantato', 0)).toHaveText(/^\s*Azione Bonus\s*$/);
+    await expect(chip('Randello Incantato', 1)).toHaveText(/^\s*Tocco\s*$/);
     await expect(chip('Morsa del Gelo', 0)).toHaveClass(/chip-tempo/);
-    await expect(chip('Morsa del Gelo', 1)).toHaveText(/🎯\s*18m/);
+    await expect(chip('Morsa del Gelo', 1)).toHaveText(/^\s*18m\s*$/);
     await expect(chip('Parola di Guarigione', 0)).toHaveClass(/chip-tempo/);
-    await expect(chip('Parola di Guarigione', 1)).toHaveText(/🎯\s*18m/);
+    await expect(chip('Parola di Guarigione', 1)).toHaveText(/^\s*18m\s*$/);
   });
 
   test('tiro per colpire e danni usano gli stessi badge di Trucchetti/Incantesimi', async ({ page }) => {
     const riga = page.locator('tr.attacchi-riga').filter({ hasText: 'Frusta di Spine' });
-    await expect(riga.locator('.badge-tiro-colpire')).toHaveText(/🎯\s*\+9/);
+    await expect(riga.locator('.badge-tiro-colpire')).toHaveText(/^\s*Attacco \+9\s*$/);
     await expect(riga.locator('.badge-tiro-danno')).toContainText('Perforante');
     // Anche le Reazioni: Attacco di Opportunità.
     const reaz = page.locator('tr.attacchi-riga').filter({ hasText: 'Attacco di Opportunità' });
@@ -115,7 +115,7 @@ test.describe('Combattimento', () => {
   test('il chip proprietà di Frusta di Spine è pulito ("Magico")', async ({ page }) => {
     const riga = page.locator('tr.attacchi-riga').filter({ hasText: 'Frusta di Spine' });
     await expect(riga.locator('.attacchi-note')).not.toContainText('):');
-    await expect(riga.locator('.attacchi-note span[title="Proprietà"]')).toHaveText(/^🏷️\s*Magico$/);
+    await expect(riga.locator('.attacchi-note span[title="Proprietà"]')).toHaveText(/^\s*Magico\s*$/);
   });
 
   test('nessun incantesimo ad azione bonus compare nella tabella Azione', async ({ page }) => {
@@ -155,13 +155,15 @@ test.describe('Combattimento', () => {
     // Lista incantesimi: il "2d8" salvato dal vecchio database non vince sull'edizione del PG.
     await expect(page.locator('.badge-tiro-danno').filter({ hasText: /1d8\+5 Guarigione/ })).toHaveCount(1);
     await expect(page.locator('.badge-tiro-danno').filter({ hasText: /2d8(\+\d+)? Guarigione/ })).toHaveCount(0);
-    // Una cura non ha tiro per colpire: nessun badge "🎯 +9" sulla riga di Cura Ferite.
+    // Una cura non ha tiro per colpire: nessun badge "Attacco +9" sulla riga di Cura Ferite.
     const rigaCura = page.getByRole('button', { name: 'Cura Ferite', exact: true }).locator('xpath=ancestor::*[.//*[contains(@class, "badge-tiro-danno")]][1]');
     await expect(rigaCura.locator('.badge-tiro-colpire')).toHaveCount(0);
   });
 
   test('Assorbire Elementi (danno sul prossimo colpo in mischia) non ha il badge del tiro per colpire', async ({ page }) => {
-    const riga = page.getByRole('button', { name: 'Assorbire Elementi', exact: true }).locator('xpath=ancestor::*[.//*[contains(@class, "badge-tiro-danno")]][1]');
+    // Solo il vero <button> del nome: dalla v4.48.0 anche il campo modificabile
+    // (span role="button") ha lo stesso nome accessibile.
+    const riga = page.getByRole('button', { name: 'Assorbire Elementi', exact: true }).and(page.locator('button')).locator('xpath=ancestor::*[.//*[contains(@class, "badge-tiro-danno")]][1]');
     await expect(riga.locator('.badge-tiro-danno')).toHaveCount(1);
     await expect(riga.locator('.badge-tiro-colpire')).toHaveCount(0);
   });

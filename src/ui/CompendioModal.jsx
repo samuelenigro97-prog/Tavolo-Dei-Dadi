@@ -511,13 +511,13 @@ export function CompendioModal({
         id: `bestia-${b.nome}`,
         tipo: 'bestiario',
         nome: b.nome,
-        gs: b.gs != null ? b.gs : '-',
+        gs: b.gs != null ? b.gs : '—',
         ca: b.ca || 10,
         pf: b.pf || 10,
         vel: b.vel || '9m',
         taglia: b.taglia || 'Media',
         tipoCreatura: b.tipo || 'Bestia',
-        desc: `GS ${b.gs != null ? b.gs : '-'} · CA ${b.ca || 10} · PF ${b.pf || 10} · Vel ${b.vel || '9m'}`,
+        desc: `GS ${b.gs != null ? b.gs : '—'} · CA ${b.ca || 10} · PF ${b.pf || 10} · Vel ${b.vel || '9m'}`,
         raw: b,
       });
     }
@@ -745,7 +745,7 @@ export function CompendioModal({
                     border: `1px solid ${String(versione) === '2014' ? C.goldDark : '#2e8b57'}`,
                   }}
                 >
-                  {String(versione) === '2014' ? '📖 D&D 5.0 (2014)' : '⚔️ D&D 5.5 (2024)'}
+                  {String(versione) === '2014' ? 'D&D 5.0 (2014)' : 'D&D 5.5 (2024)'}
                 </span>
               </div>
               <div style={{ fontSize: 11, color: C.inkDim, marginTop: 1 }}>
@@ -994,13 +994,13 @@ export function CompendioModal({
                           gap: 3,
                         }}
                       >
-                        🔮 {traduciDato(dettaglioSelezionato.scuola)}
+                        {traduciDato(dettaglioSelezionato.scuola)}
                       </span>
                     )}
-                    <span>⏱ {traduciDato(dettaglioSelezionato.tempo || '1 Azione')}</span>
-                    <span>🎯 {dettaglioSelezionato.gittata || 'Tocco'}</span>
-                    {dettaglioSelezionato.conc && <span>⏳ {lingua === 'en' ? 'Concentration' : 'Concentrazione'}</span>}
-                    {dettaglioSelezionato.rituale && <span>📜 {lingua === 'en' ? 'Ritual' : 'Rituale'}</span>}
+                    <span>{traduciDato(dettaglioSelezionato.tempo || '1 Azione')}</span>
+                    <span>{dettaglioSelezionato.gittata || 'Tocco'}</span>
+                    {dettaglioSelezionato.conc && <span>{lingua === 'en' ? 'Concentration' : 'Concentrazione'}</span>}
+                    {dettaglioSelezionato.rituale && <span>{lingua === 'en' ? 'Ritual' : 'Rituale'}</span>}
                   </div>
                 )}
               </div>
@@ -1041,7 +1041,7 @@ export function CompendioModal({
                       onChiudi();
                     }}
                   >
-                    ✨ {t('compendio.aggiungi_grimorio')}
+                    {t('compendio.aggiungi_grimorio')}
                   </button>
                 )}
 
@@ -1061,7 +1061,7 @@ export function CompendioModal({
                       onChiudi();
                     }}
                   >
-                    🎒 {t('compendio.aggiungi_inventario')}
+                    {t('compendio.aggiungi_inventario')}
                   </button>
                 )}
 
@@ -1081,7 +1081,7 @@ export function CompendioModal({
                       onChiudi();
                     }}
                   >
-                    ⚔️ {t('compendio.aggiungi_attacchi')}
+                    {t('compendio.aggiungi_attacchi')}
                   </button>
                 )}
 
@@ -1101,7 +1101,7 @@ export function CompendioModal({
                       onChiudi();
                     }}
                   >
-                    🩸 {t('compendio.applica_condizione')}
+                    {t('compendio.applica_condizione')}
                   </button>
                 )}
 
@@ -1121,7 +1121,7 @@ export function CompendioModal({
                       onChiudi();
                     }}
                   >
-                    ⭐ {t('compendio.aggiungi_talento')}
+                    {t('compendio.aggiungi_talento')}
                   </button>
                 )}
 
@@ -1146,7 +1146,7 @@ export function CompendioModal({
                       onChiudi();
                     }}
                   >
-                    🛡️ {t('compendio.aggiungi_scheda')}
+                    {t('compendio.aggiungi_scheda')}
                   </button>
                 )}
 
@@ -1171,7 +1171,7 @@ export function CompendioModal({
                       onChiudi();
                     }}
                   >
-                    🧬 {t('compendio.aggiungi_scheda')}
+                    {t('compendio.aggiungi_scheda')}
                   </button>
                 )}
               </div>

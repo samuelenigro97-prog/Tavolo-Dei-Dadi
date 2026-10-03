@@ -70,6 +70,18 @@ const AMBIENTI_FILE_NOTTE = new Set(['montagna']);
 // medievali (campane, fabbro, carretti) invece del chiacchiericcio.
 const VOLUME_BASE = { citta: 0.5, montagna: 1.35 };
 
+// Gli mp3 non sono più nella precache del service worker (pesavano ~9 MB
+// all'installazione). Al primo ascolto di un loop se ne scarica in sottofondo
+// una copia completa: il service worker la mette in cache (CacheFirst) e da lì
+// in poi quell'ambientazione suona anche offline.
+const audioMemorizzati = new Set();
+export function memorizzaAudioOffline(url) {
+  if (!url || audioMemorizzati.has(url)) return;
+  if (typeof navigator === 'undefined' || !navigator.serviceWorker?.controller || typeof fetch !== 'function') return;
+  audioMemorizzati.add(url);
+  fetch(url).catch(() => audioMemorizzati.delete(url));
+}
+
 function ambienteFileUrl(id, notte = false) {
   if (!AMBIENTI_CON_FILE.has(id)) return null;
   const base = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.BASE_URL) || '/';
@@ -130,6 +142,8 @@ function attivaOverrideSilenzioso() {
   } catch { /* ignorato */ }
 }
 
+// Effetti sonori "one-shot" da file (colpo d'arma, incantesimo): caricati e
+// decodificati una volta in AudioBuffer, così la riproduzione è istantanea.
 const SFX_FILES = {
   sword: 'sfx-sword.mp3', arrow: 'sfx-freccia.mp3', dice: 'sfx-dadi.mp3', magic: 'sfx-magic.mp3',
   // Overlay per la città medievale (si sovrappongono alla base: campane, fabbro, carretti)
@@ -469,6 +483,7 @@ export function avviaAmbiente(id, volume = 0.5, urlCustom = '', notte = false) {
   const fileUrl = ambienteFileUrl(id, notte);
   if (fileUrl) {
     htmlAudioElement = new Audio(fileUrl);
+    memorizzaAudioOffline(fileUrl);
     htmlAudioElement.loop = true;
     htmlAudioElement.volume = Math.min(1, currentVolume * fattoreVolumeBase(id));
     htmlAudioElement.setAttribute('playsinline', '');

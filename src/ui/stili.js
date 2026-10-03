@@ -52,13 +52,12 @@ export const styles = {
     fontSize: 15,
     color: C.ink,
     textAlign: 'center',
-    textTransform: 'uppercase',
     fontWeight: 'bold',
     borderTop: 'none',
     borderBottom: 'none',
     paddingTop: 2,
     paddingBottom: 4,
-    letterSpacing: 2.5,
+    letterSpacing: 1,
     fontFamily: 'var(--font-title, inherit)',
   },
   // campo in stile modulo: valore su riga con etichetta sotto
@@ -619,7 +618,7 @@ tbody tr:hover {
   justify-self: center;
   text-align: center;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   transition: text-shadow 0.3s ease;
 }
 
@@ -2310,12 +2309,25 @@ tbody tr:hover {
   }
 }
 
-/* Touch Target Accessibility (R-03 / antislop-layoutmobile) */
+/* Elimina sulle righe (incantesimi): neutro, rosso solo al passaggio/focus */
+.btn-elimina-riga:hover, .btn-elimina-riga:focus-visible {
+  color: var(--c-red) !important; border-color: var(--c-red) !important;
+}
+
+/* Bersagli touch più grandi sui dispositivi touch (pulsanti piccoli e vicini
+   sono la prima causa di tocchi sbagliati, es. Elimina al posto di Prep.) */
 @media (pointer: coarse) {
   .btn-header-azione,
   .inventario-table .inventario-riga > .inventario-azioni button {
     min-height: 38px;
     min-width: 38px;
+  }
+  .spell-azioni { gap: 8px !important; }
+  .spell-azioni button {
+    min-height: 36px;
+    min-width: 44px;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
   }
 }
 `;

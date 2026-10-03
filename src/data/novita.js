@@ -5,6 +5,44 @@
 
 export const NOVITA = [
   {
+    versione: '4.48.0',
+    voci: {
+      it: [
+        'Se la sincronizzazione è spenta, un promemoria in alto ti ricorda di scaricare un backup dei personaggi ogni 7 giorni. Se il browser esaurisce lo spazio, l\'app libera prima le copie di emergenza più vecchie e, se non basta, ti avvisa subito con il pulsante "Scarica backup".',
+        'L\'app pesa molto meno da installare: musiche e sfondi delle ambientazioni si scaricano solo quando li usi, poi restano disponibili anche offline.',
+        'In inglese ora è tradotto anche quello che restava in italiano: "1 Action", gittata, area, tipo di danno, messaggi e stati della sincronizzazione.',
+        'Combattimento su telefono: i pulsanti delle reazioni non coprono più il titolo e i testi di innesco ed effetto si leggono per intero.',
+        'Pulsanti più grandi sulle righe degli incantesimi, Escape chiude menu e finestre, e il menu iniziale compare solo al primo avvio.',
+      ],
+      en: [
+        'When sync is off, a reminder at the top asks you to download a backup of your characters every 7 days. If the browser runs out of space, the app first frees the oldest emergency copies and, if that is not enough, warns you right away with a "Download backup" button.',
+        'The app is much lighter to install: ambience music and backgrounds download only when you use them, then stay available offline.',
+        'The English version now also translates what was still in Italian: "1 Action", range, area, damage type, messages and sync statuses.',
+        'Combat on phones: the reaction buttons no longer cover the title, and trigger and effect texts are shown in full.',
+        'Bigger buttons on spell rows, Escape closes menus and dialogs, and the start menu shows up only on first launch.',
+      ],
+    },
+  },
+  {
+    versione: '4.47.0',
+    voci: {
+      it: [
+        'Concentrazione e Rituale hanno ora un colore proprio (fucsia), così si riconoscono a colpo d\'occhio nelle righe degli incantesimi. Se la nota dice già "Conc.", l\'etichetta non compare più due volte.',
+        'Meno icone: restano solo dove aiutano davvero (pulsanti della barra in alto, tipo di danno sui riquadri di tiro, slot incantesimo). Tempo di lancio, gittata, Prep., titoli di sezione, voci di menu e messaggi ora sono solo testo, distinti dal colore.',
+        'Titoli di sezione non più tutti in maiuscolo, più facili da leggere.',
+        'Il pulsante per eliminare un incantesimo ora dice "Elimina", è neutro (diventa rosso solo al passaggio) e chiede sempre conferma.',
+        'Il riquadro del tiro per colpire mostra "Attacco +9" invece di un\'icona.',
+      ],
+      en: [
+        'Concentration and Ritual now have their own color (fuchsia), so you can spot them at a glance in spell rows. If the note already says "Conc.", the label no longer shows up twice.',
+        'Fewer icons: they stay only where they really help (top bar buttons, damage type on roll badges, spell slots). Casting time, range, Prep., section titles, menu items and messages are now plain text, told apart by color.',
+        'Section titles are no longer all caps, so they are easier to read.',
+        'The button to delete a spell now says "Delete", is neutral (it turns red only on hover) and always asks for confirmation.',
+        'The attack roll badge shows "Attack +9" instead of an icon.',
+      ],
+    },
+  },
+  {
     versione: '4.46.1',
     voci: {
       it: [
