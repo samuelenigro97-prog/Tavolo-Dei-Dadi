@@ -2,6 +2,22 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.61.0] – 2026-10-05
+
+### Cambiato
+- **Poteri separati da Risorse di classe**: i contatori dei Poteri (Segreti,
+  Debito, usi dei privilegi...) non compaiono più nell'elenco "Risorse di
+  classe", che torna a contenere solo le risorse di classe (Forma Selvatica,
+  Totem Spirituale...). Vivono nella sezione Poteri; riposi e ripristini
+  continuano a funzionare. Le schede dei poteri generici hanno ora i pulsanti
+  − / + sui contatori; nel pannello Araldi il nome del privilegio spiega cosa
+  fa al passaggio del mouse.
+- **Colori dei testi uniformati**: verdi (#2e9d4d, #10b981, #2e7d32, #2e8b57) e
+  rossi (#ef4444, #c0392b, #b03a2e, #d32f2f) scritti a mano in 131 punti
+  dell'app usano ora gli stessi colori del tema (`C.green`, `C.red`), quindi
+  seguono tema chiaro/scuro e ambientazione. Restano com'erano gli sfondi pieni
+  con testo bianco, le barre dei PF e i colori delle condizioni.
+
 ## [4.60.0] – 2026-10-05
 
 ### Aggiunto

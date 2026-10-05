@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.61.0',
+    voci: {
+      it: [
+        'I Poteri stanno nella loro sezione, separati dalle Risorse di classe.',
+        'Verdi e rossi dei testi uniformati: ora seguono il tema in tutta l\'app.',
+      ],
+      en: [
+        'Powers now live in their own section, separate from Class resources.',
+        'Green and red text colours unified: they now follow the theme across the app.',
+      ],
+    },
+  },
+  {
     versione: '4.60.0',
     voci: {
       it: [

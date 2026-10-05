@@ -187,7 +187,7 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
             return (
               <div key={p.id} style={{ ...scatola, opacity: bloccato ? 0.6 : 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                  <strong style={{ fontSize: 13 }}>{nomeBreve}</strong>
+                  <strong style={{ fontSize: 13, cursor: 'help' }} title={p.descrizione}>{nomeBreve}</strong>
                   <span style={{ fontSize: 11, fontWeight: 700, color: bloccato ? C.inkDim : C.goldDark, border: `1px solid ${bloccato ? C.border : C.goldDark}`, borderRadius: 6, padding: '1px 6px' }}>
                     {bloccato ? '🔒 ' : ''}{en ? `Level ${p.livelloMin}` : `${p.livelloMin}° liv.`}
                   </span>

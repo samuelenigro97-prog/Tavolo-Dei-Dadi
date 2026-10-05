@@ -73,6 +73,8 @@ const chipStile = {
   whiteSpace: 'nowrap',
 };
 
+const miniPm = { ...styles.buttonMini, padding: '0 6px', fontSize: 12, lineHeight: 1.3, margin: '0 2px' };
+
 /** Una scheda compatta per potere: titolo, chip di contatori/modificatori, descrizione. */
 function PotereCard({ potere, scheda, indice, totale, onApri, lingua }) {
   const [sceltaEffetto, setSceltaEffetto] = useState(false);
@@ -121,8 +123,9 @@ function PotereCard({ potere, scheda, indice, totale, onApri, lingua }) {
         {potere.contatori.map((c, i) => {
           const { attuali, max } = valoreContatore(scheda, potere.id, i, c);
           return (
-            <span key={i} style={chipStile} onClick={(e) => e.stopPropagation()} title={c.nome}>
+            <span key={i} style={chipStile} onClick={(e) => e.stopPropagation()} title={potere.descrizione ? `${c.nome}: ${potere.descrizione}` : c.nome}>
               {c.nome || (lingua === 'en' ? 'Counter' : 'Contatore')}{' '}
+              <button type="button" style={miniPm} disabled={attuali <= 0} aria-label={`${c.nome} −1`} onClick={() => onApri(potere.id, { tipo: 'contatore', indice: i, patch: { attuali: Math.max(0, attuali - 1) } })}>−</button>
               <Editable
                 value={attuali}
                 tipo="numero"
@@ -130,6 +133,7 @@ function PotereCard({ potere, scheda, indice, totale, onApri, lingua }) {
                 style={{ fontSize: 12, fontWeight: 700 }}
                 onChange={(v) => onApri(potere.id, { tipo: 'contatore', indice: i, patch: { attuali: v } })}
               />
+              <button type="button" style={miniPm} disabled={max != null && attuali >= max} aria-label={`${c.nome} +1`} onClick={() => onApri(potere.id, { tipo: 'contatore', indice: i, patch: { attuali: max != null ? Math.min(max, attuali + 1) : attuali + 1 } })}>+</button>
               {max != null ? ` / ${max}` : ' (?)'}
             </span>
           );

@@ -1957,7 +1957,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.60.0';
+const APP_VERSION = '4.61.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -3057,7 +3057,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
           </button>
         </div>
         {stato && stato !== 'carico' && (
-          <div style={{ padding: 10, borderRadius: 8, background: stato.includes('successo') ? 'rgba(46,157,77,0.15)' : 'rgba(200,60,60,0.12)', border: `1px solid ${stato.includes('successo') ? '#2e9d4d' : C.red}`, marginBottom: 12, fontSize: 13, color: stato.includes('successo') ? '#2e9d4d' : C.red, fontWeight: 600 }}>{stato}</div>
+          <div style={{ padding: 10, borderRadius: 8, background: stato.includes('successo') ? 'rgba(46,157,77,0.15)' : 'rgba(200,60,60,0.12)', border: `1px solid ${stato.includes('successo') ? C.green : C.red}`, marginBottom: 12, fontSize: 13, color: stato.includes('successo') ? C.green : C.red, fontWeight: 600 }}>{stato}</div>
         )}
         {elenco && (
           <>
@@ -3184,7 +3184,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
                                   <div style={{ fontSize: 11, fontWeight: 700, color: C.inkDim }}>{sigla}</div>
                                   <div style={{ fontSize: 13, fontWeight: 800 }}>{conSegno(mod)}</div>
                                   <div style={{ fontSize: 11, color: C.inkDim }}>{score}</div>
-                                  <div style={{ fontSize: 11, color: hasTs ? '#2e9d4d' : C.inkDim, fontWeight: hasTs ? 700 : 400 }}>
+                                  <div style={{ fontSize: 11, color: hasTs ? C.green : C.inkDim, fontWeight: hasTs ? 700 : 400 }}>
                                     {hasTs ? 'TS' : 'TS —'}
                                   </div>
                                 </div>
@@ -3977,10 +3977,10 @@ export default function App() {
   const statoColoreCloud = sincronizzando
     ? '#f59e0b'
     : isCloudAttivo
-      ? '#2e9d4d'
+      ? C.green
       : isCloudConfigurato
         ? '#f59e0b'
-        : '#ef4444';
+        : C.red;
   const statoBgCloud = sincronizzando
     ? 'rgba(245, 158, 11, 0.14)'
     : isCloudAttivo
@@ -7202,7 +7202,7 @@ export default function App() {
       {(erroreSalvataggio || (avvisoBackup && !mostraMenu && !bannerBackupChiuso)) && (
         <div className="banner-dati" style={{ position: 'fixed', top: 'max(52px, calc(env(safe-area-inset-top, 0px) + 48px))', left: 8, right: 8, zIndex: 990, display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', pointerEvents: 'none' }}>
           {erroreSalvataggio && (
-            <div role="alert" data-testid="banner-spazio-pieno" style={{ pointerEvents: 'auto', maxWidth: 560, width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 10, border: '1px solid #ef4444', background: 'color-mix(in srgb, var(--c-panel) 86%, #ef4444)', color: C.ink, fontSize: 13, lineHeight: 1.45, boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }}>
+            <div role="alert" data-testid="banner-spazio-pieno" style={{ pointerEvents: 'auto', maxWidth: 560, width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 10, border: '1px solid var(--c-red)', background: 'color-mix(in srgb, var(--c-panel) 86%, var(--c-red))', color: C.ink, fontSize: 13, lineHeight: 1.45, boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }}>
               <div style={{ marginBottom: 8 }}><strong>⚠️ {tr('Salvataggio non riuscito', 'Save failed')}</strong><br />{erroreSalvataggio}</div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 <button style={{ ...styles.buttonPrimary, fontSize: 12, padding: '6px 12px', minHeight: 36 }} onClick={esportaBackupCompleto}>{tr('Scarica backup', 'Download backup')}</button>
@@ -7790,7 +7790,7 @@ export default function App() {
               </div>
 
               {tsInfo.haIncantatoreDaGuerra && !esito && (
-                <div style={{ fontSize: 12, background: 'rgba(46,157,77,0.12)', border: '1px solid #2e9d4d', borderRadius: 6, padding: '5px 8px', marginBottom: 10, color: '#2e9d4d', fontWeight: 600 }}>
+                <div style={{ fontSize: 12, background: 'rgba(46,157,77,0.12)', border: '1px solid var(--c-green)', borderRadius: 6, padding: '5px 8px', marginBottom: 10, color: C.green, fontWeight: 600 }}>
                   <strong>{lingua === 'en' ? 'War Caster / Eldritch Mind' : 'Incantatore da Guerra / Mente Occulta'}</strong>: {lingua === 'en' ? 'You have Advantage on concentration saves!' : 'Hai Vantaggio sui TS di concentrazione!'}
                 </div>
               )}
@@ -7804,8 +7804,8 @@ export default function App() {
                       width: '100%',
                       fontWeight: 700,
                       background: tsInfo.haIncantatoreDaGuerra ? 'rgba(46,157,77,0.15)' : 'rgba(201,162,39,0.18)',
-                      borderColor: tsInfo.haIncantatoreDaGuerra ? '#2e9d4d' : C.gold,
-                      color: tsInfo.haIncantatoreDaGuerra ? '#2e9d4d' : C.goldDark,
+                      borderColor: tsInfo.haIncantatoreDaGuerra ? C.green : C.gold,
+                      color: tsInfo.haIncantatoreDaGuerra ? C.green : C.goldDark,
                     }}
                     onClick={() => eseguiTiroConc(tsInfo.haIncantatoreDaGuerra ? 1 : 0)}
                   >
@@ -7829,11 +7829,11 @@ export default function App() {
                   </div>
                 </div>
               ) : (
-                <div style={{ textAlign: 'center', marginBottom: 12, padding: '10px', background: C.panelLight, borderRadius: 8, border: `1px solid ${esito.passa ? '#2e9d4d' : C.red}` }}>
+                <div style={{ textAlign: 'center', marginBottom: 12, padding: '10px', background: C.panelLight, borderRadius: 8, border: `1px solid ${esito.passa ? C.green : C.red}` }}>
                   <div style={{ fontSize: 13, color: C.inkDim }}>
                     {esito.vantaggio !== 0 ? `2d20 [${esito.d1}, ${esito.d2}] -> [${esito.d20}]` : `d20 [${esito.d20}]`} {conSegno(bonusCon)} = <strong style={{ fontSize: 15, color: C.ink }}>{esito.tot}</strong> · CD {checkConc.cd}
                   </div>
-                  <div style={{ fontSize: 16, fontWeight: 800, marginTop: 6, color: esito.passa ? '#2e9d4d' : C.red }}>
+                  <div style={{ fontSize: 16, fontWeight: 800, marginTop: 6, color: esito.passa ? C.green : C.red }}>
                     {esito.passa
                       ? `${lingua === 'en' ? 'Concentration maintained' : 'Concentrazione mantenuta'}`
                       : `${lingua === 'en' ? 'Concentration lost' : 'Concentrazione persa'}`}
@@ -7899,7 +7899,7 @@ export default function App() {
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <div role="alert" style={{ fontSize: 13, lineHeight: 1.5, padding: '8px 12px', borderRadius: 8, border: '1px solid #ef4444', background: 'rgba(239,68,68,0.08)', color: C.ink }}>
+                  <div role="alert" style={{ fontSize: 13, lineHeight: 1.5, padding: '8px 12px', borderRadius: 8, border: '1px solid var(--c-red)', background: 'rgba(239,68,68,0.08)', color: C.ink }}>
                     {t('conflitto.conferma_testo')}
                   </div>
                   <button type="button" style={{ ...styles.button, width: '100%', padding: '10px 12px', background: '#b91c1c', borderColor: '#b91c1c', color: '#fff', fontWeight: 700 }} onClick={conflittoMantieniMia}>{t('conflitto.conferma_si')}</button>
@@ -8626,7 +8626,7 @@ export default function App() {
                       <span style={{ color: C.ink }}>
                         {Number(scheda.pe || 0).toLocaleString()} PE
                       </span>
-                      <span style={{ color: infoPe.puoSalire ? '#10b981' : C.goldDark }}>
+                      <span style={{ color: infoPe.puoSalire ? C.green : C.goldDark }}>
                         {infoPe.percentuale}% {livTotale < 20 ? `(${infoPe.peGuadagnatiNelLivello.toLocaleString()} / ${infoPe.peNecessariDelta.toLocaleString()} PE)` : ''}
                       </span>
                     </div>
@@ -8651,7 +8651,7 @@ export default function App() {
                       {lingua === 'en' ? 'Threshold for next level:' : 'Soglia del prossimo livello:'} <strong>{livTotale >= 20 ? '—' : `${infoPe.peProssimoLivello.toLocaleString()} PE`}</strong>
                     </div>
                     <div>
-                      {lingua === 'en' ? 'XP to next level:' : 'PE mancanti al prossimo livello:'} <strong style={{ color: infoPe.puoSalire ? '#10b981' : C.ink }}>{infoPe.puoSalire ? (lingua === 'en' ? 'Ready to level up' : 'Puoi salire di livello') : `${infoPe.peMancanti.toLocaleString()} PE`}</strong>
+                      {lingua === 'en' ? 'XP to next level:' : 'PE mancanti al prossimo livello:'} <strong style={{ color: infoPe.puoSalire ? C.green : C.ink }}>{infoPe.puoSalire ? (lingua === 'en' ? 'Ready to level up' : 'Puoi salire di livello') : `${infoPe.peMancanti.toLocaleString()} PE`}</strong>
                     </div>
                     <div>
                       {lingua === 'en' ? 'Theoretical Level by XP:' : 'Livello teorico da PE:'} <strong>Liv. {infoPe.livelloTeorico}</strong>
@@ -8806,7 +8806,7 @@ export default function App() {
                                 {isAttuale ? (
                                   <span style={{ color: C.goldDark, fontWeight: 700 }}>● {lingua === 'en' ? 'Current' : 'Attuale'}</span>
                                 ) : isRaggiunto ? (
-                                  <span style={{ color: '#10b981' }}>✓ {lingua === 'en' ? 'Reached' : 'Raggiunto'}</span>
+                                  <span style={{ color: C.green }}>✓ {lingua === 'en' ? 'Reached' : 'Raggiunto'}</span>
                                 ) : (
                                   <span style={{ color: C.inkDim }}>—</span>
                                 )}
@@ -8959,7 +8959,7 @@ export default function App() {
                   <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, letterSpacing: 0.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>{lingua === 'en' ? 'Lifting and dragging' : 'Sollevare, spingere e trascinare'}</span>
                     {mov.haCorporaturaPossente && (
-                      <span style={{ fontSize: 11, color: '#10b981', background: 'rgba(16,185,129,0.12)', border: '1px solid #10b981', padding: '1px 5px', borderRadius: 4, fontWeight: 700 }}>
+                      <span style={{ fontSize: 11, color: C.green, background: 'rgba(16,185,129,0.12)', border: '1px solid var(--c-green)', padding: '1px 5px', borderRadius: 4, fontWeight: 700 }}>
                         {lingua === 'en' ? 'Powerful Build ×2' : 'Corporatura Possente ×2'}
                       </span>
                     )}
@@ -9068,7 +9068,7 @@ export default function App() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 18 }}>{reazioneUsata ? '🔴' : '🟢'}</span>
                   <div>
-                    <strong style={{ fontSize: 13, color: reazioneUsata ? C.red : '#2e9d4d' }}>
+                    <strong style={{ fontSize: 13, color: reazioneUsata ? C.red : C.green }}>
                       {reazioneUsata
                         ? (lingua === 'en' ? 'Reaction used this round' : 'Reazione già usata in questo round')
                         : (lingua === 'en' ? 'Reaction available' : 'Reazione disponibile')}
@@ -9085,8 +9085,8 @@ export default function App() {
                     ...styles.buttonMini,
                     fontSize: 11,
                     padding: '3px 9px',
-                    borderColor: reazioneUsata ? '#2e9d4d' : C.border,
-                    color: reazioneUsata ? '#2e9d4d' : C.ink,
+                    borderColor: reazioneUsata ? C.green : C.border,
+                    color: reazioneUsata ? C.green : C.ink,
                   }}
                 >
                   {reazioneUsata ? (lingua === 'en' ? '↺ Reset Reaction' : '↺ Ripristina Reazione') : (lingua === 'en' ? 'Mark as Used' : 'Segna come Usata')}
@@ -9139,8 +9139,8 @@ export default function App() {
                               fontWeight: 700,
                               padding: '2px 8px',
                               background: reazioneUsata ? 'rgba(0,0,0,0.05)' : 'rgba(46,157,77,0.12)',
-                              color: reazioneUsata ? C.inkDim : '#2e9d4d',
-                              borderColor: reazioneUsata ? C.border : '#2e9d4d',
+                              color: reazioneUsata ? C.inkDim : C.green,
+                              borderColor: reazioneUsata ? C.border : C.green,
                               cursor: reazioneUsata ? 'not-allowed' : 'pointer',
                             }}
                           >
@@ -9276,7 +9276,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => eseguiTiro(1)}
-                  style={{ ...styles.buttonMini, fontSize: 12, fontWeight: 700, padding: '5px 12px', background: 'rgba(46,157,77,0.15)', borderColor: '#2e9d4d', color: '#2e9d4d' }}
+                  style={{ ...styles.buttonMini, fontSize: 12, fontWeight: 700, padding: '5px 12px', background: 'rgba(46,157,77,0.15)', borderColor: C.green, color: C.green }}
                 >
                   {lingua === 'en' ? 'Advantage' : 'Con Vantaggio'}
                 </button>
@@ -9316,7 +9316,7 @@ export default function App() {
                           border: `1px solid ${C.border}`,
                         }}
                       >
-                        <strong style={{ width: 44, color: ex.cd >= 25 ? C.red : ex.cd >= 20 ? C.goldDark : '#2e9d4d', flexShrink: 0 }}>
+                        <strong style={{ width: 44, color: ex.cd >= 25 ? C.red : ex.cd >= 20 ? C.goldDark : C.green, flexShrink: 0 }}>
                           CD {ex.cd}
                         </strong>
                         <span style={{ width: 85, color: C.inkDim, fontSize: 11, flexShrink: 0, fontWeight: 600 }}>
@@ -9344,18 +9344,18 @@ export default function App() {
                             padding: '8px 10px',
                             borderRadius: 8,
                             background: syn.posseduto ? 'rgba(46,157,77,0.08)' : C.panelLight,
-                            border: `1px solid ${syn.posseduto ? '#2e9d4d' : C.border}`,
+                            border: `1px solid ${syn.posseduto ? C.green : C.border}`,
                             display: 'flex',
                             flexDirection: 'column',
                             gap: 3,
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
-                            <strong style={{ fontSize: 12, color: syn.posseduto ? '#2e9d4d' : C.ink }}>
+                            <strong style={{ fontSize: 12, color: syn.posseduto ? C.green : C.ink }}>
                               {syn.strumento}
                             </strong>
                             {syn.posseduto ? (
-                              <span style={{ fontSize: 11, fontWeight: 700, color: '#2e9d4d', background: 'rgba(46,157,77,0.15)', padding: '1px 6px', borderRadius: 4 }}>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: C.green, background: 'rgba(46,157,77,0.15)', padding: '1px 6px', borderRadius: 4 }}>
                                 ✓ {lingua === 'en' ? 'Possessed / Proficient' : 'Posseduto / Addestrato'}
                               </span>
                             ) : (
@@ -9739,7 +9739,7 @@ export default function App() {
                   {haSaltoBC ? (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                       <span style={{ textDecoration: 'line-through', opacity: 0.6, fontSize: 12 }}>{conSegno(bcVecchio)}</span>
-                      <strong style={{ color: '#2e9d4d', background: 'rgba(46,157,77,0.12)', padding: '1px 7px', borderRadius: 6, fontWeight: 800 }}>
+                      <strong style={{ color: C.green, background: 'rgba(46,157,77,0.12)', padding: '1px 7px', borderRadius: 6, fontWeight: 800 }}>
                         {conSegno(bcNuovo)} (+1)
                       </strong>
                     </span>
@@ -9836,7 +9836,7 @@ export default function App() {
                       gap: 8,
                     }}>
                       <div>
-                        <div style={{ color: '#2e9d4d', fontWeight: 800, fontSize: 13 }}>
+                        <div style={{ color: C.green, fontWeight: 800, fontSize: 13 }}>
                           {t('levelup.sblocchi', { n: nuovoLivInc })}
                         </div>
                         <div style={{ color: C.inkDim, fontSize: 12, marginTop: 1 }}>
@@ -9882,7 +9882,7 @@ export default function App() {
                                   color: C.ink,
                                 }}
                               >
-                                <span style={{ fontWeight: 700, color: isNuovoLiv ? '#2e9d4d' : C.goldDark }}>{l}° Liv:</span>
+                                <span style={{ fontWeight: 700, color: isNuovoLiv ? C.green : C.goldDark }}>{l}° Liv:</span>
                                 <span>{tot} {tot === 1 ? 'slot' : 'slot'}</span>
                                 {isNuovoLiv && (
                                   <span style={{ fontSize: 11, background: '#2e9d4d', color: '#fff', padding: '1px 5px', borderRadius: 4, fontWeight: 800 }}>
@@ -9918,7 +9918,7 @@ export default function App() {
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 2 }}>
                         {nuoviIncantesimi > 0 && (
                           <div style={{ fontSize: 12, color: C.ink, display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <strong style={{ color: '#2e9d4d' }}>+{nuoviIncantesimi}</strong> {lingua === 'it' ? (nuoviIncantesimi === 1 ? 'incantesimo' : 'incantesimi') : (nuoviIncantesimi === 1 ? 'spell' : 'spells')}
+                            <strong style={{ color: C.green }}>+{nuoviIncantesimi}</strong> {lingua === 'it' ? (nuoviIncantesimi === 1 ? 'incantesimo' : 'incantesimi') : (nuoviIncantesimi === 1 ? 'spell' : 'spells')}
                           </div>
                         )}
                       </div>
@@ -9932,7 +9932,7 @@ export default function App() {
                       {trucchettiDaScegliere > 0 && (
                         <div style={{ marginTop: nuoviIncantesimi > 0 ? 8 : 0, paddingTop: nuoviIncantesimi > 0 ? 8 : 0, borderTop: nuoviIncantesimi > 0 ? `1px dashed ${C.border}` : 'none' }}>
                           <div style={{ fontSize: 12, color: C.ink, marginBottom: 6 }}>
-                            <strong style={{ color: '#2e9d4d' }}>{trucchettiScelti.length}/{trucchettiDaScegliere}</strong> {lingua === 'it'
+                            <strong style={{ color: C.green }}>{trucchettiScelti.length}/{trucchettiDaScegliere}</strong> {lingua === 'it'
                               ? `trucchett${trucchettiDaScegliere === 1 ? 'o' : 'i'} da scegliere`
                               : `cantrip${trucchettiDaScegliere === 1 ? '' : 's'} to choose`}
                           </div>
@@ -9959,8 +9959,8 @@ export default function App() {
                                     cursor: pieno ? 'not-allowed' : 'pointer',
                                     opacity: pieno ? 0.4 : 1,
                                     background: selezionato ? 'rgba(46,157,77,0.18)' : C.panel,
-                                    borderColor: selezionato ? '#2e9d4d' : C.border,
-                                    color: selezionato ? '#2e9d4d' : C.ink,
+                                    borderColor: selezionato ? C.green : C.border,
+                                    color: selezionato ? C.green : C.ink,
                                   }}
                                 >
                                   {selezionato ? '✓ ' : '✨ '}{nome}
@@ -10731,7 +10731,7 @@ export default function App() {
       )}
 
       {erroreImport && (
-        <div style={{ maxWidth: 1080, margin: '8px auto 0', padding: '10px 12px', background: 'color-mix(in srgb, var(--c-panel) 94%, #c0392b)', border: `1px solid ${C.red}`, borderRadius: 8, color: C.red, fontSize: 13, lineHeight: 1.4, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+        <div style={{ maxWidth: 1080, margin: '8px auto 0', padding: '10px 12px', background: 'color-mix(in srgb, var(--c-panel) 94%, var(--c-red))', border: `1px solid ${C.red}`, borderRadius: 8, color: C.red, fontSize: 13, lineHeight: 1.4, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
           <span style={{ flex: 1 }}>{erroreImport}</span>
           <button style={{ ...styles.buttonMini, flexShrink: 0, padding: '2px 8px' }} onClick={() => setErroreImport('')} title={t('tip.chiudi')} aria-label={lingua === 'en' ? 'Dismiss error' : 'Chiudi errore'}>✕</button>
         </div>
@@ -10767,12 +10767,12 @@ export default function App() {
                   marginBottom: 10,
                   padding: '9px 11px',
                   background: 'color-mix(in srgb, var(--c-panel) 84%, #2e9d4d)',
-                  border: '1.5px solid #2e9d4d',
+                  border: '1.5px solid var(--c-green)',
                   borderRadius: 8,
                   boxShadow: '0 3px 12px rgba(46,157,77,0.25)',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, marginBottom: 6 }}>
-                    <strong style={{ fontSize: 12, color: '#2e9d4d', display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <strong style={{ fontSize: 12, color: C.green, display: 'flex', alignItems: 'center', gap: 5 }}>
                       {nuvolettaCorrezioni.titolo}
                     </strong>
                     <button
@@ -10791,8 +10791,8 @@ export default function App() {
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, flexWrap: 'wrap' }}>
                           <span style={{ textDecoration: 'line-through', opacity: 0.8, color: C.red }}>{v.prima}</span>
-                          <span style={{ color: '#2e9d4d', fontWeight: 800 }}>➔</span>
-                          <span style={{ color: '#2e9d4d', fontWeight: 700 }}>{v.dopo}</span>
+                          <span style={{ color: C.green, fontWeight: 800 }}>➔</span>
+                          <span style={{ color: C.green, fontWeight: 700 }}>{v.dopo}</span>
                         </div>
                       </div>
                     ))}
@@ -10804,7 +10804,7 @@ export default function App() {
                 <>
                   {/* Nessuna incongruenza attiva: scheda in regola */}
                   {controlliAttivi.length === 0 && (
-                    <div style={{ border: `1px solid #2e9d4d`, borderRadius: 8, padding: '8px 10px', background: 'rgba(46, 157, 77, 0.12)' }}>
+                    <div style={{ border: `1px solid var(--c-green)`, borderRadius: 8, padding: '8px 10px', background: 'rgba(46, 157, 77, 0.12)' }}>
                       <div style={{ fontSize: 12, color: C.ink, display: 'flex', alignItems: 'flex-start', gap: 6, lineHeight: 1.4 }}>
                         <span>{t('notifiche.scheda_ok')}</span>
                       </div>
@@ -10858,7 +10858,7 @@ export default function App() {
                                       padding: '2px 8px',
                                       background: r.tipo === 'vai_a_sezione' ? '#8b5cf6' : (r.tipo === 'rimuovi_abilita' ? '#d97706' : '#2e9d4d'),
                                       color: '#fff',
-                                      borderColor: r.tipo === 'vai_a_sezione' ? '#8b5cf6' : (r.tipo === 'rimuovi_abilita' ? '#d97706' : '#2e9d4d'),
+                                      borderColor: r.tipo === 'vai_a_sezione' ? '#8b5cf6' : (r.tipo === 'rimuovi_abilita' ? '#d97706' : C.green),
                                       fontWeight: 700,
                                       boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
                                     }}
@@ -10975,7 +10975,7 @@ export default function App() {
             maxWidth: 'min(380px, calc(100vw - 32px))',
             zIndex: 1500,
             background: C.panel,
-            border: '2px solid #2e9d4d',
+            border: '2px solid var(--c-green)',
             borderRadius: 12,
             padding: '11px 14px',
             boxShadow: '0 10px 32px rgba(0,0,0,0.5)',
@@ -10986,7 +10986,7 @@ export default function App() {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-            <strong style={{ fontSize: 13, color: '#2e9d4d', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <strong style={{ fontSize: 13, color: C.green, display: 'flex', alignItems: 'center', gap: 6 }}>
               {nuvolettaCorrezioni.titolo}
             </strong>
             <button
@@ -11005,8 +11005,8 @@ export default function App() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, flexWrap: 'wrap' }}>
                   <span style={{ textDecoration: 'line-through', opacity: 0.8, color: C.red }}>{v.prima}</span>
-                  <span style={{ color: '#2e9d4d', fontWeight: 800 }}>➔</span>
-                  <span style={{ color: '#2e9d4d', fontWeight: 700 }}>{v.dopo}</span>
+                  <span style={{ color: C.green, fontWeight: 800 }}>➔</span>
+                  <span style={{ color: C.green, fontWeight: 700 }}>{v.dopo}</span>
                 </div>
               </div>
             ))}
@@ -11433,7 +11433,7 @@ export default function App() {
                 {formaAttiva?.dati?.ritratto && (
                   <button
                     type="button"
-                    style={{ ...styles.buttonMini, marginTop: 6, fontSize: 11, borderColor: '#d32f2f', color: '#d32f2f' }}
+                    style={{ ...styles.buttonMini, marginTop: 6, fontSize: 11, borderColor: C.red, color: C.red }}
                     onClick={() => {
                       aggiorna({
                         [campoForma]: {
@@ -12442,7 +12442,7 @@ export default function App() {
                         fontSize: 12,
                         fontWeight: 800,
                         borderRadius: 6,
-                        color: delta < 0 ? '#d32f2f' : '#2e7d32',
+                        color: delta < 0 ? C.red : C.green,
                         background: C.panel,
                         border: `1px solid ${C.border}`,
                       }}
@@ -12875,20 +12875,17 @@ export default function App() {
               {/* Tier 3: Risorse di classe */}
               <div className="risorse-tier-3 profilo-risorse-box">
                 <Sezione titolo={t("sez.risorse")} senzaAngoli={true} {...apertoProps('risorse')}>
-                  {scheda.risorse.length === 0 && (
+                  {/* I contatori dei Poteri (Segreti, Debito, usi dei privilegi...) vivono nella
+                      sezione Poteri: qui restano solo le risorse di classe. */}
+                  {scheda.risorse.filter((r) => !String(r.id || '').startsWith('potere-')).length === 0 && (
                     <p style={{ ...styles.detail, marginTop: 0, fontSize: 11 }}>
                       {t('res.nessuna_risorsa')}
                     </p>
                   )}
-                  {scheda.risorse.map((r) => {
+                  {scheda.risorse.filter((r) => !String(r.id || '').startsWith('potere-')).map((r) => {
                     const modifica = (patch) =>
                       aggiorna({ risorse: scheda.risorse.map((x) => (x.id === r.id ? { ...x, ...patch } : x)) });
-                    // Risorsa nata da un contatore di un Potere: spiega cosa fa quel potere
-                    // (es. "Inquisire", "Affabilità"), altrimenti la spiegazione di classe.
-                    const potereLegato = String(r.id || '').startsWith('potere-')
-                      ? normalizzaPoteri(scheda.poteri).find((p) => String(r.id).startsWith(`potere-${p.id}-`))
-                      : null;
-                    const spiegazione = potereLegato?.descrizione?.trim() || spiegaRisorsa(r.nome);
+                    const spiegazione = spiegaRisorsa(r.nome);
                     const automatica = String(r.id || '').startsWith('auto-');
                     const nomeVisualizzato = traduciDato(r.nome);
                     // La risorsa "Forma Selvatica" apre direttamente il catalogo delle creature
@@ -13078,7 +13075,7 @@ export default function App() {
                             `Size changed by ${isTrasformato ? `${campoForma === 'metamorfosi' ? 'Polymorph' : 'Wild Shape'} (${formaAttiva.dati.nome})` : 'size effect'}: ${traduciDato(tagliaEffettiva(scheda))} (natural size: ${traduciDato(scheda.taglia || 'Media')}) · Space: ${SPAZIO_TAGLIA_5E[tagliaEffettiva(scheda)] || '1,5m'} · Grapple up to: ${traduciDato(LOTTA_MAX_TAGLIA_5E[tagliaEffettiva(scheda)] || 'Grande')}`,
                           )}
                         >
-                          <span style={{ fontWeight: 800, color: '#2e7d32', fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                          <span style={{ fontWeight: 800, color: C.green, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
                             <span>{isTrasformato ? '🐾' : '✨'}</span>
                             <span>{tagliaEffettiva(scheda)}</span>
                           </span>
@@ -13162,7 +13159,7 @@ export default function App() {
                             const infoPe = dettagliEsperienza(scheda.pe, livTotale);
                             if (infoPe.puoSalire) {
                               return (
-                                <span style={{ fontSize: 11, fontWeight: 700, color: '#10b981', background: 'rgba(16,185,129,0.12)', border: '1px solid #10b981', padding: '0 4px', borderRadius: 3 }}>
+                                <span style={{ fontSize: 11, fontWeight: 700, color: C.green, background: 'rgba(16,185,129,0.12)', border: '1px solid var(--c-green)', padding: '0 4px', borderRadius: 3 }}>
                                   Up!
                                 </span>
                               );
@@ -13176,7 +13173,7 @@ export default function App() {
                           const infoPe = dettagliEsperienza(scheda.pe, livTotale);
                           return (
                             <div style={{ height: 3, width: '100%', background: 'rgba(0,0,0,0.08)', borderRadius: 2, overflow: 'hidden' }}>
-                              <div style={{ height: '100%', width: `${infoPe.percentuale}%`, background: infoPe.puoSalire ? '#10b981' : C.goldDark, transition: 'width 0.25s ease' }} />
+                              <div style={{ height: '100%', width: `${infoPe.percentuale}%`, background: infoPe.puoSalire ? C.green : C.goldDark, transition: 'width 0.25s ease' }} />
                             </div>
                           );
                         })()}
@@ -13343,7 +13340,7 @@ export default function App() {
                   {/* Sezione Superiore: Punti Ferita — perfettamente centrata nello spazio disponibile */}
                   <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2px 0' }}>
                     <div style={{ ...styles.vitalLabel, position: 'static', margin: 0, marginBottom: 6, fontSize: 12 }}>
-                      {t("vital.pf")} {isTrasformato && <span style={{ color: '#2e7d32', fontWeight: 800 }}>· {formaAttiva.dati.nome}</span>}
+                      {t("vital.pf")} {isTrasformato && <span style={{ color: C.green, fontWeight: 800 }}>· {formaAttiva.dati.nome}</span>}
                     </div>
 
                     {/* BARRA DELLA VITA STILE VIDEOGIOCO */}
@@ -13683,7 +13680,7 @@ export default function App() {
                       {caTotale(scheda)}
                       <BadgePotere scheda={scheda} bersaglio="ca" />
                       {bonusCopertura(scheda).ca > 0 && (
-                        <span style={{ fontSize: 11, color: '#2e9d4d', fontWeight: 800, marginLeft: 3 }} title={bonusCopertura(scheda).labelIt}>
+                        <span style={{ fontSize: 11, color: C.green, fontWeight: 800, marginLeft: 3 }} title={bonusCopertura(scheda).labelIt}>
                           (+{bonusCopertura(scheda).ca})
                         </span>
                       )}
@@ -13735,7 +13732,7 @@ export default function App() {
                 </div>
                 <div style={{ marginTop: 3, width: '100%' }}>
                   <select
-                    style={{ ...styles.inlineInput, fontSize: 11, padding: '1px 3px', width: '100%', maxWidth: '100%', color: (scheda.copertura && scheda.copertura !== 'nessuna') ? '#2e9d4d' : C.inkDim, fontWeight: (scheda.copertura && scheda.copertura !== 'nessuna') ? 700 : 400 }}
+                    style={{ ...styles.inlineInput, fontSize: 11, padding: '1px 3px', width: '100%', maxWidth: '100%', color: (scheda.copertura && scheda.copertura !== 'nessuna') ? C.green : C.inkDim, fontWeight: (scheda.copertura && scheda.copertura !== 'nessuna') ? 700 : 400 }}
                     value={scheda.copertura || 'nessuna'}
                     onChange={(e) => {
                       const v = e.target.value;
@@ -13809,14 +13806,14 @@ export default function App() {
               <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 {isTrasformato ? (
                   <div style={{ ...styles.vitalValue, display: 'flex', alignItems: 'baseline', justifyContent: 'center', flexWrap: 'wrap', gap: 2 }}>
-                    <span style={{ fontSize: 18, fontWeight: 800, color: '#2e7d32' }}>
+                    <span style={{ fontSize: 18, fontWeight: 800, color: C.green }}>
                       {formaAttiva.dati.velocita?.terra ?? 9}
                     </span>
                     <span style={{ fontSize: 14, color: C.inkDim, fontWeight: 600 }}>m</span>
                     {Object.entries(formaAttiva.dati.velocita || {})
                       .filter(([k]) => k !== 'terra')
                       .map(([k, v]) => (
-                        <span key={k} style={{ fontSize: 11, color: '#2e7d32', fontWeight: 700, marginLeft: 2 }} title={`${k}: ${v}m`}>
+                        <span key={k} style={{ fontSize: 11, color: C.green, fontWeight: 700, marginLeft: 2 }} title={`${k}: ${v}m`}>
                           {k === 'volo' ? '🦅' : k === 'nuoto' ? '🏊' : k === 'scalata' ? '🧗' : '⛏️'}{v}m
                         </span>
                       ))}
@@ -13912,7 +13909,7 @@ export default function App() {
                 <div style={styles.vitalLabel}>{t("vital.visione")}</div>
                 <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                   {isTrasformato && formaAttiva.dati.sensi ? (
-                    <div style={{ fontSize: 12, fontWeight: 700, color: '#2e7d32', textAlign: 'center', padding: '0 4px', lineHeight: 1.25 }} title={`${tr('Sensi della bestia', 'Beast senses')}: ${traduciDato(formaAttiva.dati.sensi)}`}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: C.green, textAlign: 'center', padding: '0 4px', lineHeight: 1.25 }} title={`${tr('Sensi della bestia', 'Beast senses')}: ${traduciDato(formaAttiva.dati.sensi)}`}>
                       {formaAttiva.dati.sensi}
                     </div>
                   ) : (
@@ -13958,7 +13955,7 @@ export default function App() {
                       <span
                         style={{
                           background: 'rgba(0,0,0,0.04)',
-                          border: `1px solid ${scheda.effettoTaglia === 'ingrandito' ? (C.green || '#2e7d32') : (C.red || '#c0392b')}`,
+                          border: `1px solid ${scheda.effettoTaglia === 'ingrandito' ? C.green : C.red}`,
                           borderRadius: 6,
                           padding: '2px 7px',
                           fontSize: 12,
@@ -13968,12 +13965,12 @@ export default function App() {
                           whiteSpace: 'nowrap',
                         }}
                       >
-                        <span style={{ color: scheda.effettoTaglia === 'ingrandito' ? (C.green || '#2e7d32') : (C.red || '#c0392b'), fontWeight: 700 }}>
+                        <span style={{ color: scheda.effettoTaglia === 'ingrandito' ? C.green : C.red, fontWeight: 700 }}>
                           {scheda.effettoTaglia === 'ingrandito' ? 'Ingrandito' : 'Ridotto'}
                         </span>
                         <button
                           type="button"
-                          style={{ background: 'transparent', border: 'none', color: '#c0392b', cursor: 'pointer', padding: 0, fontSize: 13, lineHeight: 1, fontWeight: 'bold' }}
+                          style={{ background: 'transparent', border: 'none', color: C.red, cursor: 'pointer', padding: 0, fontSize: 13, lineHeight: 1, fontWeight: 'bold' }}
                           title={tr('Rimuovi effetto taglia', 'Remove size effect')}
                           aria-label={tr('Rimuovi effetto taglia', 'Remove size effect')}
                           onClick={() => aggiorna({ effettoTaglia: null })}
@@ -14005,7 +14002,7 @@ export default function App() {
                           <span style={{ color: col.text, fontWeight: 700 }}>{ico} {traduciDato(c)}</span>
                           <button
                             type="button"
-                            style={{ background: 'transparent', border: 'none', color: '#c0392b', cursor: 'pointer', padding: 0, fontSize: 13, lineHeight: 1, fontWeight: 'bold' }}
+                            style={{ background: 'transparent', border: 'none', color: C.red, cursor: 'pointer', padding: 0, fontSize: 13, lineHeight: 1, fontWeight: 'bold' }}
                             title={t('tip.click_rimuovi')}
                             aria-label={t('tip.click_rimuovi')}
                             onClick={() => aggiorna({ condizioni: scheda.condizioni.filter((x) => x !== c) })}
@@ -14383,8 +14380,8 @@ export default function App() {
                           alignItems: 'center',
                           justifyContent: 'space-between',
                           background: turno.azioneUsata ? 'rgba(239,68,68,0.08)' : 'rgba(46,157,77,0.1)',
-                          borderColor: turno.azioneUsata ? '#ef4444' : '#2e9d4d',
-                          color: turno.azioneUsata ? '#ef4444' : '#2e9d4d',
+                          borderColor: turno.azioneUsata ? C.red : C.green,
+                          color: turno.azioneUsata ? C.red : C.green,
                           cursor: 'pointer',
                         }}
                       >
@@ -14405,8 +14402,8 @@ export default function App() {
                           alignItems: 'center',
                           justifyContent: 'space-between',
                           background: turno.bonusUsato ? 'rgba(239,68,68,0.08)' : 'rgba(46,157,77,0.1)',
-                          borderColor: turno.bonusUsato ? '#ef4444' : '#2e9d4d',
-                          color: turno.bonusUsato ? '#ef4444' : '#2e9d4d',
+                          borderColor: turno.bonusUsato ? C.red : C.green,
+                          color: turno.bonusUsato ? C.red : C.green,
                           cursor: 'pointer',
                         }}
                       >
@@ -14427,8 +14424,8 @@ export default function App() {
                           alignItems: 'center',
                           justifyContent: 'space-between',
                           background: scheda.reazioneUsata ? 'rgba(239,68,68,0.08)' : 'rgba(46,157,77,0.1)',
-                          borderColor: scheda.reazioneUsata ? '#ef4444' : '#2e9d4d',
-                          color: scheda.reazioneUsata ? '#ef4444' : '#2e9d4d',
+                          borderColor: scheda.reazioneUsata ? C.red : C.green,
+                          color: scheda.reazioneUsata ? C.red : C.green,
                           cursor: 'pointer',
                         }}
                       >
@@ -14464,7 +14461,7 @@ export default function App() {
                     <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, background: C.panel, padding: '6px 10px', borderRadius: 8, border: `1px solid ${C.border}` }}>
                       <span style={{ fontSize: 12, fontWeight: 700, color: C.ink }}>
                         {lingua === 'en' ? 'Move:' : 'Movimento:'}{' '}
-                        <strong style={{ color: turno.movimentoRimanente > 0 ? '#2e9d4d' : C.red, fontSize: 13 }}>
+                        <strong style={{ color: turno.movimentoRimanente > 0 ? C.green : C.red, fontSize: 13 }}>
                           {turno.movimentoRimanente}m
                         </strong>
                         <span style={{ fontSize: 11, color: C.inkDim }}> / {turno.movimentoMax}m</span>
@@ -14531,8 +14528,8 @@ export default function App() {
                               padding: '2px 6px',
                               fontWeight: turno.interazioneUsata ? 700 : 500,
                               background: turno.interazioneUsata ? 'rgba(239,68,68,0.08)' : 'transparent',
-                              borderColor: turno.interazioneUsata ? '#ef4444' : C.border,
-                              color: turno.interazioneUsata ? '#ef4444' : C.ink,
+                              borderColor: turno.interazioneUsata ? C.red : C.border,
+                              color: turno.interazioneUsata ? C.red : C.ink,
                             }}
                             title={lingua === 'en' ? 'Free Object Interaction (draw weapon, open door, etc.)' : 'Interazione gratuita con un oggetto (estrarre arma, aprire porta...)'}
                           >
@@ -14576,8 +14573,8 @@ export default function App() {
                               fontSize: 11,
                               padding: '2px 6px',
                               background: turno.tatticaAttiva === 'scatto' ? 'rgba(16,185,129,0.2)' : 'transparent',
-                              borderColor: turno.tatticaAttiva === 'scatto' ? '#10b981' : C.border,
-                              color: turno.tatticaAttiva === 'scatto' ? '#10b981' : C.ink,
+                              borderColor: turno.tatticaAttiva === 'scatto' ? C.green : C.border,
+                              color: turno.tatticaAttiva === 'scatto' ? C.green : C.ink,
                             }}
                             title={lingua === 'en' ? 'Dash action (doubles movement for the turn)' : 'Azione Scatto (raddoppia il movimento del turno)'}
                           >
@@ -14633,8 +14630,8 @@ export default function App() {
                                     padding: '2px 7px',
                                     fontWeight: attivo ? 700 : 500,
                                     background: attivo ? (cop.ca >= 5 ? 'rgba(239,68,68,0.18)' : cop.ca >= 2 ? 'rgba(46,157,77,0.18)' : 'rgba(201,162,39,0.18)') : 'transparent',
-                                    borderColor: attivo ? (cop.ca >= 5 ? '#ef4444' : cop.ca >= 2 ? '#2e9d4d' : C.gold) : C.border,
-                                    color: attivo ? (cop.ca >= 5 ? '#ef4444' : cop.ca >= 2 ? '#2e9d4d' : C.goldDark) : C.inkDim,
+                                    borderColor: attivo ? (cop.ca >= 5 ? C.red : cop.ca >= 2 ? C.green : C.gold) : C.border,
+                                    color: attivo ? (cop.ca >= 5 ? C.red : cop.ca >= 2 ? C.green : C.goldDark) : C.inkDim,
                                     cursor: 'pointer',
                                   }}
                                   title={lingua === 'en' ? cop.descEn : cop.descIt}
@@ -14681,8 +14678,8 @@ export default function App() {
                                       padding: '2px 7px',
                                       fontWeight: scheda.applicaFurtivo ? 700 : 500,
                                       background: scheda.applicaFurtivo ? 'rgba(46,157,77,0.18)' : 'transparent',
-                                      borderColor: scheda.applicaFurtivo ? '#2e9d4d' : C.border,
-                                      color: scheda.applicaFurtivo ? '#2e9d4d' : C.inkDim,
+                                      borderColor: scheda.applicaFurtivo ? C.green : C.border,
+                                      color: scheda.applicaFurtivo ? C.green : C.inkDim,
                                       cursor: 'pointer',
                                     }}
                                     title={lingua === 'en' ? `Apply Sneak Attack (+${furtivo.formula}) to next weapon damage roll` : `Applica i dadi di Attacco Furtivo (+${furtivo.formula}) al prossimo tiro danni`}
@@ -14713,8 +14710,8 @@ export default function App() {
                                       padding: '2px 7px',
                                       fontWeight: scheda.inIra ? 700 : 500,
                                       background: scheda.inIra ? 'rgba(239,68,68,0.2)' : 'transparent',
-                                      borderColor: scheda.inIra ? '#ef4444' : C.border,
-                                      color: scheda.inIra ? '#ef4444' : C.inkDim,
+                                      borderColor: scheda.inIra ? C.red : C.border,
+                                      color: scheda.inIra ? C.red : C.inkDim,
                                       cursor: 'pointer',
                                     }}
                                     title={lingua === 'en' ? `Rage (+${ira.bonusDanni} STR melee damage, physical resistances)` : `Ira Barbarica (+${ira.bonusDanni} danni mischia FOR, resistenze contundente/perforante/tagliente)`}
@@ -15452,7 +15449,7 @@ export default function App() {
                                               padding: '1px 5px',
                                               borderRadius: 4,
                                               background: infoMunizioni.totale > 0 ? 'rgba(201,162,39,0.14)' : 'rgba(239,68,68,0.12)',
-                                              border: `1px solid ${infoMunizioni.totale > 0 ? C.goldDark : '#ef4444'}`,
+                                              border: `1px solid ${infoMunizioni.totale > 0 ? C.goldDark : C.red}`,
                                               color: infoMunizioni.totale > 0 ? C.goldDark : '#dc2626',
                                               fontWeight: 700,
                                               display: 'inline-flex',
@@ -15762,7 +15759,7 @@ export default function App() {
                       marginBottom: 10,
                       padding: '12px 14px',
                       borderRadius: 8,
-                      border: `2px solid ${haErroriGravi ? '#ef4444' : '#2e9d4d'}`,
+                      border: `2px solid ${haErroriGravi ? C.red : C.green}`,
                       background: haErroriGravi ? 'rgba(239, 68, 68, 0.09)' : 'rgba(46, 157, 77, 0.09)',
                       boxShadow: haErroriGravi ? '0 0 14px rgba(239, 68, 68, 0.25)' : '0 0 14px rgba(46, 157, 77, 0.25)',
                       display: 'flex',
@@ -15771,7 +15768,7 @@ export default function App() {
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
-                      <span style={{ fontSize: 13, fontWeight: 800, color: haErroriGravi ? '#ef4444' : '#2e9d4d', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 13, fontWeight: 800, color: haErroriGravi ? C.red : C.green, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                         {haErroriGravi ? '🔴' : '🟢'}
                         {lingua === 'en' ? 'Spell list check' : 'Verifica di incantesimi e trucchetti'}
                       </span>
@@ -15796,7 +15793,7 @@ export default function App() {
                             padding: '3px 8px',
                             background: '#ef4444',
                             color: '#fff',
-                            borderColor: '#ef4444',
+                            borderColor: C.red,
                             fontWeight: 700,
                             cursor: 'pointer',
                           }}
@@ -15810,12 +15807,12 @@ export default function App() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 5, fontSize: 12, lineHeight: 1.45, color: C.ink }}>
                       {trucInEccesso && (
                         <div>
-                          🔴 <strong>{t('spell.trucchetti')} ({nTrucchetti}/{maxTrucchetti})</strong>: hai <strong>+{nTrucchetti - maxTrucchetti} trucchett{nTrucchetti - maxTrucchetti > 1 ? 'i' : 'o'} in più</strong> rispetto al limite. Clicca su <strong style={{ color: '#ef4444' }}>🗑️ Rimuovi</strong> su quelli evidenziati in rosso.
+                          🔴 <strong>{t('spell.trucchetti')} ({nTrucchetti}/{maxTrucchetti})</strong>: hai <strong>+{nTrucchetti - maxTrucchetti} trucchett{nTrucchetti - maxTrucchetti > 1 ? 'i' : 'o'} in più</strong> rispetto al limite. Clicca su <strong style={{ color: C.red }}>🗑️ Rimuovi</strong> su quelli evidenziati in rosso.
                         </div>
                       )}
                       {trucMancanti && (
                         <div>
-                          <strong>{t('spell.trucchetti')} ({nTrucchetti}/{maxTrucchetti})</strong>: mancano <strong>{maxTrucchetti - nTrucchetti} trucchett{maxTrucchetti - nTrucchetti > 1 ? 'i' : 'o'} da scegliere</strong>. Seleziona dai menu a tendina verdi <strong style={{ color: '#2e9d4d' }}>Aggiungi… (da scegliere)</strong> nella sezione Trucchetti qui sotto.
+                          <strong>{t('spell.trucchetti')} ({nTrucchetti}/{maxTrucchetti})</strong>: mancano <strong>{maxTrucchetti - nTrucchetti} trucchett{maxTrucchetti - nTrucchetti > 1 ? 'i' : 'o'} da scegliere</strong>. Seleziona dai menu a tendina verdi <strong style={{ color: C.green }}>Aggiungi… (da scegliere)</strong> nella sezione Trucchetti qui sotto.
                         </div>
                       )}
                       {incInEccesso && (
@@ -15825,12 +15822,12 @@ export default function App() {
                       )}
                       {incMancanti && (
                         <div>
-                          <strong>{t('spell.incantesimi')} ({nIncantiScelti}/{maxIncantesimi})</strong>: puoi {classePreparata ? 'preparare o scegliere' : 'scegliere'} altri <strong>{maxIncantesimi - nIncantiScelti} incantesim{maxIncantesimi - nIncantiScelti > 1 ? 'i' : 'o'}</strong>. Usa i selettori verdi <strong style={{ color: '#2e9d4d' }}>Aggiungi… (da scegliere)</strong> sotto ciascun livello {classePreparata ? 'o clicca Prep. su quelli nel libro.' : '.'}
+                          <strong>{t('spell.incantesimi')} ({nIncantiScelti}/{maxIncantesimi})</strong>: puoi {classePreparata ? 'preparare o scegliere' : 'scegliere'} altri <strong>{maxIncantesimi - nIncantiScelti} incantesim{maxIncantesimi - nIncantiScelti > 1 ? 'i' : 'o'}</strong>. Usa i selettori verdi <strong style={{ color: C.green }}>Aggiungi… (da scegliere)</strong> sotto ciascun livello {classePreparata ? 'o clicca Prep. su quelli nel libro.' : '.'}
                         </div>
                       )}
                       {incDuplicati.length > 0 && (
                         <div>
-                          🔴 <strong>{lingua === 'en' ? 'Duplicate Spells' : 'Incantesimi Duplicati'}</strong>: {incDuplicati.map((d) => `"${d}"`).join(', ')} {incDuplicati.length > 1 ? 'sono presenti' : 'è presente'} più volte nella lista. Rimuovi le copie con <strong style={{ color: '#ef4444' }}>🗑️ Rimuovi</strong>.
+                          🔴 <strong>{lingua === 'en' ? 'Duplicate Spells' : 'Incantesimi Duplicati'}</strong>: {incDuplicati.map((d) => `"${d}"`).join(', ')} {incDuplicati.length > 1 ? 'sono presenti' : 'è presente'} più volte nella lista. Rimuovi le copie con <strong style={{ color: C.red }}>🗑️ Rimuovi</strong>.
                         </div>
                       )}
                       {incTroppoAlti.length > 0 && (
@@ -16121,7 +16118,7 @@ export default function App() {
                   if (liv === 0) {
                     if (!(isLivMancante && numMancanti > 0)) return null;
                     return (
-                      <div style={{ fontSize: 11, fontWeight: 700, color: '#2e9d4d', display: 'flex', alignItems: 'center', gap: 4, marginTop: 8 }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: C.green, display: 'flex', alignItems: 'center', gap: 4, marginTop: 8 }}>
                         <span>
                           {lingua === 'en'
                             ? `${numMancanti} cantrip${numMancanti > 1 ? 's' : ''} to choose: pick ${numMancanti > 1 ? 'them' : 'it'} when you level up`
@@ -16135,7 +16132,7 @@ export default function App() {
                   return (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 8 }}>
                       {isLivMancante && numMancanti > 0 && (
-                        <div style={{ fontSize: 11, fontWeight: 700, color: '#2e9d4d', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: C.green, display: 'flex', alignItems: 'center', gap: 4 }}>
                           <span>
                             {lingua === 'en'
                               ? `${numMancanti} ${liv === 0 ? 'cantrip' : 'spell'}${numMancanti > 1 ? 's' : ''} to choose: select from class suggestions below`
@@ -16154,9 +16151,9 @@ export default function App() {
                             fontWeight: isLivMancante ? 700 : 600,
                             cursor: 'pointer',
                             maxWidth: '100%',
-                            borderColor: isLivMancante ? '#2e9d4d' : undefined,
+                            borderColor: isLivMancante ? C.green : undefined,
                             background: isLivMancante ? 'rgba(46,157,77,0.18)' : undefined,
-                            color: isLivMancante ? '#2e9d4d' : undefined,
+                            color: isLivMancante ? C.green : undefined,
                             boxShadow: isLivMancante ? '0 0 12px rgba(46,157,77,0.45)' : undefined,
                           }}
                           onChange={(e) => { const v = e.target.value; if (!v) return; aggiungiInc(v === '__manuale__' ? 'Nuovo incantesimo' : v, liv, v === '__manuale__', addBonusIncantesimo); e.target.value = ''; }}
@@ -16267,7 +16264,7 @@ export default function App() {
                               </span>
                             )}
                             {isMancanteLiv && (
-                              <span style={{ fontSize: 11, fontWeight: 700, color: '#2e9d4d', background: 'rgba(46,157,77,0.15)', border: '1px solid #2e9d4d', borderRadius: 6, padding: '1px 6px' }}>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: C.green, background: 'rgba(46,157,77,0.15)', border: '1px solid var(--c-green)', borderRadius: 6, padding: '1px 6px' }}>
                                 {lingua === 'en' ? 'Choices available' : 'Scelte disponibili'}
                               </span>
                             )}
@@ -16280,13 +16277,13 @@ export default function App() {
                               onClick={(e) => e.stopPropagation()}
                               style={{
                                 fontSize: 13,
-                                color: incInEccesso ? '#ef4444' : (incMancanti ? '#2e9d4d' : ((classePreparata ? preparatiPieni : incantesimiPieno) ? C.goldDark : C.inkDim)),
+                                color: incInEccesso ? C.red : (incMancanti ? C.green : ((classePreparata ? preparatiPieni : incantesimiPieno) ? C.goldDark : C.inkDim)),
                                 fontWeight: (incInEccesso || incMancanti) ? 700 : 'normal',
                                 display: 'inline-flex',
                                 alignItems: 'center',
                                 gap: 5,
                                 background: incInEccesso ? 'rgba(239,68,68,0.1)' : (incMancanti ? 'rgba(46,157,77,0.1)' : 'transparent'),
-                                border: `1px solid ${incInEccesso ? '#ef4444' : (incMancanti ? '#2e9d4d' : 'transparent')}`,
+                                border: `1px solid ${incInEccesso ? C.red : (incMancanti ? C.green : 'transparent')}`,
                                 borderRadius: 6,
                                 padding: (incInEccesso || incMancanti) ? '2px 7px' : '0',
                               }}
@@ -16385,11 +16382,11 @@ export default function App() {
                                 }
                                 style={{
                                   border: isRowInEccesso
-                                    ? '2px solid #ef4444'
+                                    ? '2px solid var(--c-red)'
                                     : (isRowCatalogoMancante
-                                      ? '2px solid #2e9d4d'
+                                      ? '2px solid var(--c-green)'
                                       : (isRowUnpreparedMancante
-                                        ? '1.5px dashed #2e9d4d'
+                                        ? '1.5px dashed var(--c-green)'
                                         : `1px solid ${C.border}`)),
                                   borderRadius: 6,
                                   padding: '4px 8px',
@@ -16413,7 +16410,7 @@ export default function App() {
                               >
                                 <div className="spell-row" style={{ display: 'flex', flexWrap: 'nowrap', alignItems: 'center', gap: 4 }}>
                                   <button
-                                    style={{ background: 'transparent', border: 'none', color: isRowInEccesso ? '#ef4444' : C.ink, fontWeight: 700, cursor: 'help', textAlign: 'left', padding: 0, fontSize: 14, lineHeight: 1.2, textDecoration: 'underline dotted', textUnderlineOffset: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
+                                    style={{ background: 'transparent', border: 'none', color: isRowInEccesso ? C.red : C.ink, fontWeight: 700, cursor: 'help', textAlign: 'left', padding: 0, fontSize: 14, lineHeight: 1.2, textDecoration: 'underline dotted', textUnderlineOffset: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
                                     title={spieg || t('tip.cosa_fa_inc')}
                                     onClick={() => setInfo({ titolo: `${s.nome || 'Incantesimo'}${s.livello === 0 ? ' · Trucchetto' : ` · ${s.livello}° livello`}`, testo: testoModal || (lingua === 'en' ? 'No description available for this spell. Click to add notes.' : 'Nessuna descrizione disponibile per questo incantesimo. Aprilo con per aggiungere delle note.') })}
                                   >
@@ -16425,7 +16422,7 @@ export default function App() {
                                         fontSize: 11,
                                         fontWeight: 700,
                                         color: '#fff',
-                                        border: '1px solid #ef4444',
+                                        border: '1px solid var(--c-red)',
                                         background: '#ef4444',
                                         borderRadius: 6,
                                         padding: '0 6px',
@@ -16446,7 +16443,7 @@ export default function App() {
                                         fontSize: 11,
                                         fontWeight: 700,
                                         color: '#fff',
-                                        border: '1px solid #ef4444',
+                                        border: '1px solid var(--c-red)',
                                         background: '#ef4444',
                                         borderRadius: 6,
                                         padding: '0 6px',
@@ -16467,7 +16464,7 @@ export default function App() {
                                         fontSize: 11,
                                         fontWeight: 700,
                                         color: '#fff',
-                                        border: '1px solid #ef4444',
+                                        border: '1px solid var(--c-red)',
                                         background: '#ef4444',
                                         borderRadius: 6,
                                         padding: '0 6px',
@@ -16487,8 +16484,8 @@ export default function App() {
                                       style={{
                                         fontSize: 11,
                                         fontWeight: 700,
-                                        color: '#2e9d4d',
-                                        border: '1px solid #2e9d4d',
+                                        color: C.green,
+                                        border: '1px solid var(--c-green)',
                                         background: 'rgba(46,157,77,0.14)',
                                         borderRadius: 6,
                                         padding: '0 6px',
@@ -16508,8 +16505,8 @@ export default function App() {
                                       style={{
                                         fontSize: 11,
                                         fontWeight: 700,
-                                        color: isRowCatalogoMancante ? '#2e9d4d' : C.goldDark,
-                                        border: `1px solid ${isRowCatalogoMancante ? '#2e9d4d' : C.goldDark}`,
+                                        color: isRowCatalogoMancante ? C.green : C.goldDark,
+                                        border: `1px solid ${isRowCatalogoMancante ? C.green : C.goldDark}`,
                                         background: isRowCatalogoMancante ? 'rgba(46,157,77,0.14)' : 'rgba(201,162,39,0.12)',
                                         borderRadius: 6,
                                         padding: '0 4px',
@@ -16618,9 +16615,9 @@ export default function App() {
                                           type="button"
                                           style={{
                                             ...styles.buttonRiga,
-                                            color: scheda.effettoTaglia === 'ingrandito' ? '#fff' : (C.green || '#2e7d32'),
+                                            color: scheda.effettoTaglia === 'ingrandito' ? '#fff' : C.green,
                                             background: scheda.effettoTaglia === 'ingrandito' ? (C.green || '#2e7d32') : 'transparent',
-                                            borderColor: C.green || '#2e7d32',
+                                            borderColor: C.green || C.green,
                                           }}
                                           title={tr('Attiva Ingrandire: +1 taglia, +1d4 danni armi, vantaggio prove/TS FOR, carico raddoppiato', 'Turn on Enlarge: +1 size, +1d4 weapon damage, advantage on STR checks/saves, carrying capacity doubled')}
                                           onClick={() => aggiorna({ effettoTaglia: scheda.effettoTaglia === 'ingrandito' ? null : 'ingrandito' })}
@@ -16631,9 +16628,9 @@ export default function App() {
                                           type="button"
                                           style={{
                                             ...styles.buttonRiga,
-                                            color: scheda.effettoTaglia === 'ridotto' ? '#fff' : (C.red || '#c0392b'),
+                                            color: scheda.effettoTaglia === 'ridotto' ? '#fff' : C.red,
                                             background: scheda.effettoTaglia === 'ridotto' ? (C.red || '#c0392b') : 'transparent',
-                                            borderColor: C.red || '#c0392b',
+                                            borderColor: C.red || C.red,
                                           }}
                                           title={tr('Attiva Ridurre: -1 taglia, -1d4 danni armi, svantaggio prove/TS FOR, carico dimezzato', 'Turn on Reduce: -1 size, -1d4 weapon damage, disadvantage on STR checks/saves, carrying capacity halved')}
                                           onClick={() => aggiorna({ effettoTaglia: scheda.effettoTaglia === 'ridotto' ? null : 'ridotto' })}
@@ -16649,7 +16646,7 @@ export default function App() {
                                           ...styles.buttonRiga,
                                           color: '#fff',
                                           background: isRowCatalogoMancante ? '#2e9d4d' : C.goldDark,
-                                          borderColor: isRowCatalogoMancante ? '#2e9d4d' : C.goldDark,
+                                          borderColor: isRowCatalogoMancante ? C.green : C.goldDark,
                                           boxShadow: isRowCatalogoMancante ? '0 0 6px rgba(46,157,77,0.4)' : 'none',
                                         }}
                                         title={lingua === 'en' ? 'Add this spell to your character sheet' : 'Aggiungi questo incantesimo alla tua scheda'}
@@ -16664,9 +16661,9 @@ export default function App() {
                                             type="button"
                                             style={{
                                               ...styles.buttonRiga,
-                                              color: isRowInEccesso ? '#fff' : (s.preparato !== false ? C.goldDark : (isRowUnpreparedMancante ? '#2e9d4d' : C.inkDim)),
+                                              color: isRowInEccesso ? '#fff' : (s.preparato !== false ? C.goldDark : (isRowUnpreparedMancante ? C.green : C.inkDim)),
                                               background: isRowInEccesso ? '#ef4444' : (s.preparato !== false ? 'rgba(201,162,39,0.12)' : (isRowUnpreparedMancante ? 'rgba(46,157,77,0.15)' : 'transparent')),
-                                              borderColor: isRowInEccesso ? '#ef4444' : (s.preparato !== false ? C.goldDark : (isRowUnpreparedMancante ? '#2e9d4d' : C.border)),
+                                              borderColor: isRowInEccesso ? C.red : (s.preparato !== false ? C.goldDark : (isRowUnpreparedMancante ? C.green : C.border)),
                                               boxShadow: isRowInEccesso ? '0 0 6px rgba(239,68,68,0.4)' : (isRowUnpreparedMancante ? '0 0 6px rgba(46,157,77,0.3)' : 'none'),
                                             }}
                                             title={s.preparato === false && preparatiPieni && !s.bonus ? t('spell.max_tooltip') : (s.preparato !== false ? t('spell.preparato_si') : t('spell.preparato_no'))}
@@ -16686,7 +16683,7 @@ export default function App() {
                                             marginLeft: 8,
                                             color: isRowInEccesso ? '#fff' : C.inkDim,
                                             background: isRowInEccesso ? '#ef4444' : 'transparent',
-                                            borderColor: isRowInEccesso ? '#ef4444' : C.border,
+                                            borderColor: isRowInEccesso ? C.red : C.border,
                                             boxShadow: isRowInEccesso ? '0 0 6px rgba(239,68,68,0.4)' : 'none',
                                           }}
                                           title={t('tip.elimina_inc')}
@@ -16753,7 +16750,7 @@ export default function App() {
                           <span
                             style={{
                               fontSize: 13,
-                              color: trucInEccesso ? '#ef4444' : (trucMancanti ? '#2e9d4d' : (trucchettiPieno ? C.goldDark : C.inkDim)),
+                              color: trucInEccesso ? C.red : (trucMancanti ? C.green : (trucchettiPieno ? C.goldDark : C.inkDim)),
                               fontWeight: (trucInEccesso || trucMancanti) ? 700 : 'normal',
                               display: 'inline-flex',
                               alignItems: 'center',
@@ -16761,7 +16758,7 @@ export default function App() {
                               textTransform: 'none',
                               letterSpacing: 'normal',
                               background: trucInEccesso ? 'rgba(239,68,68,0.1)' : (trucMancanti ? 'rgba(46,157,77,0.1)' : 'transparent'),
-                              border: `1px solid ${trucInEccesso ? '#ef4444' : (trucMancanti ? '#2e9d4d' : 'transparent')}`,
+                              border: `1px solid ${trucInEccesso ? C.red : (trucMancanti ? C.green : 'transparent')}`,
                               borderRadius: 6,
                               padding: (trucInEccesso || trucMancanti) ? '2px 7px' : '0',
                             }}
@@ -16978,7 +16975,7 @@ export default function App() {
                               : `Doni mistici concessi dal tuo Patrono Ultraterreno (Massimo: ${maxInv} invocazioni al livello ${lvWarlock}).`}
                           </div>
                         </div>
-                        <span style={{ fontSize: 12, fontWeight: 'bold', color: scelte.length > maxInv ? '#ef4444' : C.goldDark, background: C.panel, padding: '3px 8px', borderRadius: 6, border: `1px solid ${C.border}` }}>
+                        <span style={{ fontSize: 12, fontWeight: 'bold', color: scelte.length > maxInv ? C.red : C.goldDark, background: C.panel, padding: '3px 8px', borderRadius: 6, border: `1px solid ${C.border}` }}>
                           {scelte.length} / {maxInv} {lingua === 'en' ? 'known' : 'conosciute'}
                         </span>
                       </div>
@@ -17100,10 +17097,10 @@ export default function App() {
                           </div>
                         </div>
                         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                          <span style={{ fontSize: 12, fontWeight: 'bold', color: scelte.length > maxNote ? '#ef4444' : C.goldDark, background: C.panel, padding: '3px 8px', borderRadius: 6, border: `1px solid ${C.border}` }}>
+                          <span style={{ fontSize: 12, fontWeight: 'bold', color: scelte.length > maxNote ? C.red : C.goldDark, background: C.panel, padding: '3px 8px', borderRadius: 6, border: `1px solid ${C.border}` }}>
                             {scelte.length} / {maxNote} {lingua === 'en' ? 'known' : 'note'}
                           </span>
-                          <span style={{ fontSize: 12, fontWeight: 'bold', color: attive.length > maxAttivi ? '#ef4444' : '#10b981', background: C.panel, padding: '3px 8px', borderRadius: 6, border: `1px solid ${C.border}` }}>
+                          <span style={{ fontSize: 12, fontWeight: 'bold', color: attive.length > maxAttivi ? C.red : C.green, background: C.panel, padding: '3px 8px', borderRadius: 6, border: `1px solid ${C.border}` }}>
                             {attive.length} / {maxAttivi} {lingua === 'en' ? 'active' : 'attivi'}
                           </span>
                         </div>
@@ -17143,7 +17140,7 @@ export default function App() {
                                   key={inf}
                                   style={{
                                     background: eAttiva ? 'rgba(16, 185, 129, 0.08)' : C.panel,
-                                    border: `1px solid ${eAttiva ? '#10b981' : C.border}`,
+                                    border: `1px solid ${eAttiva ? C.green : C.border}`,
                                     borderRadius: 8,
                                     padding: '8px 10px',
                                     fontSize: 12,
@@ -17173,7 +17170,7 @@ export default function App() {
                                         padding: '2px 8px',
                                         background: eAttiva ? '#10b981' : 'transparent',
                                         color: eAttiva ? '#fff' : C.ink,
-                                        borderColor: eAttiva ? '#10b981' : C.border,
+                                        borderColor: eAttiva ? C.green : C.border,
                                         cursor: 'pointer',
                                       }}
                                     >
@@ -17703,7 +17700,7 @@ export default function App() {
                                         ca: all.ca ?? 10,
                                       });
                                     }}
-                                    style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 7px', color: '#10b981', borderColor: '#10b981' }}
+                                    style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 7px', color: C.green, borderColor: C.green }}
                                     title={lingua === 'en' ? 'Send to combat tracker' : 'Invia allo scontro'}
                                   >
                                     Combat
@@ -17739,8 +17736,8 @@ export default function App() {
                                   <div style={{ display: 'flex', gap: 4 }}>
                                     <button type="button" onClick={() => modificaPfAlleato(idx, -5)} style={{ ...styles.buttonMini, fontSize: 11, padding: '1px 5px', color: C.red }}>−5</button>
                                     <button type="button" onClick={() => modificaPfAlleato(idx, -1)} style={{ ...styles.buttonMini, fontSize: 11, padding: '1px 5px', color: C.red }}>−1</button>
-                                    <button type="button" onClick={() => modificaPfAlleato(idx, 1)} style={{ ...styles.buttonMini, fontSize: 11, padding: '1px 5px', color: '#10b981' }}>+1</button>
-                                    <button type="button" onClick={() => modificaPfAlleato(idx, 5)} style={{ ...styles.buttonMini, fontSize: 11, padding: '1px 5px', color: '#10b981' }}>+5</button>
+                                    <button type="button" onClick={() => modificaPfAlleato(idx, 1)} style={{ ...styles.buttonMini, fontSize: 11, padding: '1px 5px', color: C.green }}>+1</button>
+                                    <button type="button" onClick={() => modificaPfAlleato(idx, 5)} style={{ ...styles.buttonMini, fontSize: 11, padding: '1px 5px', color: C.green }}>+5</button>
                                     <button type="button" onClick={() => resetPfAlleato(idx)} style={{ ...styles.buttonMini, fontSize: 11, padding: '1px 6px', color: C.goldDark }} title="Ripristina PF Max">Max</button>
                                   </div>
                                 </div>
@@ -18185,8 +18182,8 @@ export default function App() {
                 const perc = Math.min(100, (pesoTot / cap) * 100);
                 // Colore barra: verde se normale/ok, arancione se vicino alla capacità (>80%), rosso se oltre la capacità (sovraccarico)
                 const colore = (stato === 'sovraccarico')
-                  ? '#c0392b'
-                  : (pesoTot > cap * 0.8 ? '#e08a1e' : '#2e9d4d');
+                  ? C.red
+                  : (pesoTot > cap * 0.8 ? '#e08a1e' : C.green);
                 const modInv = (id, patch) => aggiorna({ inventario: inv.map((x) => (x.id === id ? { ...x, ...patch } : x)) });
                 const sintoniaArr = Array.isArray(scheda.sintonia) ? scheda.sintonia : (scheda.sintonia ? [scheda.sintonia] : []);
                 const normalizzaNomeOggetto = (v) => String(v || '').toLocaleLowerCase('it').replace(/[^a-zà-ÿ0-9]/gi, ' ').replace(/\s+/g, ' ').trim();
@@ -18602,8 +18599,8 @@ export default function App() {
                                             padding: '1px 6px',
                                             fontSize: 11,
                                             fontWeight: 700,
-                                            color: '#2e9d4d',
-                                            borderColor: '#2e9d4d',
+                                            color: C.green,
+                                            borderColor: C.green,
                                             background: 'rgba(46,157,77,0.12)',
                                           }}
                                           title={t('inv.bevi_pozione_tip')}
@@ -19154,7 +19151,7 @@ export default function App() {
                               value={slots[i]}
                               onChange={(e) => setSlot(i, e.target.value)}
                               placeholder={t("equip.sintonia_ph")}
-                              style={{ ...styles.inlineInput, flex: 1, minWidth: 0, padding: '6px 10px', fontSize: 13, background: isAttivo ? 'rgba(46,157,77,0.08)' : undefined, borderColor: isAttivo ? '#2e9d4d' : undefined }}
+                              style={{ ...styles.inlineInput, flex: 1, minWidth: 0, padding: '6px 10px', fontSize: 13, background: isAttivo ? 'rgba(46,157,77,0.08)' : undefined, borderColor: isAttivo ? C.green : undefined }}
                             />
                           </div>
                         );
@@ -19496,7 +19493,7 @@ export default function App() {
                             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                               <button
                                 type="button"
-                                style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 6px', color: '#2e8b57', borderColor: '#2e8b57', fontWeight: 700 }}
+                                style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 6px', color: C.green, borderColor: C.green, fontWeight: 700 }}
                                 title={t('aspetto.invia_a_combat_tip')}
                                 onClick={() => {
                                   aggiungiCombattente('alleato', {
@@ -19648,7 +19645,7 @@ export default function App() {
 
                 <button
                   type="button"
-                  style={{ ...styles.button, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 8, padding: '10px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, background: 'rgba(214,40,40,0.08)', border: '1px solid rgba(214,40,40,0.3)', color: '#d62828' }}
+                  style={{ ...styles.button, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 8, padding: '10px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, background: 'rgba(214,40,40,0.08)', border: '1px solid rgba(214,40,40,0.3)', color: C.red }}
                   onClick={() => {
                     eliminaPersonaggio();
                     setMostraMenuHubMobile(false);
@@ -20902,7 +20899,7 @@ export default function App() {
                       }
                       e.target.value = '';
                     }}
-                    style={{ ...styles.inlineInput, fontSize: 12, padding: '3px 6px', maxWidth: 125, height: 26, fontWeight: 700, background: 'rgba(46,139,87,0.1)', color: '#2e8b57', borderColor: '#2e8b57' }}
+                    style={{ ...styles.inlineInput, fontSize: 12, padding: '3px 6px', maxWidth: 125, height: 26, fontWeight: 700, background: 'rgba(46,139,87,0.1)', color: C.green, borderColor: C.green }}
                     title={tr('Aggiungi un alleato salvato nella scheda o creane uno nuovo', 'Add an ally saved on the sheet or create a new one')}
                   >
                     <option value="">+ {t('ct.alleato')}...</option>
@@ -20915,14 +20912,14 @@ export default function App() {
                   </select>
                 ) : (
                   <button
-                    style={{ ...styles.buttonMini, background: 'rgba(46,139,87,0.1)', color: '#2e8b57', borderColor: '#2e8b57', fontWeight: 700, whiteSpace: 'nowrap' }}
+                    style={{ ...styles.buttonMini, background: 'rgba(46,139,87,0.1)', color: C.green, borderColor: C.green, fontWeight: 700, whiteSpace: 'nowrap' }}
                     onClick={() => aggiungiCombattente('alleato')}
                   >
                     ＋ {t('ct.alleato')}
                   </button>
                 )}
                 <button
-                  style={{ ...styles.buttonMini, background: 'rgba(176,58,46,0.1)', color: '#b03a2e', borderColor: '#b03a2e', fontWeight: 700, whiteSpace: 'nowrap' }}
+                  style={{ ...styles.buttonMini, background: 'rgba(176,58,46,0.1)', color: C.red, borderColor: C.red, fontWeight: 700, whiteSpace: 'nowrap' }}
                   onClick={() => aggiungiCombattente('nemico')}
                 >
                   ＋ {t('ct.nemico')}
@@ -21315,14 +21312,14 @@ export default function App() {
                               style={{ ...styles.inlineInput, width: 44, padding: '3px 4px', fontSize: 12, height: 24, textAlign: 'center' }}
                             />
                             <button
-                              style={{ ...styles.buttonMini, color: '#b03a2e', borderColor: '#b03a2e', padding: '2px 4px', fontWeight: 700, fontSize: 11, height: 24, flex: 1, whiteSpace: 'nowrap' }}
+                              style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 4px', fontWeight: 700, fontSize: 11, height: 24, flex: 1, whiteSpace: 'nowrap' }}
                               title={t('ct.danno')}
                               onClick={() => applica(-1)}
                             >
                               − Danno
                             </button>
                             <button
-                              style={{ ...styles.buttonMini, color: '#2e8b57', borderColor: '#2e8b57', padding: '2px 4px', fontWeight: 700, fontSize: 11, height: 24, flex: 1, whiteSpace: 'nowrap' }}
+                              style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 4px', fontWeight: 700, fontSize: 11, height: 24, flex: 1, whiteSpace: 'nowrap' }}
                               title={t('ct.cura')}
                               onClick={() => applica(1)}
                             >

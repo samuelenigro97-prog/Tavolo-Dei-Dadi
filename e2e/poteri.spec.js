@@ -83,8 +83,11 @@ test.describe('Poteri', () => {
     });
     expect(risorse).toEqual(expect.arrayContaining(['Segreti', 'Debito', 'Affabilità', 'Inquisire', 'Trasferire Empatico']));
     expect(risorse).not.toContain('Braccare!');
-    // Passando il mouse sulla risorsa si legge cosa fa quel potere.
-    await expect(page.getByRole('button', { name: 'Inquisire', exact: true })).toHaveAttribute('title', /Occhi: hai vantaggio/);
+    // I contatori dei Poteri stanno nella sezione Poteri, non in Risorse di classe; passando il
+    // mouse sul nome del privilegio si legge cosa fa.
+    await expect(page.getByTestId('araldi-pannello').locator('strong', { hasText: 'Inquisire' })).toHaveAttribute('title', /Occhi: hai vantaggio/);
+    await expect(page.getByText('Forma Selvatica').first()).toBeVisible();
+    expect(await page.evaluate(() => [...document.querySelectorAll('.profilo-risorse-box strong')].map((e) => e.textContent).filter((t) => /Segreti|Inquisire|Affabilità/.test(t)).length)).toBe(0);
 
     // Una seconda volta non aggiunge doppioni.
     await page.getByRole('button', { name: 'Da modello' }).click();
