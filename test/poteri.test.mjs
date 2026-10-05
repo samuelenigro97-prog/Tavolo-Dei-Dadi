@@ -194,3 +194,32 @@ test('poteri con livelloMin: bloccati sotto il livello, senza modificatori né r
   assert.equal(potereSbloccato({ livelloMin: 0 }, 1), true);
   assert.equal(potereSbloccato({}, 1), true);
 });
+
+test('contatori: massimo dalla competenza, ricarica con i riposi, condizione su un altro contatore', async () => {
+  const { sincronizzaRisorsePoteri, modificatoriPoteriAttivi, patchVariaContatori, trovaContatore, valoreContatorePerNome } = await import('../src/rules/poteri.js');
+  const poteri = [
+    { id: 'base', nome: 'Base', modello: 'x', contatori: [{ nome: 'Segreti', attuali: 0, max: null, maxAuto: 'doppia-competenza' }, { nome: 'Debito', attuali: 14, max: null }], modificatori: [] },
+    { id: 'occhio', nome: 'Occhio', condizione: { contatore: 'Debito', minimo: 15 }, contatori: [], modificatori: [{ bersaglio: 'ca', valore: 1, fonte: 'Occhio' }] },
+    { id: 'inq', nome: 'Inquisire', contatori: [{ nome: 'Inquisire', attuali: 4, max: 3, maxAuto: 'competenza', ricarica: 'lungo' }], modificatori: [] },
+  ];
+  const risorse = sincronizzaRisorsePoteri(poteri, [], 6, 4);
+  const per = (nome) => risorse.find((r) => r.nome === nome);
+  assert.equal(per('Segreti').max, 8, 'doppia competenza (+4) = 8');
+  assert.equal(per('Inquisire').max, 4);
+  assert.equal(per('Inquisire').attuali, 4);
+  assert.equal(per('Inquisire').reset, 'lungo');
+  assert.equal(per('Debito').reset, 'manuale');
+  // Condizione: Debito 14 → nessun bonus; con +1 scatta.
+  const scheda = { livello: 6, bonusCompetenza: 4, poteri, risorse };
+  assert.equal(modificatoriPoteriAttivi(scheda).length, 0);
+  const patch = patchVariaContatori(scheda, [{ nome: 'Debito', delta: 1 }]);
+  const dopo = { ...scheda, ...patch };
+  assert.equal(valoreContatorePerNome(dopo, 'Debito'), 15);
+  assert.equal(modificatoriPoteriAttivi(dopo).length, 1);
+  // Il massimo vale anche per le variazioni, e non si scende sotto zero.
+  const tanti = patchVariaContatori(dopo, [{ nome: 'Segreti', delta: 99 }]);
+  assert.equal(trovaContatore({ ...dopo, ...tanti }, 'Segreti').attuali, 8);
+  const sotto = patchVariaContatori(dopo, [{ nome: 'Segreti', delta: -5 }]);
+  assert.equal(trovaContatore({ ...dopo, ...sotto }, 'Segreti').attuali, 0);
+  assert.equal(patchVariaContatori(dopo, [{ nome: 'Inesistente', delta: 1 }]), null);
+});

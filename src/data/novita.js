@@ -5,6 +5,21 @@
 
 export const NOVITA = [
   {
+    versione: '4.60.0',
+    voci: {
+      it: [
+        'Araldi del Segreto ha un pannello tutto suo: Segreti e Debito, soglie che si accendono da sole (+1 CA a Debito 15), spese dei Segreti e privilegi per livello con perle cliccabili per gli usi.',
+        'I Poteri possono avere massimo legato alla competenza, ricarica con i riposi e condizioni automatiche.',
+        'Colori delle Reazioni uniformati alla palette dei chip.',
+      ],
+      en: [
+        'Heralds of the Secret now has its own panel: Secrets and Debt, thresholds that light up on their own (+1 AC at Debt 15), Secret spending and level features with clickable pearls for uses.',
+        'Powers can have a proficiency-based maximum, rest recharge and automatic conditions.',
+        'Reaction colours now follow the chip palette.',
+      ],
+    },
+  },
+  {
     versione: '4.59.0',
     voci: {
       it: [

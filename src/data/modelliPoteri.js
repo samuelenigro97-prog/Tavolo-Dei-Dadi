@@ -3,6 +3,24 @@
 // src/rules/poteri.js): l'id viene generato all'aggiunta, i contatori creano
 // da soli le risorse collegate (reset "manuale").
 
+/** Soglie del Debito: effetto narrativo/meccanico mostrato dal pannello dedicato. */
+export const SOGLIE_DEBITO_ARALDI = [
+  { soglia: 5, nome: 'Voce nell\'Ombra', nomeEn: 'Voice in the Shadows', effetto: 'Messaggio a volontà come azione bonus e vantaggio alle prove di Intuizione.', effettoEn: 'Message at will as a bonus action and advantage on Insight checks.' },
+  { soglia: 15, nome: 'Occhio Risvegliato', nomeEn: 'Awakened Eye', effetto: 'Vantaggio a Percezione e Indagare; +1 CA (applicato in automatico).', effettoEn: 'Advantage on Perception and Investigation; +1 AC (applied automatically).' },
+  { soglia: 35, nome: 'Coraggio', nomeEn: 'Courage', effetto: 'Vantaggio ai TS contro spaventato.', effettoEn: 'Advantage on saves against being frightened.' },
+  { soglia: 70, nome: 'Veglia', nomeEn: 'Vigil', effetto: 'Truesight 9 m per 1 ora al giorno; +1 ai tiri per colpire.', effettoEn: 'Truesight 9 ft... 30 ft for 1 hour a day; +1 to attack rolls.' },
+  { soglia: 150, nome: 'Non questa volta', nomeEn: 'Not This Time', effetto: 'Una volta nella vita, a 0 PF resti a 1 PF; puoi riutilizzare il privilegio solo chiedendolo a Tim.', effettoEn: 'Once in your life, at 0 HP you stay at 1 HP; you can reuse it only by asking Tim.' },
+];
+
+/** Incantesimi della lista ampliata per cerchio (si lanciano spendendo Segreti). */
+export const LISTA_AMPLIATA_ARALDI = {
+  1: ['Charme su persone', 'Camuffare sé stessi'],
+  2: ['Individuazione dei pensieri', 'Cecità/Sordità'],
+  3: ['Parlare con i morti', 'Chiaroveggenza'],
+  4: ['Occhio arcano', 'Localizza creatura'],
+  5: ['Dominare persone', 'Storia leggendaria'],
+};
+
 export const MODELLI_POTERI = [
   {
     id: 'araldi-del-segreto',
@@ -31,7 +49,7 @@ export const MODELLI_POTERI = [
         ].join('\n'),
         attivo: true,
         contatori: [
-          { nome: 'Segreti', attuali: 0, max: null },
+          { nome: 'Segreti', attuali: 0, max: null, maxAuto: 'doppia-competenza' },
           { nome: 'Debito', attuali: 0, max: null },
         ],
         modificatori: [],
@@ -52,10 +70,19 @@ export const MODELLI_POTERI = [
       },
       {
         nome: 'Debito 15 · Occhio Risvegliato (+1 CA)',
-        descrizione: 'Attivalo quando il Debito arriva a 15: vantaggio a Percezione e Indagare, +1 alla CA.',
-        attivo: false,
+        descrizione: 'Scatta da solo quando il Debito arriva a 15: vantaggio a Percezione e Indagare, +1 alla CA.',
+        attivo: true,
+        condizione: { contatore: 'Debito', minimo: 15 },
         contatori: [],
         modificatori: [{ bersaglio: 'ca', bersaglioLibero: '', valore: 1, fonte: 'Occhio Risvegliato' }],
+      },
+      {
+        nome: 'Debito 70 · Veglia (+1 colpire)',
+        descrizione: 'Scatta da solo quando il Debito arriva a 70: Truesight 9 m per 1 ora al giorno e +1 ai tiri per colpire.',
+        attivo: true,
+        condizione: { contatore: 'Debito', minimo: 70 },
+        contatori: [],
+        modificatori: [{ bersaglio: 'altro', bersaglioLibero: 'Tiri per colpire', valore: 1, fonte: 'Veglia' }],
       },
       {
         nome: 'Affabilità (1° livello)',
@@ -65,7 +92,7 @@ export const MODELLI_POTERI = [
           'Ottieni successo automatico in una prova di Carisma (Inganno, Persuasione o Intimidire) quando la CD stabilita dal DM sarebbe 15 o meno. Contro CD più alte, tiri con vantaggio. Non funziona su una creatura ostile in combattimento, né per ottenere qualcosa contrario alla natura del bersaglio. La discrezione del DM ha l\'ultima parola.',
         ].join('\n'),
         attivo: true,
-        contatori: [{ nome: 'Affabilità', attuali: 1, max: 1 }],
+        contatori: [{ nome: 'Affabilità', attuali: 1, max: 1, ricarica: 'breve' }],
         modificatori: [],
       },
       {
@@ -81,7 +108,7 @@ export const MODELLI_POTERI = [
           '• Cuore: recuperi 2d6 + il tuo livello PF (solo se la creatura non è un costrutto né un non morto).',
         ].join('\n'),
         attivo: true,
-        contatori: [{ nome: 'Inquisire', attuali: 3, max: 3 }],
+        contatori: [{ nome: 'Inquisire', attuali: 3, max: 3, maxAuto: 'competenza', ricarica: 'lungo' }],
         modificatori: [],
       },
       {
@@ -94,7 +121,7 @@ export const MODELLI_POTERI = [
           'Se riesce: trasferisci quell\'ammontare di ferite al bersaglio in danni necrotici e ti curi di metà di quelle ferite. Se con quest\'azione il nemico muore prendi 1 Segreto.',
         ].join('\n'),
         attivo: true,
-        contatori: [{ nome: 'Trasferire Empatico', attuali: 1, max: 1 }],
+        contatori: [{ nome: 'Trasferire Empatico', attuali: 1, max: 1, ricarica: 'lungo' }],
         modificatori: [],
       },
       {
@@ -109,7 +136,7 @@ export const MODELLI_POTERI = [
           '• con un\'azione puoi spendere 3 Segreti per teletrasportarti in uno spazio libero entro 1,5 metri dalla creatura marchiata.',
         ].join('\n'),
         attivo: true,
-        contatori: [{ nome: 'Braccare!', attuali: 5, max: 5 }],
+        contatori: [{ nome: 'Braccare!', attuali: 5, max: 5, maxAuto: 'competenza', ricarica: 'lungo' }],
         modificatori: [],
       },
     ],

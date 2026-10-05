@@ -21,8 +21,11 @@ import {
   modificatoriPoteriAttivi,
   livelloTotaleScheda,
   potereSbloccato,
+  trovaContatore,
+  idRisorsaContatore,
 } from '../rules/poteri.js';
 import { MODELLI_POTERI } from '../data/modelliPoteri.js';
+import { AraldiPannello } from './AraldiPannello.jsx';
 import { manualeAttivo } from '../data/dati5e.js';
 
 function unitaBersaglio(chiave) {
@@ -173,7 +176,7 @@ function PotereCard({ potere, scheda, indice, totale, onApri, lingua }) {
 }
 
 /** Modale di dettaglio/modifica per un singolo potere: campi, contatori, modificatori, elimina, riordina. */
-function PotereModal({ potere, indice, totale, onChiudi, onAggiorna, onElimina, onSposta, lingua }) {
+function PotereModal({ potere, scheda, indice, totale, onChiudi, onAggiorna, onElimina, onSposta, lingua }) {
   const setCampo = (patch) => onAggiorna(potere.id, patch);
   const setContatore = (i, patch) => setCampo({ contatori: potere.contatori.map((c, idx) => (idx === i ? { ...c, ...patch } : c)) });
   const rimuoviContatore = (i) => setCampo({ contatori: potere.contatori.filter((_, idx) => idx !== i) });
@@ -223,6 +226,29 @@ function PotereModal({ potere, indice, totale, onChiudi, onAggiorna, onElimina, 
           <span style={{ ...styles.detail, fontSize: 11 }}>{lingua === 'en' ? '(0 = always)' : '(0 = sempre)'}</span>
         </label>
 
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, fontSize: 12, flexWrap: 'wrap' }}>
+          {lingua === 'en' ? 'Applies only if counter' : 'Si applica solo se il contatore'}
+          <input
+            value={potere.condizione?.contatore || ''}
+            onChange={(e) => setCampo({ condizione: e.target.value.trim() ? { contatore: e.target.value, minimo: potere.condizione?.minimo || 1 } : null })}
+            placeholder={lingua === 'en' ? 'e.g. Debt' : 'es. Debito'}
+            style={{ ...styles.inlineInput, width: 110, fontSize: 12, padding: '4px 6px' }}
+          />
+          {potere.condizione && (
+            <>
+              ≥
+              <input
+                type="number"
+                min={0}
+                value={potere.condizione.minimo}
+                onChange={(e) => setCampo({ condizione: { ...potere.condizione, minimo: Number(e.target.value) || 0 } })}
+                style={{ ...styles.inlineInput, width: 64, fontSize: 12, padding: '4px 6px' }}
+              />
+            </>
+          )}
+          <span style={{ ...styles.detail, fontSize: 11 }}>{lingua === 'en' ? '(empty = always)' : '(vuoto = sempre)'}</span>
+        </div>
+
         <div style={{ marginBottom: 10 }}>
           <div style={{ ...styles.detail, fontWeight: 700, marginBottom: 4 }}>{lingua === 'en' ? 'Description' : 'Descrizione'}</div>
           <AreaTesto value={potere.descrizione} onChange={(v) => setCampo({ descrizione: v })} placeholder={lingua === 'en' ? 'What this power does…' : 'Cosa fa questo potere…'} />
@@ -240,7 +266,7 @@ function PotereModal({ potere, indice, totale, onChiudi, onAggiorna, onElimina, 
               />
               <input
                 type="number"
-                value={c.attuali}
+                value={valoreContatore(scheda, potere.id, i, c).attuali}
                 onChange={(e) => setContatore(i, { attuali: Number(e.target.value) || 0 })}
                 title={lingua === 'en' ? 'Current' : 'Attuali'}
                 style={{ ...styles.inlineInput, width: 56, fontSize: 12, padding: '4px 6px', textAlign: 'center' }}
@@ -254,6 +280,26 @@ function PotereModal({ potere, indice, totale, onChiudi, onAggiorna, onElimina, 
                 title={lingua === 'en' ? 'Maximum (empty = no cap)' : 'Massimo (vuoto = nessun tetto)'}
                 style={{ ...styles.inlineInput, width: 56, fontSize: 12, padding: '4px 6px', textAlign: 'center' }}
               />
+              <select
+                value={c.maxAuto || ''}
+                onChange={(e) => setContatore(i, { maxAuto: e.target.value || undefined })}
+                title={lingua === 'en' ? 'Maximum from proficiency bonus' : 'Massimo calcolato dalla competenza'}
+                style={{ ...styles.inlineInput, fontSize: 11, padding: '4px 4px', width: 'auto' }}
+              >
+                <option value="">{lingua === 'en' ? 'Fixed max' : 'Max fisso'}</option>
+                <option value="competenza">{lingua === 'en' ? 'Max = proficiency' : 'Max = competenza'}</option>
+                <option value="doppia-competenza">{lingua === 'en' ? 'Max = 2× proficiency' : 'Max = 2× competenza'}</option>
+              </select>
+              <select
+                value={c.ricarica || ''}
+                onChange={(e) => setContatore(i, { ricarica: e.target.value || undefined })}
+                title={lingua === 'en' ? 'When it recharges' : 'Quando si ricarica'}
+                style={{ ...styles.inlineInput, fontSize: 11, padding: '4px 4px', width: 'auto' }}
+              >
+                <option value="">{lingua === 'en' ? 'Manual' : 'A mano'}</option>
+                <option value="breve">{lingua === 'en' ? 'Short rest' : 'Riposo breve'}</option>
+                <option value="lungo">{lingua === 'en' ? 'Long rest' : 'Riposo lungo'}</option>
+              </select>
               <button type="button" style={{ ...styles.buttonMini, color: C.red }} onClick={() => rimuoviContatore(i)} title={lingua === 'en' ? 'Remove' : 'Rimuovi'}>🗑</button>
             </div>
           ))}
@@ -327,7 +373,7 @@ function PotereModal({ potere, indice, totale, onChiudi, onAggiorna, onElimina, 
  * Sezione "Poteri": elenco di schede + pulsante per aggiungerne una nuova.
  * `scheda`/`aggiorna` sono le stesse props usate in tutto il resto della UI.
  */
-export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi = {} }) {
+export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi = {}, registra }) {
   const [potereApertoId, setPotereApertoId] = useState(null);
   const [mostraModelli, setMostraModelli] = useState(false);
   // Sezione comprimibile: la scelta resta su questo dispositivo.
@@ -342,11 +388,31 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
   }
   // I modelli dei manuali di campagna compaiono solo se il manuale è attivato a mano.
   const modelliDisponibili = MODELLI_POTERI.filter((m) => !m.manuale || manualeAttivo(manualiAttivi, m.manuale));
+  // Con il manuale degli Araldi attivo e i suoi poteri sulla scheda, un pannello dedicato
+  // sostituisce nell'elenco le singole schede dei poteri del modello (restano in effetto).
+  const pannelloAraldi = manualeAttivo(manualiAttivi, 'araldi') && Boolean(trovaContatore(scheda, 'Segreti')) && Boolean(trovaContatore(scheda, 'Debito'));
   const poteri = normalizzaPoteri(scheda?.poteri);
   const potereAperto = poteri.find((p) => p.id === potereApertoId) || null;
+  const poteriInLista = pannelloAraldi ? poteri.filter((p) => p.modello !== 'araldi-del-segreto') : poteri;
 
   function salvaPoteri(nuoviPoteri) {
-    aggiorna({ poteri: nuoviPoteri, risorse: sincronizzaRisorsePoteri(nuoviPoteri, scheda.risorse, livelloTotaleScheda(scheda)) });
+    let risorse = sincronizzaRisorsePoteri(nuoviPoteri, scheda.risorse, livelloTotaleScheda(scheda), scheda.bonusCompetenza);
+    // Un valore "attuali" cambiato a mano sul contatore vince su quello già nella
+    // risorsa collegata (che altrimenti, essendo la fonte più recente, lo annullerebbe).
+    const modificati = new Map();
+    for (const p of normalizzaPoteri(nuoviPoteri)) {
+      const prima = poteri.find((x) => x.id === p.id);
+      if (!prima) continue;
+      p.contatori.forEach((c, i) => {
+        if (prima.contatori[i] && c.attuali !== prima.contatori[i].attuali) modificati.set(idRisorsaContatore(p.id, i), c.attuali);
+      });
+    }
+    if (modificati.size) {
+      risorse = risorse.map((r) => (modificati.has(r.id)
+        ? { ...r, attuali: Math.max(0, r.max === null || r.max === undefined ? modificati.get(r.id) : Math.min(modificati.get(r.id), r.max)) }
+        : r));
+    }
+    aggiorna({ poteri: nuoviPoteri, risorse });
   }
 
   function aggiungiPotere() {
@@ -355,19 +421,41 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
     setPotereApertoId(nuovo.id);
   }
 
-  /** Poteri del modello già presenti (stesso nome) ma senza il livello di sblocco previsto. */
+  /** Poteri del modello già presenti (stesso nome) ma aggiunti con una versione precedente del modello. */
   function daAllineareAlModello(modello) {
-    return modello.poteri.filter((mp) => (mp.livelloMin || 0) > 0 && poteri.some((p) => p.nome === mp.nome && !(p.livelloMin > 0)));
+    return modello.poteri.filter((mp) => poteri.some((p) => p.nome === mp.nome && p.modello !== modello.id));
   }
 
-  /** Aggiunge i poteri di un modello, saltando quelli già presenti (stesso nome),
-   *  e dà il livello di sblocco previsto a quelli aggiunti con una versione precedente. */
+  /** Aggiunge i poteri di un modello (saltando quelli già presenti, stesso nome) e porta
+   *  all'ultima versione del modello quelli aggiunti prima: livello di sblocco, condizioni
+   *  automatiche, ricariche con i riposi e massimi calcolati dalla competenza. */
   function aggiungiModello(modello) {
     const presenti = new Set(poteri.map((p) => p.nome));
-    const nuovi = modello.poteri.filter((p) => !presenti.has(p.nome)).map((p) => nuovoPotere(p));
-    const livelli = new Map(daAllineareAlModello(modello).map((mp) => [mp.nome, mp.livelloMin]));
-    const esistenti = poteri.map((p) => (livelli.has(p.nome) && !(p.livelloMin > 0) ? { ...p, livelloMin: livelli.get(p.nome) } : p));
-    if (!nuovi.length && !livelli.size) return;
+    // Un contatore con lo stesso nome già presente in un altro potere (es. il Debito del
+    // proprio Potere del Patrono) resta l'unico: non se ne crea un secondo.
+    const nomiContatori = new Set(poteri.flatMap((p) => p.contatori.map((c) => String(c.nome).trim().toLowerCase())));
+    const nuovi = modello.poteri.filter((p) => !presenti.has(p.nome)).map((p) => nuovoPotere({
+      ...p,
+      modello: modello.id,
+      contatori: (p.contatori || []).filter((c) => !nomiContatori.has(String(c.nome).trim().toLowerCase())),
+    }));
+    const daAllineare = new Map(daAllineareAlModello(modello).map((mp) => [mp.nome, mp]));
+    const esistenti = poteri.map((p) => {
+      const mp = daAllineare.get(p.nome);
+      if (!mp || p.modello === modello.id) return p;
+      return {
+        ...p,
+        modello: modello.id,
+        livelloMin: mp.livelloMin || 0,
+        condizione: mp.condizione || null,
+        ...(mp.condizione ? { attivo: true } : {}),
+        contatori: p.contatori.map((c) => {
+          const mc = (mp.contatori || []).find((x) => x.nome === c.nome);
+          return mc ? { ...c, ...(mc.ricarica ? { ricarica: mc.ricarica } : {}), ...(mc.maxAuto ? { maxAuto: mc.maxAuto } : {}) } : c;
+        }),
+      };
+    });
+    if (!nuovi.length && !daAllineare.size) return;
     salvaPoteri([...esistenti, ...nuovi]);
     setMostraModelli(false);
   }
@@ -461,7 +549,7 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
                   {mancanti
                     ? (lingua === 'en' ? `Add ${mancanti} powers` : `Aggiungi ${mancanti} poteri`)
                     : daAllineare
-                      ? (lingua === 'en' ? 'Set unlock levels' : 'Imposta i livelli')
+                      ? (lingua === 'en' ? 'Update to the new template' : 'Aggiorna al nuovo modello')
                       : (lingua === 'en' ? 'Already added' : 'Già aggiunto')}
                 </button>
               </div>
@@ -470,13 +558,17 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
         </div>
       )}
 
-      {chiusa ? null : poteri.length === 0 ? (
+      {!chiusa && pannelloAraldi && (
+        <AraldiPannello scheda={scheda} aggiorna={aggiorna} lingua={lingua} registra={registra} onModifica={setPotereApertoId} />
+      )}
+
+      {chiusa ? null : poteriInLista.length === 0 && !pannelloAraldi ? (
         <div style={{ ...styles.detail, fontSize: 12, textAlign: 'center', padding: '10px 0' }}>
           {lingua === 'en' ? 'No custom powers yet.' : 'Nessun potere personalizzato per ora.'}
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {poteri.map((p, i) => (
+          {poteriInLista.map((p, i) => (
             <PotereCard key={p.id} potere={p} scheda={scheda} indice={i} totale={poteri.length} onApri={gestisciAzioneCard} lingua={lingua} />
           ))}
         </div>
@@ -485,6 +577,7 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
       {potereAperto && (
         <PotereModal
           potere={potereAperto}
+          scheda={scheda}
           indice={poteri.findIndex((p) => p.id === potereAperto.id)}
           totale={poteri.length}
           onChiudi={() => setPotereApertoId(null)}

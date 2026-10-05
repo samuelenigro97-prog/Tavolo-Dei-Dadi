@@ -1957,7 +1957,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.59.0';
+const APP_VERSION = '4.60.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -2230,7 +2230,7 @@ function loadState() {
         // così sono presenti anche appena dopo un import/una sincronizzazione
         // da codice stanza, senza aspettare la prima modifica dalla sezione Poteri.
         s.poteri = normalizzaPoteri(s.poteri);
-        s.risorse = sincronizzaRisorsePoteri(s.poteri, s.risorse, livelloTotaleScheda(s));
+        s.risorse = sincronizzaRisorsePoteri(s.poteri, s.risorse, livelloTotaleScheda(s), s.bonusCompetenza);
         // assegna un id agli incantesimi che ne fossero privi (schede legacy),
         // così ognuno è modificabile singolarmente nel sottomenu
         if (Array.isArray(s.incantesimiLista)) {
@@ -4357,14 +4357,14 @@ export default function App() {
     setRoster((r) => {
       const corrente = r.personaggi[r.attivo];
       if (!corrente) return r;
-      const sincronizzate = sincronizzaRisorsePoteri(corrente.poteri, corrente.risorse, livelloTotaleScheda(corrente));
+      const sincronizzate = sincronizzaRisorsePoteri(corrente.poteri, corrente.risorse, livelloTotaleScheda(corrente), corrente.bonusCompetenza);
       if (JSON.stringify(sincronizzate) === JSON.stringify(corrente.risorse || [])) return r;
       return {
         ...r,
         personaggi: { ...r.personaggi, [r.attivo]: { ...corrente, risorse: sincronizzate } },
       };
     });
-  }, [roster.attivo, scheda?.poteri, scheda?.livello, scheda?.multiclasse, isSolaLettura]);
+  }, [roster.attivo, scheda?.poteri, scheda?.livello, scheda?.multiclasse, scheda?.bonusCompetenza, isSolaLettura]);
 
   useEffect(() => {
     const esito = saveState(roster);
@@ -15077,9 +15077,11 @@ export default function App() {
                                       fontSize: 11,
                                       padding: '1px 7px',
                                       fontWeight: 700,
-                                      background: scheda.reazioneUsata ? 'rgba(239,68,68,0.12)' : 'rgba(46,157,77,0.12)',
-                                      borderColor: scheda.reazioneUsata ? '#ef4444' : '#2e9d4d',
-                                      color: scheda.reazioneUsata ? '#ef4444' : '#2e9d4d',
+                                      // Stessa palette dei chip: verde "quando" se disponibile, neutro se già usata
+                                      // (il rosso resta riservato ai danni).
+                                      background: `${coloreCategoria(scheda.reazioneUsata ? 'proprieta' : 'tempo', notteAttiva)}1f`,
+                                      borderColor: coloreCategoria(scheda.reazioneUsata ? 'proprieta' : 'tempo', notteAttiva),
+                                      color: coloreCategoria(scheda.reazioneUsata ? 'proprieta' : 'tempo', notteAttiva),
                                       display: 'inline-flex',
                                       alignItems: 'center',
                                       gap: 4,
@@ -15087,7 +15089,7 @@ export default function App() {
                                     }}
                                     title={lingua === 'en' ? 'Click to toggle reaction available/used status for this round' : 'Clicca per alternare lo stato della reazione (disponibile/usata) in questo round'}
                                   >
-                                    <span>{scheda.reazioneUsata ? '🔴' : '🟢'}</span>
+                                    <span aria-hidden>{scheda.reazioneUsata ? '○' : '●'}</span>
                                     <span>{scheda.reazioneUsata ? (lingua === 'en' ? 'Used' : 'Usata') : (lingua === 'en' ? 'Available' : 'Disponibile')}</span>
                                   </button>
                                   <button
@@ -15097,9 +15099,9 @@ export default function App() {
                                       ...styles.buttonMini,
                                       fontSize: 11,
                                       padding: '1px 7px',
-                                      borderColor: C.goldDark,
-                                      color: C.goldDark,
-                                      background: 'rgba(201,162,39,0.08)',
+                                      borderColor: coloreCategoria('proprieta', notteAttiva),
+                                      color: coloreCategoria('proprieta', notteAttiva),
+                                      background: `${coloreCategoria('proprieta', notteAttiva)}14`,
                                       display: 'inline-flex',
                                       alignItems: 'center',
                                       gap: 4,
@@ -15544,9 +15546,9 @@ export default function App() {
                                           type="button"
                                           style={{
                                             ...styles.buttonRiga,
-                                            background: scheda.reazioneUsata ? 'rgba(239,68,68,0.12)' : 'rgba(46,157,77,0.14)',
-                                            borderColor: scheda.reazioneUsata ? '#ef4444' : '#2e9d4d',
-                                            color: scheda.reazioneUsata ? '#ef4444' : '#2e9d4d',
+                                            background: `${coloreCategoria(scheda.reazioneUsata ? 'proprieta' : 'tempo', notteAttiva)}1f`,
+                                            borderColor: coloreCategoria(scheda.reazioneUsata ? 'proprieta' : 'tempo', notteAttiva),
+                                            color: coloreCategoria(scheda.reazioneUsata ? 'proprieta' : 'tempo', notteAttiva),
                                           }}
                                           title={scheda.reazioneUsata ? (lingua === 'en' ? 'Reaction used this round. Click to restore it.' : 'Reazione già usata in questo round. Clicca per ripristinare.') : (lingua === 'en' ? `Use ${a.nome} as reaction for this round` : `Usa ${a.nome} come reazione per questo round`)}
                                           onClick={() => {
@@ -17366,7 +17368,7 @@ export default function App() {
                   </div>
 
                   {/* Riga 3: Poteri personalizzati (regole homebrew del tavolo) */}
-                  <SezionePoteri scheda={scheda} aggiorna={aggiorna} lingua={lingua} manualiAttivi={manualiAttivi} />
+                  <SezionePoteri scheda={scheda} aggiorna={aggiorna} lingua={lingua} manualiAttivi={manualiAttivi} registra={registra} />
                 </div>
               </Sezione>
 

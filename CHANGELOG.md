@@ -2,6 +2,41 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.60.0] – 2026-10-05
+
+### Aggiunto
+- **Pannello Araldi del Segreto** (compare nei Poteri con il manuale di campagna
+  attivo e i suoi poteri sulla scheda), pensato per giocare al tavolo:
+  - **Segreti e Debito** con − / + (massimo Segreti = il doppio della
+    competenza, calcolato da solo);
+  - **Soglie del Debito** (5, 15, 35, 70, 150) che si accendono da sole, con la
+    prossima soglia e quanto manca; il **+1 CA di Occhio Risvegliato scatta
+    automaticamente a Debito 15** (e Veglia a 70);
+  - **Spendere i Segreti**: Aprire, Leva, Mercato e Incantare con i segreti
+    (cerchio e incantesimo della lista ampliata, costo = cerchio, +1 Debito),
+    con voce nel registro;
+  - **Privilegi per livello** (1°, 6°, 10°, 14°) con lucchetto finché non si
+    sbloccano, **perle cliccabili** per gli usi (una perla piena = usa, una
+    spenta = ripristina), Debito aggiunto in automatico (Inquisire +1,
+    Trasferire Empatico +2, Braccare! +1), Recupera con Segreti, dettagli
+    comprimibili e "Modifica".
+- **Poteri più potenti** (valgono per qualsiasi potere homebrew): contatore con
+  massimo calcolato dalla competenza (1× o 2×), ricarica con riposo breve o
+  lungo, e potere con **condizione automatica** su un contatore ("si applica
+  solo se Debito ≥ 15"). Nuovi campi nell'editor del potere.
+- "Da modello" riusa un contatore già presente (es. il Debito del proprio
+  Potere del Patrono) invece di crearne un secondo, e "Aggiorna al nuovo
+  modello" porta a questa versione i poteri degli Araldi aggiunti prima.
+
+### Corretto
+- Modificare "attuali" di un contatore dall'editor del potere ora cambia davvero
+  anche la risorsa collegata (prima restava il valore vecchio); l'editor
+  mostra il valore reale della risorsa.
+- **Colori delle Reazioni** unificati sulla palette dei chip: "Disponibile" e
+  "Usa" nel verde "quando" (non più un verde diverso), "Usata" in neutro (il
+  rosso resta per i danni), "Inneschi e reazioni" neutro invece che oro, e
+  niente più pallini 🟢/🔴 colorati.
+
 ## [4.59.0] – 2026-10-05
 
 ### Aggiunto
