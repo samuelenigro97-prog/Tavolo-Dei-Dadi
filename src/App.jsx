@@ -1749,7 +1749,8 @@ function risorseAutoClasse(classe, livello, caratteristiche, versione = '2024') 
       ];
     case 'druido':
       // Forma Selvatica: 2 usi nella 5.0, 2/3/4 nella 5.5.
-      return L >= 2 ? [mk('Forma Selvatica', v24 ? (L >= 17 ? 4 : L >= 6 ? 3 : 2) : 2, 'breve')] : [];
+      // Riposo breve: nella 5.0 restituisce tutti gli usi, nella 5.5 solo uno (il lungo tutti).
+      return L >= 2 ? [mk('Forma Selvatica', v24 ? (L >= 17 ? 4 : L >= 6 ? 3 : 2) : 2, v24 ? 'breve-uno' : 'breve')] : [];
     case 'chierico':
       // Incanalare Divinità: 1/2/3 nella 5.0 (liv. 2/6/18), 2/3 nella 5.5.
       return L >= 2
@@ -1874,7 +1875,7 @@ const SPIEG_RISORSE = {
   'Indomito': 'Puoi ritirare un tiro salvezza fallito (+ livello da Guerriero nella versione 2024). Usi: 1 al 9°, 2 al 13°, 3 al 17°; si ricarica con un riposo lungo.',
 
   // Druido
-  'Forma Selvatica': 'Come azione (o azione bonus nella 2024/Luna), assumi magicamente la forma di una bestia che conosci entro i limiti di GS. Ottieni i PF e le caratteristiche fisiche della bestia preservando le facoltà mentali. 2 usi (3 al 6°, 4 al 17°); si recuperano con un riposo breve o lungo.',
+  'Forma Selvatica': 'Come azione (o azione bonus nella 2024/Luna), assumi magicamente la forma di una bestia che conosci entro i limiti di GS. Ottieni i PF e le caratteristiche fisiche della bestia preservando le facoltà mentali. 2 usi (3 al 6°, 4 al 17°). Regole 2024: un riposo breve ne restituisce uno, un riposo lungo tutti. Regole 2014: entrambi i riposi li restituiscono tutti.',
   'Ausilio dalla Terra': 'Come azione spendi una Forma Selvatica per evocare fiori curativi per gli alleati o spine che feriscono i nemici nell’area.',
 
   // Chierico
@@ -1956,7 +1957,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.56.1';
+const APP_VERSION = '4.57.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -2736,7 +2737,7 @@ function normalizeImported(rawDati) {
               nome: str(r.nome, 'Risorsa') || 'Risorsa',
               max: Math.max(0, num(r.max, 0)),
               attuali: Math.max(0, Math.min(Math.max(0, num(r.max, 0)), num(r.attuali, num(r.max, 0)))),
-              reset: ['breve', 'lungo'].includes(r.reset) ? r.reset : '',
+              reset: ['breve', 'breve-uno', 'lungo'].includes(r.reset) ? r.reset : '',
             }))
         : [],
     }, versionePin),
@@ -12931,7 +12932,7 @@ export default function App() {
                             : <Editable value={r.max} tipo="numero" width={30} onChange={(v) => modifica({ max: Math.max(0, v), attuali: Math.min(Math.max(0, v), r.attuali) })} />}
                           </span>
                           {automatica ? (
-                            <span style={{ ...styles.detail, fontSize: 11, whiteSpace: 'nowrap', marginLeft: 'auto' }} title={t('tip.quando_ricarica')}>↻ {r.reset === 'breve' ? t('res.breve') : t('res.lungo')}</span>
+                            <span style={{ ...styles.detail, fontSize: 11, whiteSpace: 'nowrap', marginLeft: 'auto' }} title={t('tip.quando_ricarica')}>↻ {r.reset === 'breve' ? t('res.breve') : r.reset === 'breve-uno' ? t('res.breve_uno') : t('res.lungo')}</span>
                           ) : (
                             <select
                               style={{ ...styles.inlineInput, fontSize: 11, padding: '1px 3px', width: 'auto', marginLeft: 'auto' }}

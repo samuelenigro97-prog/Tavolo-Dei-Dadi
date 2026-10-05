@@ -441,6 +441,7 @@ export const DIZIONARIO = {
     // Risorse di classe
     'res.manuale': 'manuale',
     'res.breve': 'riposo breve',
+    'res.breve_uno': '1 a riposo breve, tutti a lungo',
     'res.lungo': 'riposo lungo',
     'res.nuova': 'Nuova risorsa',
     'res.aggiungi': 'Aggiungi risorsa',
@@ -1344,6 +1345,7 @@ export const DIZIONARIO = {
     // Class resources
     'res.manuale': 'manual',
     'res.breve': 'short rest',
+    'res.breve_uno': '1 on short rest, all on long',
     'res.lungo': 'long rest',
     'res.nuova': 'New resource',
     'res.aggiungi': 'Add resource',

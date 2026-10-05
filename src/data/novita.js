@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.57.0',
+    voci: {
+      it: ['Forma Selvatica corretta per le regole 2024: il riposo breve restituisce un solo uso, il riposo lungo tutti (nelle regole 2014 resta tutto con entrambi i riposi).'],
+      en: ['Wild Shape fixed for the 2024 rules: a short rest restores one use, a long rest restores all (2014 rules unchanged: either rest restores all).'],
+    },
+  },
+  {
     versione: '4.56.0',
     voci: {
       it: ['Riquadri CA, Competenza, Iniziativa, Velocità, Sfinimento e gli altri: titoli sempre dentro il riquadro, valori allineati alla stessa altezza e bordo luminoso come le sezioni.'],

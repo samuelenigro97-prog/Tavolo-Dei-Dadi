@@ -819,7 +819,7 @@ export const EN_INCANTESIMI = {
 export const EN_PRIVILEGI_CLASSE = {
   'Contatto Mistico': 'Warlock capstone (20th level - Eldritch Master): you spend 1 minute supplicating your patron to regain all expended Pact Magic spell slots. Recharges on a Long Rest.',
   'Maestro Occulto': 'Warlock capstone (20th level - Eldritch Master): you spend 1 minute supplicating your patron to regain all expended Pact Magic spell slots. Recharges on a Long Rest.',
-  'Colpo di Fortuna': 'Rogue capstone (20th level - Stroke of Luck): if your attack misses or you fail an ability check, you turn the miss into a hit or treat the d20 as a 20. Recharges on a Short or Long Rest.',
+  'Colpo di Fortuna': 'Rogue capstone (20th level - Stroke of Luck): if your attack misses or you fail an ability check, you turn the miss into a hit or treat the d20 as a 20. 2024 rules: a Short Rest restores one use, a Long Rest restores all. 2014 rules: either rest restores all uses.',
   'Marchio del Cacciatore': 'Bonus Action: magically mark a target within 27 m to deal +1d6 force damage on every hit and gain advantage to track it. In 2024 you gain free uses without spending spell slots.',
   'Sensi Primordiali': 'Primeval Awareness (2014): as an action, expend one ranger spell slot; for 1 minute per slot level you sense whether aberrations, celestials, dragons, elementals, fey, fiends or undead are within 1 mile (6 miles in favored terrain). It has no uses of its own: it only costs the slot.',
   'Nemico Prescelto': 'Gain advantage on Survival checks to track favoured enemies and Intelligence checks to recall information about them.',

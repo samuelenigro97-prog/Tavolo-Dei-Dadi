@@ -167,3 +167,14 @@ test('nuovoPotere: produce una struttura pronta all\'uso con id univoco', () => 
   assert.notEqual(a.id, b.id);
   assert.equal(a.attivo, true);
 });
+
+test('risorseDopoRiposo: Forma Selvatica 5.5 ("breve-uno") — il breve restituisce un uso, il lungo tutti', () => {
+  const risorse = [{ id: 'auto-druido-forma-selvatica', nome: 'Forma Selvatica', attuali: 0, max: 3, reset: 'breve-uno' }];
+  const dopoBreve = risorseDopoRiposo(risorse, 'breve');
+  assert.equal(dopoBreve[0].attuali, 1);
+  assert.equal(risorseDopoRiposo(dopoBreve, 'breve')[0].attuali, 2);
+  assert.equal(risorseDopoRiposo([{ ...risorse[0], attuali: 3 }], 'breve')[0].attuali, 3, 'mai oltre il massimo');
+  assert.equal(risorseDopoRiposo(risorse, 'lungo')[0].attuali, 3);
+  // Nella 5.0 il reset resta "breve": il breve restituisce tutto.
+  assert.equal(risorseDopoRiposo([{ ...risorse[0], reset: 'breve' }], 'breve')[0].attuali, 3);
+});

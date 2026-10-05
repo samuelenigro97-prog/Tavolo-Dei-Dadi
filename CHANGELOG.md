@@ -2,6 +2,17 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.57.0] – 2026-10-05
+
+### Corretto
+- **Forma Selvatica (regole 2024)**: un riposo breve ora restituisce **un solo
+  uso** speso, il riposo lungo tutti (prima il riposo breve li restituiva
+  tutti, come nella 5.0). Nella 5.0 resta com'era: 2 usi, entrambi i riposi li
+  restituiscono tutti. Nuovo tipo di ricarica `breve-uno` in
+  `risorseDopoRiposo` (`regole.js`), mostrato come "1 a riposo breve, tutti a
+  lungo"; le schede 2024 già esistenti si aggiornano da sole. Descrizioni in
+  italiano e inglese allineate.
+
 ## [4.56.1] – 2026-10-05
 
 ### Cambiato

@@ -897,7 +897,7 @@ export const SPIEG_PRIVILEGI = {
   'Punti Stregoneria': 'La riserva di magia innata dello Stregone: usata per la Metamagia e la conversione in slot incantesimo. Si ricarica con un riposo lungo.',
   'Stregoneria Innata': 'Come azione bonus aumenti di 1 la CD degli incantesimi e ottieni vantaggio ai tiri per colpire per 1 minuto. Si ricarica con un riposo lungo.',
   'Recupero Arcano': 'Durante un riposo breve recuperi slot incantesimo spesi fino a metà del tuo livello da Mago. Si ricarica con un riposo lungo.',
-  'Forma Selvatica': 'Come azione assumi la forma di una bestia conosciuta, assumendone PF e statistiche fisiche. Si ricarica con un riposo breve o lungo.',
+  'Forma Selvatica': 'Come azione assumi la forma di una bestia conosciuta, assumendone PF e statistiche fisiche. Regole 2024: un riposo breve restituisce un uso, un riposo lungo tutti. Regole 2014: entrambi i riposi li restituiscono tutti.',
   'Incanalare Divinità': 'Incanali energia sacra per Scacciare Non Morti o attivare il potere del tuo dominio o giuramento. Si ricarica con un riposo breve o lungo.',
   'Imposizione delle Mani': 'Riserva curativa pari a 5 × livello da Paladino per sanare ferite o neutralizzare veleni e malattie. Si ricarica con un riposo lungo.',
   'Slot del Patto': 'Gli slot del Warlock sono tutti del massimo livello disponibile e si ricaricano completamente con un riposo breve o lungo.',

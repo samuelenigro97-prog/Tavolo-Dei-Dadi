@@ -221,7 +221,7 @@ export function dettagliProgressioneLivello(classe, vecchioLivello, nuovoLivello
     }
     case 'druido': {
       if (nuovoLivello === 2) {
-        out.push({ icon: '🐾', nome: 'Forma Selvatica', desc: '2 utilizzi per riposo breve' });
+        out.push({ icon: '🐾', nome: 'Forma Selvatica', desc: '2 utilizzi. Riposo lungo: tutti; riposo breve: 1 uso (regole 2024) o tutti (2014)' });
       } else if (nuovoLivello === 4) {
         out.push({ icon: '🐟', nome: 'Forma Selvatica (Nuoto)', desc: 'Puoi trasformarti in bestie con velocità di nuoto' });
       } else if (nuovoLivello === 8) {
@@ -1242,11 +1242,17 @@ export function controlliScheda(scheda) {
 export function risorseDopoRiposo(risorse, tipo) {
   return (Array.isArray(risorse) ? risorse : []).map((r) => {
     if (!r || !r.reset) return r;
+    // 'breve-uno' (5.5, es. Forma Selvatica): un riposo breve restituisce UN solo
+    // uso speso, il riposo lungo li restituisce tutti.
+    if (tipo === 'breve' && r.reset === 'breve-uno') {
+      const maxUno = Math.max(0, Number(r.max) || 0);
+      return { ...r, attuali: Math.min(maxUno, Math.max(0, Number(r.attuali) || 0) + 1) };
+    }
     if (tipo === 'breve' && r.reset !== 'breve') return r;
     // Un riposo lungo recupera anche tutto ciò che si recupera con uno breve,
     // ma NON tocca risorse con reset non standard (es. 'manuale', usato dai
     // contatori dei Poteri personalizzati): quelle si aggiornano solo a mano.
-    if (tipo === 'lungo' && r.reset !== 'breve' && r.reset !== 'lungo') return r;
+    if (tipo === 'lungo' && r.reset !== 'breve' && r.reset !== 'breve-uno' && r.reset !== 'lungo') return r;
     const max = Math.max(0, Number(r.max) || 0);
     return { ...r, attuali: max };
   });
