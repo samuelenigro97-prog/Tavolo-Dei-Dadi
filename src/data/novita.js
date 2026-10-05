@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.56.0',
+    voci: {
+      it: ['Riquadri CA, Competenza, Iniziativa, Velocità, Sfinimento e gli altri: titoli sempre dentro il riquadro, valori allineati alla stessa altezza e bordo luminoso come le sezioni.'],
+      en: ['AC, Proficiency, Initiative, Speed, Exhaustion and the other boxes: titles always inside the box, values on the same line and a glowing border like the sections.'],
+    },
+  },
+  {
     versione: '4.55.0',
     voci: {
       it: ['I riquadri delle caratteristiche (Forza, Destrezza...) hanno ora lo stesso bordo luminoso e più marcato delle altre sezioni.'],

@@ -1956,7 +1956,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.55.0';
+const APP_VERSION = '4.56.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -13666,7 +13666,7 @@ export default function App() {
                 {/* Tier 2: Difesa e mobilità (CA, Riposo, Comp, Iniziativa, Velocità, Sfinimento) */}
                 <div className="pm-tier-2">
                   <div className="vitali pm-gruppo">
-            <div style={{ ...styles.vitalBox, gridColumn: 'span 2' }}>
+            <div className="vital-box" style={{ ...styles.vitalBox, gridColumn: 'span 2' }}>
               <div style={styles.vitalLabel}>{t("vital.ca")}</div>
               <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={styles.vitalValue}>
@@ -13753,14 +13753,14 @@ export default function App() {
                 )}
               </div>
             </div>
-            <div style={{ ...styles.vitalBox, gridColumn: 'span 2' }}>
+            <div className="vital-box" style={{ ...styles.vitalBox, gridColumn: 'span 2' }}>
               <div style={styles.vitalLabel}>{t("vital.riposo")}</div>
               <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
                 <button style={{ ...styles.buttonMini, fontSize: 14, fontWeight: 700, padding: '8px 18px', width: '100%', maxWidth: 220 }} onClick={() => riposoBreve()} title={t('vital.riposo_breve_tip')}>{t("vital.breve")}</button>
                 <button style={{ ...styles.buttonMini, fontSize: 14, fontWeight: 700, padding: '8px 18px', width: '100%', maxWidth: 220, borderColor: C.goldDark, color: C.goldDark }} onClick={() => riposoLungo()} title={t('vital.riposo_lungo_tip')}>{t("vital.lungo")}</button>
               </div>
             </div>
-            <div style={{ ...styles.vitalBox }}>
+            <div className="vital-box" style={{ ...styles.vitalBox }}>
               <div style={styles.vitalLabel}>{t("vital.competenza")}</div>
               <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={styles.vitalValue}>
@@ -13782,7 +13782,7 @@ export default function App() {
                 })()}
               </div>
             </div>
-            <div style={{ ...styles.vitalBox }}>
+            <div className="vital-box" style={{ ...styles.vitalBox }}>
               <div style={styles.vitalLabel}>{t("vital.iniziativa")}</div>
               <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={styles.vitalValue}>
@@ -13794,7 +13794,7 @@ export default function App() {
               </div>
             </div>
             <div
-              style={{ ...styles.vitalBox }}
+              className="vital-box" style={{ ...styles.vitalBox }}
               title={lingua === 'en'
                 ? `Long Jump (running): ${punteggioCaratteristica(scheda, 'forza') || 10} ft (${((punteggioCaratteristica(scheda, 'forza') || 10) * 0.3).toFixed(1)} m) • High Jump: ${3 + modificatore(punteggioCaratteristica(scheda, 'forza') || 10)} ft (${((3 + modificatore(punteggioCaratteristica(scheda, 'forza') || 10)) * 0.3).toFixed(1)} m) • Hold Breath: ${Math.max(1, 1 + modificatore(punteggioCaratteristica(scheda, 'costituzione') || 10))} minutes`
                 : `Salto in Lungo (con rincorsa): ${punteggioCaratteristica(scheda, 'forza') || 10} piedi (${((punteggioCaratteristica(scheda, 'forza') || 10) * 0.3).toFixed(1)} m) • Salto in Alto: ${3 + modificatore(punteggioCaratteristica(scheda, 'forza') || 10)} piedi (${((3 + modificatore(punteggioCaratteristica(scheda, 'forza') || 10)) * 0.3).toFixed(1)} m) • Trattenere il Respiro: ${Math.max(1, 1 + modificatore(punteggioCaratteristica(scheda, 'costituzione') || 10))} minuti`}
@@ -13857,7 +13857,11 @@ export default function App() {
                     color: C.goldDark,
                     textAlign: 'center',
                     fontWeight: 600,
-                    marginTop: 7,
+                    position: 'absolute',
+                    bottom: 10,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    whiteSpace: 'nowrap',
                     cursor: 'pointer',
                     padding: '2px 6px',
                     borderRadius: 4,
@@ -13876,7 +13880,7 @@ export default function App() {
                 </div>
               </div>
             </div>
-            <div style={{ ...styles.vitalBox }}>
+            <div className="vital-box" style={{ ...styles.vitalBox }}>
               <div style={styles.vitalLabel}>{t("vital.sfinimento")}</div>
               <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={styles.vitalValue}>
@@ -13898,7 +13902,7 @@ export default function App() {
           <div className="pm-tier-3">
             <div className="vitali-sezioni-4 pm-gruppo">
               {/* 1. Box Visione */}
-              <div style={{ ...styles.vitalBox }}>
+              <div className="vital-box" style={{ ...styles.vitalBox }}>
                 <div style={styles.vitalLabel}>{t("vital.visione")}</div>
                 <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                   {isTrasformato && formaAttiva.dati.sensi ? (
@@ -13917,7 +13921,7 @@ export default function App() {
               </div>
 
               {/* 2. Box Percezione Passiva */}
-              <div style={{ ...styles.vitalBox }} title={t('vital.passive_tooltip')}>
+              <div className="vital-box" style={{ ...styles.vitalBox }} title={t('vital.passive_tooltip')}>
                 <div style={styles.vitalLabel}>{t("vital.percezione_passiva")}</div>
                 <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                   <div style={styles.vitalValue}>
@@ -13927,7 +13931,7 @@ export default function App() {
               </div>
 
               {/* 3. Box Resistenze */}
-              <div style={{ ...styles.vitalBox }}>
+              <div className="vital-box" style={{ ...styles.vitalBox }}>
                 <div style={styles.vitalLabel}>{t("vital.resistenze")}</div>
                 <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                   <CampoConTendina
@@ -13940,7 +13944,7 @@ export default function App() {
               </div>
 
               {/* 4. Box Condizioni */}
-              <div style={{ ...styles.vitalBox }}>
+              <div className="vital-box" style={{ ...styles.vitalBox }}>
                 <div style={styles.vitalLabel}>{t("vital.condizioni")}</div>
                 <div style={{ flex: 1, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, flexWrap: 'wrap', minHeight: 22, width: '100%' }} title={t('tip.aggiungi_condizione')}>

@@ -1196,6 +1196,35 @@ tbody tr:hover {
               0 0 6px 1px var(--c-aura-glow-min, rgba(201, 162, 39, 0.08)),
               0 1px 4px rgba(0, 0, 0, 0.35) !important;
 }
+/* Riquadri statistica (CA, Competenza, Iniziativa, Velocità, Sfinimento, Visione...):
+   - etichetta sempre alta due righe e centrata, così i valori stanno alla stessa
+     altezza in tutta la riga e i titoli lunghi ("Bonus di competenza") non
+     escono dal riquadro;
+   - stessa cornice luminosa delle sezioni e dei blocchi caratteristica. */
+.vital-box > div:first-child {
+  min-height: 2.4em;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  overflow-wrap: anywhere;
+  font-size: 11px !important;
+  letter-spacing: 0.2px !important;
+  padding: 0;
+  box-sizing: border-box;
+  /* un filo più largo del contenuto del riquadro: il padding laterale non toglie spazio alle parole lunghe */
+  width: calc(100% + 8px) !important;
+  margin: 0 -4px 6px !important;
+}
+@media (max-width: 1100px) {
+  .vital-box > div:first-child { font-size: 10px !important; letter-spacing: 0 !important; }
+}
+.vital-box {
+  border-color: var(--c-border-glow-min, var(--c-border)) !important;
+  box-shadow: 0 3px 12px -2px var(--c-aura-glow-1, rgba(60,50,30,0.04)),
+              0 1px 3px rgba(0, 0, 0, 0.25) !important;
+  outline: 1px solid var(--c-border);
+  outline-offset: -4px;
+}
 /* Filetto oro doppio sotto la barra superiore, come le cornici titolo dei
    vecchi manuali — fisso, sempre presente. */
 .barra-superiore-fissa {

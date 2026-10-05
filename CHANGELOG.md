@@ -2,6 +2,21 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.56.0] – 2026-10-05
+
+### Cambiato
+- **Riquadri statistica** (Classe Armatura, Riposo, Bonus di competenza,
+  Iniziativa, Velocità, Sfinimento, Visione, Percezione passiva, Resistenze,
+  Condizioni):
+  - il titolo "Bonus di competenza" usciva dal riquadro: ora le etichette
+    stanno sempre dentro (11px, 10px sotto i 1100px, mai parole spezzate);
+  - etichetta sempre alta due righe, quindi i valori (+4, +2, 13.5 m, 0) stanno
+    alla stessa altezza in tutta la riga;
+  - il pulsante "Movimenti" è ancorato in basso e non sposta più in alto il
+    valore della Velocità;
+  - stessa cornice luminosa delle sezioni e dei blocchi caratteristica.
+  Classe `.vital-box` in `stili.js`; nessun cambio di comportamento.
+
 ## [4.55.0] – 2026-10-05
 
 ### Cambiato
