@@ -1294,7 +1294,7 @@ import { spiegaPrivilegio, spiegaIncantesimo, spiegaTratto, spiegaTalento, spieg
 import { INCANTESIMI_DB, ALIAS_INCANTESIMI, datiIncantesimo, valoreIncantesimoPerEdizione } from './data/incantesimi.js';
 
 const INCANTESIMI_NOMI = Array.from(new Set([...NOMI_SPIEG_INC, ...Object.keys(INCANTESIMI_DB)])).sort((a, b) => a.localeCompare(b, 'it'));
-import { NOMI_CLASSI, BACKGROUND_5E, TAGLIE_5E, ALLINEAMENTI_5E, SESSO_5E, SOTTOCLASSI_5E, INCANTESIMI_CLASSE, DANNI_5E, SENSI_5E, CONDIZIONI_5E, NOMI_OGGETTI, LINGUE_5E, ARMI_5E, STRUMENTI_5E, REAZIONI_5E, AZIONI_BONUS_5E, GRUPPI_ARMI_5E, GRUPPI_STRUMENTI_5E, GRUPPI_LINGUE_5E, DEFAULT_MANUALI, MANUALI_INFO, SOTTOCLASSI_FONTI, talentiPerManuali, PE_PER_LIVELLO, BACKGROUND_COMPETENZE, BACKGROUND_TALENTO_ORIGINE_2024, SPECIE_5E, tabellaPrivilegiSottoclasse, CARATT_INCANTATORE, PRIORITA_CARATT, DADO_VITA_CLASSE, BACKGROUND_CARATT, TS_CLASSE, ADDESTRAMENTO_CLASSE, COMPETENZE_CLASSE, PRIVILEGI_CLASSE_L1, PRIVILEGI_CLASSE_L1_2014, ASI_LIV, SOTTOCLASSE_LIV, COMPETENZE_SPECIE, NOMI_SPECIE, NOMI_SPECIE_GENERE, COGNOMI_SPECIE, NOMI_GENERICI, SPECIE_DATI, SPECIE_DATI_2014, BONUS_CARATT_SPECIE_2014, SFINIMENTO_2014, BASE_ARMATURA_DEFAULT, ESEMPI_ARMATURA } from "./data/dati5e.js";
+import { NOMI_CLASSI, BACKGROUND_5E, TAGLIE_5E, ALLINEAMENTI_5E, SESSO_5E, SOTTOCLASSI_5E, INCANTESIMI_CLASSE, DANNI_5E, SENSI_5E, CONDIZIONI_5E, NOMI_OGGETTI, LINGUE_5E, ARMI_5E, STRUMENTI_5E, REAZIONI_5E, AZIONI_BONUS_5E, GRUPPI_ARMI_5E, GRUPPI_STRUMENTI_5E, GRUPPI_LINGUE_5E, DEFAULT_MANUALI, MANUALI_INFO, manualeAttivo, SOTTOCLASSI_FONTI, talentiPerManuali, PE_PER_LIVELLO, BACKGROUND_COMPETENZE, BACKGROUND_TALENTO_ORIGINE_2024, SPECIE_5E, tabellaPrivilegiSottoclasse, CARATT_INCANTATORE, PRIORITA_CARATT, DADO_VITA_CLASSE, BACKGROUND_CARATT, TS_CLASSE, ADDESTRAMENTO_CLASSE, COMPETENZE_CLASSE, PRIVILEGI_CLASSE_L1, PRIVILEGI_CLASSE_L1_2014, ASI_LIV, SOTTOCLASSE_LIV, COMPETENZE_SPECIE, NOMI_SPECIE, NOMI_SPECIE_GENERE, COGNOMI_SPECIE, NOMI_GENERICI, SPECIE_DATI, SPECIE_DATI_2014, BONUS_CARATT_SPECIE_2014, SFINIMENTO_2014, BASE_ARMATURA_DEFAULT, ESEMPI_ARMATURA } from "./data/dati5e.js";
 import { modificatore, conSegno, tiraDado, parseEspressioneDado, facceDadoVita, esprDadiVita, gruppiDadoVita, bonusCompetenzaDaLivello, tiraDanni, tiraD20, capacitaCarico, modalitaEffettiva } from "./rules/dadi.js";
 import { trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, dettagliAbilita, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from "./rules/regole.js";
 import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda } from './rules/poteri.js';
@@ -1957,7 +1957,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.58.0';
+const APP_VERSION = '4.59.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -11276,28 +11276,28 @@ export default function App() {
                 <button
                   type="button"
                   style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px', fontWeight: 600 }}
-                  onClick={() => setManualiAttivi({ phb2024: true, phb2014: true, tasha: true, xanathar: true, fizban_mm: true })}
+                  onClick={() => setManualiAttivi((prev) => ({ phb2024: true, phb2014: true, tasha: true, xanathar: true, fizban_mm: true, araldi: prev.araldi === true }))}
                 >
                   {lingua === 'it' ? 'Tutto Attivo (Consigliato)' : 'All Active (Recommended)'}
                 </button>
                 <button
                   type="button"
                   style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px', fontWeight: 600 }}
-                  onClick={() => setManualiAttivi({ phb2024: true, phb2014: false, tasha: false, xanathar: false, fizban_mm: false })}
+                  onClick={() => setManualiAttivi((prev) => ({ phb2024: true, phb2014: false, tasha: false, xanathar: false, fizban_mm: false, araldi: prev.araldi === true }))}
                 >
                   {lingua === 'it' ? 'Solo D&D 2024 (5.5)' : 'Only D&D 2024 (5.5)'}
                 </button>
                 <button
                   type="button"
                   style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px', fontWeight: 600 }}
-                  onClick={() => setManualiAttivi({ phb2024: false, phb2014: true, tasha: false, xanathar: false, fizban_mm: false })}
+                  onClick={() => setManualiAttivi((prev) => ({ phb2024: false, phb2014: true, tasha: false, xanathar: false, fizban_mm: false, araldi: prev.araldi === true }))}
                 >
                   {lingua === 'it' ? 'Solo D&D 2014 (5.0)' : 'Only D&D 2014 (5.0)'}
                 </button>
                 <button
                   type="button"
                   style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px', fontWeight: 600 }}
-                  onClick={() => setManualiAttivi({ phb2024: false, phb2014: true, tasha: true, xanathar: true, fizban_mm: true })}
+                  onClick={() => setManualiAttivi((prev) => ({ phb2024: false, phb2014: true, tasha: true, xanathar: true, fizban_mm: true, araldi: prev.araldi === true }))}
                 >
                   {lingua === 'it' ? '2014 + Tasha & Xanathar' : '2014 + Tasha & Xanathar'}
                 </button>
@@ -11307,7 +11307,7 @@ export default function App() {
             {/* Lista Manuali */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {Object.entries(MANUALI_INFO).map(([k, m]) => {
-                const attivo = manualiAttivi[k] !== false;
+                const attivo = manualeAttivo(manualiAttivi, k);
                 return (
                   <div
                     key={k}
@@ -17366,7 +17366,7 @@ export default function App() {
                   </div>
 
                   {/* Riga 3: Poteri personalizzati (regole homebrew del tavolo) */}
-                  <SezionePoteri scheda={scheda} aggiorna={aggiorna} lingua={lingua} />
+                  <SezionePoteri scheda={scheda} aggiorna={aggiorna} lingua={lingua} manualiAttivi={manualiAttivi} />
                 </div>
               </Sezione>
 

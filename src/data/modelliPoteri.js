@@ -6,6 +6,7 @@
 export const MODELLI_POTERI = [
   {
     id: 'araldi-del-segreto',
+    manuale: 'araldi', // visibile solo con il manuale di campagna attivato (Manuali e fonti)
     nome: 'Araldi del Segreto',
     nomeEn: 'Heralds of the Secret',
     descrizione: 'Segreti, Debito e i privilegi del 1°, 6°, 10° e 14° livello: si sbloccano da soli al livello giusto, come i privilegi di classe.',

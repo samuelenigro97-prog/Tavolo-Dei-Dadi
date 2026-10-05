@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.59.0',
+    voci: {
+      it: [
+        'Nuovo manuale "Araldi del Segreto" (campagna del tavolo) in Manuali e fonti: spento di base, si attiva a mano per usare il modello nei Poteri.',
+        'La sezione Poteri si può rimpicciolire con un clic sul titolo.',
+      ],
+      en: [
+        'New "Heralds of the Secret" sourcebook (table campaign) in Sourcebooks: off by default, turn it on to use the Powers template.',
+        'The Powers section can be collapsed with a click on its title.',
+      ],
+    },
+  },
+  {
     versione: '4.58.0',
     voci: {
       it: [

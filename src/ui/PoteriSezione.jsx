@@ -23,6 +23,7 @@ import {
   potereSbloccato,
 } from '../rules/poteri.js';
 import { MODELLI_POTERI } from '../data/modelliPoteri.js';
+import { manualeAttivo } from '../data/dati5e.js';
 
 function unitaBersaglio(chiave) {
   return BERSAGLI_MODIFICATORE_POTERE.find((b) => b.chiave === chiave)?.unita || '';
@@ -326,9 +327,21 @@ function PotereModal({ potere, indice, totale, onChiudi, onAggiorna, onElimina, 
  * Sezione "Poteri": elenco di schede + pulsante per aggiungerne una nuova.
  * `scheda`/`aggiorna` sono le stesse props usate in tutto il resto della UI.
  */
-export function SezionePoteri({ scheda, aggiorna, lingua = 'it' }) {
+export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi = {} }) {
   const [potereApertoId, setPotereApertoId] = useState(null);
   const [mostraModelli, setMostraModelli] = useState(false);
+  // Sezione comprimibile: la scelta resta su questo dispositivo.
+  const [chiusa, setChiusa] = useState(() => {
+    try { return localStorage.getItem('scheda-interattiva:poteri-chiusi') === '1'; } catch { return false; }
+  });
+  function alternaChiusa() {
+    setChiusa((v) => {
+      try { localStorage.setItem('scheda-interattiva:poteri-chiusi', v ? '0' : '1'); } catch { /* niente */ }
+      return !v;
+    });
+  }
+  // I modelli dei manuali di campagna compaiono solo se il manuale è attivato a mano.
+  const modelliDisponibili = MODELLI_POTERI.filter((m) => !m.manuale || manualeAttivo(manualiAttivi, m.manuale));
   const poteri = normalizzaPoteri(scheda?.poteri);
   const potereAperto = poteri.find((p) => p.id === potereApertoId) || null;
 
@@ -400,24 +413,41 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it' }) {
 
   return (
     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px' }}>
-      <div className="poteri-intestazione" style={{ display: 'grid', gridTemplateColumns: 'minmax(28px, 1fr) auto minmax(28px, 1fr)', alignItems: 'center', columnGap: 6, marginBottom: 8 }}>
+      <div className="poteri-intestazione" style={{ display: 'grid', gridTemplateColumns: 'minmax(28px, 1fr) auto minmax(28px, 1fr)', alignItems: 'center', columnGap: 6, marginBottom: chiusa ? 0 : 8 }}>
         <div />
-        <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, letterSpacing: 0.5, textAlign: 'center' }} title={lingua === 'en' ? 'For rules invented at the table (not in the official books): pacts, blessings, curses, magic items with custom effects...' : 'Per le regole inventate al tavolo (non nei manuali ufficiali): patti, benedizioni, maledizioni, oggetti magici con effetti custom...'}>
+        <div
+          role="button"
+          data-testid="poteri-titolo"
+          tabIndex={0}
+          aria-expanded={!chiusa}
+          onClick={alternaChiusa}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternaChiusa(); } }}
+          style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, letterSpacing: 0.5, textAlign: 'center', cursor: 'pointer', userSelect: 'none' }}
+          title={chiusa
+            ? (lingua === 'en' ? 'Click to expand the Powers' : 'Clicca per espandere i Poteri')
+            : (lingua === 'en' ? 'Click to collapse the Powers. For rules invented at the table (not in the official books): pacts, blessings, curses, magic items with custom effects...' : 'Clicca per rimpicciolire i Poteri. Per le regole inventate al tavolo (non nei manuali ufficiali): patti, benedizioni, maledizioni, oggetti magici con effetti custom...')}
+        >
+          <span aria-hidden style={{ fontSize: 10, marginRight: 4 }}>{chiusa ? '▸' : '▾'}</span>
           {lingua === 'en' ? 'Powers' : 'Poteri'} <span style={{ textTransform: 'none', fontWeight: 500, letterSpacing: 'normal', color: C.inkDim, fontSize: 11 }}>({lingua === 'en' ? 'homebrew rules' : 'regole homebrew'})</span>
+          {chiusa && poteri.length > 0 && <span style={{ fontWeight: 500, color: C.inkDim, fontSize: 11 }}> · {poteri.length}</span>}
         </div>
-        <div style={{ display: 'flex', gap: 6, justifySelf: 'end' }}>
-          <button type="button" style={{ ...styles.buttonMini, borderStyle: 'dashed' }} onClick={() => setMostraModelli((v) => !v)} aria-expanded={mostraModelli}>
-            {lingua === 'en' ? 'From template' : 'Da modello'}
-          </button>
-          <button type="button" style={{ ...styles.buttonMini, borderStyle: 'dashed' }} onClick={aggiungiPotere}>
-            {lingua === 'en' ? 'Add power' : 'Aggiungi potere'}
-          </button>
-        </div>
+        {chiusa ? <div /> : (
+          <div style={{ display: 'flex', gap: 6, justifySelf: 'end' }}>
+            {modelliDisponibili.length > 0 && (
+              <button type="button" style={{ ...styles.buttonMini, borderStyle: 'dashed' }} onClick={() => setMostraModelli((v) => !v)} aria-expanded={mostraModelli}>
+                {lingua === 'en' ? 'From template' : 'Da modello'}
+              </button>
+            )}
+            <button type="button" style={{ ...styles.buttonMini, borderStyle: 'dashed' }} onClick={aggiungiPotere}>
+              {lingua === 'en' ? 'Add power' : 'Aggiungi potere'}
+            </button>
+          </div>
+        )}
       </div>
 
-      {mostraModelli && (
+      {!chiusa && mostraModelli && (
         <div data-testid="modelli-poteri" style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
-          {MODELLI_POTERI.map((m) => {
+          {modelliDisponibili.map((m) => {
             const presenti = new Set(poteri.map((p) => p.nome));
             const mancanti = m.poteri.filter((p) => !presenti.has(p.nome)).length;
             const daAllineare = daAllineareAlModello(m).length;
@@ -440,7 +470,7 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it' }) {
         </div>
       )}
 
-      {poteri.length === 0 ? (
+      {chiusa ? null : poteri.length === 0 ? (
         <div style={{ ...styles.detail, fontSize: 12, textAlign: 'center', padding: '10px 0' }}>
           {lingua === 'en' ? 'No custom powers yet.' : 'Nessun potere personalizzato per ora.'}
         </div>

@@ -2,6 +2,21 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.59.0] – 2026-10-05
+
+### Aggiunto
+- **Manuale di campagna "Araldi del Segreto"** (🗝️, codice "Campagna") nel
+  pannello Manuali e fonti: contenuto del solo tavolo, **spento di base** per
+  tutti i personaggi. Si attiva a mano; finché è spento il modello degli
+  Araldi non compare nei Poteri. Lo stato dei manuali viaggia con la
+  sincronizzazione delle preferenze. Nuovo `manualeAttivo()` in `dati5e.js`
+  per i manuali spenti di base; i preset rapidi non lo accendono né lo
+  spengono. I poteri già aggiunti restano sul personaggio anche se il manuale
+  viene spento.
+- **Poteri comprimibili**: un clic sul titolo "Poteri" chiude la sezione
+  (resta il numero dei poteri e il pulsante si riapre con un clic); la scelta
+  si ricorda su questo dispositivo.
+
 ## [4.58.0] – 2026-10-05
 
 ### Aggiunto

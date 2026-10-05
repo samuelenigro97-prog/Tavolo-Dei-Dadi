@@ -2383,7 +2383,14 @@ export const DEFAULT_MANUALI = {
   tasha: true,
   xanathar: true,
   fizban_mm: true,
+  // Manuale della campagna del tavolo: spento di base, si attiva solo a mano.
+  araldi: false,
 };
+
+/** Un manuale è attivo se acceso; quelli spenti di base (es. Araldi del Segreto) lo sono solo se esplicitamente true. */
+export function manualeAttivo(manuali, chiave) {
+  return DEFAULT_MANUALI[chiave] === false ? manuali?.[chiave] === true : manuali?.[chiave] !== false;
+}
 
 export const MANUALI_INFO = {
   phb2024: {
@@ -2435,6 +2442,16 @@ export const MANUALI_INFO = {
     colore: '#ef4444',
     descrizione: 'Evocazione Spirito Draconico, catalogo mostri completo per il tracker del combattimento e creature avanzate.',
     descrizioneEn: 'Summon Draconic Spirit, full classic monster catalog for the combat tracker, and expanded creatures.',
+  },
+  araldi: {
+    id: 'araldi',
+    nome: 'Araldi del Segreto (manuale di campagna)',
+    nomeEn: 'Heralds of the Secret (campaign handbook)',
+    codice: 'Campagna',
+    icona: '🗝️',
+    colore: '#6366f1',
+    descrizione: 'Contenuto della campagna del tavolo, spento di base: sblocca nei Poteri il modello Araldi del Segreto (Segreti, Debito e privilegi per livello).',
+    descrizioneEn: 'Table campaign content, off by default: unlocks the Heralds of the Secret template in Powers (Secrets, Debt and level features).',
   },
 };
 
