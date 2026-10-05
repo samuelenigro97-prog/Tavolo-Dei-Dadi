@@ -3,7 +3,7 @@
 // con chip per contatori e modificatori; clic sulla scheda apre i dettagli
 // (modifica, eliminazione, riordino). Vedi src/rules/poteri.js per il modello
 // dati e la sincronizzazione con `scheda.risorse`.
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { t } from '../i18n.js';
 import { C } from './tema.js';
 import { styles } from './stili.js';
@@ -377,7 +377,7 @@ function PotereModal({ potere, scheda, indice, totale, onChiudi, onAggiorna, onE
  * Sezione "Poteri": elenco di schede + pulsante per aggiungerne una nuova.
  * `scheda`/`aggiorna` sono le stesse props usate in tutto il resto della UI.
  */
-export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi = {}, registra }) {
+export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi = {}, registra, mostraInfo }) {
   const [potereApertoId, setPotereApertoId] = useState(null);
   const [mostraModelli, setMostraModelli] = useState(false);
   // Sezione comprimibile: la scelta resta su questo dispositivo.
@@ -390,12 +390,13 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
       return !v;
     });
   }
+  const poteri = normalizzaPoteri(scheda?.poteri);
   // I modelli dei manuali di campagna compaiono solo se il manuale è attivato a mano.
   const modelliDisponibili = MODELLI_POTERI.filter((m) => !m.manuale || manualeAttivo(manualiAttivi, m.manuale));
   // Con il manuale degli Araldi attivo e i suoi poteri sulla scheda, un pannello dedicato
   // sostituisce nell'elenco le singole schede dei poteri del modello (restano in effetto).
-  const pannelloAraldi = manualeAttivo(manualiAttivi, 'araldi') && Boolean(trovaContatore(scheda, 'Segreti')) && Boolean(trovaContatore(scheda, 'Debito'));
-  const poteri = normalizzaPoteri(scheda?.poteri);
+  const haPoteriAraldi = poteri.some((p) => p.modello === 'araldi-del-segreto');
+  const pannelloAraldi = (manualeAttivo(manualiAttivi, 'araldi') || haPoteriAraldi) && Boolean(trovaContatore(scheda, 'Segreti')) && Boolean(trovaContatore(scheda, 'Debito'));
   const potereAperto = poteri.find((p) => p.id === potereApertoId) || null;
   const poteriInLista = pannelloAraldi ? poteri.filter((p) => p.modello !== 'araldi-del-segreto') : poteri;
 
@@ -430,9 +431,31 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
     return modello.poteri.filter((mp) => poteri.some((p) => p.nome === mp.nome && p.modello !== modello.id));
   }
 
-  /** Aggiunge i poteri di un modello (saltando quelli già presenti, stesso nome) e porta
-   *  all'ultima versione del modello quelli aggiunti prima: livello di sblocco, condizioni
-   *  automatiche, ricariche con i riposi e massimi calcolati dalla competenza. */
+  /** Porta all'ultima versione del modello i poteri già presenti (stesso nome): livello di
+   *  sblocco, condizioni automatiche, ricariche con i riposi e massimi dalla competenza. */
+  function alignaEsistenti(modello) {
+    const daAllineare = new Map(daAllineareAlModello(modello).map((mp) => [mp.nome, mp]));
+    return {
+      cambiati: daAllineare.size,
+      lista: poteri.map((p) => {
+        const mp = daAllineare.get(p.nome);
+        if (!mp || p.modello === modello.id) return p;
+        return {
+          ...p,
+          modello: modello.id,
+          livelloMin: mp.livelloMin || 0,
+          condizione: mp.condizione || null,
+          ...(mp.condizione ? { attivo: true } : {}),
+          contatori: p.contatori.map((c) => {
+            const mc = (mp.contatori || []).find((x) => x.nome === c.nome);
+            return mc ? { ...c, ...(mc.ricarica ? { ricarica: mc.ricarica } : {}), ...(mc.maxAuto ? { maxAuto: mc.maxAuto } : {}) } : c;
+          }),
+        };
+      }),
+    };
+  }
+
+  /** Aggiunge i poteri di un modello (saltando quelli già presenti, stesso nome) e allinea gli altri. */
   function aggiungiModello(modello) {
     const presenti = new Set(poteri.map((p) => p.nome));
     // Un contatore con lo stesso nome già presente in un altro potere (es. il Debito del
@@ -443,26 +466,21 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
       modello: modello.id,
       contatori: (p.contatori || []).filter((c) => !nomiContatori.has(String(c.nome).trim().toLowerCase())),
     }));
-    const daAllineare = new Map(daAllineareAlModello(modello).map((mp) => [mp.nome, mp]));
-    const esistenti = poteri.map((p) => {
-      const mp = daAllineare.get(p.nome);
-      if (!mp || p.modello === modello.id) return p;
-      return {
-        ...p,
-        modello: modello.id,
-        livelloMin: mp.livelloMin || 0,
-        condizione: mp.condizione || null,
-        ...(mp.condizione ? { attivo: true } : {}),
-        contatori: p.contatori.map((c) => {
-          const mc = (mp.contatori || []).find((x) => x.nome === c.nome);
-          return mc ? { ...c, ...(mc.ricarica ? { ricarica: mc.ricarica } : {}), ...(mc.maxAuto ? { maxAuto: mc.maxAuto } : {}) } : c;
-        }),
-      };
-    });
-    if (!nuovi.length && !daAllineare.size) return;
-    salvaPoteri([...esistenti, ...nuovi]);
+    const { cambiati, lista } = alignaEsistenti(modello);
+    if (!nuovi.length && !cambiati) return;
+    salvaPoteri([...lista, ...nuovi]);
     setMostraModelli(false);
   }
+
+  // Poteri degli Araldi aggiunti con una versione precedente (prima dei livelli, delle
+  // condizioni e del pannello): si portano da soli alla versione attuale.
+  useEffect(() => {
+    for (const m of MODELLI_POTERI) {
+      const { cambiati, lista } = alignaEsistenti(m);
+      if (cambiati) { salvaPoteri(lista); break; }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(poteri.map((p) => [p.nome, p.modello]))]);
 
   function aggiornaPotere(id, patch) {
     salvaPoteri(poteri.map((p) => (p.id === id ? { ...p, ...patch } : p)));
@@ -563,7 +581,7 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
       )}
 
       {!chiusa && pannelloAraldi && (
-        <AraldiPannello scheda={scheda} aggiorna={aggiorna} lingua={lingua} registra={registra} onModifica={setPotereApertoId} />
+        <AraldiPannello scheda={scheda} aggiorna={aggiorna} lingua={lingua} registra={registra} onModifica={setPotereApertoId} onInfo={mostraInfo} />
       )}
 
       {chiusa ? null : poteriInLista.length === 0 && !pannelloAraldi ? (

@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.63.0',
+    voci: {
+      it: ['Araldi del Segreto ora ha lo stesso formato della Panoramica dei privilegi: righe per livello, usi con le perle e livelli futuri sbiaditi.', 'Segreti e Debito accettano qualsiasi numero senza dover impostare un totale.'],
+      en: ['Heralds of the Secret now uses the same layout as the Features overview: rows by level, uses as pearls and future levels greyed out.', 'Secrets and Debt accept any number without setting a total.'],
+    },
+  },
+  {
     versione: '4.62.0',
     voci: {
       it: ['Il chip Rituale ha un colore tutto suo (viola), diverso dalla Concentrazione.', 'Riquadri CA, Competenza, Iniziativa e gli altri: un solo bordo invece del doppio.'],

@@ -42,7 +42,7 @@ function Contatore({ titolo, valore, max, onMeno, onPiu, sotto, suggerimento }) 
   );
 }
 
-export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onModifica }) {
+export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onModifica, onInfo }) {
   const [aperti, setAperti] = useState({});
   const [cerchio, setCerchio] = useState(1);
   const [incanto, setIncanto] = useState(0);
@@ -56,6 +56,12 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
   const privilegi = poteri
     .filter((p) => !p.condizione && p.contatori.some((c) => !NOMI_BASE.includes(c.nome)))
     .sort((a, b) => a.livelloMin - b.livelloMin);
+
+  const gruppiPerLivello = [];
+  for (const p of privilegi) {
+    const g = gruppiPerLivello.find((x) => x.livelloMin === p.livelloMin);
+    if (g) g.lista.push(p); else gruppiPerLivello.push({ livelloMin: p.livelloMin, lista: [p] });
+  }
 
   // Cerchi sbloccati: quelli per cui il personaggio ha slot (se non ne ha, nessun limite).
   const slot = scheda.slotIncantesimo || {};
@@ -167,93 +173,98 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
       </div>
 
       {privilegi.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <div style={etichetta}>{en ? 'Features by level' : 'Privilegi per livello'}</div>
-          {privilegi.map((p) => {
-            const bloccato = !potereSbloccato(p, livello);
-            const indice = p.contatori.findIndex((c) => !NOMI_BASE.includes(c.nome));
-            const c = p.contatori[indice];
-            const t = bloccato ? null : trovaContatore(scheda, c.nome);
-            const usi = t ? t.attuali : 0;
-            const maxUsi = t ? t.max : null;
-            const debitoUso = DEBITO_PER_USO[c.nome] || 0;
-            const costoRecupero = RECUPERO_CON_SEGRETI[c.nome] || 0;
-            const nomeBreve = p.nome.replace(/\s*\(.*?\)\s*$/, '');
-            const usaUno = () => applica(
-              [{ nome: c.nome, delta: -1 }, ...(debitoUso ? [{ nome: 'Debito', delta: debitoUso }] : [])],
-              nomeBreve,
-              debitoUso ? (en ? `Used: +${debitoUso} Debt` : `Usato: +${debitoUso} Debito`) : (en ? 'Used' : 'Usato'),
-            );
+        <div style={scatola} data-testid="araldi-privilegi">
+          <div style={{ ...etichetta, textAlign: 'center', marginBottom: 4 }}>{en ? 'Features overview' : 'Panoramica dei privilegi'}</div>
+          {gruppiPerLivello.map(({ livelloMin, lista }) => {
+            const futuro = !potereSbloccato(lista[0], livello);
             return (
-              <div key={p.id} style={{ ...scatola, opacity: bloccato ? 0.6 : 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                  <strong style={{ fontSize: 13, cursor: 'help' }} title={p.descrizione}>{nomeBreve}</strong>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: bloccato ? C.inkDim : C.goldDark, border: `1px solid ${bloccato ? C.border : C.goldDark}`, borderRadius: 6, padding: '1px 6px' }}>
-                    {bloccato ? '🔒 ' : ''}{en ? `Level ${p.livelloMin}` : `${p.livelloMin}° liv.`}
-                  </span>
-                  {bloccato ? (
-                    <span style={{ fontSize: 11, color: C.inkDim }}>{en ? `Unlocks at level ${p.livelloMin}` : `Si sblocca al ${p.livelloMin}° livello`}</span>
-                  ) : (
-                    <>
-                      <span style={{ display: 'inline-flex', gap: 4 }} role="group" aria-label={`${usi}/${maxUsi}`}>
-                        {Array.from({ length: maxUsi || 0 }, (_, i) => {
-                          const disponibile = i < usi;
-                          return (
-                            <button
-                              key={i}
-                              type="button"
-                              data-testid={`perla-${c.nome}`}
-                              aria-pressed={!disponibile}
-                              onClick={() => (disponibile ? usaUno() : applica([{ nome: c.nome, delta: 1 }], nomeBreve, en ? 'Use restored' : 'Uso ripristinato'))}
-                              title={disponibile
-                                ? (debitoUso ? (en ? `Use it (+${debitoUso} Debt)` : `Usalo (+${debitoUso} Debito)`) : (en ? 'Use it' : 'Usalo'))
-                                : (en ? 'Spent: click to restore' : 'Speso: clicca per ripristinarlo')}
-                              style={{ width: 16, height: 16, padding: 0, borderRadius: '50%', cursor: 'pointer', border: `2px solid ${C.goldDark}`, background: disponibile ? C.goldDark : 'transparent', transition: 'all 0.15s ease' }}
-                            />
-                          );
-                        })}
-                      </span>
-                      <span style={{ fontSize: 12, color: C.inkDim }}>{usi}{maxUsi != null ? ` / ${maxUsi}` : ''}</span>
-                      <span style={{ fontSize: 11, color: C.inkDim }} title={en ? 'Restored by resting' : 'Si ripristina con il riposo'}>↻ {c.ricarica === 'breve' ? (en ? 'short rest' : 'riposo breve') : (en ? 'long rest' : 'riposo lungo')}</span>
-                      <span style={{ marginLeft: 'auto', display: 'inline-flex', gap: 5, flexWrap: 'wrap' }}>
-                        <button
-                          type="button"
-                          style={styles.buttonMini}
-                          disabled={usi <= 0}
-                          onClick={usaUno}
-                          title={debitoUso ? (en ? `Using it adds ${debitoUso} Debt` : `Usarlo fa guadagnare ${debitoUso} Debito`) : undefined}
-                        >
-                          {en ? 'Use' : 'Usa'}{debitoUso ? <span style={{ color: C.inkDim }}> (+{debitoUso} {en ? 'Debt' : 'Debito'})</span> : null}
-                        </button>
-                        {costoRecupero > 0 && (
-                          <button
-                            type="button"
-                            style={styles.buttonMini}
-                            disabled={usi >= (maxUsi ?? 0) || valSegreti < costoRecupero}
-                            onClick={() => applica([{ nome: c.nome, delta: 1 }, { nome: 'Segreti', delta: -costoRecupero }], nomeBreve, en ? `Use restored for ${costoRecupero} Secrets` : `Uso recuperato spendendo ${costoRecupero} Segreti`)}
-                            title={en ? `Regain a use by spending ${costoRecupero} Secrets` : `Recupera un uso spendendo ${costoRecupero} Segreti`}
-                          >
-                            {en ? 'Regain' : 'Recupera'} <span style={{ color: C.inkDim }}>(−{costoRecupero})</span>
-                          </button>
+              <div key={livelloMin} style={{ display: 'flex', gap: 10, padding: '8px 0', borderBottom: `1px solid ${C.border}`, opacity: futuro ? 0.5 : 1 }}>
+                <div style={{ flexShrink: 0, width: 62, fontWeight: 'bold', color: futuro ? C.inkDim : C.goldDark }}>
+                  {en ? 'Lvl' : 'Liv.'} {livelloMin}
+                </div>
+                <div style={{ flex: 1, minWidth: 0, fontSize: 13, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {lista.map((p) => {
+                    const indice = p.contatori.findIndex((c) => !NOMI_BASE.includes(c.nome));
+                    const c = p.contatori[indice];
+                    const t = futuro ? null : trovaContatore(scheda, c.nome);
+                    const usi = t ? t.attuali : 0;
+                    const maxUsi = t ? t.max : null;
+                    const debitoUso = DEBITO_PER_USO[c.nome] || 0;
+                    const costoRecupero = RECUPERO_CON_SEGRETI[c.nome] || 0;
+                    const nomeBreve = p.nome.replace(/\s*\(.*?\)\s*$/, '');
+                    const usaUno = () => applica(
+                      [{ nome: c.nome, delta: -1 }, ...(debitoUso ? [{ nome: 'Debito', delta: debitoUso }] : [])],
+                      nomeBreve,
+                      debitoUso ? (en ? `Used: +${debitoUso} Debt` : `Usato: +${debitoUso} Debito`) : (en ? 'Used' : 'Usato'),
+                    );
+                    return (
+                      <div key={p.id}>
+                        <div>
+                          •{' '}
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            title={p.descrizione}
+                            onClick={() => (onInfo ? onInfo({ titolo: nomeBreve, testo: p.descrizione }) : setAperti((x) => ({ ...x, [p.id]: !x[p.id] })))}
+                            style={{ cursor: 'help', textDecoration: 'underline dotted', textUnderlineOffset: 3, fontWeight: 600 }}
+                          >{nomeBreve}</span>
+                          {onModifica && (
+                            <button type="button" style={{ background: 'none', border: 0, padding: '0 0 0 8px', color: C.inkDim, cursor: 'pointer', fontSize: 11 }} onClick={() => onModifica(p.id)} title={en ? 'Edit' : 'Modifica'}>✎</button>
+                          )}
+                        </div>
+                        {futuro ? (
+                          <span style={{ ...styles.detail, fontStyle: 'italic' }}>— {en ? 'not reached yet' : 'non ancora raggiunto'}</span>
+                        ) : (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
+                            <span style={{ display: 'inline-flex', gap: 4 }} role="group" aria-label={`${usi}/${maxUsi}`}>
+                              {Array.from({ length: maxUsi || 0 }, (_, i) => {
+                                const disponibile = i < usi;
+                                return (
+                                  <button
+                                    key={i}
+                                    type="button"
+                                    data-testid={`perla-${c.nome}`}
+                                    aria-pressed={!disponibile}
+                                    onClick={() => (disponibile ? usaUno() : applica([{ nome: c.nome, delta: 1 }], nomeBreve, en ? 'Use restored' : 'Uso ripristinato'))}
+                                    title={disponibile
+                                      ? (debitoUso ? (en ? `Use it (+${debitoUso} Debt)` : `Usalo (+${debitoUso} Debito)`) : (en ? 'Use it' : 'Usalo'))
+                                      : (en ? 'Spent: click to restore' : 'Speso: clicca per ripristinarlo')}
+                                    style={{ width: 16, height: 16, padding: 0, borderRadius: '50%', cursor: 'pointer', border: `2px solid ${C.goldDark}`, background: disponibile ? C.goldDark : 'transparent', transition: 'all 0.15s ease' }}
+                                  />
+                                );
+                              })}
+                            </span>
+                            <span style={{ fontSize: 12, color: C.inkDim }}>{usi}{maxUsi != null ? ` / ${maxUsi}` : ''}</span>
+                            <span style={{ fontSize: 11, color: C.inkDim }} title={en ? 'Restored by resting' : 'Si ripristina con il riposo'}>↻ {c.ricarica === 'breve' ? (en ? 'short rest' : 'riposo breve') : (en ? 'long rest' : 'riposo lungo')}</span>
+                            <span style={{ marginLeft: 'auto', display: 'inline-flex', gap: 5, flexWrap: 'wrap' }}>
+                              <button type="button" style={styles.buttonMini} disabled={usi <= 0} onClick={usaUno} title={debitoUso ? (en ? `Using it adds ${debitoUso} Debt` : `Usarlo fa guadagnare ${debitoUso} Debito`) : undefined}>
+                                {en ? 'Use' : 'Usa'}{debitoUso ? <span style={{ color: C.inkDim }}> (+{debitoUso} {en ? 'Debt' : 'Debito'})</span> : null}
+                              </button>
+                              {costoRecupero > 0 && (
+                                <button
+                                  type="button"
+                                  style={styles.buttonMini}
+                                  disabled={usi >= (maxUsi ?? 0) || valSegreti < costoRecupero}
+                                  onClick={() => applica([{ nome: c.nome, delta: 1 }, { nome: 'Segreti', delta: -costoRecupero }], nomeBreve, en ? `Use restored for ${costoRecupero} Secrets` : `Uso recuperato spendendo ${costoRecupero} Segreti`)}
+                                  title={en ? `Regain a use by spending ${costoRecupero} Secrets` : `Recupera un uso spendendo ${costoRecupero} Segreti`}
+                                >
+                                  {en ? 'Regain' : 'Recupera'} <span style={{ color: C.inkDim }}>(−{costoRecupero})</span>
+                                </button>
+                              )}
+                            </span>
+                          </div>
                         )}
-                      </span>
-                    </>
-                  )}
+                        {!onInfo && aperti[p.id] && <div style={{ ...styles.detail, fontSize: 12, whiteSpace: 'pre-wrap', marginTop: 4 }}>{p.descrizione}</div>}
+                      </div>
+                    );
+                  })}
                 </div>
-                <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-                  <button type="button" style={{ background: 'none', border: 0, padding: 0, color: C.goldDark, cursor: 'pointer', fontSize: 11, fontWeight: 600 }} onClick={() => setAperti((a) => ({ ...a, [p.id]: !a[p.id] }))} aria-expanded={Boolean(aperti[p.id])}>
-                    {aperti[p.id] ? '▾' : '▸'} {en ? 'Details' : 'Dettagli'}
-                  </button>
-                  {onModifica && (
-                    <button type="button" style={{ background: 'none', border: 0, padding: 0, color: C.inkDim, cursor: 'pointer', fontSize: 11 }} onClick={() => onModifica(p.id)}>
-                      ✎ {en ? 'Edit' : 'Modifica'}
-                    </button>
-                  )}
-                </div>
-                {aperti[p.id] && <div style={{ ...styles.detail, fontSize: 12, whiteSpace: 'pre-wrap', marginTop: 4 }}>{p.descrizione}</div>}
               </div>
             );
           })}
+          <p style={{ ...styles.detail, marginTop: 8, marginBottom: 0, fontSize: 11 }}>
+            {en ? 'Click a name for details; the pearls are the uses (click = use / restore).' : 'Tocca un nome per i dettagli; le perle sono gli usi (un tocco = usa / ripristina).'}
+          </p>
         </div>
       )}
     </div>

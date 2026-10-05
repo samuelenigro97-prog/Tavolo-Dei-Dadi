@@ -2,6 +2,26 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.63.0] – 2026-10-05
+
+### Cambiato
+- **Araldi del Segreto nel formato "Panoramica dei privilegi"**: i privilegi
+  sono righe per livello (Liv. 1, 6, 10, 14) con il nome sottolineato
+  (un tocco apre la spiegazione), gli usi come perle, Usa / Recupera sulla
+  stessa riga, e i livelli non ancora raggiunti sbiaditi con
+  "— non ancora raggiunto", come nella panoramica dei privilegi di classe.
+- I poteri degli Araldi aggiunti con una versione precedente si portano
+  **da soli** alla versione attuale (livelli, condizione automatica del
+  Debito, ricariche, massimi) e mostrano il pannello anche se il manuale di
+  campagna è spento: il manuale controlla solo la disponibilità del modello
+  "Da modello", non i poteri già sulla scheda.
+
+### Corretto
+- **Segreti e Debito senza totale**: i contatori senza massimo accettano
+  qualsiasi numero scritto a mano (es. 1000) e il + non si blocca; non serve
+  più impostare un totale. (Il blocco veniva dall'elenco Risorse di classe,
+  da cui i contatori dei Poteri sono usciti nella 4.61.0.) Aggiunti test.
+
 ## [4.62.0] – 2026-10-05
 
 ### Cambiato

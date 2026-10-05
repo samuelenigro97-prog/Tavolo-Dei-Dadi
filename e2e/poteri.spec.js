@@ -75,8 +75,9 @@ test.describe('Poteri', () => {
     const pannello = page.getByTestId('araldi-pannello');
     await expect(pannello).toBeVisible();
     // Il PG di esempio è di 10° livello: Braccare! (14°) resta bloccato, Inquisire (6°) è disponibile.
-    await expect(pannello.getByText('🔒 14° liv.')).toBeVisible();
-    await expect(pannello.getByText('6° liv.', { exact: true })).toBeVisible();
+    await expect(pannello.getByText('Liv. 14', { exact: true })).toBeVisible();
+    await expect(pannello.getByText('— non ancora raggiunto')).toHaveCount(1);
+    await expect(pannello.getByText('Liv. 6', { exact: true })).toBeVisible();
     const risorse = await page.evaluate(() => {
       const st = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
       return st.personaggi[st.attivo].risorse.map((r) => r.nome);
@@ -85,7 +86,7 @@ test.describe('Poteri', () => {
     expect(risorse).not.toContain('Braccare!');
     // I contatori dei Poteri stanno nella sezione Poteri, non in Risorse di classe; passando il
     // mouse sul nome del privilegio si legge cosa fa.
-    await expect(page.getByTestId('araldi-pannello').locator('strong', { hasText: 'Inquisire' })).toHaveAttribute('title', /Occhi: hai vantaggio/);
+    await expect(page.getByTestId('araldi-privilegi').getByText('Inquisire', { exact: true })).toHaveAttribute('title', /Occhi: hai vantaggio/);
     await expect(page.getByText('Forma Selvatica').first()).toBeVisible();
     expect(await page.evaluate(() => [...document.querySelectorAll('.profilo-risorse-box strong')].map((e) => e.textContent).filter((t) => /Segreti|Inquisire|Affabilità/.test(t)).length)).toBe(0);
 
@@ -134,5 +135,38 @@ test.describe('Poteri', () => {
     await pannello.getByRole('button', { name: /^Lancia/ }).click();
     await expect.poll(async () => (await stato()).segreti).toBe(1);
     await expect.poll(async () => (await stato()).debito).toBe(16);
+  });
+
+  test('poteri degli Araldi aggiunti con la versione vecchia: si aggiornano da soli e mostrano il pannello anche col manuale spento', async ({ page }) => {
+    await page.evaluate(() => {
+      const st = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+      const pg = st.personaggi[st.attivo];
+      pg.poteri.push(
+        { id: 'old-1', nome: 'Araldi del Segreto · Segreti e Debito', descrizione: 'x', attivo: true, contatori: [{ nome: 'Segreti', attuali: 0, max: null }], modificatori: [] },
+        { id: 'old-2', nome: 'Inquisire (6° livello)', descrizione: 'Occhi: test', attivo: true, contatori: [{ nome: 'Inquisire', attuali: 3, max: 3 }], modificatori: [] },
+      );
+      localStorage.setItem('scheda-interattiva:v1', JSON.stringify(st));
+    });
+    await page.reload();
+    await page.waitForTimeout(1200);
+    for (let i = 0; i < 3; i++) await page.keyboard.press('Escape');
+    await page.mouse.click(20, 300);
+    await expect(page.getByTestId('araldi-pannello')).toBeVisible();
+    const pg = await page.evaluate(() => { const st = JSON.parse(localStorage.getItem('scheda-interattiva:v1')); return st.personaggi[st.attivo].poteri.find((p) => p.id === 'old-2'); });
+    expect(pg.modello).toBe('araldi-del-segreto');
+    expect(pg.livelloMin).toBe(6);
+    expect(pg.contatori[0].ricarica).toBe('lungo');
+  });
+
+  test('un contatore senza totale accetta qualsiasi numero e il + non lo blocca', async ({ page }) => {
+    const debito = () => page.evaluate(() => { const st = JSON.parse(localStorage.getItem('scheda-interattiva:v1')); return st.personaggi[st.attivo].risorse.find((r) => r.nome === 'Debito').attuali; });
+    const campo = page.locator('span', { hasText: /^Debito/ }).locator('span').filter({ hasText: /^5$/ }).first();
+    await campo.click();
+    await page.keyboard.press('Control+A');
+    await page.keyboard.type('1000');
+    await page.keyboard.press('Enter');
+    await expect.poll(debito).toBe(1000);
+    await page.getByRole('button', { name: 'Debito +1' }).click();
+    await expect.poll(debito).toBe(1001);
   });
 });
