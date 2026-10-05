@@ -2,6 +2,18 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.52.1] – 2026-10-05
+
+### Corretto
+- Sincronizzazione dopo l'aggiornamento alla 4.52.0: la "base" salvata dai
+  dispositivi usava l'impronta senza preferenze, quindi appariva sempre
+  diversa dal roster locale. Se un altro dispositivo aveva già salvato una
+  versione più recente (per esempio con un nuovo Potere), compariva una
+  finestra di conflitto anche se qui i personaggi non erano stati toccati,
+  e scegliere "Mantieni la mia" avrebbe sovrascritto il lavoro online. Ora
+  `decidiSync` riconosce l'impronta precedente (`improntaRosterLegacy`) e in
+  quel caso carica la versione online.
+
 ## [4.52.0] – 2026-10-05
 
 ### Aggiunto

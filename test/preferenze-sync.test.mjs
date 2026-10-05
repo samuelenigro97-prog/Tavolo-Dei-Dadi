@@ -54,3 +54,15 @@ test('gli id degli attacchi (rigenerati a ogni normalizzazione) non contano per 
   assert.equal(improntaPersonaggi(con(1)), improntaPersonaggi(con(1791221581443)));
   assert.notEqual(improntaPersonaggi(con(1)), improntaPersonaggi({ attivo: 'a', personaggi: { a: { ...pg, attacchi: [{ id: 1, nome: 'Spada', bonus: 6 }] } } }));
 });
+
+test('base salvata prima delle preferenze: personaggi non toccati qui, la copia online più nuova si carica (niente finto conflitto)', async () => {
+  const { improntaRosterLegacy } = await import('../src/utils/conflittiSync.js');
+  const locale = rosterCon({ tema: 'chiaro' }, 100);
+  const remotoConPotere = { attivo: 'a', personaggi: { a: { ...pg, poteri: [{ id: 'p1', nome: 'Pugno del Tuono' }] } } };
+  const base = { rev: 'r1', ts: 10, hash: improntaRosterLegacy(locale) };
+  const d = decidiSync({ base, remoto: { rev: 'r2', ts: 20, roster: remotoConPotere }, locale });
+  assert.equal(d.azione, 'carica');
+  // Se invece i personaggi sono stati toccati qui, resta un vero conflitto.
+  const toccato = { ...locale, personaggi: { a: { ...pg, pfMax: 99 } } };
+  assert.equal(decidiSync({ base, remoto: { rev: 'r2', ts: 20, roster: remotoConPotere }, locale: toccato }).azione, 'conflitto');
+});

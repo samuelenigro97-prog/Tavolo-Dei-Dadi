@@ -59,6 +59,11 @@ export function improntaRoster(roster) {
   }));
 }
 
+/** Impronta nel formato precedente alla 4.52.0 (senza preferenze): per le basi già salvate. */
+export function improntaRosterLegacy(roster) {
+  return hashTesto(jsonStabile({ attivo: roster?.attivo || '', personaggi: personaggiSenzaImmagini(roster) }));
+}
+
 /**
  * Come improntaRoster, ma ignora le preferenze: confronta solo i personaggi.
  * Ignora anche gli id degli attacchi: l'app li rigenera a ogni normalizzazione
@@ -113,6 +118,9 @@ export function decidiSync({ base, remoto, locale }) {
   }
   if (improntaRoster(remoto.roster) === hashLocale) return { azione: 'allineato', motivo: 'contenuto-identico' };
   if (!localeModificato) return { azione: 'carica', motivo: 'locale-invariato' };
+  // Base salvata prima della 4.52.0: la sua impronta non conosce le preferenze,
+  // quindi "diverso" non significa che i personaggi siano stati toccati qui.
+  if (base?.hash && base.hash === improntaRosterLegacy(locale)) return { azione: 'carica', motivo: 'base-precedente-invariata' };
   if (!haPersonaggi(locale)) return { azione: 'carica', motivo: 'locale-vuoto' };
   // Personaggi identici e differenze solo nelle preferenze (tema, audio...):
   // non è un vero conflitto, vince la copia cambiata più di recente.
