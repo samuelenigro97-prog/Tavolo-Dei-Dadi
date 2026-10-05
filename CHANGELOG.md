@@ -2,6 +2,15 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.51.0] – 2026-10-05
+
+### Rimosso
+- **Il dado 🎲 dal logo nella barra in alto**, in versione desktop e
+  mobile: il titolo "Tavolo dei Dadi" parte ora direttamente dal bordo
+  sinistro della barra (circa 24px più a sinistra), liberando spazio per
+  i pulsanti a destra su schermi stretti. Il margine della barra non è
+  cambiato: ha l'angolo arrotondato a sinistra e il testo lo toccherebbe.
+
 ## [4.50.0] – 2026-10-05
 
 ### Rimosso

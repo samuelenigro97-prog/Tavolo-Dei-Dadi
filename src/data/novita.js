@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.51.0',
+    voci: {
+      it: ['Tolto il dado dal logo in alto: il titolo "Tavolo dei Dadi" parte ora dal bordo sinistro della barra.'],
+      en: ['Removed the die from the logo at the top: the "Tavolo dei Dadi" title now starts at the left edge of the bar.'],
+    },
+  },
+  {
     versione: '4.50.0',
     voci: {
       it: ['Tolta la scritta "Profilo" in cima alla prima sezione, che occupava una riga senza aggiungere informazioni.'],

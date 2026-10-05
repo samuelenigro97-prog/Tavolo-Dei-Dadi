@@ -1955,7 +1955,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.50.0';
+const APP_VERSION = '4.51.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -11901,7 +11901,6 @@ export default function App() {
                 >
                   {/* Sinistra su Desktop: Home standalone, non dentro la barra laterale */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, userSelect: 'none', flexShrink: 0, alignSelf: 'center' }}>
-                    <span style={{ fontSize: 18, lineHeight: 1 }}>🎲</span>
                     <span style={{ fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", fontSize: 16, fontWeight: 800, color: 'var(--c-title)', letterSpacing: 0.5, whiteSpace: 'nowrap', transition: 'color 0.2s ease', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
                       Tavolo dei Dadi
                       <span className="app-version" style={{ fontSize: 11, color: C.inkDim, opacity: 0.75, fontWeight: 600, fontVariantNumeric: 'tabular-nums', letterSpacing: 0.3, whiteSpace: 'nowrap', lineHeight: 1, transform: 'translateY(1px)' }}>
@@ -12148,7 +12147,6 @@ export default function App() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, userSelect: 'none', flexShrink: 0 }}>
-                    <span style={{ fontSize: 16, lineHeight: 1 }}>🎲</span>
                     <span style={{ fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", fontSize: 15, fontWeight: 800, color: 'var(--c-title)', letterSpacing: 0.4, whiteSpace: 'nowrap', transition: 'color 0.2s ease', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
                       Tavolo dei Dadi
                       <span className="app-version" style={{ fontSize: 11, color: C.inkDim, opacity: 0.7, fontWeight: 600, fontVariantNumeric: 'tabular-nums', letterSpacing: 0.2, whiteSpace: 'nowrap', lineHeight: 1, transform: 'translateY(1px)' }}>
