@@ -35,4 +35,24 @@ test.describe('Poteri', () => {
     await dialog.getByRole('button', { name: '✕' }).click();
     await expect(page.getByText(/Vantaggio ai TS Carisma/)).toBeVisible();
   });
+
+  test('"Da modello" aggiunge Araldi del Segreto con contatori collegati e non lo duplica', async ({ page }) => {
+    await page.getByRole('button', { name: 'Da modello' }).click();
+    const elenco = page.getByTestId('modelli-poteri');
+    await expect(elenco.getByText('Araldi del Segreto', { exact: true })).toBeVisible();
+    await elenco.getByRole('button', { name: /Aggiungi \d+ poteri/ }).click();
+
+    await expect(page.getByText('Affabilità (1° livello)')).toBeVisible();
+    await expect(page.getByText('Braccare! (14° livello)')).toBeVisible();
+    // I contatori creano le risorse collegate (Segreti, Debito, usi dei privilegi).
+    const risorse = await page.evaluate(() => {
+      const st = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+      return st.personaggi[st.attivo].risorse.map((r) => r.nome);
+    });
+    expect(risorse).toEqual(expect.arrayContaining(['Segreti', 'Affabilità', 'Inquisire', 'Trasferire Empatico', 'Braccare!']));
+
+    // Una seconda volta non aggiunge doppioni.
+    await page.getByRole('button', { name: 'Da modello' }).click();
+    await expect(page.getByTestId('modelli-poteri').getByRole('button', { name: 'Già aggiunto' })).toBeDisabled();
+  });
 });

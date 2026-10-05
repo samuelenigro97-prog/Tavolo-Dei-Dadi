@@ -1198,6 +1198,12 @@ tbody tr:hover {
 .privilegi-duo > * { min-width: 0; }
 .privilegi-talenti > .sezione, .privilegi-duo > .sezione { margin-bottom: 0 !important; }
 @media (max-width: 720px) { .privilegi-duo { grid-template-columns: 1fr; } }
+/* Intestazione dei Poteri: su schermi stretti il titolo resta centrato e i pulsanti vanno a capo. */
+@media (max-width: 560px) {
+  .poteri-intestazione { grid-template-columns: 1fr !important; row-gap: 6px; }
+  .poteri-intestazione > div:first-child { display: none; }
+  .poteri-intestazione > div:last-child { justify-self: center !important; }
+}
 /* Profilo: caratteristiche (colonna sinistra) e riquadri vitali (colonna
    centrale) vivono nella STESSA griglia. */
 .profilo-griglia {

@@ -20,6 +20,7 @@ import {
   sincronizzaRisorsePoteri,
   modificatoriPoteriAttivi,
 } from '../rules/poteri.js';
+import { MODELLI_POTERI } from '../data/modelliPoteri.js';
 
 function unitaBersaglio(chiave) {
   return BERSAGLI_MODIFICATORE_POTERE.find((b) => b.chiave === chiave)?.unita || '';
@@ -298,6 +299,7 @@ function PotereModal({ potere, indice, totale, onChiudi, onAggiorna, onElimina, 
  */
 export function SezionePoteri({ scheda, aggiorna, lingua = 'it' }) {
   const [potereApertoId, setPotereApertoId] = useState(null);
+  const [mostraModelli, setMostraModelli] = useState(false);
   const poteri = normalizzaPoteri(scheda?.poteri);
   const potereAperto = poteri.find((p) => p.id === potereApertoId) || null;
 
@@ -309,6 +311,15 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it' }) {
     const nuovo = nuovoPotere({ nome: lingua === 'en' ? 'New power' : 'Nuovo potere' });
     salvaPoteri([...poteri, nuovo]);
     setPotereApertoId(nuovo.id);
+  }
+
+  /** Aggiunge i poteri di un modello, saltando quelli già presenti (stesso nome). */
+  function aggiungiModello(modello) {
+    const presenti = new Set(poteri.map((p) => p.nome));
+    const nuovi = modello.poteri.filter((p) => !presenti.has(p.nome)).map((p) => nuovoPotere(p));
+    if (!nuovi.length) return;
+    salvaPoteri([...poteri, ...nuovi]);
+    setMostraModelli(false);
   }
 
   function aggiornaPotere(id, patch) {
@@ -352,15 +363,42 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it' }) {
 
   return (
     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(28px, 1fr) auto minmax(28px, 1fr)', alignItems: 'center', columnGap: 6, marginBottom: 8 }}>
+      <div className="poteri-intestazione" style={{ display: 'grid', gridTemplateColumns: 'minmax(28px, 1fr) auto minmax(28px, 1fr)', alignItems: 'center', columnGap: 6, marginBottom: 8 }}>
         <div />
         <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, letterSpacing: 0.5, textAlign: 'center' }} title={lingua === 'en' ? 'For rules invented at the table (not in the official books): pacts, blessings, curses, magic items with custom effects...' : 'Per le regole inventate al tavolo (non nei manuali ufficiali): patti, benedizioni, maledizioni, oggetti magici con effetti custom...'}>
           {lingua === 'en' ? 'Powers' : 'Poteri'} <span style={{ textTransform: 'none', fontWeight: 500, letterSpacing: 'normal', color: C.inkDim, fontSize: 11 }}>({lingua === 'en' ? 'homebrew rules' : 'regole homebrew'})</span>
         </div>
-        <button type="button" style={{ ...styles.buttonMini, borderStyle: 'dashed', justifySelf: 'end' }} onClick={aggiungiPotere}>
-          {lingua === 'en' ? 'Add power' : 'Aggiungi potere'}
-        </button>
+        <div style={{ display: 'flex', gap: 6, justifySelf: 'end' }}>
+          <button type="button" style={{ ...styles.buttonMini, borderStyle: 'dashed' }} onClick={() => setMostraModelli((v) => !v)} aria-expanded={mostraModelli}>
+            {lingua === 'en' ? 'From template' : 'Da modello'}
+          </button>
+          <button type="button" style={{ ...styles.buttonMini, borderStyle: 'dashed' }} onClick={aggiungiPotere}>
+            {lingua === 'en' ? 'Add power' : 'Aggiungi potere'}
+          </button>
+        </div>
       </div>
+
+      {mostraModelli && (
+        <div data-testid="modelli-poteri" style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+          {MODELLI_POTERI.map((m) => {
+            const presenti = new Set(poteri.map((p) => p.nome));
+            const mancanti = m.poteri.filter((p) => !presenti.has(p.nome)).length;
+            return (
+              <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 8, border: `1px solid ${C.border}`, borderRadius: 6, padding: '6px 8px' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>{lingua === 'en' ? m.nomeEn : m.nome}</div>
+                  <div style={{ ...styles.detail, fontSize: 11 }}>{lingua === 'en' ? m.descrizioneEn : m.descrizione}</div>
+                </div>
+                <button type="button" style={styles.buttonMini} disabled={!mancanti} onClick={() => aggiungiModello(m)}>
+                  {mancanti
+                    ? (lingua === 'en' ? `Add ${mancanti} powers` : `Aggiungi ${mancanti} poteri`)
+                    : (lingua === 'en' ? 'Already added' : 'Già aggiunto')}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {poteri.length === 0 ? (
         <div style={{ ...styles.detail, fontSize: 12, textAlign: 'center', padding: '10px 0' }}>

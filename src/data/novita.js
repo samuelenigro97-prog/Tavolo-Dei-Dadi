@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.53.0',
+    voci: {
+      it: ['Nei Poteri c\'è il nuovo pulsante "Da modello": con un tocco aggiungi i poteri degli Araldi del Segreto (Segreti, Debito e i privilegi al 1°, 6°, 10° e 14° livello).'],
+      en: ['Powers now has a "From template" button: add the Heralds of the Secret powers (Secrets, Debt and the level 1, 6, 10 and 14 features) in one tap.'],
+    },
+  },
+  {
     versione: '4.52.0',
     voci: {
       it: ['Tema, ambientazione, audio, lingua e ordine delle sezioni ora si sincronizzano tra i tuoi dispositivi insieme ai personaggi: Mac, iPad e iPhone mostrano lo stesso aspetto.'],

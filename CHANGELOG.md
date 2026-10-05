@@ -2,6 +2,21 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.53.0] – 2026-10-05
+
+### Aggiunto
+- **Poteri → "Da modello"**: nuovo pulsante accanto ad "Aggiungi potere" che
+  inserisce in un tocco un gruppo di poteri già scritti
+  (`src/data/modelliPoteri.js`). Primo modello: **Araldi del Segreto**, dal
+  manuale del tavolo, con 7 poteri: Segreti e Debito (contatori, spese dei
+  Segreti, lista ampliata), Soglie del Debito, Occhio Risvegliato (+1 CA, già
+  pronto ma spento finché il Debito non arriva a 15), Affabilità (1°),
+  Inquisire (6°), Trasferire Empatico (10°) e Braccare! (14°). I contatori
+  creano da soli le risorse collegate. I poteri già presenti (stesso nome)
+  non vengono duplicati.
+- Su schermi stretti l'intestazione dei Poteri porta i pulsanti sotto il
+  titolo, che resta centrato.
+
 ## [4.52.1] – 2026-10-05
 
 ### Corretto
