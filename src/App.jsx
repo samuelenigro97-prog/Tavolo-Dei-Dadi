@@ -1955,7 +1955,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.49.0';
+const APP_VERSION = '4.50.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -12293,14 +12293,11 @@ export default function App() {
         )}
 
         {/* Testata: anagrafica + riquadri vitali uniformi */}
-        <section className="sezione profilo-sezione" style={{ ...styles.panel, position: 'relative' }}>
+        <section className="sezione profilo-sezione" aria-label={t("profilo.titolo")} style={{ ...styles.panel, position: 'relative' }}>
           <span className="angolo-ornamento angolo-tl" aria-hidden="true" />
           <span className="angolo-ornamento angolo-tr" aria-hidden="true" />
           <span className="angolo-ornamento angolo-bl" aria-hidden="true" />
           <span className="angolo-ornamento angolo-br" aria-hidden="true" />
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', width: '100%', marginBottom: 10 }}>
-            <h2 style={{ ...styles.panelTitle, fontSize: 19, margin: 0, width: '100%', textAlign: 'center' }}>{t("profilo.titolo")}</h2>
-          </div>
           {/* ===== BANNER FORMA BESTIALE ATTIVA (Regole Ufficiali 5e PHB) ===== */}
           {isTrasformato && (
             <div

@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.50.0',
+    voci: {
+      it: ['Tolta la scritta "Profilo" in cima alla prima sezione, che occupava una riga senza aggiungere informazioni.'],
+      en: ['Removed the "Profile" heading at the top of the first section: it took a line without adding information.'],
+    },
+  },
+  {
     versione: '4.48.0',
     voci: {
       it: [

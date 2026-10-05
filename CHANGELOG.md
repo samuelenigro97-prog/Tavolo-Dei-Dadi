@@ -2,6 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.50.0] – 2026-10-05
+
+### Rimosso
+- **Titolo "Profilo" in cima alla sezione profilo**: la scritta non
+  serviva (anagrafica, ritratto e punti ferita si riconoscono da soli) e
+  occupava una riga. Il nome resta come `aria-label` della sezione, così
+  i lettori di schermo la annunciano ancora come "Profilo".
+
 ## [4.49.0] – 2026-10-03
 
 ### Aggiunto
