@@ -2,6 +2,16 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.55.0] – 2026-10-05
+
+### Cambiato
+- **Blocchi delle caratteristiche** (Forza, Destrezza, Costituzione,
+  Intelligenza, Saggezza, Carisma) con la stessa cornice delle sezioni
+  (Competenze, Risorse di classe...): bordo verde luminoso, filetto interno e
+  alone, con reazione al passaggio del mouse. Prima avevano un bordo sottile
+  grigio che sembrava più debole accanto al resto. Solo CSS (`.blocco-car`
+  in `stili.js`), segue tema chiaro/scuro e ambientazione.
+
 ## [4.54.0] – 2026-10-05
 
 ### Cambiato

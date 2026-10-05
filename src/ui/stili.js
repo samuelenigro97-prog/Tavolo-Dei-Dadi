@@ -1179,6 +1179,23 @@ tbody tr:hover {
   outline: 1px solid var(--c-border);
   outline-offset: -4px;
 }
+/* Blocchi delle caratteristiche (Forza, Destrezza...): stessa cornice delle
+   sezioni — bordo verde luminoso, filetto interno e alone — invece del
+   bordo sottile grigio. !important perché il bordo base è inline (abilityBlock). */
+.blocco-car {
+  border-color: var(--c-border-glow-min, var(--c-border)) !important;
+  box-shadow: 0 3px 12px -2px var(--c-aura-glow-1, rgba(60,50,30,0.04)),
+              0 1px 3px rgba(0, 0, 0, 0.25) !important;
+  outline: 1px solid var(--c-border);
+  outline-offset: -4px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.blocco-car:hover {
+  border-color: var(--c-border-glow-max, var(--c-gold)) !important;
+  box-shadow: 0 4px 18px -2px var(--c-aura-glow-pulse-1, rgba(201, 162, 39, 0.12)),
+              0 0 6px 1px var(--c-aura-glow-min, rgba(201, 162, 39, 0.08)),
+              0 1px 4px rgba(0, 0, 0, 0.35) !important;
+}
 /* Filetto oro doppio sotto la barra superiore, come le cornici titolo dei
    vecchi manuali — fisso, sempre presente. */
 .barra-superiore-fissa {

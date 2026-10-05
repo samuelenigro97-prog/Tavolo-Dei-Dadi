@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.55.0',
+    voci: {
+      it: ['I riquadri delle caratteristiche (Forza, Destrezza...) hanno ora lo stesso bordo luminoso e più marcato delle altre sezioni.'],
+      en: ['The ability boxes (Strength, Dexterity...) now have the same brighter, bolder border as the other sections.'],
+    },
+  },
+  {
     versione: '4.54.0',
     voci: {
       it: ['TS contro morte più larghi e ordinati: Successi e Fallimenti sono allineati, le caselle sono più grandi e i pulsanti Reset e Tira stanno accanto.'],
