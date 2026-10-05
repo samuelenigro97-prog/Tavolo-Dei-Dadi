@@ -1956,7 +1956,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.53.0';
+const APP_VERSION = '4.54.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -13586,98 +13586,59 @@ export default function App() {
                       {lingua === 'en' ? 'Death saves' : 'TS contro morte'}
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-start' }}>
-                        {/* 3 sopra: Successi */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: C.green, minWidth: 76, textAlign: 'right' }}>
-                            {lingua === 'en' ? 'Successes' : 'Successi'}
+                    {/* Griglia: etichetta | 3 caselle | azioni. Le due righe condividono le stesse colonne, quindi caselle e pulsanti restano sempre allineati. */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'auto repeat(3, 32px) auto', alignItems: 'center', justifyContent: 'center', columnGap: 12, rowGap: 10 }}>
+                      {[
+                        { chiave: 'successi', colore: C.green, ombra: 'rgba(46,125,50,0.5)', segno: '✔', etichetta: lingua === 'en' ? 'Successes' : 'Successi', titolo: (n) => (lingua === 'en' ? `Death Save Success ${n}` : `Successo Tiro Morte ${n}`) },
+                        { chiave: 'fallimenti', colore: C.red, ombra: 'rgba(198,40,40,0.5)', segno: '✘', etichetta: `✘ ${lingua === 'en' ? 'Failures' : 'Fallimenti'}`, titolo: (n) => (lingua === 'en' ? `Death Save Failure ${n}` : `Fallimento Tiro Morte ${n}`) },
+                      ].map((riga, i) => (
+                        <Fragment key={riga.chiave}>
+                          <span style={{ gridRow: i + 1, gridColumn: 1, fontSize: 14, fontWeight: 700, color: riga.colore, textAlign: 'right', whiteSpace: 'nowrap' }}>
+                            {riga.etichetta}
                           </span>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            {[1, 2, 3].map((n) => {
-                              const check = (scheda.tsMorte?.successi || 0) >= n;
-                              return (
-                                <button
-                                  key={`s-${n}`}
-                                  type="button"
-                                  onClick={() => {
-                                    const att = scheda.tsMorte?.successi || 0;
-                                    aggiorna({ tsMorte: { ...scheda.tsMorte, successi: att === n ? n - 1 : n } });
-                                  }}
-                                  title={lingua === 'en' ? `Death Save Success ${n}` : `Successo Tiro Morte ${n}`}
-                                  style={{
-                                    width: 22,
-                                    height: 22,
-                                    borderRadius: 5,
-                                    border: `2px solid ${check ? C.green : C.border}`,
-                                    background: check ? C.green : 'transparent',
-                                    color: '#fff',
-                                    fontSize: 13,
-                                    fontWeight: 900,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: 'pointer',
-                                    padding: 0,
-                                    transition: 'all 0.15s ease',
-                                    boxShadow: check ? '0 0 6px rgba(46,125,50,0.5)' : 'none',
-                                  }}
-                                >
-                                  {check ? '✔' : ''}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
+                          {[1, 2, 3].map((n) => {
+                            const check = (scheda.tsMorte?.[riga.chiave] || 0) >= n;
+                            return (
+                              <button
+                                key={`${riga.chiave}-${n}`}
+                                type="button"
+                                onClick={() => {
+                                  const att = scheda.tsMorte?.[riga.chiave] || 0;
+                                  aggiorna({ tsMorte: { ...scheda.tsMorte, [riga.chiave]: att === n ? n - 1 : n } });
+                                }}
+                                title={riga.titolo(n)}
+                                style={{
+                                  gridRow: i + 1,
+                                  gridColumn: n + 1,
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: 7,
+                                  border: `2px solid ${check ? riga.colore : C.border}`,
+                                  background: check ? riga.colore : 'transparent',
+                                  color: '#fff',
+                                  fontSize: 16,
+                                  fontWeight: 900,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  cursor: 'pointer',
+                                  padding: 0,
+                                  transition: 'all 0.15s ease',
+                                  boxShadow: check ? `0 0 6px ${riga.ombra}` : 'none',
+                                }}
+                              >
+                                {check ? riga.segno : ''}
+                              </button>
+                            );
+                          })}
+                        </Fragment>
+                      ))}
 
-                        {/* 3 sotto: Fallimenti */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: C.red, minWidth: 76, textAlign: 'right' }}>
-                            ✘ {lingua === 'en' ? 'Failures' : 'Fallimenti'}
-                          </span>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            {[1, 2, 3].map((n) => {
-                              const check = (scheda.tsMorte?.fallimenti || 0) >= n;
-                              return (
-                                <button
-                                  key={`f-${n}`}
-                                  type="button"
-                                  onClick={() => {
-                                    const att = scheda.tsMorte?.fallimenti || 0;
-                                    aggiorna({ tsMorte: { ...scheda.tsMorte, fallimenti: att === n ? n - 1 : n } });
-                                  }}
-                                  title={lingua === 'en' ? `Death Save Failure ${n}` : `Fallimento Tiro Morte ${n}`}
-                                  style={{
-                                    width: 22,
-                                    height: 22,
-                                    borderRadius: 5,
-                                    border: `2px solid ${check ? C.red : C.border}`,
-                                    background: check ? C.red : 'transparent',
-                                    color: '#fff',
-                                    fontSize: 13,
-                                    fontWeight: 900,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: 'pointer',
-                                    padding: 0,
-                                    transition: 'all 0.15s ease',
-                                    boxShadow: check ? '0 0 6px rgba(198,40,40,0.5)' : 'none',
-                                  }}
-                                >
-                                  {check ? '✘' : ''}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Reset e Tiro */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 5, alignItems: 'center', justifyContent: 'center' }}>
+                      {/* Reset e Tiro: una sola colonna a destra, centrata sulle due righe */}
+                      <div style={{ gridRow: '1 / span 2', gridColumn: 5, display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'stretch', justifyContent: 'center' }}>
                         <button
                           className="ts-morte-reset"
-                          style={{ ...styles.buttonMini, fontSize: 12, padding: '4px 10px', fontWeight: 600, borderRadius: 6 }}
+                          style={{ ...styles.buttonMini, fontSize: 13, padding: '5px 12px', fontWeight: 600, borderRadius: 6 }}
                           onClick={() => aggiorna({ tsMorte: { successi: 0, fallimenti: 0 } })}
                           title={t("vital.reset_ts")}
                         >
@@ -13685,7 +13646,7 @@ export default function App() {
                         </button>
                         {scheda.pfAttuali <= 0 && (
                           <button
-                            style={{ ...styles.buttonMini, fontSize: 12, color: C.red, borderColor: C.red, fontWeight: 700, padding: '3px 8px', borderRadius: 6, background: 'rgba(231,76,60,0.08)' }}
+                            style={{ ...styles.buttonMini, fontSize: 13, color: C.red, borderColor: C.red, fontWeight: 700, padding: '5px 12px', borderRadius: 6, background: 'rgba(231,76,60,0.08)' }}
                             onClick={tiroSalvezzaMorte}
                             disabled={rolling || (scheda.tsMorte?.successi || 0) >= 3 || (scheda.tsMorte?.fallimenti || 0) >= 3}
                             title={tr('Tira 1d20 TS contro morte', 'Roll 1d20 death save')}

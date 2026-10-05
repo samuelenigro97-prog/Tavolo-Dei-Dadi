@@ -2,6 +2,16 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.54.0] – 2026-10-05
+
+### Cambiato
+- **TS contro morte** riordinati su una griglia: etichette, caselle e
+  pulsanti condividono le stesse colonne, quindi Successi e Fallimenti
+  restano allineati (prima la riga dei Fallimenti slittava a destra perché
+  l'etichetta era più larga). Caselle più grandi (32px, prima 22px), pulsanti
+  Reset/Tira affiancati e centrati sulle due righe, font più leggibili.
+  Nessun cambio di comportamento.
+
 ## [4.53.0] – 2026-10-05
 
 ### Aggiunto

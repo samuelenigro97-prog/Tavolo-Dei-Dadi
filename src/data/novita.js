@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.54.0',
+    voci: {
+      it: ['TS contro morte più larghi e ordinati: Successi e Fallimenti sono allineati, le caselle sono più grandi e i pulsanti Reset e Tira stanno accanto.'],
+      en: ['Wider, tidier death saves: Successes and Failures line up, the boxes are bigger and the Reset and Roll buttons sit alongside.'],
+    },
+  },
+  {
     versione: '4.53.0',
     voci: {
       it: ['Nei Poteri c\'è il nuovo pulsante "Da modello": con un tocco aggiungi i poteri degli Araldi del Segreto (Segreti, Debito e i privilegi al 1°, 6°, 10° e 14° livello).'],
