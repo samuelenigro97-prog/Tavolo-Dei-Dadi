@@ -49,7 +49,13 @@ test.describe('Poteri', () => {
       const st = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
       return st.personaggi[st.attivo].risorse.map((r) => r.nome);
     });
-    expect(risorse).toEqual(expect.arrayContaining(['Segreti', 'Affabilità', 'Inquisire', 'Trasferire Empatico', 'Braccare!']));
+    // Il PG di esempio è di 10° livello: Braccare! (14°) resta bloccato e senza risorsa.
+    expect(risorse).toEqual(expect.arrayContaining(['Segreti', 'Affabilità', 'Inquisire', 'Trasferire Empatico']));
+    expect(risorse).not.toContain('Braccare!');
+    await expect(page.getByText('🔒 14° liv.')).toBeVisible();
+    await expect(page.getByText('6° liv.', { exact: true })).toBeVisible();
+    // Passando il mouse sulla risorsa si legge cosa fa quel potere.
+    await expect(page.getByRole('button', { name: 'Inquisire', exact: true })).toHaveAttribute('title', /Occhi: hai vantaggio/);
 
     // Una seconda volta non aggiunge doppioni.
     await page.getByRole('button', { name: 'Da modello' }).click();

@@ -8,11 +8,12 @@ export const MODELLI_POTERI = [
     id: 'araldi-del-segreto',
     nome: 'Araldi del Segreto',
     nomeEn: 'Heralds of the Secret',
-    descrizione: 'Segreti, Debito e i quattro privilegi (1°, 6°, 10°, 14° livello) dal manuale del tavolo.',
-    descrizioneEn: 'Secrets, Debt and the four features (levels 1, 6, 10, 14) from the table handbook.',
+    descrizione: 'Segreti, Debito e i privilegi del 1°, 6°, 10° e 14° livello: si sbloccano da soli al livello giusto, come i privilegi di classe.',
+    descrizioneEn: 'Secrets, Debt and the level 1, 6, 10 and 14 features: they unlock on their own at the right level, like class features.',
     poteri: [
       {
         nome: 'Araldi del Segreto · Segreti e Debito',
+        livelloMin: 1,
         descrizione: [
           'Spendere i Segreti (massimo pari al doppio del bonus di competenza):',
           '• Aprire (1 Segreto): rompi il sigillo e leggi l\'informazione; il DM garantisce che sia vera e utile.',
@@ -36,6 +37,7 @@ export const MODELLI_POTERI = [
       },
       {
         nome: 'Araldi del Segreto · Soglie del Debito',
+        livelloMin: 1,
         descrizione: [
           '5: Voce nell\'Ombra: messaggio a volontà come azione bonus e vantaggio alle prove di Intuizione.',
           '15: Occhio Risvegliato: vantaggio a Percezione e Indagare; +1 CA (vedi il potere dedicato, da attivare al raggiungimento).',
@@ -56,6 +58,7 @@ export const MODELLI_POTERI = [
       },
       {
         nome: 'Affabilità (1° livello)',
+        livelloMin: 1,
         descrizione: [
           'Usi: una volta per riposo breve. Puoi recuperare l\'uso spendendo 1 Segreto.',
           'Ottieni successo automatico in una prova di Carisma (Inganno, Persuasione o Intimidire) quando la CD stabilita dal DM sarebbe 15 o meno. Contro CD più alte, tiri con vantaggio. Non funziona su una creatura ostile in combattimento, né per ottenere qualcosa contrario alla natura del bersaglio. La discrezione del DM ha l\'ultima parola.',
@@ -66,6 +69,7 @@ export const MODELLI_POTERI = [
       },
       {
         nome: 'Inquisire (6° livello)',
+        livelloMin: 6,
         descrizione: [
           'Usi: un numero di volte pari al tuo bonus di competenza per riposo lungo (aggiorna il massimo quando sale). Guadagni 1 Debito a ogni uso.',
           'Con un\'azione bonus, scegli una creatura che vedi entro 18 metri e che abbia Intelligenza 4 o superiore. Effettua un TS su Carisma contro la CD del nemico.',
@@ -81,6 +85,7 @@ export const MODELLI_POTERI = [
       },
       {
         nome: 'Trasferire Empatico (10° livello)',
+        livelloMin: 10,
         descrizione: [
           'Usi: 1 per riposo lungo. Dopo un riposo breve puoi spendere 2 Segreti per recuperare l\'uso. Guadagni 2 Debiti a ogni uso.',
           'Con un\'azione, scegli una creatura che vedi entro 18 metri. Dichiara quanti PF in ferite vuoi trasferire (massimo la metà del tuo massimale) ed effettua un TS su Carisma contro la CD del nemico.',
@@ -93,6 +98,7 @@ export const MODELLI_POTERI = [
       },
       {
         nome: 'Braccare! (14° livello)',
+        livelloMin: 14,
         descrizione: [
           'Usi: un numero di volte pari al tuo bonus di competenza per riposo lungo (aggiorna il massimo quando sale). Guadagni 1 Debito a ogni uso.',
           'Con un\'azione bonus marchi una creatura che vedi entro 18 metri. Spendi 1 Segreto per ogni ora di durata dopo la prima che vuoi (massimo 8 ore). Finché il marchio dura:',

@@ -38,6 +38,7 @@ export function nuovoPotere(dati = {}) {
     nome: '',
     descrizione: '',
     attivo: true,
+    livelloMin: 0,
     contatori: [],
     modificatori: [],
     ...dati,
@@ -64,6 +65,8 @@ export function normalizzaPotere(p) {
     nome: String(p.nome || ''),
     descrizione: String(p.descrizione || ''),
     attivo: p.attivo !== false,
+    // Livello da cui il potere è disponibile (0 = sempre), come i privilegi di classe.
+    livelloMin: Math.max(0, Math.min(20, Math.floor(Number(p.livelloMin) || 0))),
     contatori: Array.isArray(p.contatori)
       ? p.contatori.map((c) => ({
           nome: String(c?.nome || ''),
@@ -89,10 +92,23 @@ export function idRisorsaContatore(potereId, indiceContatore) {
   return `potere-${potereId}-${indiceContatore}`;
 }
 
-/** Tutti i modificatori dei Poteri ATTIVI (non disattivati), appiattiti con la fonte. */
+/** Livello totale del personaggio (classe principale + multiclasse). */
+export function livelloTotaleScheda(scheda) {
+  const base = Number(scheda?.livello) || 1;
+  const multi = Array.isArray(scheda?.multiclasse) ? scheda.multiclasse.reduce((a, m) => a + (Number(m?.livello) || 0), 0) : 0;
+  return base + multi;
+}
+
+/** Un potere con `livelloMin` è disponibile solo dal livello indicato (come i privilegi di classe). */
+export function potereSbloccato(potere, livelloTotale) {
+  return (Number(potere?.livelloMin) || 0) <= (Number.isFinite(livelloTotale) ? livelloTotale : Infinity);
+}
+
+/** Tutti i modificatori dei Poteri ATTIVI e già sbloccati, appiattiti con la fonte. */
 export function modificatoriPoteriAttivi(scheda) {
+  const livello = livelloTotaleScheda(scheda);
   return normalizzaPoteri(scheda?.poteri)
-    .filter((p) => p.attivo)
+    .filter((p) => p.attivo && potereSbloccato(p, livello))
     .flatMap((p) => p.modificatori.map((m) => ({ ...m, fonte: m.fonte || p.nome || '' })));
 }
 
@@ -123,20 +139,20 @@ export function valoreContatore(scheda, potereId, indiceContatore, contatore) {
 /**
  * Ricalcola `scheda.risorse` in base ai Poteri correnti: aggiunge/aggiorna
  * (nome, max, reset: 'manuale') la risorsa collegata a ogni contatore di ogni
- * potere ATTIVO, preservandone gli `attuali` se la risorsa esiste già
+ * potere ATTIVO e già sbloccato (livelloMin), preservandone gli `attuali` se la risorsa esiste già
  * (rispetta le modifiche fatte da Risorse di Classe); rimuove le risorse
  * collegate a poteri disattivati/eliminati o a contatori non più presenti,
  * cosi' un potere spento o cancellato smette di comparire ovunque.
  * Va chiamata insieme a ogni `aggiorna({ poteri: ... })`, nello stesso patch.
  */
-export function sincronizzaRisorsePoteri(poteri, risorseAttuali) {
+export function sincronizzaRisorsePoteri(poteri, risorseAttuali, livelloTotale = Infinity) {
   const risorseBase = Array.isArray(risorseAttuali) ? risorseAttuali : [];
   const listaPoteri = normalizzaPoteri(poteri);
   const mappaEsistenti = new Map(risorseBase.map((r) => [r?.id, r]));
 
   const risorsePoteri = [];
   for (const p of listaPoteri) {
-    if (!p.attivo) continue;
+    if (!p.attivo || !potereSbloccato(p, livelloTotale)) continue;
     p.contatori.forEach((c, i) => {
       const id = idRisorsaContatore(p.id, i);
       const esistente = mappaEsistenti.get(id);

@@ -17,6 +17,7 @@ import {
   sincronizzaRisorsePoteri,
 } from '../src/rules/poteri.js';
 import { risorseDopoRiposo, calcolaMovimentoESalti } from '../src/rules/regole.js';
+import { livelloTotaleScheda, potereSbloccato } from '../src/rules/poteri.js';
 import { caTotale, iniziativaTotale, pfMassimiEffettivi } from '../src/rules/scheda.js';
 
 function potereDebito(overrides = {}) {
@@ -177,4 +178,19 @@ test('risorseDopoRiposo: Forma Selvatica 5.5 ("breve-uno") — il breve restitui
   assert.equal(risorseDopoRiposo(risorse, 'lungo')[0].attuali, 3);
   // Nella 5.0 il reset resta "breve": il breve restituisce tutto.
   assert.equal(risorseDopoRiposo([{ ...risorse[0], reset: 'breve' }], 'breve')[0].attuali, 3);
+});
+
+test('poteri con livelloMin: bloccati sotto il livello, senza modificatori né risorse', () => {
+  const poteri = [
+    { id: 'a', nome: 'Affabilità', livelloMin: 1, contatori: [{ nome: 'Affabilità', attuali: 1, max: 1 }], modificatori: [] },
+    { id: 'b', nome: 'Inquisire', livelloMin: 6, contatori: [{ nome: 'Inquisire', attuali: 3, max: 3 }], modificatori: [{ bersaglio: 'ca', valore: 1, fonte: 'x' }] },
+  ];
+  const nomi = (lv) => sincronizzaRisorsePoteri(poteri, [], lv).map((r) => r.nome);
+  assert.deepEqual(nomi(5), ['Affabilità']);
+  assert.deepEqual(nomi(6), ['Affabilità', 'Inquisire']);
+  assert.equal(modificatoriPoteriAttivi({ livello: 5, poteri }).length, 0);
+  assert.equal(modificatoriPoteriAttivi({ livello: 4, multiclasse: [{ classe: 'Mago', livello: 2 }], poteri }).length, 1, 'conta il livello totale');
+  assert.equal(livelloTotaleScheda({ livello: 4, multiclasse: [{ livello: 2 }] }), 6);
+  assert.equal(potereSbloccato({ livelloMin: 0 }, 1), true);
+  assert.equal(potereSbloccato({}, 1), true);
 });

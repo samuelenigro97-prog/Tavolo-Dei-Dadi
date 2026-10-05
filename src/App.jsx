@@ -1297,7 +1297,7 @@ const INCANTESIMI_NOMI = Array.from(new Set([...NOMI_SPIEG_INC, ...Object.keys(I
 import { NOMI_CLASSI, BACKGROUND_5E, TAGLIE_5E, ALLINEAMENTI_5E, SESSO_5E, SOTTOCLASSI_5E, INCANTESIMI_CLASSE, DANNI_5E, SENSI_5E, CONDIZIONI_5E, NOMI_OGGETTI, LINGUE_5E, ARMI_5E, STRUMENTI_5E, REAZIONI_5E, AZIONI_BONUS_5E, GRUPPI_ARMI_5E, GRUPPI_STRUMENTI_5E, GRUPPI_LINGUE_5E, DEFAULT_MANUALI, MANUALI_INFO, SOTTOCLASSI_FONTI, talentiPerManuali, PE_PER_LIVELLO, BACKGROUND_COMPETENZE, BACKGROUND_TALENTO_ORIGINE_2024, SPECIE_5E, tabellaPrivilegiSottoclasse, CARATT_INCANTATORE, PRIORITA_CARATT, DADO_VITA_CLASSE, BACKGROUND_CARATT, TS_CLASSE, ADDESTRAMENTO_CLASSE, COMPETENZE_CLASSE, PRIVILEGI_CLASSE_L1, PRIVILEGI_CLASSE_L1_2014, ASI_LIV, SOTTOCLASSE_LIV, COMPETENZE_SPECIE, NOMI_SPECIE, NOMI_SPECIE_GENERE, COGNOMI_SPECIE, NOMI_GENERICI, SPECIE_DATI, SPECIE_DATI_2014, BONUS_CARATT_SPECIE_2014, SFINIMENTO_2014, BASE_ARMATURA_DEFAULT, ESEMPI_ARMATURA } from "./data/dati5e.js";
 import { modificatore, conSegno, tiraDado, parseEspressioneDado, facceDadoVita, esprDadiVita, gruppiDadoVita, bonusCompetenzaDaLivello, tiraDanni, tiraD20, capacitaCarico, modalitaEffettiva } from "./rules/dadi.js";
 import { trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, dettagliAbilita, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from "./rules/regole.js";
-import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi } from './rules/poteri.js';
+import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda } from './rules/poteri.js';
 
 /**
  * Ricava tempo/gittata/note di un incantesimo dalla sua descrizione (le meccaniche
@@ -1957,7 +1957,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.57.0';
+const APP_VERSION = '4.58.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -2230,7 +2230,7 @@ function loadState() {
         // così sono presenti anche appena dopo un import/una sincronizzazione
         // da codice stanza, senza aspettare la prima modifica dalla sezione Poteri.
         s.poteri = normalizzaPoteri(s.poteri);
-        s.risorse = sincronizzaRisorsePoteri(s.poteri, s.risorse);
+        s.risorse = sincronizzaRisorsePoteri(s.poteri, s.risorse, livelloTotaleScheda(s));
         // assegna un id agli incantesimi che ne fossero privi (schede legacy),
         // così ognuno è modificabile singolarmente nel sottomenu
         if (Array.isArray(s.incantesimiLista)) {
@@ -4357,14 +4357,14 @@ export default function App() {
     setRoster((r) => {
       const corrente = r.personaggi[r.attivo];
       if (!corrente) return r;
-      const sincronizzate = sincronizzaRisorsePoteri(corrente.poteri, corrente.risorse);
+      const sincronizzate = sincronizzaRisorsePoteri(corrente.poteri, corrente.risorse, livelloTotaleScheda(corrente));
       if (JSON.stringify(sincronizzate) === JSON.stringify(corrente.risorse || [])) return r;
       return {
         ...r,
         personaggi: { ...r.personaggi, [r.attivo]: { ...corrente, risorse: sincronizzate } },
       };
     });
-  }, [roster.attivo, scheda?.poteri, isSolaLettura]);
+  }, [roster.attivo, scheda?.poteri, scheda?.livello, scheda?.multiclasse, isSolaLettura]);
 
   useEffect(() => {
     const esito = saveState(roster);
@@ -12883,7 +12883,12 @@ export default function App() {
                   {scheda.risorse.map((r) => {
                     const modifica = (patch) =>
                       aggiorna({ risorse: scheda.risorse.map((x) => (x.id === r.id ? { ...x, ...patch } : x)) });
-                    const spiegazione = spiegaRisorsa(r.nome);
+                    // Risorsa nata da un contatore di un Potere: spiega cosa fa quel potere
+                    // (es. "Inquisire", "Affabilità"), altrimenti la spiegazione di classe.
+                    const potereLegato = String(r.id || '').startsWith('potere-')
+                      ? normalizzaPoteri(scheda.poteri).find((p) => String(r.id).startsWith(`potere-${p.id}-`))
+                      : null;
+                    const spiegazione = potereLegato?.descrizione?.trim() || spiegaRisorsa(r.nome);
                     const automatica = String(r.id || '').startsWith('auto-');
                     const nomeVisualizzato = traduciDato(r.nome);
                     // La risorsa "Forma Selvatica" apre direttamente il catalogo delle creature

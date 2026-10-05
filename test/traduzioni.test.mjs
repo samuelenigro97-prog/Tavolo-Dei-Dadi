@@ -142,7 +142,7 @@ test('traduzioni: tutte le creature del bestiario, famigli ed evocazioni sono tr
   const { BESTIE, FAMIGLI, EVOCAZIONI } = await import('../src/data/bestiario.js');
   conLingua('en', () => {
     for (const c of [...BESTIE, ...FAMIGLI, ...EVOCAZIONI]) {
-      if (['Otyugh', 'Pony', 'Mammut', 'Sprite', 'Imp', 'Quasit', 'Gazer', 'Unicorno'].includes(c.nome)) continue;
+      if (['Otyugh', 'Pony', 'Mammut', 'Sprite', 'Imp', 'Quasit', 'Gazer', 'Unicorno', 'Quipper'].includes(c.nome)) continue;
       assert.notEqual(traduciDato(c.nome), c.nome, `Creatura non tradotta: ${c.nome}`);
     }
   });

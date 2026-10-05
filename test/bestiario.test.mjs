@@ -89,3 +89,18 @@ test('raggruppaPerGS: gruppi in ordine di GS crescente, creature alfabetiche den
   assert.deepEqual(raggruppaPerGS([]), []);
   assert.deepEqual(raggruppaPerGS(undefined), []);
 });
+
+test('catalogo completo delle bestie SRD fino a GS 1/2: ci sono anche gli animali comuni', () => {
+  const nomiEn = new Set(BESTIE.map((b) => b.nomeEn));
+  for (const n of ['Deer', 'Eagle', 'Goat', 'Hyena', 'Jackal', 'Quipper', 'Scorpion', 'Sea Horse', 'Spider', 'Vulture', 'Weasel', 'Giant Fire Beetle',
+    'Blood Hawk', 'Camel', 'Giant Crab', 'Giant Rat', 'Giant Weasel', 'Mule', 'Axe Beak', 'Draft Horse', 'Giant Owl', 'Giant Wolf Spider', 'Pteranodon', 'Giant Sea Horse']) {
+    assert.ok(nomiEn.has(n), `manca ${n}`);
+  }
+  // Livello 2 (GS 1/4, niente nuoto né volo): animali di terra; Pteranodonte e Aquila no (volano).
+  const liv2 = bestieDisponibili(2).map((b) => b.nomeEn);
+  assert.ok(liv2.includes('Deer') && liv2.includes('Giant Wolf Spider') && liv2.includes('Axe Beak'));
+  assert.ok(!liv2.includes('Eagle') && !liv2.includes('Pteranodon') && !liv2.includes('Quipper'));
+  // Livello 8: volo e nuoto sbloccati, GS 1.
+  const liv8 = bestieDisponibili(8).map((b) => b.nomeEn);
+  assert.ok(liv8.includes('Pteranodon') && liv8.includes('Giant Owl') && liv8.includes('Giant Sea Horse'));
+});

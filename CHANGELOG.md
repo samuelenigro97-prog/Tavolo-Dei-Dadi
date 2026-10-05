@@ -2,6 +2,29 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.58.0] – 2026-10-05
+
+### Aggiunto
+- **Forma Selvatica / Metamorfosi: 24 creature in più**, tutte le bestie SRD
+  fino a GS 1/2 che mancavano: Cervo, Aquila, Scarabeo di fuoco gigante, Capra,
+  Iena, Sciacallo, Quipper, Scorpione, Cavalluccio marino, Ragno, Avvoltoio,
+  Donnola (GS 0); Falco di sangue, Cammello, Granchio gigante, Ratto gigante,
+  Donnola gigante, Mulo (GS 1/8); Becco d'ascia, Cavallo da tiro, Gufo gigante,
+  Ragno lupo gigante, Pteranodonte (GS 1/4); Cavalluccio marino gigante
+  (GS 1/2). Rispettano i limiti di nuoto e volo della Forma Selvatica. Il
+  catalogo passa da 62 a 86 bestie, con traduzione inglese dei nomi.
+- **Poteri sbloccati per livello**, come i privilegi di classe: ogni potere
+  ha un campo "Disponibile dal livello" (0 = sempre). Prima di quel livello il
+  potere resta in elenco con il lucchetto (🔒 14° liv.) ma non applica
+  modificatori e non crea risorse; al livello giusto si attiva da solo
+  (conta il livello totale, anche multiclasse). Nel modello Araldi del
+  Segreto: Segreti, Soglie e Affabilità dal 1°, Inquisire dal 6°, Trasferire
+  Empatico dal 10°, Braccare! dal 14°. Chi li aveva già aggiunti trova in "Da
+  modello" il pulsante "Imposta i livelli".
+- **Risorse di classe**: passando il mouse su una risorsa nata da un Potere
+  (Inquisire, Affabilità...) si legge la descrizione di quel potere; un tocco
+  la apre in finestra.
+
 ## [4.57.0] – 2026-10-05
 
 ### Corretto

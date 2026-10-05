@@ -5,6 +5,21 @@
 
 export const NOVITA = [
   {
+    versione: '4.58.0',
+    voci: {
+      it: [
+        'Forma Selvatica: aggiunte 24 bestie (Cervo, Aquila, Ragno lupo gigante, Pteranodonte, Gufo gigante e altre) fino a GS 1/2.',
+        'I Poteri si sbloccano per livello come i privilegi di classe: gli Araldi del Segreto compaiono con il lucchetto e si attivano da soli al livello giusto.',
+        'Passando il mouse su una risorsa di un Potere (Inquisire, Affabilità...) si legge cosa fa.',
+      ],
+      en: [
+        'Wild Shape: 24 more beasts (Deer, Eagle, Giant Wolf Spider, Pteranodon, Giant Owl and more) up to CR 1/2.',
+        'Powers now unlock by level like class features: Heralds of the Secret show with a lock and switch on at the right level.',
+        'Hover a Power resource (Inquire, Affability...) to read what it does.',
+      ],
+    },
+  },
+  {
     versione: '4.57.0',
     voci: {
       it: ['Forma Selvatica corretta per le regole 2024: il riposo breve restituisce un solo uso, il riposo lungo tutti (nelle regole 2014 resta tutto con entrambi i riposi).'],

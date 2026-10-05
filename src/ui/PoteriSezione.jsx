@@ -19,6 +19,8 @@ import {
   valoreContatore,
   sincronizzaRisorsePoteri,
   modificatoriPoteriAttivi,
+  livelloTotaleScheda,
+  potereSbloccato,
 } from '../rules/poteri.js';
 import { MODELLI_POTERI } from '../data/modelliPoteri.js';
 
@@ -70,6 +72,7 @@ const chipStile = {
 /** Una scheda compatta per potere: titolo, chip di contatori/modificatori, descrizione. */
 function PotereCard({ potere, scheda, indice, totale, onApri, lingua }) {
   const [sceltaEffetto, setSceltaEffetto] = useState(false);
+  const bloccato = !potereSbloccato(potere, livelloTotaleScheda(scheda));
   return (
     <div
       onClick={() => onApri(potere.id)}
@@ -79,7 +82,7 @@ function PotereCard({ potere, scheda, indice, totale, onApri, lingua }) {
         borderRadius: 8,
         padding: '10px 12px',
         cursor: 'pointer',
-        opacity: potere.attivo ? 1 : 0.6,
+        opacity: potere.attivo && !bloccato ? 1 : 0.6,
         display: 'flex',
         flexDirection: 'column',
         gap: 6,
@@ -91,11 +94,23 @@ function PotereCard({ potere, scheda, indice, totale, onApri, lingua }) {
         <strong style={{ fontSize: 13, color: C.ink }}>
           {potere.nome || (lingua === 'en' ? 'Unnamed power' : 'Potere senza nome')}
         </strong>
-        {!potere.attivo && (
-          <span style={{ fontSize: 11, fontWeight: 700, color: C.inkDim, border: `1px solid ${C.border}`, borderRadius: 6, padding: '1px 6px' }}>
-            {lingua === 'en' ? 'Off' : 'Disattivato'}
-          </span>
-        )}
+        <span style={{ display: 'inline-flex', gap: 5, alignItems: 'center' }}>
+          {potere.livelloMin > 0 && (
+            <span
+              style={{ fontSize: 11, fontWeight: 700, color: bloccato ? C.inkDim : C.goldDark, border: `1px solid ${bloccato ? C.border : C.goldDark}`, borderRadius: 6, padding: '1px 6px', whiteSpace: 'nowrap' }}
+              title={bloccato
+                ? (lingua === 'en' ? `Unlocks at level ${potere.livelloMin}` : `Si sblocca al ${potere.livelloMin}° livello`)
+                : (lingua === 'en' ? `Unlocked at level ${potere.livelloMin}` : `Sbloccato al ${potere.livelloMin}° livello`)}
+            >
+              {bloccato ? '🔒 ' : ''}{lingua === 'en' ? `Level ${potere.livelloMin}` : `${potere.livelloMin}° liv.`}
+            </span>
+          )}
+          {!potere.attivo && (
+            <span style={{ fontSize: 11, fontWeight: 700, color: C.inkDim, border: `1px solid ${C.border}`, borderRadius: 6, padding: '1px 6px' }}>
+              {lingua === 'en' ? 'Off' : 'Disattivato'}
+            </span>
+          )}
+        </span>
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, alignItems: 'center' }}>
@@ -191,6 +206,20 @@ function PotereModal({ potere, indice, totale, onChiudi, onAggiorna, onElimina, 
         <label style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, fontSize: 12, cursor: 'pointer' }}>
           <input type="checkbox" checked={potere.attivo} onChange={(e) => setCampo({ attivo: e.target.checked })} />
           {lingua === 'en' ? 'Active (inactive: modifiers stop applying and counters keep their value but are hidden from resources)' : 'Attivo (disattivato: i modificatori smettono di applicarsi e i contatori restano con il loro valore ma spariscono da Risorse)'}
+        </label>
+
+        <label style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, fontSize: 12 }}>
+          {lingua === 'en' ? 'Available from level' : 'Disponibile dal livello'}
+          <input
+            type="number"
+            min={0}
+            max={20}
+            value={potere.livelloMin || 0}
+            onChange={(e) => setCampo({ livelloMin: Math.max(0, Math.min(20, Math.floor(Number(e.target.value) || 0))) })}
+            style={{ ...styles.inlineInput, width: 56, fontSize: 12, padding: '4px 6px' }}
+            title={lingua === 'en' ? '0 = always. Before that level the power is locked: no modifiers, no resources.' : '0 = sempre. Prima di quel livello il potere è bloccato: niente modificatori né risorse.'}
+          />
+          <span style={{ ...styles.detail, fontSize: 11 }}>{lingua === 'en' ? '(0 = always)' : '(0 = sempre)'}</span>
         </label>
 
         <div style={{ marginBottom: 10 }}>
@@ -304,7 +333,7 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it' }) {
   const potereAperto = poteri.find((p) => p.id === potereApertoId) || null;
 
   function salvaPoteri(nuoviPoteri) {
-    aggiorna({ poteri: nuoviPoteri, risorse: sincronizzaRisorsePoteri(nuoviPoteri, scheda.risorse) });
+    aggiorna({ poteri: nuoviPoteri, risorse: sincronizzaRisorsePoteri(nuoviPoteri, scheda.risorse, livelloTotaleScheda(scheda)) });
   }
 
   function aggiungiPotere() {
@@ -313,12 +342,20 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it' }) {
     setPotereApertoId(nuovo.id);
   }
 
-  /** Aggiunge i poteri di un modello, saltando quelli già presenti (stesso nome). */
+  /** Poteri del modello già presenti (stesso nome) ma senza il livello di sblocco previsto. */
+  function daAllineareAlModello(modello) {
+    return modello.poteri.filter((mp) => (mp.livelloMin || 0) > 0 && poteri.some((p) => p.nome === mp.nome && !(p.livelloMin > 0)));
+  }
+
+  /** Aggiunge i poteri di un modello, saltando quelli già presenti (stesso nome),
+   *  e dà il livello di sblocco previsto a quelli aggiunti con una versione precedente. */
   function aggiungiModello(modello) {
     const presenti = new Set(poteri.map((p) => p.nome));
     const nuovi = modello.poteri.filter((p) => !presenti.has(p.nome)).map((p) => nuovoPotere(p));
-    if (!nuovi.length) return;
-    salvaPoteri([...poteri, ...nuovi]);
+    const livelli = new Map(daAllineareAlModello(modello).map((mp) => [mp.nome, mp.livelloMin]));
+    const esistenti = poteri.map((p) => (livelli.has(p.nome) && !(p.livelloMin > 0) ? { ...p, livelloMin: livelli.get(p.nome) } : p));
+    if (!nuovi.length && !livelli.size) return;
+    salvaPoteri([...esistenti, ...nuovi]);
     setMostraModelli(false);
   }
 
@@ -383,16 +420,19 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it' }) {
           {MODELLI_POTERI.map((m) => {
             const presenti = new Set(poteri.map((p) => p.nome));
             const mancanti = m.poteri.filter((p) => !presenti.has(p.nome)).length;
+            const daAllineare = daAllineareAlModello(m).length;
             return (
               <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 8, border: `1px solid ${C.border}`, borderRadius: 6, padding: '6px 8px' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>{lingua === 'en' ? m.nomeEn : m.nome}</div>
                   <div style={{ ...styles.detail, fontSize: 11 }}>{lingua === 'en' ? m.descrizioneEn : m.descrizione}</div>
                 </div>
-                <button type="button" style={styles.buttonMini} disabled={!mancanti} onClick={() => aggiungiModello(m)}>
+                <button type="button" style={styles.buttonMini} disabled={!mancanti && !daAllineare} onClick={() => aggiungiModello(m)}>
                   {mancanti
                     ? (lingua === 'en' ? `Add ${mancanti} powers` : `Aggiungi ${mancanti} poteri`)
-                    : (lingua === 'en' ? 'Already added' : 'Già aggiunto')}
+                    : daAllineare
+                      ? (lingua === 'en' ? 'Set unlock levels' : 'Imposta i livelli')
+                      : (lingua === 'en' ? 'Already added' : 'Già aggiunto')}
                 </button>
               </div>
             );
