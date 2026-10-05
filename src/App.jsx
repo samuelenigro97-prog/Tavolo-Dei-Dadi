@@ -19,6 +19,7 @@ import { codificaScheda, decodificaScheda, preparaPerCondivisione, costruisciLin
 import { creaStanza, apriStanza, normalizzaCodiceStanza, formattaCodiceStanza, DURATA_STANZA_ORE } from './utils/stanze.js';
 import { generaCodiceSync, normalizzaCodiceSync, formattaCodiceSync, salvaSync, caricaSync, messaggioErroreSync } from './utils/sync.js';
 import { posizionePopover, stilePopover } from './utils/popover.js';
+import { normalizzaPreferenze } from './utils/preferenze.js';
 import { improntaRoster, decidiSync, riepilogoConflitto, leggiBaseSync, salvaBaseSync, revisioneGist } from './utils/conflittiSync.js';
 import { trovaBackdropInCima, eCampoModificabile, deveAttivareDaTastiera } from './utils/accessibilita.js';
 import { salvaJsonLiberandoSpazio, deveRicordareBackup, rosterSenzaImmagini, riagganciaImmagini, salvaImmaginiRoster, caricaImmaginiRoster, rimuoviImmaginePersonaggio, preservaImmaginiSeMancanti } from './utils/persistenza.js';
@@ -1955,7 +1956,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.51.0';
+const APP_VERSION = '4.52.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -3842,12 +3843,67 @@ export default function App() {
   const [autoSync, setAutoSync] = useState(() => localStorage.getItem('scheda-interattiva:auto-sync') !== 'off');
   const [ultimoSync, setUltimoSync] = useState(() => localStorage.getItem('scheda-interattiva:ultimo-sync') || '');
   const [caricandoCloud, setCaricandoCloud] = useState(false); // overlay di caricamento dal cloud
-  const rosterSyncRef = useRef(roster);
+  // Preferenze di aspetto e audio sincronizzate coi personaggi (tema, ambientazione,
+  // cornici, audio, lingua, regole, ordine sezioni). Il timestamp dice quale copia
+  // è stata cambiata più di recente; solo i cambi fatti dall'utente lo aggiornano
+  // (non la scelta casuale del primo avvio né i valori ricevuti dal cloud).
+  const valoriPreferenze = useMemo(() => ({
+    tema, presetColori, temaCornici, ambienteAudio, volumeAudio, volumeEffetti,
+    urlCustomAudio, effettiSonori: effettiSonoriAttivi, lingua, regoleVersione,
+    manuali: manualiAttivi, ordineSezioni,
+  }), [tema, presetColori, temaCornici, ambienteAudio, volumeAudio, volumeEffetti, urlCustomAudio, effettiSonoriAttivi, lingua, regoleVersione, manualiAttivi, ordineSezioni]);
+  const [preferenzeTs, setPreferenzeTs] = useState(() => Number(localStorage.getItem('scheda-interattiva:preferenze-ts')) || 0);
+  const preferenzeNoteRef = useRef(JSON.stringify(valoriPreferenze));
+  useEffect(() => {
+    const attuale = JSON.stringify(valoriPreferenze);
+    if (attuale === preferenzeNoteRef.current) return;
+    preferenzeNoteRef.current = attuale;
+    const ora = Date.now();
+    setPreferenzeTs(ora);
+    try { localStorage.setItem('scheda-interattiva:preferenze-ts', String(ora)); } catch { /* niente */ }
+  }, [valoriPreferenze]);
+  /** Roster così come viaggia online: personaggi + preferenze. */
+  const rosterSincronizzato = useMemo(
+    () => ({ ...roster, preferenze: { ts: preferenzeTs, valori: valoriPreferenze } }),
+    [roster, preferenzeTs, valoriPreferenze],
+  );
+  /** Applica le preferenze ricevute dal cloud (ignora chiavi mancanti o non valide). */
+  function applicaPreferenzeRemote(pref) {
+    const p = normalizzaPreferenze(pref);
+    if (!p) return;
+    const v = p.valori;
+    const finali = { ...valoriPreferenze };
+    if ('tema' in v) { finali.tema = v.tema; setTema(v.tema); }
+    if ('presetColori' in v && PRESET_COLORI.some((x) => x.id === v.presetColori)) { finali.presetColori = v.presetColori; setPresetColori(v.presetColori); }
+    if ('temaCornici' in v) { finali.temaCornici = v.temaCornici; setTemaCornici(v.temaCornici); }
+    if ('ambienteAudio' in v) { finali.ambienteAudio = v.ambienteAudio; setAmbienteAudio(v.ambienteAudio); }
+    if ('volumeAudio' in v) { finali.volumeAudio = v.volumeAudio; setVolumeAudio(v.volumeAudio); }
+    if ('volumeEffetti' in v) { finali.volumeEffetti = v.volumeEffetti; setVolumeEffetti(v.volumeEffetti); }
+    if ('urlCustomAudio' in v) { finali.urlCustomAudio = v.urlCustomAudio; setUrlCustomAudio(v.urlCustomAudio); }
+    if ('effettiSonori' in v) { finali.effettiSonori = v.effettiSonori; setEffettiSonoriAttivi(v.effettiSonori); }
+    if ('lingua' in v) { finali.lingua = v.lingua; setLingua(v.lingua); }
+    if ('regoleVersione' in v) { finali.regoleVersione = v.regoleVersione; setRegoleVersione(v.regoleVersione); }
+    if ('manuali' in v) { finali.manuali = { ...DEFAULT_MANUALI, ...v.manuali }; setManualiAttivi(finali.manuali); }
+    if ('ordineSezioni' in v) {
+      // Stessa regola dell'avvio: scarta id sconosciuti e inserisci le sezioni nuove al loro posto.
+      const ordinato = v.ordineSezioni.filter((id) => ORDINE_SEZIONI_DEFAULT.includes(id));
+      for (const id of ORDINE_SEZIONI_DEFAULT) {
+        if (!ordinato.includes(id)) ordinato.splice(Math.min(ORDINE_SEZIONI_DEFAULT.indexOf(id), ordinato.length), 0, id);
+      }
+      finali.ordineSezioni = ordinato;
+      setOrdineSezioni(ordinato);
+    }
+    // Quel che si applica non è un cambio dell'utente: non deve aggiornare il timestamp.
+    preferenzeNoteRef.current = JSON.stringify(finali);
+    setPreferenzeTs(p.ts);
+    try { localStorage.setItem('scheda-interattiva:preferenze-ts', String(p.ts)); } catch { /* niente */ }
+  }
+  const rosterSyncRef = useRef(rosterSincronizzato);
   const tokenSyncRef = useRef(githubToken);
   const gistSyncRef = useRef(gistId);
   const syncInCorsoRef = useRef(false);
   const syncPendenteRef = useRef(false);
-  rosterSyncRef.current = roster;
+  rosterSyncRef.current = rosterSincronizzato;
   tokenSyncRef.current = githubToken;
   gistSyncRef.current = gistId;
 
@@ -5907,7 +5963,7 @@ export default function App() {
     try {
       const ids = Object.keys(r?.personaggi || {});
       if (!ids.length) return;
-      const leggero = rosterSenzaImmagini(r);
+      const { preferenze: _pref, ...leggero } = rosterSenzaImmagini(r);
       const serial = JSON.stringify(leggero.personaggi);
       const snaps = leggiSnapshots();
       if (snaps[0] && JSON.stringify(snaps[0].roster.personaggi) === serial) return; // no doppioni
@@ -6178,6 +6234,8 @@ export default function App() {
       if (parsed.personaggi[id]) caricato.personaggi[id] = normalizeImported(parsed.personaggi[id]);
     }
     if (!caricato.attivo || !caricato.personaggi[caricato.attivo]) caricato.attivo = Object.keys(caricato.personaggi)[0] || '';
+    const pref = normalizzaPreferenze(parsed?.preferenze);
+    if (pref) caricato.preferenze = pref;
     return caricato;
   }
   /** Sostituisce il roster locale con la versione online e ne fa la nuova base.
@@ -6188,10 +6246,11 @@ export default function App() {
     // Caricamento automatico: se nel frattempo l'utente ha modificato qualcosa
     // non si sostituisce nulla (lo gestirà il prossimo controllo come conflitto).
     if (atteso && rosterSyncRef.current !== atteso) return false;
-    const finale = preservaImmaginiSeMancanti(conImmaginiLocali, rosterSyncRef.current);
+    const { preferenze: prefRemote, ...finale } = preservaImmaginiSeMancanti(conImmaginiLocali, rosterSyncRef.current);
     salvaBaseCanale(canale, { rev: remoto.rev, ts: remoto.ts, hash: improntaRoster(remoto.roster) });
     rosterSyncRef.current = finale;
     setRoster(finale);
+    applicaPreferenzeRemote(remoto.roster?.preferenze);
     return true;
   }
   function apriConflitto(canale, remoto) {
@@ -6441,7 +6500,7 @@ export default function App() {
     const t = setTimeout(() => { salvaSuCloud(true); }, 2500);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roster, autoSync, githubToken, gistId]);
+  }, [rosterSincronizzato, autoSync, githubToken, gistId]);
 
   // Avvio: PRIMA si legge la copia online, poi eventualmente si invia.
   // salvaSuCloud tiene il "lucchetto" per tutta la verifica, quindi gli
@@ -6731,7 +6790,7 @@ export default function App() {
     const t = setTimeout(() => { salvaSuCodiceSync(true); }, 2500);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roster, autoSyncCodice, codiceSync]);
+  }, [rosterSincronizzato, autoSyncCodice, codiceSync]);
 
   // All'apertura della sezione Cloud, aggiorna silenziosamente in background se impostato
   useEffect(() => {

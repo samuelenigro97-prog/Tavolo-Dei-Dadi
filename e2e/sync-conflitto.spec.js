@@ -146,3 +146,92 @@ test('codice di sincronizzazione: stesso controllo, nessun PUT finché l’utent
   // Il client dichiara la versione da cui parte: il Worker può rifiutare se cambia ancora.
   expect(put[0].baseUpdatedAt).toBe(rosterOnline._updatedAt);
 });
+
+// Preferenze di aspetto e audio (v4.52.0): viaggiano col roster, quindi Mac,
+// iPad e iPhone mostrano lo stesso tema. Personaggi uguali + solo preferenze
+// diverse non è mai un conflitto: vince la copia cambiata più di recente.
+async function preparaPreferenze({ page, prefOnline, prefLocali }) {
+  // Roster già normalizzato dall'app (come lo avrebbero due dispositivi reali
+  // dopo una sincronizzazione): si legge dal salvataggio di una prima apertura.
+  const prima = await page.context().newPage();
+  await prima.addInitScript((locale) => {
+    if (sessionStorage.getItem('preparato')) return;
+    sessionStorage.setItem('preparato', '1');
+    localStorage.setItem('scheda-interattiva:guida-vista', '1');
+    localStorage.setItem('scheda-interattiva:v1', JSON.stringify(locale));
+  }, { attivo: 'pg-a', personaggi: { 'pg-a': { nome: 'Aldric', classe: 'Guerriero', livello: 5, versione: '2024' } } });
+  await prima.goto('/');
+  await prima.waitForFunction(() => JSON.parse(localStorage.getItem('scheda-interattiva:v1') || '{}')?.personaggi?.['pg-a']?.nome === 'Aldric');
+  // L'app completa la scheda (incantesimi, risorse...) dopo il caricamento:
+  // due aperture di fila e il salvataggio è quello a regime.
+  await prima.waitForTimeout(4000);
+  await prima.reload();
+  await prima.waitForTimeout(4000);
+  let normalizzato = await prima.evaluate(() => localStorage.getItem('scheda-interattiva:v1'));
+  normalizzato = JSON.parse(normalizzato);
+  // Campi che l'importazione online rigenera (id degli attacchi, privilegi e
+  // risorse di classe): li si fissa, come in una scheda reale già completa.
+  Object.assign(normalizzato.personaggi['pg-a'], {
+    attacchi: [{ id: 'att-1', nome: 'Spada lunga', categoria: 'Azione', bonus: 5, danno: '1d8+3', tipoDanno: 'Tagliente', note: '' }],
+    privilegi: 'Stile di combattimento\nRecuperare energie (azione bonus)\nMaestria nelle armi\nAzione impetuosa\nMente tattica\nAttacco extra\nSpostamento tattico',
+    risorse: [
+      { id: 'auto-guerriero-recuperare-energie', nome: 'Recuperare Energie', max: 3, attuali: 3, reset: 'breve' },
+      { id: 'auto-guerriero-azione-impetuosa', nome: 'Azione Impetuosa', max: 1, attuali: 1, reset: 'breve' },
+    ],
+    addestramento: { armature: { leggera: true, media: true, pesante: true, scudi: true }, armi: 'Armi semplici e da guerra', strumenti: '' },
+  });
+  await prima.close();
+  const stato = { patch: [], rev: 'rev-pref-1', contenuto: JSON.stringify({ ...normalizzato, preferenze: prefOnline, _updatedAt: 5 }) };
+  await page.route('https://api.github.com/**', async (route) => {
+    const req = route.request();
+    if (req.method() === 'PATCH') {
+      stato.patch.push(JSON.parse(req.postData() || '{}'));
+      stato.contenuto = stato.patch.at(-1).files[FILE].content;
+      stato.rev = `rev-pref-${stato.patch.length + 1}`;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ id: GIST_ID, files: { [FILE]: { content: stato.contenuto, truncated: false } }, history: [{ version: stato.rev }] }),
+    });
+  });
+  await page.addInitScript(({ gist, locale, pref }) => {
+    if (sessionStorage.getItem('preparato')) return;
+    sessionStorage.setItem('preparato', '1');
+    localStorage.setItem('scheda-interattiva:guida-vista', '1');
+    localStorage.setItem('scheda-interattiva:v1', JSON.stringify(locale));
+    localStorage.setItem('scheda-interattiva:github-token', 'token-finto');
+    localStorage.setItem('scheda-interattiva:gist-id', gist);
+    localStorage.setItem('scheda-interattiva:auto-sync', 'on');
+    localStorage.setItem('scheda-interattiva:tema', pref.tema);
+    localStorage.setItem('scheda-interattiva:preferenze-ts', String(pref.ts));
+    localStorage.setItem('scheda-interattiva:sync-base', JSON.stringify({ rev: 'rev-vecchia', ts: 1, hash: 'impronta-vecchia' }));
+  }, { gist: GIST_ID, locale: normalizzato, pref: prefLocali });
+  return stato;
+}
+
+test('preferenze: il tema scelto su un altro dispositivo arriva qui senza conflitti', async ({ page }) => {
+  const stato = await preparaPreferenze({
+    page,
+    prefOnline: { ts: 9_000_000_000_000, valori: { tema: 'scuro', lingua: 'it' } },
+    prefLocali: { tema: 'chiaro', ts: 1000 },
+  });
+  await page.goto('/');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('scheda-interattiva:tema')), { timeout: 10000 }).toBe('scuro');
+  await expect(page.getByTestId('conflitto-sync')).toHaveCount(0);
+  expect(stato.patch).toHaveLength(0);
+});
+
+test('preferenze: il tema cambiato qui più di recente viene inviato online', async ({ page }) => {
+  const stato = await preparaPreferenze({
+    page,
+    prefOnline: { ts: 1000, valori: { tema: 'scuro', lingua: 'it' } },
+    prefLocali: { tema: 'chiaro', ts: 9_000_000_000_000 },
+  });
+  await page.goto('/');
+  await expect.poll(() => stato.patch.length, { timeout: 10000 }).toBeGreaterThan(0);
+  await expect(page.getByTestId('conflitto-sync')).toHaveCount(0);
+  const inviato = JSON.parse(stato.patch.at(-1).files[FILE].content);
+  expect(inviato.preferenze.valori.tema).toBe('chiaro');
+  expect(inviato.preferenze.ts).toBe(9_000_000_000_000);
+});

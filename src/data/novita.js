@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.52.0',
+    voci: {
+      it: ['Tema, ambientazione, audio, lingua e ordine delle sezioni ora si sincronizzano tra i tuoi dispositivi insieme ai personaggi: Mac, iPad e iPhone mostrano lo stesso aspetto.'],
+      en: ['Theme, setting, audio, language and section order now sync across your devices together with your characters: Mac, iPad and iPhone show the same look.'],
+    },
+  },
+  {
     versione: '4.51.0',
     voci: {
       it: ['Tolto il dado dal logo in alto: il titolo "Tavolo dei Dadi" parte ora dal bordo sinistro della barra.'],

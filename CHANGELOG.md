@@ -2,6 +2,30 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.52.0] – 2026-10-05
+
+### Aggiunto
+- **Le preferenze di aspetto e audio ora si sincronizzano** insieme ai
+  personaggi (Gist e codice): tema (auto/chiaro/scuro), ambientazione,
+  cornici, audio di sottofondo e volumi, effetti sonori, lingua, versione
+  delle regole, manuali attivi e ordine delle sezioni. Prima restavano nel
+  `localStorage` del singolo dispositivo e Mac, iPad e iPhone finivano con
+  temi diversi. Restano locali: token e codici di sincronizzazione, stato del
+  combattimento, guida e date di backup.
+- Le preferenze viaggiano nel campo `preferenze: { ts, valori }` del roster
+  (`src/utils/preferenze.js`). `ts` è l'istante dell'ultimo cambio fatto
+  dall'utente: la scelta casuale del primo avvio e i valori ricevuti dal
+  cloud non lo aggiornano.
+
+### Cambiato
+- `decidiSync` (`conflittiSync.js`): se i personaggi sono identici e
+  differiscono solo le preferenze non c'è conflitto, vince la copia cambiata
+  più di recente. L'impronta del roster include i valori delle preferenze (non
+  il `ts`); il confronto dei soli personaggi ignora gli id degli attacchi, che
+  l'importazione rigenera a ogni normalizzazione.
+- Primo aggiornamento: la prima sincronizzazione di ogni dispositivo invia
+  anche le preferenze; il resto non cambia per chi non tocca nulla.
+
 ## [4.51.0] – 2026-10-05
 
 ### Rimosso

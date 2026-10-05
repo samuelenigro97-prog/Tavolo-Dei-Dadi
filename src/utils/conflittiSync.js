@@ -23,18 +23,7 @@ function jsonStabile(valore) {
   return `{${chiavi.map((k) => `${JSON.stringify(k)}:${jsonStabile(valore[k])}`).join(',')}}`;
 }
 
-/**
- * Impronta del contenuto di un roster. Esclude le immagini (vivono in
- * IndexedDB e il cloud può non averle) e i metadati di sincronizzazione.
- */
-export function improntaRoster(roster) {
-  const personaggi = {};
-  for (const [id, pg] of Object.entries(roster?.personaggi || {})) {
-    if (!pg || typeof pg !== 'object') continue;
-    const { ritratto: _r, mappaCampagna: _m, ...resto } = pg;
-    personaggi[id] = resto;
-  }
-  const testo = jsonStabile({ attivo: roster?.attivo || '', personaggi });
+function hashTesto(testo) {
   // FNV-1a a 32 bit + lunghezza: basta per riconoscere "uguale / diverso".
   let h = 0x811c9dc5;
   for (let i = 0; i < testo.length; i++) {
@@ -42,6 +31,45 @@ export function improntaRoster(roster) {
     h = Math.imul(h, 0x01000193) >>> 0;
   }
   return `${h.toString(16).padStart(8, '0')}-${testo.length}`;
+}
+
+function personaggiSenzaImmagini(roster) {
+  const personaggi = {};
+  for (const [id, pg] of Object.entries(roster?.personaggi || {})) {
+    if (!pg || typeof pg !== 'object') continue;
+    const { ritratto: _r, mappaCampagna: _m, ...resto } = pg;
+    personaggi[id] = resto;
+  }
+  return personaggi;
+}
+
+/**
+ * Impronta del contenuto di un roster. Esclude le immagini (vivono in
+ * IndexedDB e il cloud può non averle) e i metadati di sincronizzazione.
+ * Include i valori delle preferenze (tema, audio...) se il roster le ha, ma
+ * non il loro timestamp: due dispositivi con gli stessi valori sono uguali.
+ */
+export function improntaRoster(roster) {
+  const valoriPref = roster?.preferenze?.valori;
+  const conPref = valoriPref && typeof valoriPref === 'object' && Object.keys(valoriPref).length > 0;
+  return hashTesto(jsonStabile({
+    attivo: roster?.attivo || '',
+    personaggi: personaggiSenzaImmagini(roster),
+    ...(conPref ? { preferenze: valoriPref } : {}),
+  }));
+}
+
+/**
+ * Come improntaRoster, ma ignora le preferenze: confronta solo i personaggi.
+ * Ignora anche gli id degli attacchi: l'app li rigenera a ogni normalizzazione
+ * della copia online, quindi due schede identiche avrebbero id diversi.
+ */
+export function improntaPersonaggi(roster) {
+  const personaggi = personaggiSenzaImmagini(roster);
+  for (const pg of Object.values(personaggi)) {
+    if (Array.isArray(pg.attacchi)) pg.attacchi = pg.attacchi.map((a) => (a && typeof a === 'object' ? { ...a, id: undefined } : a));
+  }
+  return hashTesto(jsonStabile({ attivo: roster?.attivo || '', personaggi }));
 }
 
 /** La versione online è cambiata rispetto alla base di questo dispositivo? */
@@ -86,6 +114,15 @@ export function decidiSync({ base, remoto, locale }) {
   if (improntaRoster(remoto.roster) === hashLocale) return { azione: 'allineato', motivo: 'contenuto-identico' };
   if (!localeModificato) return { azione: 'carica', motivo: 'locale-invariato' };
   if (!haPersonaggi(locale)) return { azione: 'carica', motivo: 'locale-vuoto' };
+  // Personaggi identici e differenze solo nelle preferenze (tema, audio...):
+  // non è un vero conflitto, vince la copia cambiata più di recente.
+  if (improntaPersonaggi(remoto.roster) === improntaPersonaggi(locale)) {
+    const tsRemoto = Number(remoto.roster?.preferenze?.ts) || 0;
+    const tsLocale = Number(locale?.preferenze?.ts) || 0;
+    return tsRemoto >= tsLocale
+      ? { azione: 'carica', motivo: 'solo-preferenze-online' }
+      : { azione: 'invia', motivo: 'solo-preferenze-locali' };
+  }
   return { azione: 'conflitto', motivo: 'modifiche-su-entrambi' };
 }
 
