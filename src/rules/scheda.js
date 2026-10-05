@@ -486,11 +486,14 @@ export function analizzaMunizioniArma(attacco, inventario = [], armaDb = null) {
 // Coppie chiaro/scuro perché un solo hex non regge sfondo bianco e quasi-nero.
 const NEUTRO = { chiaro: '#57534e', scuro: '#d6d3d1' };
 const QUANDO = { chiaro: '#15803d', scuro: '#4ade80' };
-// "Come si lancia": Concentrazione e Rituale. Fucsia, una tinta che nessun altro
-// chip usa (né le scuole, che sono neutre): con il grigio neutro la
-// Concentrazione si confondeva con la scuola di magia accanto. Contrasto del
-// testo: ~6,6:1 su bianco (#a21caf) e ~11:1 sul pannello scuro (#f0abfc).
-const LANCIO = { chiaro: '#a21caf', scuro: '#f0abfc' };
+// "Come si lancia": Concentrazione (fucsia) e Rituale (viola), due tinte che nessun
+// altro chip usa (le scuole sono neutre): con il grigio neutro la Concentrazione
+// si confondeva con la scuola di magia accanto, e il Rituale deve distinguersi
+// dalla Concentrazione. Contrasto del testo: Concentrazione ~6,6:1 su bianco
+// (#a21caf) e ~11:1 sul pannello scuro (#f0abfc); Rituale ~7,1:1 (#6d28d9) e
+// ~7:1 (#a78bfa).
+const CONCENTRAZIONE = { chiaro: '#a21caf', scuro: '#f0abfc' };
+const RITUALE = { chiaro: '#6d28d9', scuro: '#a78bfa' };
 
 /** Palette per tipo di informazione, condivisa da Combattimento e Incantesimi. */
 export const COLORE_CATEGORIA_INFO = {
@@ -505,8 +508,8 @@ export const COLORE_CATEGORIA_INFO = {
   modificato:   { chiaro: '#2563eb', scuro: '#93c5fd' }, // valore modificato da Poteri/Sfinimento
   proprieta:    NEUTRO,                                   // descrittivo: Magico, Versatile, Maestria
   effetto:      NEUTRO,                                   // descrittivo: effetto di una reazione
-  concentrazione: LANCIO,                                 // come si lancia: Concentrazione
-  rituale:      LANCIO,                                   // come si lancia: Rituale
+  concentrazione: CONCENTRAZIONE,                         // come si lancia: Concentrazione
+  rituale:      RITUALE,                                  // come si lancia: Rituale
   scuola:       NEUTRO,                                   // descrittivo: il nome della scuola basta
 };
 

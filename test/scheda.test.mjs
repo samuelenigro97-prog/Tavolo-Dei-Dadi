@@ -842,14 +842,15 @@ test('separaNotaIncantesimo: "Conc."/"Rituale" nella nota diventano solo il chip
   assert.deepEqual(separaNotaIncantesimo(undefined), { nota: '', conc: false, rituale: false });
 });
 
-test('coloreCategoria: Concentrazione e Rituale hanno una tinta propria, diversa da scuola e dagli altri chip', async () => {
+test('coloreCategoria: Concentrazione e Rituale hanno ciascuno una tinta propria, diversa da scuola e dagli altri chip', async () => {
   const { coloreCategoria, COLORE_CATEGORIA_INFO } = await import('../src/rules/scheda.js');
   for (const scuro of [false, true]) {
     const conc = coloreCategoria('concentrazione', scuro);
-    assert.equal(coloreCategoria('rituale', scuro), conc);
+    const rit = coloreCategoria('rituale', scuro);
+    assert.notEqual(rit, conc, `Rituale (${scuro ? 'scuro' : 'chiaro'}) uguale a Concentrazione`);
     for (const k of Object.keys(COLORE_CATEGORIA_INFO)) {
-      if (k === 'concentrazione' || k === 'rituale') continue;
-      assert.notEqual(coloreCategoria(k, scuro), conc, `${k} (${scuro ? 'scuro' : 'chiaro'}) uguale a Concentrazione`);
+      if (k !== 'concentrazione') assert.notEqual(coloreCategoria(k, scuro), conc, `${k} (${scuro ? 'scuro' : 'chiaro'}) uguale a Concentrazione`);
+      if (k !== 'rituale') assert.notEqual(coloreCategoria(k, scuro), rit, `${k} (${scuro ? 'scuro' : 'chiaro'}) uguale a Rituale`);
     }
   }
 });

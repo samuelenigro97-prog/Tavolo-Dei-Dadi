@@ -2,6 +2,18 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.62.0] – 2026-10-05
+
+### Cambiato
+- **Rituale** ha ora un colore suo (viola: #6d28d9 chiaro, #a78bfa scuro):
+  prima condivideva il fucsia della Concentrazione, quindi due chip diversi
+  sembravano lo stesso. Il test sulla palette verifica che Concentrazione e
+  Rituale siano diversi tra loro e da ogni altra categoria.
+- **Riquadri statistica** (CA, Riposo, Bonus di competenza, Iniziativa,
+  Velocità, Sfinimento, Visione, Percezione passiva, Resistenze, Condizioni):
+  tolto il **doppio bordo**, ora hanno un solo bordo luminoso (il filetto
+  interno resta solo sulle sezioni grandi).
+
 ## [4.61.0] – 2026-10-05
 
 ### Cambiato

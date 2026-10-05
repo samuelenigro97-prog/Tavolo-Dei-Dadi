@@ -1200,7 +1200,7 @@ tbody tr:hover {
    - etichetta sempre alta due righe e centrata, così i valori stanno alla stessa
      altezza in tutta la riga e i titoli lunghi ("Bonus di competenza") non
      escono dal riquadro;
-   - stessa cornice luminosa delle sezioni e dei blocchi caratteristica. */
+   - bordo luminoso singolo (senza il doppio filetto delle sezioni grandi). */
 .vital-box > div:first-child {
   min-height: 2.4em;
   display: flex !important;
@@ -1222,8 +1222,7 @@ tbody tr:hover {
   border-color: var(--c-border-glow-min, var(--c-border)) !important;
   box-shadow: 0 3px 12px -2px var(--c-aura-glow-1, rgba(60,50,30,0.04)),
               0 1px 3px rgba(0, 0, 0, 0.25) !important;
-  outline: 1px solid var(--c-border);
-  outline-offset: -4px;
+  /* un solo bordo: niente filetto interno (outline) come nelle sezioni grandi */
 }
 /* Filetto oro doppio sotto la barra superiore, come le cornici titolo dei
    vecchi manuali — fisso, sempre presente. */

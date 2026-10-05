@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.62.0',
+    voci: {
+      it: ['Il chip Rituale ha un colore tutto suo (viola), diverso dalla Concentrazione.', 'Riquadri CA, Competenza, Iniziativa e gli altri: un solo bordo invece del doppio.'],
+      en: ['The Ritual chip has its own colour (purple), different from Concentration.', 'AC, Proficiency, Initiative and the other boxes: a single border instead of a double one.'],
+    },
+  },
+  {
     versione: '4.61.0',
     voci: {
       it: [
