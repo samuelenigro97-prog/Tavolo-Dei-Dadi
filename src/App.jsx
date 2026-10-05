@@ -1956,7 +1956,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.56.0';
+const APP_VERSION = '4.56.1';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -13544,10 +13544,10 @@ export default function App() {
                             <span key={g.facce} style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
                               {t('vital.dadi_vita')}{' '}
                               <Rollable onRoll={() => tiraDadoVita(g.facce)} title={t('vital.dadi_vita_tooltip')}>
-                                <strong style={{ color: C.goldDark }}>{g.quantita}</strong>
+                                <strong style={{ color: C.ink }}>{g.quantita}</strong>
                               </Rollable>
                               {' × d'}
-                              <strong style={{ color: C.goldDark }} title={t('vital.dado_tipo_tooltip')}>
+                              <strong style={{ color: C.ink }} title={t('vital.dado_tipo_tooltip')}>
                                 {g.facce}
                               </strong>
                               {' · '}{t('vital.spesi')}{' '}
@@ -13563,7 +13563,7 @@ export default function App() {
                               </select>
                               <span style={{ color: C.inkDim }}>/ {g.quantita}</span>
                               <button
-                                style={{ ...styles.buttonMini, padding: '1px 5px', fontSize: 11, color: C.green, borderColor: C.green }}
+                                style={{ ...styles.buttonMini, padding: '1px 5px', fontSize: 11, color: C.ink, borderColor: C.ink }}
                                 title={t('vital.usa_tooltip')}
                                 disabled={(spesiMapDV[g.facce] || 0) >= g.quantita}
                                 onClick={() => tiraDadoVita(g.facce)}

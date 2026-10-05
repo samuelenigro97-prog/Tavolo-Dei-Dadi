@@ -2,6 +2,13 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.56.1] – 2026-10-05
+
+### Cambiato
+- **Riga dei Dadi Vita** (sotto i Punti Ferita): numero e tipo di dado
+  ("10 × d8") e pulsante "Usa" passano dal verde al colore del testo
+  (bianco nel tema scuro, scuro in quello chiaro).
+
 ## [4.56.0] – 2026-10-05
 
 ### Cambiato
