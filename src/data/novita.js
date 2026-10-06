@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.78.0',
+    voci: {
+      it: [
+        'Reazioni più pulite: niente riquadri colorati di innesco ed effetto. Tocca il nome per una nuvoletta con l\'essenziale: tipo di azione, distanza, innesco, effetto, attacco e danno.',
+        'I nomi di attacchi, reazioni, oggetti e risorse non si rinominano più: li decide il sistema.',
+      ],
+      en: [
+        'Cleaner Reactions: no more coloured trigger and effect boxes. Tap the name for a bubble with the essentials: action type, range, trigger, effect, attack and damage.',
+        'Attack, reaction, item and resource names can no longer be renamed: the system sets them.',
+      ],
+    },
+  },
+  {
     versione: '4.77.0',
     voci: {
       it: [

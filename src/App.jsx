@@ -1952,7 +1952,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.77.0';
+const APP_VERSION = '4.78.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -10318,7 +10318,7 @@ export default function App() {
                               style={{ padding: 0, border: 0, background: 'transparent', color: C.ink, font: 'inherit', fontWeight: 600, textAlign: 'left', cursor: 'pointer', textDecoration: 'none', marginRight: 'auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}
                             >{nomeVisualizzato}</button>
                           ) : (
-                            <span style={{ marginRight: 'auto', minWidth: 0 }}><Editable value={nomeVisualizzato} onChange={(v) => modifica({ nome: v })} width={110} title={t('tip.nome_risorsa')} /></span>
+                            <span style={{ marginRight: 'auto', minWidth: 0, fontWeight: 600, color: C.ink, overflow: 'hidden', textOverflow: 'ellipsis' }}>{nomeVisualizzato}</span>
                           )}
                           {!automatica && (
                             <button
@@ -12667,13 +12667,34 @@ export default function App() {
                                 : a.tipo === 'specie' ? '🧬'
                                 : '⚡';
 
+                              // Nuvoletta essenziale (tocco sul nome o sull'icona): tipo di azione,
+                              // distanza, innesco/effetto, tiro e danno, poi una descrizione breve.
                               const apriInfoReazione = () => {
-                                const tCond = a.innescoIt ? `${lingua === 'en' ? 'Trigger' : 'Innesco'}: ${lingua === 'en' ? (a.innescoEn || a.innescoIt) : a.innescoIt}\n\n` : '';
-                                const tEff = a.effettoIt ? `${lingua === 'en' ? 'Effect' : 'Effetto'}: ${lingua === 'en' ? (a.effettoEn || a.effettoIt) : a.effettoIt}` : '';
-                                setInfo({
-                                  titolo: `${iconaReazione} ${cleanNome}`,
-                                  testo: (tCond + tEff) || testoAttacco || spiegazioneEffetto || (lingua === 'en' ? 'No description available.' : 'Nessuna descrizione disponibile.')
-                                });
+                                const en = lingua === 'en';
+                                const righe = [];
+                                righe.push(`${en ? 'Action' : 'Azione'}: ${cat === 'Azione' ? (en ? '1 Action' : '1 Azione') : cat === 'Bonus' ? (en ? 'Bonus Action' : 'Azione Bonus') : (en ? 'Reaction' : 'Reazione')}`);
+                                const distanza = gittataAttacco(a, spellInLista, armaDb) || (hasReach ? '3m' : '') || spSpell?.gittata
+                                  || (!a.isSpell && (a.tipo === 'tattica' || a.tipo === 'attacco') ? (en ? '5 ft (melee reach)' : '1,5 m (portata in mischia)') : '');
+                                if (distanza) righe.push(`${en ? 'Range' : 'Distanza'}: ${traduciDato(distanza)}`);
+                                if (spSpell?.durata) righe.push(`${en ? 'Duration' : 'Durata'}: ${traduciDato(spSpell.durata)}`);
+                                if (spSpell?.conc) righe.push(en ? 'Concentration' : 'Concentrazione');
+                                if (a.innescoIt) righe.push(`${en ? 'Trigger' : 'Innesco'}: ${en ? (a.innescoEn || a.innescoIt) : a.innescoIt}`);
+                                if (a.effettoIt) righe.push(`${en ? 'Effect' : 'Effetto'}: ${en ? (a.effettoEn || a.effettoIt) : a.effettoIt}`);
+                                if (a.isTS && a.cd) righe.push(`${en ? 'Save' : 'Tiro salvezza'}: ${en ? 'DC' : 'CD'} ${a.cd}${a.caratteristicaTS ? ` (${a.caratteristicaTS})` : ''}`);
+                                else if (typeof a.bonus === 'number') righe.push(`${en ? 'Attack' : 'Attacco'}: ${a.bonus >= 0 ? '+' : ''}${a.bonus}`);
+                                if (a.danno) righe.push(`${a.tipoDanno === 'Guarigione' ? (en ? 'Healing' : 'Cura') : (en ? 'Damage' : 'Danno')}: ${a.danno}${a.tipoDanno && a.tipoDanno !== 'Guarigione' ? ` ${traduciDato(a.tipoDanno)}` : ''}`);
+                                if (infoMunizioni.usaMunizioni) righe.push(`${en ? 'Ammunition' : 'Munizioni'}: ${infoMunizioni.totale}`);
+                                // Descrizione breve (solo se non è già detta da innesco/effetto).
+                                let breve = '';
+                                if (!a.innescoIt && !a.effettoIt) {
+                                  const testo = String(spiegazioneEffetto || a.note || '').replace(/\s+/g, ' ').trim();
+                                  if (testo) {
+                                    const frasi = testo.match(/[^.!?]+[.!?]+/g) || [testo];
+                                    breve = frasi.slice(0, 2).join(' ').trim();
+                                    if (breve.length > 260) breve = `${breve.slice(0, 257).trimEnd()}…`;
+                                  }
+                                }
+                                setInfo({ titolo: `${iconaReazione} ${cleanNome}`, testo: righe.join('\n') + (breve ? `\n\n${breve}` : '') });
                               };
 
                               return (
@@ -12744,13 +12765,15 @@ export default function App() {
                                           )}
                                         </select>
                                       )}
-                                      <Editable
-                                        value={a.nome}
-                                        width={130}
-                                        onChange={(v) => aggiornaAttacco({ nome: v })}
-                                        onRoll={castBloccato ? undefined : () => tiraColpoArma(a)}
-                                        title={titoloRiga || (castBloccato ? tr('Equipaggia un focus per lanciare questo incantesimo', 'Equip a focus to cast this spell') : undefined)}
-                                      />
+                                      {/* Il nome lo decide il sistema (arma, incantesimo, privilegio): non si
+                                          rinomina. Un tocco apre la nuvoletta con le informazioni essenziali. */}
+                                      <button
+                                        type="button"
+                                        className="attacco-nome"
+                                        onClick={apriInfoReazione}
+                                        title={castBloccato ? tr('Equipaggia un focus per lanciare questo incantesimo', 'Equip a focus to cast this spell') : tr('Tocca per i dettagli', 'Tap for details')}
+                                        style={{ background: 'transparent', border: 0, padding: 0, font: 'inherit', fontWeight: 700, color: C.ink, cursor: 'help', textAlign: 'left', textDecoration: 'underline dotted', textUnderlineOffset: 3, textDecorationColor: C.inkDim, minWidth: 0 }}
+                                      >{traduciDato(cleanNome) || cleanNome}</button>
                                     </div>
                                   </td>
                                   <td style={styles.td} className="attacchi-bonus" data-label={t('combat.col_bonus')}>
@@ -12815,14 +12838,10 @@ export default function App() {
                                           </button>
                                         )}
                                       </div>
-                                    ) : cat === 'Reazione' ? null : (
-                                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
-                                        <Editable value={a.danno} width={65} onChange={(v) => aggiornaAttacco({ danno: v })} />
-                                        <Editable value={a.tipoDanno} width={75} onChange={(v) => aggiornaAttacco({ tipoDanno: v })} />
-                                      </div>
-                                    )}
+                                    ) : null}
                                   </td>
                                   <td style={styles.td} className="attacchi-note" data-label={t('combat.col_note')}>
+                                    {cat === 'Reazione' ? null : (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
                                       <span
                                         className="chip-tempo"
@@ -12943,18 +12962,15 @@ export default function App() {
                                             {c.testo}
                                           </span>
                                         ))}
-                                        {!notaRidondante && (
-                                          <Editable
-                                            value={a.note}
-                                            width={gittataRiga || hasReach || infoMunizioni.usaMunizioni || categorieNota.length > 0 ? 90 : 130}
-                                            onChange={(v) => aggiornaAttacco({ note: v })}
-                                            title={titoloRiga || a.note || t('tip.click_modifica')}
-                                          />
+                                        {!notaRidondante && a.note && (
+                                          // Nota non riconosciuta: si legge nella nuvoletta (tocco sul nome), non si modifica qui.
+                                          <span style={{ ...styles.detail, fontSize: 11, maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={a.note}>{a.note}</span>
                                         )}
                                       </span>
                                         );
                                       })()}
                                     </div>
+                                    )}
                                   </td>
                                   <td className="col-azioni attacchi-azioni" style={{ ...styles.td, textAlign: 'right' }}>
                                     <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
@@ -15389,16 +15405,6 @@ export default function App() {
                   }
                   aggiorna({ sintonia: [...occupati, o.nome] });
                 };
-                const rinominaItem = (o, nome) => {
-                  const indice = indiceSintonia(o.nome);
-                  const nuovaSintonia = indice < 0 ? sintoniaArr : sintoniaArr.map((s, i) => (i === indice ? nome : s));
-                  const newAttacchi = (scheda.attacchi || []).map((a) => (a.nome.toLowerCase() === o.nome.toLowerCase() ? { ...a, nome } : a));
-                  aggiorna({
-                    inventario: inv.map((x) => (x.id === o.id ? completaUtilizziOggetto({ ...x, nome }) : x)),
-                    attacchi: newAttacchi,
-                    sintonia: nuovaSintonia,
-                  });
-                };
                 const eliminaItem = (o) => {
                   const indice = indiceSintonia(o.nome);
                   const newAttacchi = (scheda.attacchi || []).filter((a) => a.nome.toLowerCase() !== o.nome.toLowerCase());
@@ -15736,12 +15742,13 @@ export default function App() {
                                       {(() => {
                                         const spItem = o.effetto || spiegaIncantesimo(o.nome) || (EFFETTI_OGGETTO.find(([id]) => id === o.effettoMeccanico)?.[lingua === 'en' ? 2 : 1]);
                                         return (
-                                          <Editable
-                                            value={o.nome}
-                                            width={150}
-                                            onChange={(v) => rinominaItem(o, v)}
-                                            title={spItem ? `${o.nome}: ${spItem}` : undefined}
-                                          />
+                                          <button
+                                            type="button"
+                                            className="oggetto-nome"
+                                            onClick={() => spItem && setInfo({ titolo: traduciDato(o.nome) || o.nome, testo: spItem })}
+                                            title={spItem ? `${o.nome}: ${spItem}` : o.nome}
+                                            style={{ background: 'transparent', border: 0, padding: 0, font: 'inherit', color: C.ink, cursor: spItem ? 'help' : 'default', textAlign: 'left', textDecoration: spItem ? 'underline dotted' : 'none', textUnderlineOffset: 3, textDecorationColor: C.inkDim }}
+                                          >{traduciDato(o.nome) || o.nome}</button>
                                         );
                                       })()}
                                       {isContainer && (

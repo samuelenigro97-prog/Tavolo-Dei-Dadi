@@ -165,9 +165,8 @@ test.describe('Combattimento', () => {
   });
 
   test('Assorbire Elementi (danno sul prossimo colpo in mischia) non ha il badge del tiro per colpire', async ({ page }) => {
-    // Solo il vero <button> del nome: dalla v4.48.0 anche il campo modificabile
-    // (span role="button") ha lo stesso nome accessibile.
-    const riga = page.getByRole('button', { name: 'Assorbire Elementi', exact: true }).and(page.locator('button')).locator('xpath=ancestor::*[.//*[contains(@class, "badge-tiro-danno")]][1]');
+    // La riga della Reazione in Combattimento (il nome è un pulsante anche nella lista incantesimi).
+    const riga = page.locator('tr.attacchi-riga').filter({ hasText: 'Assorbire Elementi' });
     await expect(riga.locator('.badge-tiro-danno')).toHaveCount(1);
     await expect(riga.locator('.badge-tiro-colpire')).toHaveCount(0);
   });
@@ -183,5 +182,19 @@ test.describe('Combattimento', () => {
     await apriScheda(page);
     const rigaBonus = page.locator('tr.attacchi-riga').filter({ hasText: 'Parola di Guarigione' });
     await expect(rigaBonus.locator('.badge-tiro-danno')).toContainText('2d4+5');
+  });
+
+  test('Reazioni: niente riquadri di innesco/effetto, nome non modificabile, il tocco apre la nuvoletta essenziale', async ({ page }) => {
+    const riga = page.locator('tr.attacchi-riga').filter({ hasText: 'Attacco di Opportunità' });
+    await expect(riga.locator('.chip-reazione-testo')).toHaveCount(0);
+    await expect(riga.locator('.chip-tempo')).toHaveCount(0);
+    // Nessun campo modificabile nella riga (il nome lo decide il sistema).
+    await expect(riga.locator('input, [contenteditable="true"]')).toHaveCount(0);
+    await riga.locator('.attacco-nome').click();
+    const nuvola = page.getByText(/Azione: Reazione/).last();
+    await expect(nuvola).toBeVisible();
+    await expect(nuvola).toContainText('Distanza: 1,5 m');
+    await expect(nuvola).toContainText('Innesco:');
+    await expect(nuvola).toContainText('Danno:');
   });
 });

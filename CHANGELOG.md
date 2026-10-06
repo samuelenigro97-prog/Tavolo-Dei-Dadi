@@ -2,6 +2,22 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.78.0] – 2026-10-06
+
+### Cambiato
+- **Reazioni senza riquadri colorati**: tolti i chip di Innesco ed Effetto (e
+  quello "Reazione", già detto dal titolo). La riga mostra icona, nome, tiri e
+  "Usa". Tocco sul nome o sull'icona → nuvoletta con l'essenziale: tipo di
+  azione, distanza (anche la portata in mischia di 1,5 m dell'Attacco di
+  Opportunità), durata e concentrazione, innesco, effetto, attacco o CD, danno,
+  munizioni, più due frasi di descrizione quando non c'è innesco/effetto.
+- **Niente rinomina**: in Combattimento (Azioni, Azioni Bonus, Reazioni) il
+  nome è un pulsante che apre la nuvoletta, non un campo; tolti anche i campi
+  liberi di danno e nota. Nell'inventario il nome dell'oggetto non si modifica
+  (tocco = descrizione); le risorse di classe hanno il nome fisso. Restano
+  scrivibili solo i nomi delle cose create a mano (Poteri homebrew, nemici del
+  tracker di combattimento).
+
 ## [4.77.0] – 2026-10-06
 
 ### Cambiato
