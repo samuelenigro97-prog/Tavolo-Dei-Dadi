@@ -1870,12 +1870,18 @@ const SPIEG_RISORSE = {
   'Indomito': 'Puoi ritirare un tiro salvezza fallito (+ livello da Guerriero nella versione 2024). Usi: 1 al 9°, 2 al 13°, 3 al 17°; si ricarica con un riposo lungo.',
 
   // Druido
+  'Senso Divino': '(Regole 2014) Come azione, fino alla fine del tuo prossimo turno sai dove si trovano celestiali, immondi e non morti entro 18 m non dietro copertura totale, e i luoghi consacrati o profanati. Usi: 1 + modificatore di Carisma per riposo lungo.',
+  'Astuzia Magica': '(Regole 2024) Con un rito di 1 minuto recuperi slot del Patto spesi pari a metà del massimo (arrotondato per eccesso). Una volta per riposo lungo; al 20° livello (Maestro dell\'Occulto) recuperi tutti gli slot.',
+  'Metabolismo Prodigioso': '(Regole 2024) Quando tiri l\'iniziativa recuperi tutti i Punti Focus spesi e tiri il Dado delle Arti Marziali: recuperi PF pari al risultato + il tuo livello da Monaco. Una volta per riposo lungo.',
+  'Ripristino Stregonesco': '(Regole 2024) Quando finisci un riposo breve recuperi Punti Stregoneria spesi fino a metà del tuo livello da Stregone (arrotondato per difetto). Una volta per riposo lungo.',
+  'Instancabile': '(Regole 2024) Come azione ottieni PF temporanei pari a 1d8 + modificatore di Saggezza; un riposo breve riduce di 1 lo Sfinimento. Usi: modificatore di Saggezza (min. 1) per riposo lungo.',
+  'Velo della Natura': '(Regole 2024) Come azione bonus diventi Invisibile fino alla fine del tuo prossimo turno. Usi: modificatore di Saggezza (min. 1) per riposo lungo.',
   'Forma Selvatica': 'Come azione (o azione bonus nella 2024/Luna), assumi magicamente la forma di una bestia che conosci entro i limiti di GS. Ottieni i PF e le caratteristiche fisiche della bestia preservando le facoltà mentali. 2 usi (3 al 6°, 4 al 17°). Regole 2024: un riposo breve ne restituisce uno, un riposo lungo tutti. Regole 2014: entrambi i riposi li restituiscono tutti.',
   'Ausilio dalla Terra': 'Come azione spendi una Forma Selvatica per evocare fiori curativi per gli alleati o spine che feriscono i nemici nell’area.',
 
   // Chierico
   'Incanalare Divinità': 'Incanali l’energia divina della tua divinità per alimentare effetti sacri: Scacciare Non Morti e il potere unico del tuo Dominio Divino (Preservare Vita, Radiosità dell’Alba, Furia della Tempesta…). Usi limitati per livello. Nella 2014 si recuperano tutti con un riposo breve o lungo; nella 2024 il riposo breve ne restituisce uno e il lungo tutti.',
-  'Intervento Divino': 'Come azione implori l’aiuto della tua divinità tirando 1d100: se ottieni un numero pari o inferiore al tuo livello da Chierico (automatico al 20°), la divinità interviene compiendo un miracolo o replicando un incantesimo. Si ricarica con un riposo lungo.',
+  'Intervento Divino': 'Regole 2014: come azione implori l’aiuto della tua divinità tirando 1d100; se ottieni un numero pari o inferiore al tuo livello da Chierico (automatico al 20°) la divinità interviene. Regole 2024: come azione lanci un incantesimo da chierico di 5° livello o inferiore senza slot né componenti materiali. Una volta per riposo lungo.',
 
   // Paladino
   'Imposizione delle Mani': 'Hai una riserva di potere curativo benedetto pari a 5 × il tuo livello da Paladino. Toccando una creatura spendi punti per curarla, oppure ne spendi 5 per neutralizzare un veleno o una malattia. Si ricarica con un riposo lungo.',
@@ -1952,7 +1958,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.78.0';
+const APP_VERSION = '4.79.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -3238,6 +3244,25 @@ function leggiTentativiAggiornamento(build) {
  * Cronologia versioni, e le sue modifiche a parti diverse della scheda restano.
  */
 const POLITICA_SYNC = 'online';
+
+/**
+ * Nuvoletta unica dei dettagli (Combattimento, Incantesimi...): prima le
+ * informazioni essenziali, una per riga (tipo di azione, distanza, durata...),
+ * poi al massimo un paio di frasi di descrizione.
+ */
+function riassumiDescrizione(testo, maxFrasi = 2, maxCaratteri = 320) {
+  const pulito = String(testo || '').replace(/\s+/g, ' ').trim();
+  if (!pulito) return '';
+  const frasi = pulito.match(/[^.!?]+[.!?]+(\s|$)/g) || [pulito];
+  let breve = frasi.slice(0, maxFrasi).join('').trim();
+  if (breve.length > maxCaratteri) breve = `${breve.slice(0, maxCaratteri - 1).trimEnd()}…`;
+  return breve;
+}
+function testoNuvoletta(righe, descrizione) {
+  const essenziale = righe.filter(Boolean).join('\n');
+  const breve = riassumiDescrizione(descrizione);
+  return [essenziale, breve].filter(Boolean).join('\n\n');
+}
 
 /** Conta (in sessionStorage) i tentativi di aggiornamento verso la stessa versione. */
 function registraTentativoAggiornamento(build) {
@@ -7460,10 +7485,11 @@ export default function App() {
                     <strong>{lingua === 'en' ? 'Short rest auto-recharge:' : 'Ricarica automatica riposo breve:'}</strong>
                     <div style={{ fontSize: 11, marginTop: 2 }}>
                       {(() => {
-                        const risorseBrevi = (scheda.risorse || []).filter((r) => r.ricarica === 'breve');
+                        // Il campo è `reset` ('breve' = tutti gli usi, 'breve-uno' = un uso; il lungo li dà tutti).
+                        const risorseBrevi = (scheda.risorse || []).filter((r) => r.reset === 'breve' || r.reset === 'breve-uno');
                         const isWarlock = /warlock|patto/i.test(scheda.classe || '');
                         const elenco = [
-                          ...risorseBrevi.map((r) => r.nome),
+                          ...risorseBrevi.map((r) => (r.reset === 'breve-uno' ? `${traduciDato(r.nome)} (${lingua === 'en' ? '+1 use' : '+1 uso'})` : traduciDato(r.nome))),
                           ...(isWarlock ? [lingua === 'en' ? 'Pact Magic Slots' : 'Slot del Patto (Warlock)'] : []),
                         ];
                         return elenco.length > 0 ? elenco.join(', ') : (lingua === 'en' ? 'No short-rest class features.' : 'Nessuna risorsa con ricarica breve.');
@@ -12623,23 +12649,6 @@ export default function App() {
                               const spSpell = datiIncantesimo(cleanNome);
                               const spiegazioneEffetto = spiegaIncantesimo(cleanNome) || spSpell?.desc || (dettagliIncantesimo(cleanNome)?.desc) || spiegaPrivilegio(cleanNome) || spiegaTratto(cleanNome) || spiegaTalento(cleanNome) || a.note || '';
                               
-                              let testoAttacco = spiegazioneEffetto;
-                              if (spSpell) {
-                                const dTags = [];
-                                if (spSpell.scuola) dTags.push(`${lingua === 'en' ? 'School' : 'Scuola'}: ${traduciDato(spSpell.scuola)}`);
-                                if (spSpell.tempo) dTags.push(`${lingua === 'en' ? 'Casting Time' : 'Tempo di lancio'}: ${traduciDato(spSpell.tempo)}`);
-                                if (spSpell.gittata) dTags.push(`${lingua === 'en' ? 'Range' : 'Gittata'}: ${spSpell.gittata}`);
-                                if (spSpell.area) dTags.push(`${lingua === 'en' ? 'Area' : 'Area'}: ${spSpell.area}`);
-                                if (spSpell.danno || spSpell.tipoDanno) dTags.push(`${lingua === 'en' ? 'Damage' : 'Danno'}: ${spSpell.danno || ''} ${spSpell.tipoDanno ? `(${traduciDato(spSpell.tipoDanno)})` : ''}`.trim());
-                                if (spSpell.conc) dTags.push(`${lingua === 'en' ? 'Concentration' : 'Concentrazione'}: ${lingua === 'en' ? 'Yes' : 'Sì'}`);
-                                if (spSpell.rituale) dTags.push(`${lingua === 'en' ? 'Ritual' : 'Rituale'}: ${lingua === 'en' ? 'Yes' : 'Sì'}`);
-                                if (dTags.length > 0) testoAttacco = (testoAttacco ? testoAttacco + '\n\n' : '') + dTags.join('\n');
-                              }
-                              if (a.note && a.note !== spiegazioneEffetto) {
-                                testoAttacco = (testoAttacco ? testoAttacco + '\n\n' : '') + `${lingua === 'en' ? 'Personal Notes' : 'Note personali'}: ${a.note}`;
-                              }
-                              
-                              const titoloRiga = spiegazioneEffetto ? `${cleanNome}: ${spiegazioneEffetto}` : undefined;
                               const armaDb = !a.isSpell ? trovaArma(a.nome) : null;
                               const infoArma = analizzaArmaVersatileEPortata(a, armaDb);
                               const { isVersatile, dado1M, dado2M } = infoArma;
@@ -12648,10 +12657,6 @@ export default function App() {
                               const hasReach = !a.isSpell && infoArma.hasReach;
                               const infoMunizioni = !a.isSpell ? analizzaMunizioniArma(a, scheda.inventario, armaDb) : { usaMunizioni: false };
                               const spellInLista = (scheda.incantesimiLista || []).find((x) => x.id === a.idIncantesimo || (x.nome && x.nome.toLowerCase() === cleanNome.toLowerCase()));
-                              // Gittata/portata: SEMPRE il primo chip dopo il nome (prima di durata,
-                              // proprietà, CD...), anche quando la nota non la scrive (es. Inaridire).
-                              // Per le reazioni automatiche con Innesco/Effetto non si inventa nulla.
-                              const gittataRiga = cat === 'Reazione' && (a.innescoIt || a.effettoIt) ? '' : gittataAttacco(a, spellInLista, armaDb);
                               const categorieNotaTutte = estraiCategorieNota(a.note);
                               // Gittata e (per gli incantesimi a TS) la CD hanno già il loro badge:
                               // non ripeterli tra i chip della nota.
@@ -12684,28 +12689,21 @@ export default function App() {
                                 else if (typeof a.bonus === 'number') righe.push(`${en ? 'Attack' : 'Attacco'}: ${a.bonus >= 0 ? '+' : ''}${a.bonus}`);
                                 if (a.danno) righe.push(`${a.tipoDanno === 'Guarigione' ? (en ? 'Healing' : 'Cura') : (en ? 'Damage' : 'Danno')}: ${a.danno}${a.tipoDanno && a.tipoDanno !== 'Guarigione' ? ` ${traduciDato(a.tipoDanno)}` : ''}`);
                                 if (infoMunizioni.usaMunizioni) righe.push(`${en ? 'Ammunition' : 'Munizioni'}: ${infoMunizioni.totale}`);
-                                // Descrizione breve (solo se non è già detta da innesco/effetto).
-                                let breve = '';
-                                if (!a.innescoIt && !a.effettoIt) {
-                                  const testo = String(spiegazioneEffetto || a.note || '').replace(/\s+/g, ' ').trim();
-                                  if (testo) {
-                                    const frasi = testo.match(/[^.!?]+[.!?]+/g) || [testo];
-                                    breve = frasi.slice(0, 2).join(' ').trim();
-                                    if (breve.length > 260) breve = `${breve.slice(0, 257).trimEnd()}…`;
-                                  }
-                                }
-                                setInfo({ titolo: `${iconaReazione} ${cleanNome}`, testo: righe.join('\n') + (breve ? `\n\n${breve}` : '') });
+                                if (a.aDueMani !== undefined && isVersatile) righe.push(`${en ? 'Grip' : 'Impugnatura'}: ${a.aDueMani ? (en ? 'two hands' : 'a due mani') : (en ? 'one hand' : 'a una mano')}`);
+                                for (const c of categorieNota) righe.push(c.etichetta ? `${c.etichetta}: ${c.testo}` : c.testo);
+                                const descr = (a.innescoIt || a.effettoIt) ? '' : (spiegazioneEffetto || (categorieNotaTutte.length ? '' : a.note) || '');
+                                setInfo({ titolo: `${iconaReazione} ${cleanNome}`, testo: testoNuvoletta(righe, descr) || (en ? 'No description available.' : 'Nessuna descrizione disponibile.') });
                               };
 
                               return (
-                                <tr key={a.id} className="attacchi-riga" title={titoloRiga}>
+                                <tr key={a.id} className="attacchi-riga">
                                   <td style={styles.td} className="attacchi-nome">
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 4, width: '100%' }}>
                                       {a.isSpell || cat === 'Reazione' ? (
                                         <button
                                           type="button"
                                           style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 16, cursor: 'help', display: 'inline-block', width: 22, textAlign: 'center' }}
-                                          title={titoloRiga || (a.isSpell ? (isTrucchetto ? (lingua === 'en' ? 'Cantrip (At-will)' : 'Trucchetto a volontà') : (lingua === 'en' ? 'Spell (Requires slot)' : 'Incantesimo con slot')) : `${a.nome} (${lingua === 'en' ? 'Reaction' : 'Reazione'})`)}
+                                          aria-label={tr(`Dettagli di ${cleanNome}`, `${cleanNome} details`)}
                                           onClick={apriInfoReazione}
                                         >{iconaReazione}</button>
                                       ) : (
@@ -12771,7 +12769,7 @@ export default function App() {
                                         type="button"
                                         className="attacco-nome"
                                         onClick={apriInfoReazione}
-                                        title={castBloccato ? tr('Equipaggia un focus per lanciare questo incantesimo', 'Equip a focus to cast this spell') : tr('Tocca per i dettagli', 'Tap for details')}
+                                        title={castBloccato ? tr('Equipaggia un focus per lanciare questo incantesimo', 'Equip a focus to cast this spell') : undefined}
                                         style={{ background: 'transparent', border: 0, padding: 0, font: 'inherit', fontWeight: 700, color: C.ink, cursor: 'help', textAlign: 'left', textDecoration: 'underline dotted', textUnderlineOffset: 3, textDecorationColor: C.inkDim, minWidth: 0 }}
                                       >{traduciDato(cleanNome) || cleanNome}</button>
                                     </div>
@@ -12780,7 +12778,7 @@ export default function App() {
                                     {a.isTS ? (
                                       // Incantesimo a tiro salvezza: solo la CD, mai un tiro per colpire.
                                       <BadgeTiroSalvezza cd={a.cd} caratteristica={a.caratteristicaTS} colore={coloreCategoria('tiroSalvezza', notteAttiva)} />
-                                    ) : a.bonus === undefined || a.bonus === null ? null : typeof a.bonus === 'string' && isNaN(Number(a.bonus)) ? (
+                                    ) : a.bonus === undefined || a.bonus === null || (cat === 'Reazione' && !a.danno) ? null : typeof a.bonus === 'string' && isNaN(Number(a.bonus)) ? (
                                       <span style={{ ...styles.badge, background: 'rgba(59,130,246,0.12)', color: '#2563eb', border: '1px solid #3b82f6', padding: '2px 6px', fontWeight: 700 }}>
                                         {a.bonus}
                                       </span>
@@ -12841,45 +12839,9 @@ export default function App() {
                                     ) : null}
                                   </td>
                                   <td style={styles.td} className="attacchi-note" data-label={t('combat.col_note')}>
-                                    {cat === 'Reazione' ? null : (
+                                    {/* Tempo, distanza, proprietà e note stanno nella nuvoletta (tocco sul nome):
+                                        qui resta solo ciò che si usa in gioco, come le munizioni. */}
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
-                                      <span
-                                        className="chip-tempo"
-                                        style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria('tempo', notteAttiva)}1f`, border: `1px solid ${coloreCategoria('tempo', notteAttiva)}`, color: coloreCategoria('tempo', notteAttiva), fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
-                                        title={lingua === 'en' ? `Casting time: ${cat === 'Azione' ? '1 Action' : cat === 'Bonus' ? 'Bonus Action' : 'Reaction'}` : `Tempo di lancio: ${cat === 'Azione' ? '1 Azione' : cat === 'Bonus' ? 'Azione Bonus' : 'Reazione'}`}
-                                      >
-                                        {cat === 'Azione' ? (lingua === 'en' ? '1 Action' : '1 Azione') : cat === 'Bonus' ? (lingua === 'en' ? 'Bonus Action' : 'Azione Bonus') : (lingua === 'en' ? 'Reaction' : 'Reazione')}
-                                      </span>
-                                      {gittataRiga && (
-                                        <span
-                                          className="chip-gittata"
-                                          style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria('gittata', notteAttiva)}1f`, border: `1px solid ${coloreCategoria('gittata', notteAttiva)}`, color: coloreCategoria('gittata', notteAttiva), fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
-                                          title={lingua === 'en' ? `Range: ${traduciDato(gittataRiga)}` : `Gittata: ${gittataRiga}`}
-                                        >
-                                          {traduciDato(gittataRiga)}
-                                        </span>
-                                      )}
-                                      {hasReach && (
-                                        <span
-                                          style={{
-                                            fontSize: 11,
-                                            padding: '1px 5px',
-                                            borderRadius: 4,
-                                            background: `${coloreCategoria('gittata', notteAttiva)}1f`,
-                                            border: `1px solid ${coloreCategoria('gittata', notteAttiva)}`,
-                                            color: coloreCategoria('gittata', notteAttiva),
-                                            fontWeight: 700,
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: 3,
-                                            flexShrink: 0,
-                                            cursor: 'help',
-                                          }}
-                                          title={lingua === 'en' ? 'Reach Weapon: 3m (10 ft) melee reach for attacks & opportunity attacks' : 'Arma con Portata: minaccia ed estensione attacchi a 3m'}
-                                        >
-                                          {lingua === 'en' ? 'Reach 3m' : 'Portata 3m'}
-                                        </span>
-                                      )}
                                       {infoMunizioni.usaMunizioni && (
                                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
                                           <span
@@ -12931,46 +12893,7 @@ export default function App() {
                                           )}
                                         </div>
                                       )}
-                                      {(() => {
-                                        // Se i badge già riassumono la nota (Reazione con Innesco/Effetto,
-                                        // oppure Combattimento con categorie riconosciute), il testo libero
-                                        // ripeterebbe la stessa informazione per esteso: niente pencil,
-                                        // Combattimento non ha campi liberi modificabili a mano.
-                                        // (Un incantesimo senza nota, es. una cura, non mostra un "—" vuoto.)
-                                        const notaRidondante = cat === 'Reazione' ? Boolean(a.innescoIt || a.effettoIt) : (categorieNotaTutte.length > 0 || (a.isSpell && !String(a.note || '').trim()));
-                                        return (
-                                      <span className="nota-dettagli" style={{ display: 'contents' }}>
-                                        {cat === 'Reazione' && (a.innescoIt || a.effettoIt) ? (
-                                          <>
-                                            {a.innescoIt && (
-                                              <span className="chip-reazione-testo" style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria('innesco', notteAttiva)}1f`, border: `1px solid ${coloreCategoria('innesco', notteAttiva)}`, color: coloreCategoria('innesco', notteAttiva), fontWeight: 700, display: 'inline-block', maxWidth: '100%', boxSizing: 'border-box', whiteSpace: 'normal', overflowWrap: 'anywhere', lineHeight: 1.3, textAlign: 'left' }} title={`${lingua === 'en' ? 'Trigger' : 'Innesco'}: ${lingua === 'en' ? (a.innescoEn || a.innescoIt) : a.innescoIt}`}>
-                                                {lingua === 'en' ? (a.innescoEn || a.innescoIt) : a.innescoIt}
-                                              </span>
-                                            )}
-                                            {a.effettoIt && (
-                                              <span className="chip-reazione-testo" style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria('effetto', notteAttiva)}1f`, border: `1px solid ${coloreCategoria('effetto', notteAttiva)}`, color: coloreCategoria('effetto', notteAttiva), fontWeight: 700, display: 'inline-block', maxWidth: '100%', boxSizing: 'border-box', whiteSpace: 'normal', overflowWrap: 'anywhere', lineHeight: 1.3, textAlign: 'left' }} title={`${lingua === 'en' ? 'Effect' : 'Effetto'}: ${lingua === 'en' ? (a.effettoEn || a.effettoIt) : a.effettoIt}`}>
-                                                {lingua === 'en' ? (a.effettoEn || a.effettoIt) : a.effettoIt}
-                                              </span>
-                                            )}
-                                          </>
-                                        ) : categorieNota.map((c, ci) => (
-                                          <span
-                                            key={ci}
-                                            style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: `${coloreCategoria(c.categoria, notteAttiva)}1f`, border: `1px solid ${coloreCategoria(c.categoria, notteAttiva)}`, color: coloreCategoria(c.categoria, notteAttiva), fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3, whiteSpace: 'nowrap' }}
-                                            title={c.etichetta}
-                                          >
-                                            {c.testo}
-                                          </span>
-                                        ))}
-                                        {!notaRidondante && a.note && (
-                                          // Nota non riconosciuta: si legge nella nuvoletta (tocco sul nome), non si modifica qui.
-                                          <span style={{ ...styles.detail, fontSize: 11, maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={a.note}>{a.note}</span>
-                                        )}
-                                      </span>
-                                        );
-                                      })()}
                                     </div>
-                                    )}
                                   </td>
                                   <td className="col-azioni attacchi-azioni" style={{ ...styles.td, textAlign: 'right' }}>
                                     <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-end', gap: 4 }}>
@@ -13776,37 +13699,21 @@ export default function App() {
                             const isRowCatalogoMancante = isMancanteLiv && s.catalogo;
                             const isRowUnpreparedMancante = isMancanteLiv && classePreparata && liv >= 1 && s.preparato === false;
 
-                            const dettagliTecnici = [];
-                            if (scuola) dettagliTecnici.push(`${lingua === 'en' ? 'School' : 'Scuola'}: ${traduciDato(scuola)}`);
-                            if (tempoLabel) dettagliTecnici.push(`${lingua === 'en' ? 'Casting Time' : 'Tempo di lancio'}: ${tempoLabel}`);
-                            if (gittata) dettagliTecnici.push(`${lingua === 'en' ? 'Range' : 'Gittata'}: ${gittata}`);
-                            if (area) dettagliTecnici.push(`${lingua === 'en' ? 'Area' : 'Area'}: ${area}`);
-                            if (danno || tipoDanno) dettagliTecnici.push(`${lingua === 'en' ? 'Damage' : 'Danno'}: ${danno || ''} ${tipoDanno ? `(${traduciDato(tipoDanno)})` : ''}`.trim());
-                            if (isConcRow || /concentrazione/i.test(spieg)) dettagliTecnici.push(`${lingua === 'en' ? 'Concentration' : 'Concentrazione'}: ${lingua === 'en' ? 'Yes' : 'Sì'}`);
-                            if (isRitualeRow) dettagliTecnici.push(`${lingua === 'en' ? 'Ritual' : 'Rituale'}: ${lingua === 'en' ? 'Yes' : 'Sì'}`);
-                            if (d?.classi && d.classi.length > 0) dettagliTecnici.push(`${lingua === 'en' ? 'Classes' : 'Classi'}: ${d.classi.join(', ')}`);
-
-                            let testoModal = spieg;
-                            if (dettagliTecnici.length > 0) {
-                              testoModal = (testoModal ? testoModal + '\n\n' : '') + dettagliTecnici.join('\n');
-                            }
-                            if (note && s.note !== spieg) {
-                              testoModal = (testoModal ? testoModal + '\n\n' : '') + `${lingua === 'en' ? 'Personal Notes' : 'Note personali'}: ${note}`;
-                            }
-
-                            const chip = (icona, label, val, colore, classe) => val ? (
-                              <span
-                                key={label}
-                                className={classe}
-                                style={colore
-                                  ? { fontSize: 11, background: `${colore}1f`, border: `1px solid ${colore}`, borderRadius: 4, padding: '1px 5px', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 3, color: colore, fontWeight: 700 }
-                                  : { fontSize: 11, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: '1px 5px', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 3 }}
-                                title={`${label}: ${val}`}
-                              >
-                                {icona && <span aria-hidden="true">{icona}</span>}
-                                <span style={colore ? undefined : { color: C.inkDim }}>{val}</span>
-                              </span>
-                            ) : null;
+                            // Nuvoletta unica (tocco sul nome): prima l'essenziale, poi due frasi di descrizione.
+                            const en = lingua === 'en';
+                            const durataInc = d?.durata || '';
+                            const righeInfo = [
+                              tempoLabel && `${en ? 'Casting time' : 'Tempo di lancio'}: ${tempoLabel}`,
+                              gittata && `${en ? 'Range' : 'Distanza'}: ${traduciDato(gittata)}`,
+                              area && `${en ? 'Area' : 'Area'}: ${traduciDato(area)}`,
+                              durataInc && `${en ? 'Duration' : 'Durata'}: ${traduciDato(durataInc)}`,
+                              (isConcRow || /concentrazione/i.test(spieg)) && (en ? 'Concentration' : 'Concentrazione'),
+                              isRitualeRow && (en ? 'Ritual' : 'Rituale'),
+                              (danno || tipoDanno) && `${tipoDanno === 'Guarigione' ? (en ? 'Healing' : 'Cura') : (en ? 'Damage' : 'Danno')}: ${[danno, tipoDanno && tipoDanno !== 'Guarigione' ? traduciDato(tipoDanno) : ''].filter(Boolean).join(' ')}`,
+                              scuola && `${en ? 'School' : 'Scuola'}: ${traduciDato(scuola)}`,
+                              note && s.note !== spieg && `${en ? 'Notes' : 'Note'}: ${note}`,
+                            ];
+                            const testoModal = testoNuvoletta(righeInfo, spieg);
 
                             const isUltimoCritInc = ultimoAttaccoCritico && (ultimoAttaccoCritico.id === s.id || ultimoAttaccoCritico.nome === s.nome);
 
@@ -13850,8 +13757,7 @@ export default function App() {
                                 <div className="spell-row" style={{ display: 'flex', flexWrap: 'nowrap', alignItems: 'center', gap: 4 }}>
                                   <button
                                     style={{ background: 'transparent', border: 'none', color: isRowInEccesso ? C.red : C.ink, fontWeight: 700, cursor: 'help', textAlign: 'left', padding: 0, fontSize: 14, lineHeight: 1.2, textDecoration: 'underline dotted', textUnderlineOffset: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
-                                    title={spieg || t('tip.cosa_fa_inc')}
-                                    onClick={() => setInfo({ titolo: `${s.nome || 'Incantesimo'}${s.livello === 0 ? ' · Trucchetto' : ` · ${s.livello}° livello`}`, testo: testoModal || (lingua === 'en' ? 'No description available for this spell. Click to add notes.' : 'Nessuna descrizione disponibile per questo incantesimo. Aprilo con per aggiungere delle note.') })}
+                                    onClick={() => setInfo({ titolo: `${s.nome || 'Incantesimo'}${s.livello === 0 ? (en ? ' · Cantrip' : ' · Trucchetto') : (en ? ` · Level ${s.livello}` : ` · ${s.livello}° livello`)}`, testo: testoModal || (en ? 'No description available for this spell.' : 'Nessuna descrizione disponibile per questo incantesimo.') })}
                                   >
                                     {s.nome || t('menu.senza_nome')}
                                   </button>
@@ -13961,39 +13867,8 @@ export default function App() {
                                       onClick={() => aggiorna({ incantesimiLista: scheda.incantesimiLista.map((x) => (x.id === s.id ? { ...x, bonus: false } : x)) })}
                                     >✦ {t('spell.bonus_badge')}</span>
                                   )}
-                                  <div className="spell-chips" tabIndex={0} role="group" aria-label={tr('Dettagli dell\'incantesimo', 'Spell details')} style={{ display: 'flex', flexWrap: 'nowrap', gap: 4, alignItems: 'center', overflowX: 'auto', flex: '1 1 auto', minWidth: 0 }}>
-                                    {chip('', t('spell.chip_tempo'), tempoLabel, coloreCategoria('tempo', notteAttiva), 'chip-tempo')}
-                                    {chip('', t('spell.chip_gittata'), traduciDato(gittata), coloreCategoria('gittata', notteAttiva), 'chip-gittata')}
-                                    {area && chip('', 'Area', traduciDato(area), coloreCategoria('gittata', notteAttiva), 'chip-area')}
-                                    {isConcRow && chip('', lingua === 'en' ? 'Concentration' : 'Concentrazione', lingua === 'en' ? 'Concentration' : 'Concentrazione', coloreCategoria('concentrazione', notteAttiva), 'chip-concentrazione')}
-                                    {isRitualeRow && chip('', lingua === 'en' ? 'Ritual' : 'Rituale', lingua === 'en' ? 'Ritual' : 'Rituale', coloreCategoria('rituale', notteAttiva), 'chip-rituale')}
-                                    {(danno || tipoDanno) && !parseEspressioneDado(danno) && (
-                                      chip(iconaTipoDanno(tipoDanno), 'Danno', [danno, tipoDanno].filter(Boolean).join(' '), coloreCategoria(tipoDanno === 'Guarigione' ? 'guarigione' : 'danno', notteAttiva))
-                                    )}
-                                    {note && chip('', t('spell.chip_note'), note, undefined, 'chip-nota')}
-                                  </div>
-                                  {scuola && (
-                                    <span
-                                      style={{
-                                        fontSize: 11,
-                                        fontWeight: 700,
-                                        color: coloreCategoria('scuola', notteAttiva),
-                                        border: `1px solid ${coloreCategoria('scuola', notteAttiva)}`,
-                                        background: `${coloreCategoria('scuola', notteAttiva)}1f`,
-                                        borderRadius: 4,
-                                        padding: '1px 5px',
-                                        lineHeight: '13px',
-                                        whiteSpace: 'nowrap',
-                                        flexShrink: 0,
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: 3,
-                                      }}
-                                      title={`Scuola: ${traduciDato(scuola)}`}
-                                    >
-                                      {traduciDato(scuola)}
-                                    </span>
-                                  )}
+                                  {/* Tempo, distanza, area, durata, concentrazione, scuola e note: nella nuvoletta del nome. */}
+                                  <div style={{ flex: '1 1 auto', minWidth: 0 }} />
                                   {parseEspressioneDado(danno) && (
                                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
                                       {modIncantatore !== null && isTSInc && (

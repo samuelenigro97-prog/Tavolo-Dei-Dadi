@@ -1349,3 +1349,28 @@ test('risorseAutoClasse: i recuperi dei riposi seguono l\'edizione', async () =>
   assert.equal(risorseDopoRiposo(spesa, 'breve')[0].attuali, 1);
   assert.equal(risorseDopoRiposo(spesa, 'lungo')[0].attuali, ira.max);
 });
+
+test('risorseAutoClasse: privilegi a usi limitati che mancavano (v4.79.0)', async () => {
+  const { risorseAutoClasse, risorseDopoRiposo } = await import('../src/rules/regole.js');
+  const car = { carisma: 16, saggezza: 16 };
+  const trova = (classe, liv, ver, nome) => risorseAutoClasse(classe, liv, car, ver).find((r) => r.nome === nome);
+  // Forma Selvatica: 2/3/4 usi nella 5.5 (breve = 1 uso), 2 nella 5.0 (breve = tutti).
+  assert.deepEqual([2, 6, 17].map((l) => trova('Druido', l, '2024', 'Forma Selvatica').max), [2, 3, 4]);
+  assert.equal(trova('Druido', 10, '2014', 'Forma Selvatica').max, 2);
+  const fs = trova('Druido', 10, '2024', 'Forma Selvatica');
+  assert.equal(risorseDopoRiposo([{ ...fs, attuali: 0 }], 'breve')[0].attuali, 1);
+  assert.equal(risorseDopoRiposo([{ ...fs, attuali: 0 }], 'lungo')[0].attuali, 3);
+  // Nuovi contatori, tutti a riposo lungo.
+  assert.equal(trova('Paladino', 1, '2014', 'Senso Divino').max, 4, '1 + mod CAR (+3)');
+  assert.equal(trova('Paladino', 1, '2024', 'Senso Divino'), undefined, 'nella 5.5 è un uso di Incanalare Divinità');
+  assert.equal(trova('Warlock', 2, '2024', 'Astuzia Magica').reset, 'lungo');
+  assert.equal(trova('Warlock', 20, '2014', 'Contatto Mistico').reset, 'lungo');
+  assert.equal(trova('Monaco', 2, '2024', 'Metabolismo Prodigioso').max, 1);
+  assert.equal(trova('Stregone', 5, '2024', 'Ripristino Stregonesco').max, 1);
+  assert.equal(trova('Chierico', 10, '2024', 'Intervento Divino').max, 1);
+  assert.equal(trova('Ranger', 10, '2024', 'Instancabile').max, 3);
+  assert.equal(trova('Ranger', 14, '2024', 'Velo della Natura').max, 3);
+  // Il riposo breve non tocca le risorse a riposo lungo.
+  const sd = trova('Paladino', 1, '2014', 'Senso Divino');
+  assert.equal(risorseDopoRiposo([{ ...sd, attuali: 0 }], 'breve')[0].attuali, 0);
+});

@@ -2399,11 +2399,14 @@ export function risorseAutoClasse(classe, livello, caratteristiche, versione = '
       return [mk('Ispirazione Bardica', Math.max(1, modCar(caratteristiche?.carisma)), L >= 5 ? 'breve' : 'lungo')];
     case 'monaco':
       // 5.0: Punti Ki. 5.5: Punti Focus (stesso numero, nome diverso).
-      return L >= 2 ? [mk(v24 ? 'Punti Focus' : 'Punti Ki', L, 'breve')] : [];
+      // 5.5: Metabolismo Prodigioso (2°): una volta per riposo lungo, tirando l'iniziativa.
+      return L >= 2 ? [mk(v24 ? 'Punti Focus' : 'Punti Ki', L, 'breve'), ...(v24 ? [mk('Metabolismo Prodigioso', 1, 'lungo')] : [])] : [];
     case 'stregone':
       return [
         ...(v24 ? [mk('Stregoneria Innata', 2, 'lungo')] : []),
         ...(L >= 2 ? [mk('Punti Stregoneria', L, 'lungo')] : []),
+        // 5.5: Ripristino Stregonesco (5°), una volta per riposo lungo durante un riposo breve.
+        ...(v24 && L >= 5 ? [mk('Ripristino Stregonesco', 1, 'lungo')] : []),
       ];
     case 'mago':
       // Recupero Arcano: un uso per riposo lungo, si spende durante un riposo breve.
@@ -2424,12 +2427,18 @@ export function risorseAutoClasse(classe, livello, caratteristiche, versione = '
       // Incanalare Divinità: 1/2/3 nella 5.0 (liv. 2/6/18, riposo breve o lungo),
       // 2/3/4 nella 5.5 (liv. 2/6/18; il riposo breve ne restituisce uno, il lungo tutti).
       return L >= 2
-        ? [mk('Incanalare Divinità', v24 ? (L >= 18 ? 4 : L >= 6 ? 3 : 2) : (L >= 18 ? 3 : L >= 6 ? 2 : 1), v24 ? 'breve-uno' : 'breve')]
+        ? [
+          mk('Incanalare Divinità', v24 ? (L >= 18 ? 4 : L >= 6 ? 3 : 2) : (L >= 18 ? 3 : L >= 6 ? 2 : 1), v24 ? 'breve-uno' : 'breve'),
+          // 5.5: Intervento Divino (10°), una volta per riposo lungo.
+          ...(v24 && L >= 10 ? [mk('Intervento Divino', 1, 'lungo')] : []),
+        ]
         : [];
     case 'paladino':
       // Incanalare Divinità: 5.0 = 1 uso, torna con riposo breve o lungo; 5.5 = 2 usi (3 dall'11°),
       // il riposo breve ne restituisce uno e il lungo tutti.
       return [
+        // 5.0: Senso Divino, 1 + modificatore di Carisma usi per riposo lungo (nella 5.5 è un'opzione di Incanalare Divinità).
+        ...(!v24 ? [mk('Senso Divino', Math.max(1, 1 + modCar(caratteristiche?.carisma)), 'lungo')] : []),
         mk('Imposizione delle Mani', L * 5, 'lungo'),
         ...(L >= 3 ? [mk('Incanalare Divinità', v24 ? (L >= 11 ? 3 : 2) : 1, v24 ? 'breve-uno' : 'breve')] : []),
       ];
@@ -2438,12 +2447,19 @@ export function risorseAutoClasse(classe, livello, caratteristiche, versione = '
       // 2014: Consapevolezza Primordiale (Sensi Primordiali) NON ha usi propri: costa uno slot
       // incantesimo, quindi nessun contatore automatico (quelli già salvati non vengono toccati).
       return v24
-        ? [mk('Marchio del Cacciatore', L >= 17 ? 6 : L >= 13 ? 5 : L >= 9 ? 4 : L >= 5 ? 3 : 2, 'lungo')]
+        ? [
+          mk('Marchio del Cacciatore', L >= 17 ? 6 : L >= 13 ? 5 : L >= 9 ? 4 : L >= 5 ? 3 : 2, 'lungo'),
+          // 5.5: Instancabile (10°) e Velo della Natura (14°): usi pari al modificatore di Saggezza (min. 1) per riposo lungo.
+          ...(L >= 10 ? [mk('Instancabile', Math.max(1, modCar(caratteristiche?.saggezza)), 'lungo')] : []),
+          ...(L >= 14 ? [mk('Velo della Natura', Math.max(1, modCar(caratteristiche?.saggezza)), 'lungo')] : []),
+        ]
         : [];
     case 'ladro':
       return L >= 20 ? [mk('Colpo di Fortuna', 1, 'breve')] : [];
     case 'warlock':
-      return L >= 20 ? [mk('Contatto Mistico', 1, 'lungo')] : [];
+      // 5.5: Astuzia Magica (2°), una volta per riposo lungo (al 20° recupera tutti gli slot).
+      // 5.0: Contatto Mistico (20°), una volta per riposo lungo.
+      return v24 ? (L >= 2 ? [mk('Astuzia Magica', 1, 'lungo')] : []) : (L >= 20 ? [mk('Contatto Mistico', 1, 'lungo')] : []);
     default:
       return [];
   }

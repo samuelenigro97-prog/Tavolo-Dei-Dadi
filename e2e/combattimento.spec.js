@@ -19,13 +19,13 @@ test.describe('Combattimento', () => {
     await expect(nomiArma.filter({ hasText: /^\s*Bastone Ferrato\s*$/ })).toHaveCount(0);
   });
 
-  test('la nota di un attacco con badge riconosciuti non mostra il testo ripetuto né una matita per modificarla', async ({ page }) => {
+  test('la riga non ripete la nota: proprietà e note stanno nella nuvoletta del nome', async ({ page }) => {
     const riga = page.locator('tr.attacchi-riga').filter({ hasText: 'Randello Incantato' });
-    await expect(riga.getByText('Magico con SAG (Randello/Bastone)')).toBeVisible();
-    // Il testo completo della nota non deve comparire una seconda volta in chiaro.
+    await expect(riga.getByText('Magico con SAG (Randello/Bastone)')).toHaveCount(0);
     await expect(riga.getByText('1 min: usa SAG su randello/bastone, danno 1d8')).toHaveCount(0);
-    // Combattimento non ha campi liberi modificabili a mano: niente matita.
-    await expect(riga.locator('.nota-dettagli').getByText('✏️')).toHaveCount(0);
+    await riga.locator('.attacco-nome').click();
+    const nuvola = page.getByText(/Azione: Azione Bonus/).last();
+    await expect(nuvola).toContainText('Magico con SAG (Randello/Bastone)');
   });
 
   test('un\'arma senza categorie riconosciute mostra ancora il testo libero per intero', async ({ page }) => {
@@ -59,16 +59,19 @@ test.describe('Combattimento', () => {
     await expect(page.getByText(/Nessun attacco\/incantesimo ad azione bonus/)).toHaveCount(0);
   });
 
-  test('il tempo di lancio è il primo chip dopo il nome, subito seguito dalla gittata (anche per Inaridire, che ha solo la CD nella nota)', async ({ page }) => {
-    const chip = (nome, i) => page.locator('tr.attacchi-riga').filter({ hasText: nome }).locator('.attacchi-note span').nth(i);
-    await expect(chip('Inaridire', 0)).toHaveClass(/chip-tempo/);
-    await expect(chip('Inaridire', 1)).toHaveText(/^\s*9m\s*$/);
-    await expect(chip('Randello Incantato', 0)).toHaveText(/^\s*Azione Bonus\s*$/);
-    await expect(chip('Randello Incantato', 1)).toHaveText(/^\s*Tocco\s*$/);
-    await expect(chip('Morsa del Gelo', 0)).toHaveClass(/chip-tempo/);
-    await expect(chip('Morsa del Gelo', 1)).toHaveText(/^\s*18m\s*$/);
-    await expect(chip('Parola di Guarigione', 0)).toHaveClass(/chip-tempo/);
-    await expect(chip('Parola di Guarigione', 1)).toHaveText(/^\s*18m\s*$/);
+  test('nuvoletta unica: prima il tipo di azione, subito dopo la distanza (anche per Inaridire)', async ({ page }) => {
+    for (const [nome, azione, distanza] of [['Inaridire', '1 Azione', '9m'], ['Randello Incantato', 'Azione Bonus', 'Tocco'], ['Morsa del Gelo', '1 Azione', '18m'], ['Parola di Guarigione', 'Azione Bonus', '18m']]) {
+      const riga = page.locator('tr.attacchi-riga').filter({ hasText: nome });
+      await expect(riga.locator('.chip-tempo, .chip-gittata')).toHaveCount(0);
+      await riga.locator('.attacco-nome').click();
+      const nuvola = page.getByText(new RegExp(`Azione: ${azione}`)).last();
+      await expect(nuvola).toBeVisible();
+      const testo = await nuvola.innerText();
+      const righe = testo.split('\n').map((r) => r.trim()).filter(Boolean);
+      expect(righe[0]).toBe(`Azione: ${azione}`);
+      expect(righe[1]).toBe(`Distanza: ${distanza}`);
+      await page.keyboard.press('Escape');
+    }
   });
 
   test('tiro per colpire e danni usano gli stessi badge di Trucchetti/Incantesimi', async ({ page }) => {
@@ -116,10 +119,13 @@ test.describe('Combattimento', () => {
     }
   });
 
-  test('il chip proprietà di Frusta di Spine è pulito ("Magico")', async ({ page }) => {
+  test('la proprietà di Frusta di Spine nella nuvoletta è pulita ("Magico")', async ({ page }) => {
     const riga = page.locator('tr.attacchi-riga').filter({ hasText: 'Frusta di Spine' });
-    await expect(riga.locator('.attacchi-note')).not.toContainText('):');
-    await expect(riga.locator('.attacchi-note span[title="Proprietà"]')).toHaveText(/^\s*Magico\s*$/);
+    await expect(riga.locator('.attacchi-note')).not.toContainText('Magico');
+    await riga.locator('.attacco-nome').click();
+    const nuvola = page.getByText(/Azione: 1 Azione/).last();
+    const righe = (await nuvola.innerText()).split('\n').map((r) => r.trim());
+    expect(righe).toContain('Proprietà: Magico');
   });
 
   test('nessun incantesimo ad azione bonus compare nella tabella Azione', async ({ page }) => {

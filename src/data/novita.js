@@ -5,6 +5,21 @@
 
 export const NOVITA = [
   {
+    versione: '4.79.0',
+    voci: {
+      it: [
+        'Nuvoletta unica: in Combattimento (Azioni, Azioni Bonus, Reazioni) e negli Incantesimi le righe mostrano solo nome e tiri. Tocca il nome per l\'essenziale: tipo di azione, distanza, durata, concentrazione, danno, poi due frasi di spiegazione.',
+        'Riposi: la finestra del riposo breve elenca davvero cosa si ricarica (con "+1 uso" per Forma Selvatica e simili nelle regole 2024).',
+        'Aggiunti i privilegi a usi limitati che mancavano: Senso Divino (2014), Astuzia Magica, Metabolismo Prodigioso, Ripristino Stregonesco, Intervento Divino, Instancabile e Velo della Natura (2024).',
+      ],
+      en: [
+        'One details bubble: in Combat (Actions, Bonus Actions, Reactions) and Spells the rows show only name and rolls. Tap the name for the essentials: action type, range, duration, concentration, damage, then two sentences of explanation.',
+        'Rests: the short rest window now lists what actually recharges (with "+1 use" for Wild Shape and similar under the 2024 rules).',
+        'Added the missing limited-use features: Divine Sense (2014), Magical Cunning, Uncanny Metabolism, Sorcerous Restoration, Divine Intervention, Tireless and Nature\'s Veil (2024).',
+      ],
+    },
+  },
+  {
     versione: '4.78.0',
     voci: {
       it: [

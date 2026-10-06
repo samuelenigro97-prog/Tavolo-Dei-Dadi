@@ -57,8 +57,14 @@ test.describe('Incantesimi', () => {
       return (r.personaggi[r.attivo].incantesimiLista || []).find((x) => x.nome === 'Metamorfosi')?.note;
     });
     expect(notaSalvata).toBe('Conc.');
-    await expect(riga.locator('.chip-concentrazione')).toHaveCount(1);
+    // La riga non ha più chip: Concentrazione compare una sola volta, nella nuvoletta del nome.
     await expect(riga.getByText('Conc.', { exact: true })).toHaveCount(0);
+    await riga.getByRole('button', { name: 'Metamorfosi', exact: true }).click();
+    const nuvola = page.getByText(/Tempo di lancio:/).last();
+    await expect(nuvola).toBeVisible();
+    const testo = await nuvola.innerText();
+    expect(testo.split('\n').filter((r) => r.trim() === 'Concentrazione')).toHaveLength(1);
+    expect(testo).not.toMatch(/Note: Conc\./);
   });
 
   test('il cestino della riga chiede conferma prima di eliminare l\'incantesimo', async ({ page }) => {

@@ -2,6 +2,31 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.79.0] – 2026-10-06
+
+### Cambiato
+- **Nuvoletta unica dei dettagli** (`testoNuvoletta`, `riassumiDescrizione`):
+  in Combattimento (Azioni, Azioni Bonus, Reazioni) e nelle righe degli
+  Incantesimi niente più chip descrittivi (tempo, distanza, area, durata,
+  concentrazione, rituale, scuola, proprietà, note) né suggerimenti al
+  passaggio del mouse: la riga mostra nome, tiri e pulsanti d'uso. Il tocco sul
+  nome apre la stessa nuvoletta ovunque: righe essenziali (azione / tempo di
+  lancio, distanza, area, durata, concentrazione, rituale, attacco o CD, danno,
+  proprietà, munizioni, impugnatura) e poi al massimo due frasi di descrizione.
+- Reazioni senza danno (es. Totem Spirituale) non mostrano più "Attacco +0".
+
+### Corretto
+- **Riposo breve**: l'elenco "Ricarica automatica" leggeva un campo inesistente
+  (`ricarica`) e diceva sempre "Nessuna risorsa"; ora usa `reset` e segna
+  "+1 uso" per le risorse 2024 che recuperano un solo uso (Forma Selvatica, Ira,
+  Recuperare Energie, Incanalare Divinità). Il recupero vero era già corretto.
+- **Privilegi a usi limitati mancanti** in `risorseAutoClasse`: Senso Divino
+  (Paladino 2014, 1 + CAR, lungo), Astuzia Magica (Warlock 2024, 2°, lungo; il
+  Contatto Mistico resta per la 2014), Metabolismo Prodigioso (Monaco 2024),
+  Ripristino Stregonesco (Stregone 2024, 5°), Intervento Divino (Chierico 2024,
+  10°), Instancabile e Velo della Natura (Ranger 2024, 10° e 14°, SAG usi), con
+  le loro spiegazioni.
+
 ## [4.78.0] – 2026-10-06
 
 ### Cambiato
