@@ -2,6 +2,22 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.65.0] – 2026-10-06
+
+### Aggiunto (test e CI, nessun cambio per chi usa l'app)
+- **Test end-to-end sulla build di produzione** (`e2e-build/pwa.spec.js`,
+  `playwright.build.config.js`, `npm run test:e2e:build`): versione mostrata =
+  versione del codice, `version.json` presente, service worker installato che
+  prende il controllo, app che si riapre **offline**, nessun errore JS
+  all'avvio. Parte in CI dopo la suite principale. Prima nessun test copriva la
+  PWA vera (i test giravano solo sul server di sviluppo).
+
+### Cambiato
+- Suite e2e principale: limite di 45 s per test e di 12 minuti in totale in CI
+  (con report), invece di bloccarsi fino ai 15 minuti del job e venire
+  annullata senza spiegazioni; `apriScheda()` attende l'app e il benvenuto
+  invece di tempi fissi (da 5 attese a 1).
+
 ## [4.64.0] – 2026-10-06
 
 ### Cambiato

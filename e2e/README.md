@@ -9,7 +9,16 @@ npm run test:e2e:ui     # modalità interattiva (utile durante lo sviluppo)
 npx playwright test e2e/azioni.spec.js   # un solo file
 ```
 
-Non serve una build prima: `playwright.config.js` avvia da solo il server di
+Oltre alla suite per sezione c'è una **suite sulla build di produzione**
+(`e2e-build/`, config `playwright.build.config.js`, `npm run test:e2e:build`):
+gira su `vite preview` con il service worker attivo e controlla versione
+mostrata, `version.json`, installazione della PWA, funzionamento offline e
+assenza di errori JavaScript all'avvio. In CI parte dopo la suite principale.
+
+Ogni test ha un limite di 45 s e in CI l'intera suite si ferma dopo 12 minuti
+(con report), così un blocco non arriva più al limite del job.
+
+Non serve una build prima per la suite principale: `playwright.config.js` avvia da solo il server di
 sviluppo Vite sulla porta 5199 (`webServer`) e lo riusa se è già in ascolto.
 
 Ogni test parte da `apriScheda()` (`e2e/helpers.js`): apertura pagina,

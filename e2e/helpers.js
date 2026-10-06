@@ -3,20 +3,17 @@
 // (Benvenuto + Menu) che altrimenti coprono tutto il resto della pagina.
 export async function apriScheda(page) {
   await page.goto('/');
-  await page.waitForTimeout(600);
+  // Attende l'app (non un tempo fisso): il titolo compare quando React ha disegnato.
+  await page.getByText(/Tavolo dei Dadi/i).first().waitFor();
   const benvenuto = page.getByRole('button', { name: /^Inizia( a giocare)?$/ });
-  if (await benvenuto.count()) {
-    await benvenuto.click();
-    await page.waitForTimeout(200);
-  }
-  for (let i = 0; i < 3; i++) {
-    await page.keyboard.press('Escape');
-    await page.waitForTimeout(100);
-  }
+  // Il benvenuto compare solo al primo avvio: se non arriva entro un attimo si prosegue.
+  await benvenuto.waitFor({ timeout: 1500 }).then(() => benvenuto.click()).catch(() => {});
+  for (let i = 0; i < 3; i++) await page.keyboard.press('Escape');
   // Click fuori da eventuali modal residui (il Menu Iniziale non si chiude
   // sempre con Escape se il focus è finito altrove).
   await page.mouse.click(20, 300);
-  await page.waitForTimeout(200);
+  // Nessuna finestra modale deve restare aperta sopra la scheda.
+  await page.locator('[role="dialog"]:visible').first().waitFor({ state: 'detached', timeout: 1000 }).catch(() => {});
 }
 
 /** Scrolla l'elemento che contiene `testo` (case-insensitive) fino al centro dello schermo. */

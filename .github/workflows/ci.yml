@@ -42,6 +42,10 @@ jobs:
         run: npm run test:e2e
         env:
           CI: 'true'
+      - name: Test sulla build di produzione (service worker, offline, versione)
+        run: npx playwright test -c playwright.build.config.js
+        env:
+          CI: 'true'
       - name: Report e2e in caso di errore
         if: failure()
         uses: actions/upload-artifact@v4
@@ -49,5 +53,6 @@ jobs:
           name: playwright-report
           path: |
             playwright-report/
+            playwright-report-build/
             test-results/
           retention-days: 7
