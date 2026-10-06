@@ -53,28 +53,17 @@ async function preparaDispositivoVecchio(page) {
   return stato;
 }
 
-test('dispositivo con dati vecchi: all’avvio non sovrascrive, mostra il conflitto e carica la versione online', async ({ page }) => {
+// Dalla v4.77.0 nei conflitti non si chiede più: vince l'ultima versione
+// sincronizzata online, e la copia di questo dispositivo va in Cronologia versioni.
+test('dispositivo con dati vecchi: all’avvio carica da solo la versione online, senza chiedere e senza sovrascriverla', async ({ page }) => {
   const stato = await preparaDispositivoVecchio(page);
   await page.goto('/');
-  const dialogo = page.getByTestId('conflitto-sync');
-  await expect(dialogo).toBeVisible({ timeout: 10000 });
-  await expect(dialogo).toContainText('Versione online più recente');
-  await expect(dialogo).toContainText('Solo su questo dispositivo: Frost');
-  await expect(dialogo).toContainText('Solo online: Wendell');
-  await expect(dialogo).toContainText('Con modifiche diverse: Vaelion');
-  // Anche dopo il debounce dell'auto-salvataggio non parte nessuna scrittura.
-  await page.waitForTimeout(3500);
-  expect(stato.patch).toHaveLength(0);
-
-  await dialogo.getByRole('button', { name: 'Carica la versione online' }).click();
-  await expect(dialogo).toBeHidden();
-  const salvato = await page.evaluate(() => JSON.parse(localStorage.getItem('scheda-interattiva:v1')));
-  expect(Object.values(salvato.personaggi).map((p) => p.nome).sort()).toEqual(['Vaelion', 'Wendell']);
+  await expect.poll(async () => page.evaluate(() => Object.values(JSON.parse(localStorage.getItem('scheda-interattiva:v1')).personaggi).map((p) => p.nome).sort().join(',')), { timeout: 10000 }).toBe('Vaelion,Wendell');
+  await expect(page.getByTestId('conflitto-sync')).toHaveCount(0);
   // La versione locale resta in Cronologia versioni.
   const snap = await page.evaluate(() => JSON.parse(localStorage.getItem('scheda-interattiva:snapshots') || '[]'));
   expect(snap.some((s) => Object.values(s.roster.personaggi).some((p) => p.nome === 'Frost'))).toBe(true);
-  // Da qui in poi eventuali salvataggi partono dalla versione online: la
-  // versione vecchia (con Frost, senza Wendell) non torna mai online.
+  // La versione vecchia (con Frost, senza Wendell) non torna mai online.
   await page.waitForTimeout(3500);
   for (const p of stato.patch) {
     const nomi = Object.values(JSON.parse(p.files[FILE].content).personaggi).map((x) => x.nome).sort();
@@ -82,37 +71,7 @@ test('dispositivo con dati vecchi: all’avvio non sovrascrive, mostra il confli
   }
 });
 
-test('conflitto: "Mantieni la mia versione" chiede conferma e solo dopo sovrascrive online', async ({ page }) => {
-  const stato = await preparaDispositivoVecchio(page);
-  await page.goto('/');
-  const dialogo = page.getByTestId('conflitto-sync');
-  await expect(dialogo).toBeVisible({ timeout: 10000 });
-  await dialogo.getByRole('button', { name: 'Mantieni la mia versione…' }).click();
-  await expect(dialogo.getByRole('alert')).toContainText('La versione online verrà sostituita');
-  expect(stato.patch).toHaveLength(0);
-  await dialogo.getByRole('button', { name: 'Sovrascrivi la versione online' }).click();
-  await expect(dialogo).toBeHidden();
-  await expect.poll(() => stato.patch.length, { timeout: 8000 }).toBe(1);
-  const inviato = JSON.parse(stato.patch[0].files[FILE].content);
-  expect(Object.values(inviato.personaggi).map((p) => p.nome).sort()).toEqual(['Frost', 'Vaelion']);
-});
-
-test('conflitto: "Decidi più tardi" lascia la sincronizzazione in pausa (nessuna scrittura, neanche al ritorno della connessione)', async ({ page }) => {
-  const stato = await preparaDispositivoVecchio(page);
-  await page.goto('/');
-  const dialogo = page.getByTestId('conflitto-sync');
-  await expect(dialogo).toBeVisible({ timeout: 10000 });
-  await dialogo.getByRole('button', { name: 'Decidi più tardi' }).click();
-  await expect(dialogo).toBeHidden();
-  // Il pannello Backup e sincronizzazione segnala la pausa e permette di riaprire la scelta.
-  await page.waitForTimeout(3500);
-  expect(stato.patch).toHaveLength(0);
-  await page.evaluate(() => window.dispatchEvent(new Event('online')));
-  await page.waitForTimeout(3500);
-  expect(stato.patch).toHaveLength(0);
-});
-
-test('codice di sincronizzazione: stesso controllo, nessun PUT finché l’utente non sceglie', async ({ page }) => {
+test('codice di sincronizzazione: stessa regola, vince la versione online senza chiedere', async ({ page }) => {
   const put = [];
   await page.route('**/sync/23456ABCDE', async (route) => {
     const req = route.request();
@@ -135,16 +94,11 @@ test('codice di sincronizzazione: stesso controllo, nessun PUT finché l’utent
     localStorage.setItem('scheda-interattiva:sync-codice-ts', String(Date.parse('2026-09-26T10:00:00+02:00')));
   }, { locale: rosterLocale });
   await page.goto('/');
-  const dialogo = page.getByTestId('conflitto-sync');
-  await expect(dialogo).toBeVisible({ timeout: 10000 });
-  await expect(dialogo).toContainText('Codice di sincronizzazione');
+  await expect.poll(async () => page.evaluate(() => Object.values(JSON.parse(localStorage.getItem('scheda-interattiva:v1')).personaggi).map((p) => p.nome).sort().join(',')), { timeout: 10000 }).toBe('Vaelion,Wendell');
+  await expect(page.getByTestId('conflitto-sync')).toHaveCount(0);
   await page.waitForTimeout(3500);
-  expect(put).toHaveLength(0);
-  await dialogo.getByRole('button', { name: 'Mantieni la mia versione…' }).click();
-  await dialogo.getByRole('button', { name: 'Sovrascrivi la versione online' }).click();
-  await expect.poll(() => put.length, { timeout: 8000 }).toBe(1);
-  // Il client dichiara la versione da cui parte: il Worker può rifiutare se cambia ancora.
-  expect(put[0].baseUpdatedAt).toBe(rosterOnline._updatedAt);
+  // Se qualcosa riparte online, è la versione online (mai Frost).
+  for (const p of put) expect(Object.values(p.roster.personaggi).map((x) => x.nome).sort()).toEqual(['Vaelion', 'Wendell']);
 });
 
 // Preferenze di aspetto e audio (v4.52.0): viaggiano col roster, quindi Mac,

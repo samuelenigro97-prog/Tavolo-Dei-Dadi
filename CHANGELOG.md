@@ -2,6 +2,24 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.77.0] – 2026-10-06
+
+### Cambiato
+- **Nessuna finestra di conflitto: vince l'ultima versione online.** Nuova
+  politica `POLITICA_SYNC = 'online'` passata a `decidiSync`: quando lo stesso
+  campo è cambiato su due dispositivi, `unisciTreVie(..., { vince: 'remoto' })`
+  tiene il valore online e conserva le altre modifiche locali (che poi vengono
+  inviate); senza il contenuto della base (dispositivi aggiornati da versioni
+  vecchie) si carica la versione online. Prima di ogni sostituzione la copia
+  locale finisce in Cronologia versioni. Un personaggio eliminato da una parte
+  e modificato dall'altra si tiene (meglio uno in più che uno perso).
+- Se un altro dispositivo salva nello stesso istante (409 dal Worker) si
+  rilegge e si riprova da soli (massimo 3 volte di fila).
+- Controllo della copia online più frequente: al ritorno sull'app ogni 10 s al
+  massimo (prima 30 s) e ogni 45 s con l'app aperta in primo piano.
+- La finestra di conflitto e `decidiSync` con politica `chiedi` restano nel
+  codice (e nei test unitari) se un giorno si volesse tornare a chiedere.
+
 ## [4.76.0] – 2026-10-06
 
 ### Corretto

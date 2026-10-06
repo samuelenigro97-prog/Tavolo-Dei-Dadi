@@ -320,3 +320,20 @@ test('decidiSync propone "unisci" quando la base ha il contenuto e le modifiche 
   // Senza contenuto (base delle versioni precedenti) resta il conflitto.
   assert.equal(decidiSync({ base: { ...b, contenuto: undefined }, remoto: { rev: 'r2', ts: 2, roster: online }, locale: qui }).azione, 'conflitto');
 });
+
+test('politica "online": nei conflitti veri vince la copia online, il resto delle modifiche locali resta (v4.77.0)', async () => {
+  const { contenutoBase } = await import('../src/utils/conflittiSync.js');
+  const base = { attivo: 'p', personaggi: { p: { nome: 'V', pf: 30, note: 'a' } } };
+  const qui = { attivo: 'p', personaggi: { p: { nome: 'V', pf: 10, note: 'b' } } };
+  const online = { attivo: 'p', personaggi: { p: { nome: 'V', pf: 22, note: 'a' } } };
+  const b = { rev: 'r1', ts: 1, hash: improntaRoster(base), contenuto: contenutoBase(base) };
+  const d = decidiSync({ base: b, remoto: { rev: 'r2', ts: 2, roster: online }, locale: qui, politica: 'online' });
+  assert.equal(d.azione, 'unisci');
+  assert.equal(d.motivo, 'conflitto-vince-online');
+  assert.deepEqual(d.roster.personaggi.p, { nome: 'V', pf: 22, note: 'b' }, 'pf: vince online; note: cambiata solo qui, resta');
+  // Senza contenuto della base non si può unire: si carica la versione online.
+  const d2 = decidiSync({ base: { rev: 'r1', ts: 1, hash: 'vecchia' }, remoto: { rev: 'r2', ts: 2, roster: online }, locale: qui, politica: 'online' });
+  assert.deepEqual([d2.azione, d2.motivo], ['carica', 'conflitto-vince-online']);
+  // Con la politica predefinita ("chiedi") resta il conflitto.
+  assert.equal(decidiSync({ base: b, remoto: { rev: 'r2', ts: 2, roster: online }, locale: qui }).azione, 'conflitto');
+});

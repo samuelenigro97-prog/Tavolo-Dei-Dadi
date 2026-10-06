@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.77.0',
+    voci: {
+      it: [
+        'Sincronizzazione senza domande: se due dispositivi cambiano la stessa cosa, vince l\'ultima versione salvata online. Le altre modifiche di questo dispositivo restano e la copia precedente va in Cronologia versioni.',
+        'Con l\'app aperta, ogni 45 secondi controlla se un altro dispositivo ha salvato, così le sue modifiche compaiono da sole.',
+      ],
+      en: [
+        'Sync without questions: if two devices change the same thing, the latest version saved online wins. This device\'s other changes are kept and the previous copy goes to Version history.',
+        'While the app is open it checks every 45 seconds whether another device has saved, so its changes appear on their own.',
+      ],
+    },
+  },
+  {
     versione: '4.76.0',
     voci: {
       it: ['Aggiornamenti più affidabili, soprattutto su iPhone: l\'app aspetta che la versione nuova sia installata prima di ricaricarsi, e se resta bloccata sulla vecchia svuota da sola la cache del programma (personaggi e immagini restano).'],

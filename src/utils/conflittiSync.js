@@ -154,6 +154,13 @@ function campiDi(...pgs) {
   return campi;
 }
 
+function preservaImmagine(pg, altro) {
+  const out = { ...pg };
+  if (!out.ritratto && altro?.ritratto) out.ritratto = altro.ritratto;
+  if (!out.mappaCampagna && altro?.mappaCampagna) out.mappaCampagna = altro.mappaCampagna;
+  return out;
+}
+
 function pgUgualeABase(pg, base) {
   for (const campo of campiDi(pg, base)) if (valoreCampo(pg, campo, false) !== valoreCampo(base, campo, true)) return false;
   return true;
@@ -168,7 +175,10 @@ function pgUgualeABase(pg, base) {
  * conflitto: decide l'utente). Un'immagine assente nella copia online conta
  * come "non cambiata" (il servizio può non averla), non come cancellata.
  */
-export function unisciTreVie(contenuto, locale, remoto) {
+export function unisciTreVie(contenuto, locale, remoto, opzioni = {}) {
+  // vince: 'remoto' → nei conflitti veri vale la copia online (senza chiedere);
+  // altrimenti un conflitto restituisce null e decide l'utente.
+  const vinceOnline = opzioni.vince === 'remoto';
   let base;
   try { base = JSON.parse(contenuto); } catch { return null; }
   if (!base || typeof base.personaggi !== 'object') return null;
@@ -183,15 +193,19 @@ export function unisciTreVie(contenuto, locale, remoto) {
     if (!b) {
       // Nuovo da una parte sola: si tiene. Nuovo da entrambe: solo se identico.
       if (l && r) {
-        if (improntaPersonaggi({ personaggi: { x: l } }) !== improntaPersonaggi({ personaggi: { x: r } })) return null;
-        personaggi[id] = l;
+        if (improntaPersonaggi({ personaggi: { x: l } }) !== improntaPersonaggi({ personaggi: { x: r } })) {
+          if (!vinceOnline) return null;
+          personaggi[id] = preservaImmagine(r, l);
+        } else personaggi[id] = l;
       } else if (l || r) personaggi[id] = l || r;
       continue;
     }
     if (!l && !r) continue;
     // Eliminato da una parte: va bene solo se l'altra non l'ha modificato.
-    if (!l) { if (pgUgualeABase(r, b)) continue; return null; }
-    if (!r) { if (pgUgualeABase(l, b)) continue; return null; }
+    // Se l'altra l'ha modificato, con "vince online" il personaggio si tiene:
+    // meglio un personaggio in più che uno perso.
+    if (!l) { if (pgUgualeABase(r, b)) continue; if (!vinceOnline) return null; personaggi[id] = r; continue; }
+    if (!r) { if (pgUgualeABase(l, b)) continue; if (!vinceOnline) return null; personaggi[id] = l; continue; }
     const unito = {};
     for (const campo of campiDi(l, r, b)) {
       const bv = valoreCampo(b, campo, true);
@@ -201,6 +215,7 @@ export function unisciTreVie(contenuto, locale, remoto) {
       let scelto;
       if (lv === rv || rv === bv) scelto = l[campo] !== undefined ? l[campo] : r[campo];
       else if (lv === bv) scelto = r[campo] !== undefined ? r[campo] : l[campo];
+      else if (vinceOnline) scelto = r[campo] !== undefined ? r[campo] : l[campo];
       else return null;
       if (scelto !== undefined) unito[campo] = scelto;
     }
@@ -233,6 +248,7 @@ function haPersonaggi(roster) {
  * @param {{rev?:string, ts?:number, hash?:string}|null} p.base  versione online da cui partono le modifiche locali
  * @param {{rev?:string, ts?:number, roster?:object}|null} p.remoto  versione online attuale (null = non esiste ancora)
  * @param {object} p.locale  roster di questo dispositivo
+ * @param {'chiedi'|'online'} [p.politica]  nei conflitti veri: chiedere all'utente o far vincere la copia online
  * @returns {{azione:'invia'|'niente'|'carica'|'allineato'|'unisci'|'conflitto', motivo:string, roster?:object}}
  *   invia     → la copia online è quella da cui partiamo: si può inviare
  *   niente    → come sopra, ma in locale non è cambiato nulla: inutile inviare
@@ -241,7 +257,7 @@ function haPersonaggi(roster) {
  *   unisci    → online è cambiata E qui ci sono modifiche, ma a campi diversi: `roster` le contiene tutte
  *   conflitto → online è cambiata E qui ci sono modifiche allo stesso campo: decide l'utente
  */
-export function decidiSync({ base, remoto, locale }) {
+export function decidiSync({ base, remoto, locale, politica = 'chiedi' }) {
   const hashLocale = improntaRoster(locale);
   // Base salvata da una versione che non contava le immagini (riconoscibile perché
   // non ha il contenuto): se coincide con l'impronta senza immagini, qui non è
@@ -273,7 +289,14 @@ export function decidiSync({ base, remoto, locale }) {
   if (base?.contenuto) {
     const unito = unisciTreVie(base.contenuto, locale, remoto.roster);
     if (unito) return { azione: 'unisci', motivo: 'modifiche-compatibili', roster: unito };
+    // Stesso campo cambiato da entrambe le parti: con la politica "online" vince
+    // l'ultima versione sincronizzata, campo per campo, senza chiedere.
+    if (politica === 'online') {
+      const conOnline = unisciTreVie(base.contenuto, locale, remoto.roster, { vince: 'remoto' });
+      if (conOnline) return { azione: 'unisci', motivo: 'conflitto-vince-online', roster: conOnline };
+    }
   }
+  if (politica === 'online') return { azione: 'carica', motivo: 'conflitto-vince-online' };
   return { azione: 'conflitto', motivo: 'modifiche-su-entrambi' };
 }
 

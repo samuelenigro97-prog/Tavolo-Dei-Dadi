@@ -1952,7 +1952,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.76.0';
+const APP_VERSION = '4.77.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -3231,6 +3231,13 @@ function leggiTentativiAggiornamento(build) {
     return prec.build === String(build) ? Number(prec.n) || 0 : 0;
   } catch { return 0; }
 }
+
+/**
+ * Nei conflitti di sincronizzazione vince sempre l'ultima versione salvata
+ * online, senza chiedere: la copia di questo dispositivo finisce prima in
+ * Cronologia versioni, e le sue modifiche a parti diverse della scheda restano.
+ */
+const POLITICA_SYNC = 'online';
 
 /** Conta (in sessionStorage) i tentativi di aggiornamento verso la stessa versione. */
 function registraTentativoAggiornamento(build) {
@@ -6315,16 +6322,29 @@ export default function App() {
       setRoster(finale);
       const tsPrefRemote = Number(remoto.roster?.preferenze?.ts) || 0;
       if (tsPrefRemote > (Number(rosterValutato?.preferenze?.ts) || 0)) applicaPreferenzeRemote(remoto.roster?.preferenze);
-      setStato({ text: tr('Unite le modifiche di questo dispositivo con quelle dell’altro.', 'Merged the changes from this device with those from the other one.'), type: 'success' });
+      setStato({
+        text: decisione.motivo === 'conflitto-vince-online'
+          ? tr('Caricata l’ultima versione online; le altre modifiche di questo dispositivo sono state tenute. La copia precedente è in Cronologia versioni.', 'Loaded the latest online version; the other changes from this device were kept. The previous copy is in Version history.')
+          : tr('Unite le modifiche di questo dispositivo con quelle dell’altro.', 'Merged the changes from this device with those from the other one.'),
+        type: 'success',
+      });
       return true;
     }
     if (decisione.azione === 'carica') {
       if (!(await applicaRosterRemoto(canale, remoto, rosterValutato))) {
+        // Modificato qualcosa proprio adesso: con la politica "online" si riprova
+        // al prossimo controllo (parte da solo con la modifica), senza chiedere.
+        if (POLITICA_SYNC === 'online') return true;
         apriConflitto(canale, remoto);
         setStato({ text: t('conflitto.in_pausa'), type: 'error' });
         return true;
       }
-      setStato({ text: t('conflitto.caricata_recente'), type: 'success' });
+      setStato({
+        text: decisione.motivo === 'conflitto-vince-online'
+          ? tr('Caricata l’ultima versione online. La copia di questo dispositivo è in Cronologia versioni.', 'Loaded the latest online version. This device’s copy is in Version history.')
+          : t('conflitto.caricata_recente'),
+        type: 'success',
+      });
       return true;
     }
     apriConflitto(canale, remoto);
@@ -6414,7 +6434,7 @@ export default function App() {
         }
       }
       if (!forza) {
-        const decisione = decidiSync({ base: leggiBaseCanale('gist'), remoto, locale: rosterLocale });
+        const decisione = decidiSync({ base: leggiBaseCanale('gist'), remoto, locale: rosterLocale, politica: POLITICA_SYNC });
         if (await gestisciDecisione('gist', decisione, remoto, silenzioso, setCloudStatus, rosterLocale)) return;
         if (soloLettura) return;
       }
@@ -6595,6 +6615,8 @@ export default function App() {
    *  rilegge, confronta con la base, invia solo se nessun altro ha salvato nel
    *  frattempo. In più passa baseUpdatedAt al Worker, che rifiuta (409) se la
    *  copia online è cambiata tra la lettura e la scrittura. */
+  // Riprove automatiche dopo un 409 (altro dispositivo che salva nello stesso istante).
+  const riprovaConflittoRef = useRef(0);
   async function salvaSuCodiceSync(silenzioso = false, opzioni = {}) {
     const { forza = false, soloLettura = false } = opzioni;
     if (!codiceSyncRef.current) return;
@@ -6628,7 +6650,7 @@ export default function App() {
         }
       }
       if (!forza) {
-        const decisione = decidiSync({ base: leggiBaseCanale('codice'), remoto, locale: rosterLocale });
+        const decisione = decidiSync({ base: leggiBaseCanale('codice'), remoto, locale: rosterLocale, politica: POLITICA_SYNC });
         if (await gestisciDecisione('codice', decisione, remoto, silenzioso, setSyncCodiceStatus, rosterLocale)) return;
         if (soloLettura) return;
       }
@@ -6638,7 +6660,13 @@ export default function App() {
         await salvaSync(URL_STANZE, codiceSyncRef.current, rosterDaInviare, quando, fetch, remoto ? { baseUpdatedAt: remoto.ts } : {});
       } catch (errScrittura) {
         if (errScrittura.message === 'SYNC_CONFLICT') {
-          // Un altro dispositivo ha salvato proprio adesso: rileggi e chiedi.
+          // Un altro dispositivo ha salvato proprio adesso. Con la politica "online"
+          // si ripete il giro (rilettura + unione) fra un attimo, senza chiedere.
+          if (POLITICA_SYNC === 'online' && riprovaConflittoRef.current < 3) {
+            riprovaConflittoRef.current += 1;
+            syncCodicePendenteRef.current = true;
+            return;
+          }
           const ora = await caricaSync(URL_STANZE, codiceSyncRef.current);
           apriConflitto('codice', { rev: String(ora.updatedAt || ''), ts: ora.updatedAt, roster: normalizzaRosterRemoto(ora.roster) });
           setSyncCodiceStatus({ text: t('conflitto.in_pausa'), type: 'error' });
@@ -6646,6 +6674,7 @@ export default function App() {
         }
         throw errScrittura;
       }
+      riprovaConflittoRef.current = 0;
       salvaBaseCanale('codice', { rev: String(quando), ts: quando, hash: improntaRoster(rosterLocale), contenuto: contenutoBase(rosterLocale) });
       const orario = new Date(quando).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
       setUltimoSyncCodice(orario);
@@ -6887,7 +6916,7 @@ export default function App() {
   // Ritorno sull'app (scheda di nuovo visibile, finestra a fuoco, connessione
   // tornata): ricontrolla la copia online. È il caso tipico del dispositivo
   // rimasto aperto per ore: vede subito le modifiche fatte altrove invece di
-  // sovrascriverle alla prima modifica. Al massimo un controllo ogni 30 s.
+  // sovrascriverle alla prima modifica. Al massimo un controllo ogni 10 s, più uno ogni 45 s a app aperta.
   const verificaRitornoRef = useRef(null);
   verificaRitornoRef.current = () => {
     if (tokenSyncRef.current && gistSyncRef.current) salvaSuCloud(true, { soloLettura: !autoSyncRef.current });
@@ -6897,14 +6926,18 @@ export default function App() {
     let ultimo = Date.now();
     const verifica = (e) => {
       if (document.visibilityState === 'hidden') return;
-      if (e?.type !== 'online' && Date.now() - ultimo < 30000) return;
+      if (e?.type !== 'online' && Date.now() - ultimo < 10000) return;
       ultimo = Date.now();
       verificaRitornoRef.current?.();
     };
+    // Anche con l'app aperta e ferma: ogni 45 s (solo se in primo piano) si guarda
+    // se un altro dispositivo ha salvato, così le sue modifiche compaiono da sole.
+    const periodico = setInterval(() => verifica({ type: 'intervallo' }), 45000);
     document.addEventListener('visibilitychange', verifica);
     window.addEventListener('focus', verifica);
     window.addEventListener('online', verifica);
     return () => {
+      clearInterval(periodico);
       document.removeEventListener('visibilitychange', verifica);
       window.removeEventListener('focus', verifica);
       window.removeEventListener('online', verifica);
