@@ -73,10 +73,15 @@ const chipStile = {
   whiteSpace: 'nowrap',
 };
 
+const etichettaGruppo = {
+  fontSize: 11, fontWeight: 700, color: C.inkDim, textTransform: 'uppercase', letterSpacing: 0.8,
+  display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6,
+};
+
 const miniPm = { ...styles.buttonMini, padding: '0 6px', fontSize: 12, lineHeight: 1.3, margin: '0 2px' };
 
 /** Una scheda compatta per potere: titolo, chip di contatori/modificatori, descrizione. */
-function PotereCard({ potere, scheda, indice, totale, onApri, lingua }) {
+function PotereCard({ potere, scheda, onApri, lingua, nomiNelPannello = [] }) {
   const [sceltaEffetto, setSceltaEffetto] = useState(false);
   const bloccato = !potereSbloccato(potere, livelloTotaleScheda(scheda));
   return (
@@ -122,6 +127,13 @@ function PotereCard({ potere, scheda, indice, totale, onApri, lingua }) {
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, alignItems: 'center' }}>
         {potere.contatori.map((c, i) => {
           const { attuali, max } = valoreContatore(scheda, potere.id, i, c);
+          if (nomiNelPannello.includes(String(c.nome || '').trim().toLowerCase())) {
+            return (
+              <span key={i} style={{ ...chipStile, color: C.inkDim }} title={lingua === 'en' ? 'Managed in the Heralds panel above' : 'Si gestisce nel pannello degli Araldi qui sopra'}>
+                {c.nome} <strong style={{ color: C.ink }}>{attuali}</strong>{max != null ? ` / ${max}` : ''} ↑
+              </span>
+            );
+          }
           return (
             <span key={i} style={chipStile} onClick={(e) => e.stopPropagation()} title={potere.descrizione ? `${c.nome}: ${potere.descrizione}` : c.nome}>
               {c.nome || (lingua === 'en' ? 'Counter' : 'Contatore')}{' '}
@@ -532,7 +544,7 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
           aria-expanded={!chiusa}
           onClick={alternaChiusa}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternaChiusa(); } }}
-          style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, letterSpacing: 0.5, textAlign: 'center', cursor: 'pointer', userSelect: 'none' }}
+          style={{ fontSize: 13.5, fontWeight: 700, color: C.goldDark, letterSpacing: 0.3, textAlign: 'center', cursor: 'pointer', userSelect: 'none' }}
           title={chiusa
             ? (lingua === 'en' ? 'Click to expand the Powers' : 'Clicca per espandere i Poteri')
             : (lingua === 'en' ? 'Click to collapse the Powers. For rules invented at the table (not in the official books): pacts, blessings, curses, magic items with custom effects...' : 'Clicca per rimpicciolire i Poteri. Per le regole inventate al tavolo (non nei manuali ufficiali): patti, benedizioni, maledizioni, oggetti magici con effetti custom...')}
@@ -581,6 +593,9 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
       )}
 
       {!chiusa && pannelloAraldi && (
+        <div style={{ ...etichettaGruppo, marginTop: 2 }}>{lingua === 'en' ? 'Heralds of the Secret' : 'Araldi del Segreto'}</div>
+      )}
+      {!chiusa && pannelloAraldi && (
         <AraldiPannello scheda={scheda} aggiorna={aggiorna} lingua={lingua} registra={registra} onModifica={setPotereApertoId} onInfo={mostraInfo} />
       )}
 
@@ -590,8 +605,11 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {poteriInLista.map((p, i) => (
-            <PotereCard key={p.id} potere={p} scheda={scheda} indice={i} totale={poteri.length} onApri={gestisciAzioneCard} lingua={lingua} />
+          {pannelloAraldi && poteriInLista.length > 0 && (
+            <div style={etichettaGruppo}>{lingua === 'en' ? 'Other powers' : 'Altri poteri'}</div>
+          )}
+          {poteriInLista.map((p) => (
+            <PotereCard key={p.id} potere={p} scheda={scheda} onApri={gestisciAzioneCard} lingua={lingua} nomiNelPannello={pannelloAraldi ? ['segreti', 'debito'] : []} />
           ))}
         </div>
       )}

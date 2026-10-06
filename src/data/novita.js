@@ -5,6 +5,21 @@
 
 export const NOVITA = [
   {
+    versione: '4.72.0',
+    voci: {
+      it: [
+        'Torna il riquadro Poteri sotto Risorse di classe: Segreti, Debito e usi dei privilegi da spendere al volo, una riga ciascuno.',
+        'Un solo tema per tutta l\'app: la classe e l\'ambientazione non ricolorano più testi, bordi e pulsanti (l\'ambientazione cambia scena e audio). Tolta la linea sotto la barra in alto.',
+        'Araldi del Segreto: soglie del Debito con il loro effetto, barra verso la prossima soglia, Segreti e Debito scrivibili a mano e pulsanti per Cervello, Nemico ucciso, Ora in più e Teletrasporto.',
+      ],
+      en: [
+        'The Powers box is back under Class resources: Secrets, Debt and feature uses to spend on the fly, one row each.',
+        'One theme for the whole app: class and setting no longer recolour text, borders and buttons (the setting changes scene and audio). Removed the line under the top bar.',
+        'Heralds of the Secret: Debt thresholds with their effects, a bar toward the next threshold, Secrets and Debt editable by hand, and buttons for Brain, Enemy slain, Extra hour and Teleport.',
+      ],
+    },
+  },
+  {
     versione: '4.68.0',
     voci: {
       it: ['Testi più leggibili in tema chiaro e scuro: etichette, chip e righe degli incantesimi hanno ora un contrasto adeguato in ogni ambientazione.'],

@@ -123,7 +123,8 @@ test.describe('Poteri', () => {
     // Debito a 15: il +1 CA di Occhio Risvegliato scatta da solo.
     for (let i = debito0 + 1; i < 15; i++) await pannello.getByRole('button', { name: 'Debito +1' }).click();
     await expect.poll(async () => (await stato()).debito).toBe(15);
-    await expect(pannello.getByText(/✓ 15 · Occhio Risvegliato/)).toBeVisible();
+    await expect(pannello.getByTestId('soglia-15')).toHaveAttribute('data-raggiunta', 'si');
+    await expect(pannello.getByTestId('soglia-35')).toHaveAttribute('data-raggiunta', 'no');
     const caFinale = await page.evaluate(() => document.body.innerText.match(/CLASSE ARMATURA\s*(\d+)/i)?.[1]);
     expect(caIniziale).toBeTruthy();
     expect(Number(caFinale)).toBe(Number(caIniziale) + 1);
@@ -135,6 +136,9 @@ test.describe('Poteri', () => {
     await pannello.getByRole('button', { name: /^Lancia/ }).click();
     await expect.poll(async () => (await stato()).segreti).toBe(1);
     await expect.poll(async () => (await stato()).debito).toBe(16);
+    // Inquisire → Cervello: la prova superata dà 1 Segreto.
+    await pannello.getByRole('button', { name: /^Cervello/ }).click();
+    await expect.poll(async () => (await stato()).segreti).toBe(2);
   });
 
   test('poteri degli Araldi aggiunti con la versione vecchia: si aggiornano da soli e mostrano il pannello anche col manuale spento', async ({ page }) => {
@@ -166,7 +170,39 @@ test.describe('Poteri', () => {
     await page.keyboard.type('1000');
     await page.keyboard.press('Enter');
     await expect.poll(debito).toBe(1000);
-    await page.getByRole('button', { name: 'Debito +1' }).click();
+    // Il + della scheda del potere (il riquadro rapido a sinistra ha il suo, vedi sotto).
+    await page.getByRole('button', { name: 'Debito +1' }).last().click();
     await expect.poll(debito).toBe(1001);
+  });
+
+  test('riquadro Poteri sotto Risorse di classe: stessi contatori, separati dalle risorse di classe', async ({ page }) => {
+    const box = page.getByTestId('poteri-risorse');
+    await expect(box).toBeVisible();
+    await expect(box.getByText('Debito', { exact: true })).toBeVisible();
+    const debito = () => page.evaluate(() => { const st = JSON.parse(localStorage.getItem('scheda-interattiva:v1')); return st.personaggi[st.attivo].risorse.find((r) => r.nome === 'Debito').attuali; });
+    const prima = await debito();
+    await box.getByRole('button', { name: 'Debito +1' }).click();
+    await expect.poll(debito).toBe(prima + 1);
+    await box.getByRole('button', { name: 'Debito −1' }).click();
+    await expect.poll(debito).toBe(prima);
+  });
+
+  test('riquadro Poteri con gli Araldi: una perla di Inquisire spende un uso e aggiunge Debito', async ({ page }) => {
+    await attivaManuale(page);
+    await page.getByRole('button', { name: 'Da modello' }).click();
+    await page.getByTestId('modelli-poteri').getByRole('button', { name: /Aggiungi \d+ poteri/ }).click();
+    const box = page.getByTestId('poteri-risorse');
+    const stato = () => page.evaluate(() => {
+      const st = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+      const pg = st.personaggi[st.attivo];
+      const r = (n) => pg.risorse.find((x) => x.nome === n)?.attuali;
+      return { inquisire: r('Inquisire'), debito: r('Debito') };
+    });
+    const prima = await stato();
+    await box.getByRole('button', { name: 'Usa Inquisire' }).first().click();
+    await expect.poll(async () => (await stato()).inquisire).toBe(prima.inquisire - 1);
+    await expect.poll(async () => (await stato()).debito).toBe(prima.debito + 1);
+    // Il pannello Araldi della sezione Poteri vede lo stesso valore.
+    await expect(page.getByTestId('araldi-pannello').getByTestId('perla-Inquisire').nth(prima.inquisire - 1)).toHaveAttribute('aria-pressed', 'true');
   });
 });

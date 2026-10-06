@@ -256,3 +256,25 @@ export function patchVariaContatori(scheda, variazioni) {
   }
   return toccato ? { poteri, risorse } : null;
 }
+
+/**
+ * Contatori dei Poteri "in gioco" (potere attivo e già sbloccato al livello), uno per nome
+ * (il primo, come trovaContatore): servono al riquadro rapido sotto Risorse di classe.
+ * Ogni voce: { potere, indice, contatore, attuali, max }.
+ */
+export function contatoriInGioco(scheda) {
+  const livello = livelloTotaleScheda(scheda);
+  const visti = new Set();
+  const voci = [];
+  for (const p of normalizzaPoteri(scheda?.poteri)) {
+    if (!p.attivo || !potereSbloccato(p, livello)) continue;
+    p.contatori.forEach((c, indice) => {
+      const chiave = String(c.nome || '').trim().toLowerCase();
+      if (!chiave || visti.has(chiave)) return;
+      visti.add(chiave);
+      const { attuali, max } = valoreContatore(scheda, p.id, indice, c);
+      voci.push({ potere: p, indice, contatore: c, attuali, max });
+    });
+  }
+  return voci;
+}

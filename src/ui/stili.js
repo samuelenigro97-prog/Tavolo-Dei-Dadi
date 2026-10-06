@@ -627,8 +627,12 @@ tbody tr:hover {
   width: 22px;
   height: 22px;
   pointer-events: none;
-  background-size: contain;
-  background-repeat: no-repeat;
+  /* La forma degli angoli cambia con la classe, il colore resta quello del tema. */
+  background-color: var(--c-gold);
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
   z-index: 2;
   opacity: 0.70;
   filter: drop-shadow(0 0 1.5px var(--c-aura-color, rgba(201, 162, 39, 0.25)));
@@ -790,10 +794,10 @@ tbody tr:hover {
 }
 
 /* Default / Generico D&D Gold Corners */
-.angolo-tl { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23c9a227' stroke-width='1.8'><path d='M3 3h14M3 3v14M3 3l8 8M7 3v6M3 7h6'/><circle cx='5' cy='5' r='1.8' fill='%23dcb84f'/></svg>"); }
-.angolo-tr { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23c9a227' stroke-width='1.8'><path d='M25 3H11M25 3v14M25 3l-8 8M21 3v6M25 7h-6'/><circle cx='23' cy='5' r='1.8' fill='%23dcb84f'/></svg>"); }
-.angolo-bl { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23c9a227' stroke-width='1.8'><path d='M3 25h14M3 25V11M3 25l8-8M7 25v-6M3 21h6'/><circle cx='5' cy='23' r='1.8' fill='%23dcb84f'/></svg>"); }
-.angolo-br { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23c9a227' stroke-width='1.8'><path d='M25 25H11M25 25V11M25 25l-8-8M21 25v-6M25 21h-6'/><circle cx='23' cy='23' r='1.8' fill='%23dcb84f'/></svg>"); }
+.angolo-tl { -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23c9a227' stroke-width='1.8'><path d='M3 3h14M3 3v14M3 3l8 8M7 3v6M3 7h6'/><circle cx='5' cy='5' r='1.8' fill='%23dcb84f'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23c9a227' stroke-width='1.8'><path d='M3 3h14M3 3v14M3 3l8 8M7 3v6M3 7h6'/><circle cx='5' cy='5' r='1.8' fill='%23dcb84f'/></svg>"); }
+.angolo-tr { -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23c9a227' stroke-width='1.8'><path d='M25 3H11M25 3v14M25 3l-8 8M21 3v6M25 7h-6'/><circle cx='23' cy='5' r='1.8' fill='%23dcb84f'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23c9a227' stroke-width='1.8'><path d='M25 3H11M25 3v14M25 3l-8 8M21 3v6M25 7h-6'/><circle cx='23' cy='5' r='1.8' fill='%23dcb84f'/></svg>"); }
+.angolo-bl { -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23c9a227' stroke-width='1.8'><path d='M3 25h14M3 25V11M3 25l8-8M7 25v-6M3 21h6'/><circle cx='5' cy='23' r='1.8' fill='%23dcb84f'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23c9a227' stroke-width='1.8'><path d='M3 25h14M3 25V11M3 25l8-8M7 25v-6M3 21h6'/><circle cx='5' cy='23' r='1.8' fill='%23dcb84f'/></svg>"); }
+.angolo-br { -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23c9a227' stroke-width='1.8'><path d='M25 25H11M25 25V11M25 25l-8-8M21 25v-6M25 21h-6'/><circle cx='23' cy='23' r='1.8' fill='%23dcb84f'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23c9a227' stroke-width='1.8'><path d='M25 25H11M25 25V11M25 25l-8-8M21 25v-6M25 21h-6'/><circle cx='23' cy='23' r='1.8' fill='%23dcb84f'/></svg>"); }
 
 /* 1. Druido: Rami intrecciati, foglie, nodi silvestri 🌿 */
 [data-classe="druido"] {
@@ -808,19 +812,16 @@ tbody tr:hover {
   --c-border-glow-max: rgba(82, 183, 136, 0.85);
 }
 [data-classe="druido"] .angolo-tl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2340916c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 24C3 12 12 3 24 3M3 3c6 0 10 4 10 10M3 3c0 6 4 10 10 10'/><circle cx='18' cy='7' r='2' fill='%2352b788'/><circle cx='7' cy='18' r='2' fill='%2352b788'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2340916c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 24C3 12 12 3 24 3M3 3c6 0 10 4 10 10M3 3c0 6 4 10 10 10'/><circle cx='18' cy='7' r='2' fill='%2352b788'/><circle cx='7' cy='18' r='2' fill='%2352b788'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2340916c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 24C3 12 12 3 24 3M3 3c6 0 10 4 10 10M3 3c0 6 4 10 10 10'/><circle cx='18' cy='7' r='2' fill='%2352b788'/><circle cx='7' cy='18' r='2' fill='%2352b788'/></svg>");
 }
 [data-classe="druido"] .angolo-tr {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2340916c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M25 24C25 12 16 3 4 3M25 3c-6 0-10 4-10 10M25 3c0 6-4 10-10 10'/><circle cx='10' cy='7' r='2' fill='%2352b788'/><circle cx='21' cy='18' r='2' fill='%2352b788'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2340916c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M25 24C25 12 16 3 4 3M25 3c-6 0-10 4-10 10M25 3c0 6-4 10-10 10'/><circle cx='10' cy='7' r='2' fill='%2352b788'/><circle cx='21' cy='18' r='2' fill='%2352b788'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2340916c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M25 24C25 12 16 3 4 3M25 3c-6 0-10 4-10 10M25 3c0 6-4 10-10 10'/><circle cx='10' cy='7' r='2' fill='%2352b788'/><circle cx='21' cy='18' r='2' fill='%2352b788'/></svg>");
 }
 [data-classe="druido"] .angolo-bl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2340916c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 4C3 16 12 25 24 25M3 25c6 0 10-4 10-10M3 25c0-6 4-10 10-10'/><circle cx='18' cy='21' r='2' fill='%2352b788'/><circle cx='7' cy='10' r='2' fill='%2352b788'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2340916c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 4C3 16 12 25 24 25M3 25c6 0 10-4 10-10M3 25c0-6 4-10 10-10'/><circle cx='18' cy='21' r='2' fill='%2352b788'/><circle cx='7' cy='10' r='2' fill='%2352b788'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2340916c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 4C3 16 12 25 24 25M3 25c6 0 10-4 10-10M3 25c0-6 4-10 10-10'/><circle cx='18' cy='21' r='2' fill='%2352b788'/><circle cx='7' cy='10' r='2' fill='%2352b788'/></svg>");
 }
 [data-classe="druido"] .angolo-br {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2340916c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M25 4C25 16 16 25 4 25M25 25c-6 0-10-4-10-10M25 25c0-6-4-10-10-10'/><circle cx='10' cy='21' r='2' fill='%2352b788'/><circle cx='21' cy='10' r='2' fill='%2352b788'/></svg>");
-}
-[data-classe="druido"] .sottosezione-titolo {
-  border-top: 1.5px solid rgba(64, 145, 108, 0.7) !important;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2340916c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M25 4C25 16 16 25 4 25M25 25c-6 0-10-4-10-10M25 25c0-6-4-10-10-10'/><circle cx='10' cy='21' r='2' fill='%2352b788'/><circle cx='21' cy='10' r='2' fill='%2352b788'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2340916c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M25 4C25 16 16 25 4 25M25 25c-6 0-10-4-10-10M25 25c0-6-4-10-10-10'/><circle cx='10' cy='21' r='2' fill='%2352b788'/><circle cx='21' cy='10' r='2' fill='%2352b788'/></svg>");
 }
 
 /* 2. Mago: Rune arcanee, cerchi cosmici, stelle ✦ 🔮 */
@@ -836,19 +837,16 @@ tbody tr:hover {
   --c-border-glow-max: rgba(199, 125, 255, 0.85);
 }
 [data-classe="mago"] .angolo-tl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%239d4edd' stroke-width='1.8'><path d='M3 3h12M3 3v12M3 3l12 12M8 8l5-5M8 8l-5 5'/><circle cx='5' cy='5' r='2' fill='%239d4edd'/><circle cx='18' cy='3' r='1.2' fill='%234cc9f0'/><circle cx='3' cy='18' r='1.2' fill='%234cc9f0'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%239d4edd' stroke-width='1.8'><path d='M3 3h12M3 3v12M3 3l12 12M8 8l5-5M8 8l-5 5'/><circle cx='5' cy='5' r='2' fill='%239d4edd'/><circle cx='18' cy='3' r='1.2' fill='%234cc9f0'/><circle cx='3' cy='18' r='1.2' fill='%234cc9f0'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%239d4edd' stroke-width='1.8'><path d='M3 3h12M3 3v12M3 3l12 12M8 8l5-5M8 8l-5 5'/><circle cx='5' cy='5' r='2' fill='%239d4edd'/><circle cx='18' cy='3' r='1.2' fill='%234cc9f0'/><circle cx='3' cy='18' r='1.2' fill='%234cc9f0'/></svg>");
 }
 [data-classe="mago"] .angolo-tr {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%239d4edd' stroke-width='1.8'><path d='M25 3H13M25 3v12M25 3L13 15M20 8l-5-5M20 8l5 5'/><circle cx='23' cy='5' r='2' fill='%239d4edd'/><circle cx='10' cy='3' r='1.2' fill='%234cc9f0'/><circle cx='25' cy='18' r='1.2' fill='%234cc9f0'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%239d4edd' stroke-width='1.8'><path d='M25 3H13M25 3v12M25 3L13 15M20 8l-5-5M20 8l5 5'/><circle cx='23' cy='5' r='2' fill='%239d4edd'/><circle cx='10' cy='3' r='1.2' fill='%234cc9f0'/><circle cx='25' cy='18' r='1.2' fill='%234cc9f0'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%239d4edd' stroke-width='1.8'><path d='M25 3H13M25 3v12M25 3L13 15M20 8l-5-5M20 8l5 5'/><circle cx='23' cy='5' r='2' fill='%239d4edd'/><circle cx='10' cy='3' r='1.2' fill='%234cc9f0'/><circle cx='25' cy='18' r='1.2' fill='%234cc9f0'/></svg>");
 }
 [data-classe="mago"] .angolo-bl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%239d4edd' stroke-width='1.8'><path d='M3 25h12M3 25V13M3 25l12-12M8 20l5 5M8 20l-5-5'/><circle cx='5' cy='23' r='2' fill='%239d4edd'/><circle cx='18' cy='25' r='1.2' fill='%234cc9f0'/><circle cx='3' cy='10' r='1.2' fill='%234cc9f0'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%239d4edd' stroke-width='1.8'><path d='M3 25h12M3 25V13M3 25l12-12M8 20l5 5M8 20l-5-5'/><circle cx='5' cy='23' r='2' fill='%239d4edd'/><circle cx='18' cy='25' r='1.2' fill='%234cc9f0'/><circle cx='3' cy='10' r='1.2' fill='%234cc9f0'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%239d4edd' stroke-width='1.8'><path d='M3 25h12M3 25V13M3 25l12-12M8 20l5 5M8 20l-5-5'/><circle cx='5' cy='23' r='2' fill='%239d4edd'/><circle cx='18' cy='25' r='1.2' fill='%234cc9f0'/><circle cx='3' cy='10' r='1.2' fill='%234cc9f0'/></svg>");
 }
 [data-classe="mago"] .angolo-br {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%239d4edd' stroke-width='1.8'><path d='M25 25H13M25 25V13M25 25L13 13M20 20l-5 5M20 20l5-5'/><circle cx='23' cy='23' r='2' fill='%239d4edd'/><circle cx='10' cy='25' r='1.2' fill='%234cc9f0'/><circle cx='25' cy='10' r='1.2' fill='%234cc9f0'/></svg>");
-}
-[data-classe="mago"] .sottosezione-titolo {
-  border-top: 1.5px solid rgba(157, 78, 221, 0.7) !important;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%239d4edd' stroke-width='1.8'><path d='M25 25H13M25 25V13M25 25L13 13M20 20l-5 5M20 20l5-5'/><circle cx='23' cy='23' r='2' fill='%239d4edd'/><circle cx='10' cy='25' r='1.2' fill='%234cc9f0'/><circle cx='25' cy='10' r='1.2' fill='%234cc9f0'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%239d4edd' stroke-width='1.8'><path d='M25 25H13M25 25V13M25 25L13 13M20 20l-5 5M20 20l5-5'/><circle cx='23' cy='23' r='2' fill='%239d4edd'/><circle cx='10' cy='25' r='1.2' fill='%234cc9f0'/><circle cx='25' cy='10' r='1.2' fill='%234cc9f0'/></svg>");
 }
 
 /* 3. Guerriero: Lame d'acciaio, borchie da scudo, ferro ⚔️ */
@@ -864,19 +862,16 @@ tbody tr:hover {
   --c-border-glow-max: rgba(217, 138, 90, 0.85);
 }
 [data-classe="guerriero"] .angolo-tl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='square'><path d='M3 3h16M3 3v16M3 3l14 14M8 3v5M3 8h5'/><rect x='4' y='4' width='4' height='4' fill='%23adb5bd'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='square'><path d='M3 3h16M3 3v16M3 3l14 14M8 3v5M3 8h5'/><rect x='4' y='4' width='4' height='4' fill='%23adb5bd'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='square'><path d='M3 3h16M3 3v16M3 3l14 14M8 3v5M3 8h5'/><rect x='4' y='4' width='4' height='4' fill='%23adb5bd'/></svg>");
 }
 [data-classe="guerriero"] .angolo-tr {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='square'><path d='M25 3H9M25 3v16M25 3L11 17M20 3v5M25 8h-5'/><rect x='20' y='4' width='4' height='4' fill='%23adb5bd'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='square'><path d='M25 3H9M25 3v16M25 3L11 17M20 3v5M25 8h-5'/><rect x='20' y='4' width='4' height='4' fill='%23adb5bd'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='square'><path d='M25 3H9M25 3v16M25 3L11 17M20 3v5M25 8h-5'/><rect x='20' y='4' width='4' height='4' fill='%23adb5bd'/></svg>");
 }
 [data-classe="guerriero"] .angolo-bl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='square'><path d='M3 25h16M3 25V9M3 25l14-14M8 25v-5M3 20h5'/><rect x='4' y='20' width='4' height='4' fill='%23adb5bd'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='square'><path d='M3 25h16M3 25V9M3 25l14-14M8 25v-5M3 20h5'/><rect x='4' y='20' width='4' height='4' fill='%23adb5bd'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='square'><path d='M3 25h16M3 25V9M3 25l14-14M8 25v-5M3 20h5'/><rect x='4' y='20' width='4' height='4' fill='%23adb5bd'/></svg>");
 }
 [data-classe="guerriero"] .angolo-br {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='square'><path d='M25 25H9M25 25V9M25 25L11 11M20 25v-5M25 20h-5'/><rect x='20' y='20' width='4' height='4' fill='%23adb5bd'/></svg>");
-}
-[data-classe="guerriero"] .sottosezione-titolo {
-  border-top: 1.5px solid rgba(140, 58, 43, 0.7) !important;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='square'><path d='M25 25H9M25 25V9M25 25L11 11M20 25v-5M25 20h-5'/><rect x='20' y='20' width='4' height='4' fill='%23adb5bd'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='square'><path d='M25 25H9M25 25V9M25 25L11 11M20 25v-5M25 20h-5'/><rect x='20' y='20' width='4' height='4' fill='%23adb5bd'/></svg>");
 }
 
 /* 4. Ladro: Pugnali nascosti, ombre, angoli acuti 🗡️ */
@@ -892,19 +887,16 @@ tbody tr:hover {
   --c-border-glow-max: rgba(160, 160, 160, 0.80);
 }
 [data-classe="ladro"] .angolo-tl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23495057' stroke-width='1.8' stroke-linecap='round'><path d='M3 18L3 3l15 0M3 3l16 16M6 6l4-2 2 4-4 2z' fill='rgba(73,80,87,0.3)'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23495057' stroke-width='1.8' stroke-linecap='round'><path d='M3 18L3 3l15 0M3 3l16 16M6 6l4-2 2 4-4 2z' fill='rgba(73,80,87,0.3)'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23495057' stroke-width='1.8' stroke-linecap='round'><path d='M3 18L3 3l15 0M3 3l16 16M6 6l4-2 2 4-4 2z' fill='rgba(73,80,87,0.3)'/></svg>");
 }
 [data-classe="ladro"] .angolo-tr {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23495057' stroke-width='1.8' stroke-linecap='round'><path d='M25 18L25 3l-15 0M25 3L9 19M22 6l-4-2-2 4 4 2z' fill='rgba(73,80,87,0.3)'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23495057' stroke-width='1.8' stroke-linecap='round'><path d='M25 18L25 3l-15 0M25 3L9 19M22 6l-4-2-2 4 4 2z' fill='rgba(73,80,87,0.3)'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23495057' stroke-width='1.8' stroke-linecap='round'><path d='M25 18L25 3l-15 0M25 3L9 19M22 6l-4-2-2 4 4 2z' fill='rgba(73,80,87,0.3)'/></svg>");
 }
 [data-classe="ladro"] .angolo-bl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23495057' stroke-width='1.8' stroke-linecap='round'><path d='M3 10L3 25l15 0M3 25l16-16M6 22l4 2 2-4-4-2z' fill='rgba(73,80,87,0.3)'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23495057' stroke-width='1.8' stroke-linecap='round'><path d='M3 10L3 25l15 0M3 25l16-16M6 22l4 2 2-4-4-2z' fill='rgba(73,80,87,0.3)'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23495057' stroke-width='1.8' stroke-linecap='round'><path d='M3 10L3 25l15 0M3 25l16-16M6 22l4 2 2-4-4-2z' fill='rgba(73,80,87,0.3)'/></svg>");
 }
 [data-classe="ladro"] .angolo-br {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23495057' stroke-width='1.8' stroke-linecap='round'><path d='M25 10L25 25l-15 0M25 25L9 9M22 22l-4 2-2-4 4-2z' fill='rgba(73,80,87,0.3)'/></svg>");
-}
-[data-classe="ladro"] .sottosezione-titolo {
-  border-top: 1.5px solid rgba(52, 58, 64, 0.7) !important;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23495057' stroke-width='1.8' stroke-linecap='round'><path d='M25 10L25 25l-15 0M25 25L9 9M22 22l-4 2-2-4 4-2z' fill='rgba(73,80,87,0.3)'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23495057' stroke-width='1.8' stroke-linecap='round'><path d='M25 10L25 25l-15 0M25 25L9 9M22 22l-4 2-2-4 4-2z' fill='rgba(73,80,87,0.3)'/></svg>");
 }
 
 /* 5. Chierico: Raggi solari, croci sacre, aureola ☀️ 📿 */
@@ -920,19 +912,16 @@ tbody tr:hover {
   --c-border-glow-max: rgba(255, 208, 74, 0.90);
 }
 [data-classe="chierico"] .angolo-tl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23e09f3e' stroke-width='2' stroke-linecap='round'><path d='M3 3h14M3 3v14M3 3l12 12M7 7a6 6 0 0 1 6-4M7 7a6 6 0 0 0-4 6'/><circle cx='8' cy='8' r='2' fill='%23fff3b0'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23e09f3e' stroke-width='2' stroke-linecap='round'><path d='M3 3h14M3 3v14M3 3l12 12M7 7a6 6 0 0 1 6-4M7 7a6 6 0 0 0-4 6'/><circle cx='8' cy='8' r='2' fill='%23fff3b0'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23e09f3e' stroke-width='2' stroke-linecap='round'><path d='M3 3h14M3 3v14M3 3l12 12M7 7a6 6 0 0 1 6-4M7 7a6 6 0 0 0-4 6'/><circle cx='8' cy='8' r='2' fill='%23fff3b0'/></svg>");
 }
 [data-classe="chierico"] .angolo-tr {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23e09f3e' stroke-width='2' stroke-linecap='round'><path d='M25 3H11M25 3v14M25 3L13 15M21 7a6 6 0 0 0-6-4M21 7a6 6 0 0 1 4 6'/><circle cx='20' cy='8' r='2' fill='%23fff3b0'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23e09f3e' stroke-width='2' stroke-linecap='round'><path d='M25 3H11M25 3v14M25 3L13 15M21 7a6 6 0 0 0-6-4M21 7a6 6 0 0 1 4 6'/><circle cx='20' cy='8' r='2' fill='%23fff3b0'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23e09f3e' stroke-width='2' stroke-linecap='round'><path d='M25 3H11M25 3v14M25 3L13 15M21 7a6 6 0 0 0-6-4M21 7a6 6 0 0 1 4 6'/><circle cx='20' cy='8' r='2' fill='%23fff3b0'/></svg>");
 }
 [data-classe="chierico"] .angolo-bl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23e09f3e' stroke-width='2' stroke-linecap='round'><path d='M3 25h14M3 25V11M3 25l12-12M7 21a6 6 0 0 0 6 4M7 21a6 6 0 0 1-4-6'/><circle cx='8' cy='20' r='2' fill='%23fff3b0'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23e09f3e' stroke-width='2' stroke-linecap='round'><path d='M3 25h14M3 25V11M3 25l12-12M7 21a6 6 0 0 0 6 4M7 21a6 6 0 0 1-4-6'/><circle cx='8' cy='20' r='2' fill='%23fff3b0'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23e09f3e' stroke-width='2' stroke-linecap='round'><path d='M3 25h14M3 25V11M3 25l12-12M7 21a6 6 0 0 0 6 4M7 21a6 6 0 0 1-4-6'/><circle cx='8' cy='20' r='2' fill='%23fff3b0'/></svg>");
 }
 [data-classe="chierico"] .angolo-br {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23e09f3e' stroke-width='2' stroke-linecap='round'><path d='M25 25H11M25 25V11M25 25L13 13M21 21a6 6 0 0 1-6 4M21 21a6 6 0 0 0 4-6'/><circle cx='20' cy='20' r='2' fill='%23fff3b0'/></svg>");
-}
-[data-classe="chierico"] .sottosezione-titolo {
-  border-top: 1.5px solid rgba(224, 159, 62, 0.7) !important;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23e09f3e' stroke-width='2' stroke-linecap='round'><path d='M25 25H11M25 25V11M25 25L13 13M21 21a6 6 0 0 1-6 4M21 21a6 6 0 0 0 4-6'/><circle cx='20' cy='20' r='2' fill='%23fff3b0'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23e09f3e' stroke-width='2' stroke-linecap='round'><path d='M25 25H11M25 25V11M25 25L13 13M21 21a6 6 0 0 1-6 4M21 21a6 6 0 0 0 4-6'/><circle cx='20' cy='20' r='2' fill='%23fff3b0'/></svg>");
 }
 
 /* 6. Paladino: Scudo sacro, purezza, bordi solenni 🛡️ */
@@ -948,19 +937,16 @@ tbody tr:hover {
   --c-border-glow-max: rgba(255, 215, 0, 0.90);
 }
 [data-classe="paladino"] .angolo-tl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b8860b' stroke-width='2'><path d='M3 3h14M3 3v14M3 3l14 14M3 11l8-8M3 17l14-14'/><polygon points='4,4 10,4 4,10' fill='%23ffd700'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b8860b' stroke-width='2'><path d='M3 3h14M3 3v14M3 3l14 14M3 11l8-8M3 17l14-14'/><polygon points='4,4 10,4 4,10' fill='%23ffd700'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b8860b' stroke-width='2'><path d='M3 3h14M3 3v14M3 3l14 14M3 11l8-8M3 17l14-14'/><polygon points='4,4 10,4 4,10' fill='%23ffd700'/></svg>");
 }
 [data-classe="paladino"] .angolo-tr {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b8860b' stroke-width='2'><path d='M25 3H11M25 3v14M25 3L11 17M25 11l-8-8M25 17L11 3'/><polygon points='24,4 18,4 24,10' fill='%23ffd700'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b8860b' stroke-width='2'><path d='M25 3H11M25 3v14M25 3L11 17M25 11l-8-8M25 17L11 3'/><polygon points='24,4 18,4 24,10' fill='%23ffd700'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b8860b' stroke-width='2'><path d='M25 3H11M25 3v14M25 3L11 17M25 11l-8-8M25 17L11 3'/><polygon points='24,4 18,4 24,10' fill='%23ffd700'/></svg>");
 }
 [data-classe="paladino"] .angolo-bl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b8860b' stroke-width='2'><path d='M3 25h14M3 25V11M3 25L17 11M3 17l8 8M3 11l14 14'/><polygon points='4,24 10,24 4,18' fill='%23ffd700'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b8860b' stroke-width='2'><path d='M3 25h14M3 25V11M3 25L17 11M3 17l8 8M3 11l14 14'/><polygon points='4,24 10,24 4,18' fill='%23ffd700'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b8860b' stroke-width='2'><path d='M3 25h14M3 25V11M3 25L17 11M3 17l8 8M3 11l14 14'/><polygon points='4,24 10,24 4,18' fill='%23ffd700'/></svg>");
 }
 [data-classe="paladino"] .angolo-br {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b8860b' stroke-width='2'><path d='M25 25H11M25 25V11M25 25L11 11M25 17l-8 8M25 11L11 25'/><polygon points='24,24 18,24 24,18' fill='%23ffd700'/></svg>");
-}
-[data-classe="paladino"] .sottosezione-titolo {
-  border-top: 1.5px solid rgba(184, 134, 11, 0.7) !important;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b8860b' stroke-width='2'><path d='M25 25H11M25 25V11M25 25L11 11M25 17l-8 8M25 11L11 25'/><polygon points='24,24 18,24 24,18' fill='%23ffd700'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b8860b' stroke-width='2'><path d='M25 25H11M25 25V11M25 25L11 11M25 17l-8 8M25 11L11 25'/><polygon points='24,24 18,24 24,18' fill='%23ffd700'/></svg>");
 }
 
 /* 7. Bardo: Volute liriche, curve melodiche, note 🎵 🪕 */
@@ -976,19 +962,16 @@ tbody tr:hover {
   --c-border-glow-max: rgba(247, 37, 133, 0.85);
 }
 [data-classe="bardo"] .angolo-tl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5179e' stroke-width='2' stroke-linecap='round'><path d='M3 21C3 9 9 3 21 3M3 13c0-6 4-10 10-10M3 3l14 14'/><circle cx='8' cy='8' r='2' fill='%23f72585'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5179e' stroke-width='2' stroke-linecap='round'><path d='M3 21C3 9 9 3 21 3M3 13c0-6 4-10 10-10M3 3l14 14'/><circle cx='8' cy='8' r='2' fill='%23f72585'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5179e' stroke-width='2' stroke-linecap='round'><path d='M3 21C3 9 9 3 21 3M3 13c0-6 4-10 10-10M3 3l14 14'/><circle cx='8' cy='8' r='2' fill='%23f72585'/></svg>");
 }
 [data-classe="bardo"] .angolo-tr {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5179e' stroke-width='2' stroke-linecap='round'><path d='M25 21C25 9 19 3 7 3M25 13c0-6-4-10-10-10M25 3L11 17'/><circle cx='20' cy='8' r='2' fill='%23f72585'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5179e' stroke-width='2' stroke-linecap='round'><path d='M25 21C25 9 19 3 7 3M25 13c0-6-4-10-10-10M25 3L11 17'/><circle cx='20' cy='8' r='2' fill='%23f72585'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5179e' stroke-width='2' stroke-linecap='round'><path d='M25 21C25 9 19 3 7 3M25 13c0-6-4-10-10-10M25 3L11 17'/><circle cx='20' cy='8' r='2' fill='%23f72585'/></svg>");
 }
 [data-classe="bardo"] .angolo-bl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5179e' stroke-width='2' stroke-linecap='round'><path d='M3 7C3 19 9 25 21 25M3 15c0 6 4 10 10 10M3 25L17 11'/><circle cx='8' cy='20' r='2' fill='%23f72585'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5179e' stroke-width='2' stroke-linecap='round'><path d='M3 7C3 19 9 25 21 25M3 15c0 6 4 10 10 10M3 25L17 11'/><circle cx='8' cy='20' r='2' fill='%23f72585'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5179e' stroke-width='2' stroke-linecap='round'><path d='M3 7C3 19 9 25 21 25M3 15c0 6 4 10 10 10M3 25L17 11'/><circle cx='8' cy='20' r='2' fill='%23f72585'/></svg>");
 }
 [data-classe="bardo"] .angolo-br {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5179e' stroke-width='2' stroke-linecap='round'><path d='M25 7C25 19 19 25 7 25M25 15c0 6-4 10-10 10M25 25L11 11'/><circle cx='20' cy='20' r='2' fill='%23f72585'/></svg>");
-}
-[data-classe="bardo"] .sottosezione-titolo {
-  border-top: 1.5px solid rgba(181, 23, 158, 0.7) !important;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5179e' stroke-width='2' stroke-linecap='round'><path d='M25 7C25 19 19 25 7 25M25 15c0 6-4 10-10 10M25 25L11 11'/><circle cx='20' cy='20' r='2' fill='%23f72585'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5179e' stroke-width='2' stroke-linecap='round'><path d='M25 7C25 19 19 25 7 25M25 15c0 6-4 10-10 10M25 25L11 11'/><circle cx='20' cy='20' r='2' fill='%23f72585'/></svg>");
 }
 
 /* 8. Barbaro: Graffi selvaggi, zanne, asce primordiali 🪓 */
@@ -1004,19 +987,16 @@ tbody tr:hover {
   --c-border-glow-max: rgba(255, 107, 94, 0.85);
 }
 [data-classe="barbaro"] .angolo-tl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23d00000' stroke-width='2.2' stroke-linecap='round'><path d='M3 3l14 6M3 3l6 14M3 3l18 18M7 3l4 12M3 7l12 4'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23d00000' stroke-width='2.2' stroke-linecap='round'><path d='M3 3l14 6M3 3l6 14M3 3l18 18M7 3l4 12M3 7l12 4'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23d00000' stroke-width='2.2' stroke-linecap='round'><path d='M3 3l14 6M3 3l6 14M3 3l18 18M7 3l4 12M3 7l12 4'/></svg>");
 }
 [data-classe="barbaro"] .angolo-tr {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23d00000' stroke-width='2.2' stroke-linecap='round'><path d='M25 3l-14 6M25 3l-6 14M25 3L7 21M21 3l-4 12M25 7l-12 4'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23d00000' stroke-width='2.2' stroke-linecap='round'><path d='M25 3l-14 6M25 3l-6 14M25 3L7 21M21 3l-4 12M25 7l-12 4'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23d00000' stroke-width='2.2' stroke-linecap='round'><path d='M25 3l-14 6M25 3l-6 14M25 3L7 21M21 3l-4 12M25 7l-12 4'/></svg>");
 }
 [data-classe="barbaro"] .angolo-bl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23d00000' stroke-width='2.2' stroke-linecap='round'><path d='M3 25l14-6M3 25l6-14M3 25L21 7M7 25l4-12M3 21l12-4'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23d00000' stroke-width='2.2' stroke-linecap='round'><path d='M3 25l14-6M3 25l6-14M3 25L21 7M7 25l4-12M3 21l12-4'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23d00000' stroke-width='2.2' stroke-linecap='round'><path d='M3 25l14-6M3 25l6-14M3 25L21 7M7 25l4-12M3 21l12-4'/></svg>");
 }
 [data-classe="barbaro"] .angolo-br {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23d00000' stroke-width='2.2' stroke-linecap='round'><path d='M25 25l-14-6M25 25l-6-14M25 25L7 7M21 25l-4-12M25 21l-12-4'/></svg>");
-}
-[data-classe="barbaro"] .sottosezione-titolo {
-  border-top: 1.5px solid rgba(208, 0, 0, 0.7) !important;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23d00000' stroke-width='2.2' stroke-linecap='round'><path d='M25 25l-14-6M25 25l-6-14M25 25L7 7M21 25l-4-12M25 21l-12-4'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23d00000' stroke-width='2.2' stroke-linecap='round'><path d='M25 25l-14-6M25 25l-6-14M25 25L7 7M21 25l-4-12M25 21l-12-4'/></svg>");
 }
 
 /* 9. Ranger: Nodi da cacciatore e frecce intagliate 🏹 */
@@ -1032,19 +1012,16 @@ tbody tr:hover {
   --c-border-glow-max: rgba(122, 183, 79, 0.85);
 }
 [data-classe="ranger"] .angolo-tl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%232b9348' stroke-width='2' stroke-linecap='round'><path d='M3 3h12M3 3v12M3 3l14 14M7 13l6-6'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%232b9348' stroke-width='2' stroke-linecap='round'><path d='M3 3h12M3 3v12M3 3l14 14M7 13l6-6'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%232b9348' stroke-width='2' stroke-linecap='round'><path d='M3 3h12M3 3v12M3 3l14 14M7 13l6-6'/></svg>");
 }
 [data-classe="ranger"] .angolo-tr {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%232b9348' stroke-width='2' stroke-linecap='round'><path d='M25 3H13M25 3v12M25 3L11 17M21 13l-6-6'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%232b9348' stroke-width='2' stroke-linecap='round'><path d='M25 3H13M25 3v12M25 3L11 17M21 13l-6-6'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%232b9348' stroke-width='2' stroke-linecap='round'><path d='M25 3H13M25 3v12M25 3L11 17M21 13l-6-6'/></svg>");
 }
 [data-classe="ranger"] .angolo-bl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%232b9348' stroke-width='2' stroke-linecap='round'><path d='M3 25h12M3 25V13M3 25L17 11M7 15l6 6'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%232b9348' stroke-width='2' stroke-linecap='round'><path d='M3 25h12M3 25V13M3 25L17 11M7 15l6 6'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%232b9348' stroke-width='2' stroke-linecap='round'><path d='M3 25h12M3 25V13M3 25L17 11M7 15l6 6'/></svg>");
 }
 [data-classe="ranger"] .angolo-br {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%232b9348' stroke-width='2' stroke-linecap='round'><path d='M25 25H13M25 25V13M25 25L11 11M21 15l-6 6'/></svg>");
-}
-[data-classe="ranger"] .sottosezione-titolo {
-  border-top: 1.5px solid rgba(43, 147, 72, 0.7) !important;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%232b9348' stroke-width='2' stroke-linecap='round'><path d='M25 25H13M25 25V13M25 25L11 11M21 15l-6 6'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%232b9348' stroke-width='2' stroke-linecap='round'><path d='M25 25H13M25 25V13M25 25L11 11M21 15l-6 6'/></svg>");
 }
 
 /* 10. Stregone: Mana grezzo e fulmini elementali ⚡ */
@@ -1060,19 +1037,16 @@ tbody tr:hover {
   --c-border-glow-max: rgba(247, 37, 133, 0.85);
 }
 [data-classe="stregone"] .angolo-tl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23f72585' stroke-width='2' stroke-linecap='round'><path d='M3 3l10 0-5 7 7 0-10 9'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23f72585' stroke-width='2' stroke-linecap='round'><path d='M3 3l10 0-5 7 7 0-10 9'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23f72585' stroke-width='2' stroke-linecap='round'><path d='M3 3l10 0-5 7 7 0-10 9'/></svg>");
 }
 [data-classe="stregone"] .angolo-tr {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23f72585' stroke-width='2' stroke-linecap='round'><path d='M25 3l-10 0 5 7-7 0 10 9'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23f72585' stroke-width='2' stroke-linecap='round'><path d='M25 3l-10 0 5 7-7 0 10 9'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23f72585' stroke-width='2' stroke-linecap='round'><path d='M25 3l-10 0 5 7-7 0 10 9'/></svg>");
 }
 [data-classe="stregone"] .angolo-bl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23f72585' stroke-width='2' stroke-linecap='round'><path d='M3 25l10 0-5-7 7 0-10-9'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23f72585' stroke-width='2' stroke-linecap='round'><path d='M3 25l10 0-5-7 7 0-10-9'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23f72585' stroke-width='2' stroke-linecap='round'><path d='M3 25l10 0-5-7 7 0-10-9'/></svg>");
 }
 [data-classe="stregone"] .angolo-br {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23f72585' stroke-width='2' stroke-linecap='round'><path d='M25 25l-10 0 5-7-7 0 10-9'/></svg>");
-}
-[data-classe="stregone"] .sottosezione-titolo {
-  border-top: 1.5px solid rgba(247, 37, 133, 0.7) !important;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23f72585' stroke-width='2' stroke-linecap='round'><path d='M25 25l-10 0 5-7-7 0 10-9'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23f72585' stroke-width='2' stroke-linecap='round'><path d='M25 25l-10 0 5-7-7 0 10-9'/></svg>");
 }
 
 /* 11. Warlock: Spire eldritch, occhi occulti e abisso 👁️ */
@@ -1088,19 +1062,16 @@ tbody tr:hover {
   --c-border-glow-max: rgba(138, 74, 158, 0.88);
 }
 [data-classe="warlock"] .angolo-tl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%237209b7' stroke-width='2'><path d='M3 3c7 0 12 5 12 12M3 3c0 7 5 12 12 12'/><circle cx='8' cy='8' r='2.2' fill='%234361ee'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%237209b7' stroke-width='2'><path d='M3 3c7 0 12 5 12 12M3 3c0 7 5 12 12 12'/><circle cx='8' cy='8' r='2.2' fill='%234361ee'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%237209b7' stroke-width='2'><path d='M3 3c7 0 12 5 12 12M3 3c0 7 5 12 12 12'/><circle cx='8' cy='8' r='2.2' fill='%234361ee'/></svg>");
 }
 [data-classe="warlock"] .angolo-tr {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%237209b7' stroke-width='2'><path d='M25 3c-7 0-12 5-12 12M25 3c0 7-5 12-12 12'/><circle cx='20' cy='8' r='2.2' fill='%234361ee'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%237209b7' stroke-width='2'><path d='M25 3c-7 0-12 5-12 12M25 3c0 7-5 12-12 12'/><circle cx='20' cy='8' r='2.2' fill='%234361ee'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%237209b7' stroke-width='2'><path d='M25 3c-7 0-12 5-12 12M25 3c0 7-5 12-12 12'/><circle cx='20' cy='8' r='2.2' fill='%234361ee'/></svg>");
 }
 [data-classe="warlock"] .angolo-bl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%237209b7' stroke-width='2'><path d='M3 25c7 0 12-5 12-12M3 25c0-7 5-12 12-12'/><circle cx='8' cy='20' r='2.2' fill='%234361ee'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%237209b7' stroke-width='2'><path d='M3 25c7 0 12-5 12-12M3 25c0-7 5-12 12-12'/><circle cx='8' cy='20' r='2.2' fill='%234361ee'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%237209b7' stroke-width='2'><path d='M3 25c7 0 12-5 12-12M3 25c0-7 5-12 12-12'/><circle cx='8' cy='20' r='2.2' fill='%234361ee'/></svg>");
 }
 [data-classe="warlock"] .angolo-br {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%237209b7' stroke-width='2'><path d='M25 25c-7 0-12-5-12-12M25 25c0-7-5-12-12-12'/><circle cx='20' cy='20' r='2.2' fill='%234361ee'/></svg>");
-}
-[data-classe="warlock"] .sottosezione-titolo {
-  border-top: 1.5px solid rgba(114, 9, 183, 0.7) !important;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%237209b7' stroke-width='2'><path d='M25 25c-7 0-12-5-12-12M25 25c0-7-5-12-12-12'/><circle cx='20' cy='20' r='2.2' fill='%234361ee'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%237209b7' stroke-width='2'><path d='M25 25c-7 0-12-5-12-12M25 25c0-7-5-12-12-12'/><circle cx='20' cy='20' r='2.2' fill='%234361ee'/></svg>");
 }
 
 /* 12. Monaco: Cerchio Zen (Enso) e giada ☯️ */
@@ -1116,19 +1087,16 @@ tbody tr:hover {
   --c-border-glow-max: rgba(255, 232, 163, 0.85);
 }
 [data-classe="monaco"] .angolo-tl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2338b000' stroke-width='2.2' stroke-linecap='round'><path d='M3 15A12 12 0 0 1 15 3'/><circle cx='11' cy='11' r='2.5' fill='%2370e000'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2338b000' stroke-width='2.2' stroke-linecap='round'><path d='M3 15A12 12 0 0 1 15 3'/><circle cx='11' cy='11' r='2.5' fill='%2370e000'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2338b000' stroke-width='2.2' stroke-linecap='round'><path d='M3 15A12 12 0 0 1 15 3'/><circle cx='11' cy='11' r='2.5' fill='%2370e000'/></svg>");
 }
 [data-classe="monaco"] .angolo-tr {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2338b000' stroke-width='2.2' stroke-linecap='round'><path d='M25 15A12 12 0 0 0 15 3'/><circle cx='17' cy='11' r='2.5' fill='%2370e000'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2338b000' stroke-width='2.2' stroke-linecap='round'><path d='M25 15A12 12 0 0 0 15 3'/><circle cx='17' cy='11' r='2.5' fill='%2370e000'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2338b000' stroke-width='2.2' stroke-linecap='round'><path d='M25 15A12 12 0 0 0 15 3'/><circle cx='17' cy='11' r='2.5' fill='%2370e000'/></svg>");
 }
 [data-classe="monaco"] .angolo-bl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2338b000' stroke-width='2.2' stroke-linecap='round'><path d='M3 13A12 12 0 0 0 15 25'/><circle cx='11' cy='17' r='2.5' fill='%2370e000'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2338b000' stroke-width='2.2' stroke-linecap='round'><path d='M3 13A12 12 0 0 0 15 25'/><circle cx='11' cy='17' r='2.5' fill='%2370e000'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2338b000' stroke-width='2.2' stroke-linecap='round'><path d='M3 13A12 12 0 0 0 15 25'/><circle cx='11' cy='17' r='2.5' fill='%2370e000'/></svg>");
 }
 [data-classe="monaco"] .angolo-br {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2338b000' stroke-width='2.2' stroke-linecap='round'><path d='M25 13A12 12 0 0 1 15 25'/><circle cx='17' cy='17' r='2.5' fill='%2370e000'/></svg>");
-}
-[data-classe="monaco"] .sottosezione-titolo {
-  border-top: 1.5px solid rgba(196, 138, 26, 0.7) !important;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2338b000' stroke-width='2.2' stroke-linecap='round'><path d='M25 13A12 12 0 0 1 15 25'/><circle cx='17' cy='17' r='2.5' fill='%2370e000'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%2338b000' stroke-width='2.2' stroke-linecap='round'><path d='M25 13A12 12 0 0 1 15 25'/><circle cx='17' cy='17' r='2.5' fill='%2370e000'/></svg>");
 }
 
 /* 13. Artefice: Ingranaggi di bronzo e ottone ⚙️ */
@@ -1144,19 +1112,16 @@ tbody tr:hover {
   --c-border-glow-max: rgba(212, 160, 106, 0.85);
 }
 [data-classe="artefice"] .angolo-tl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5651d' stroke-width='2'><rect x='3' y='3' width='12' height='12' rx='2' fill='rgba(181,101,29,0.15)'/><circle cx='9' cy='9' r='2.5' fill='%23d4a373'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5651d' stroke-width='2'><rect x='3' y='3' width='12' height='12' rx='2' fill='rgba(181,101,29,0.15)'/><circle cx='9' cy='9' r='2.5' fill='%23d4a373'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5651d' stroke-width='2'><rect x='3' y='3' width='12' height='12' rx='2' fill='rgba(181,101,29,0.15)'/><circle cx='9' cy='9' r='2.5' fill='%23d4a373'/></svg>");
 }
 [data-classe="artefice"] .angolo-tr {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5651d' stroke-width='2'><rect x='13' y='3' width='12' height='12' rx='2' fill='rgba(181,101,29,0.15)'/><circle cx='19' cy='9' r='2.5' fill='%23d4a373'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5651d' stroke-width='2'><rect x='13' y='3' width='12' height='12' rx='2' fill='rgba(181,101,29,0.15)'/><circle cx='19' cy='9' r='2.5' fill='%23d4a373'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5651d' stroke-width='2'><rect x='13' y='3' width='12' height='12' rx='2' fill='rgba(181,101,29,0.15)'/><circle cx='19' cy='9' r='2.5' fill='%23d4a373'/></svg>");
 }
 [data-classe="artefice"] .angolo-bl {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5651d' stroke-width='2'><rect x='3' y='13' width='12' height='12' rx='2' fill='rgba(181,101,29,0.15)'/><circle cx='9' cy='19' r='2.5' fill='%23d4a373'/></svg>");
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5651d' stroke-width='2'><rect x='3' y='13' width='12' height='12' rx='2' fill='rgba(181,101,29,0.15)'/><circle cx='9' cy='19' r='2.5' fill='%23d4a373'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5651d' stroke-width='2'><rect x='3' y='13' width='12' height='12' rx='2' fill='rgba(181,101,29,0.15)'/><circle cx='9' cy='19' r='2.5' fill='%23d4a373'/></svg>");
 }
 [data-classe="artefice"] .angolo-br {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5651d' stroke-width='2'><rect x='13' y='13' width='12' height='12' rx='2' fill='rgba(181,101,29,0.15)'/><circle cx='19' cy='19' r='2.5' fill='%23d4a373'/></svg>");
-}
-[data-classe="artefice"] .sottosezione-titolo {
-  border-top: 1.5px solid rgba(181, 101, 29, 0.7) !important;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5651d' stroke-width='2'><rect x='13' y='13' width='12' height='12' rx='2' fill='rgba(181,101,29,0.15)'/><circle cx='19' cy='19' r='2.5' fill='%23d4a373'/></svg>"); mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23b5651d' stroke-width='2'><rect x='13' y='13' width='12' height='12' rx='2' fill='rgba(181,101,29,0.15)'/><circle cx='19' cy='19' r='2.5' fill='%23d4a373'/></svg>");
 }
 
 /* Disattivazione bordi speciali */
@@ -1234,11 +1199,6 @@ tbody tr:hover {
   clip: auto; width: auto; height: auto; margin: 0; padding: 4px 8px; z-index: 5;
   background: var(--c-panel); color: var(--c-ink); border: 2px solid var(--c-gold);
 }
-/* Filetto oro doppio sotto la barra superiore, come le cornici titolo dei
-   vecchi manuali — fisso, sempre presente. */
-.barra-superiore-fissa {
-  border-bottom: 3px double var(--c-gold) !important;
-}
 /* Corpo scheda: le sezioni ora sono a PIENA LARGHEZZA, impilate in verticale.
    L'ordine è controllato con 'order' (Combattimento/Magia prima, poi il resto). */
 .griglia-scheda {
@@ -1264,12 +1224,17 @@ tbody tr:hover {
 .profilo-griglia {
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr) 310px;
+  /* La colonna sinistra occupa anche una seconda riga elastica: se è più lunga
+     (es. con il riquadro Poteri) scende sotto, senza stirare i riquadri delle
+     altre due colonne, che restano alla loro altezza naturale e allineate fra loro. */
+  grid-template-rows: auto minmax(0, 1fr);
   column-gap: 14px;
   row-gap: 12px;
   align-items: stretch;
 }
 .profilo-col-sinistra {
   grid-column: 1;
+  grid-row: 1 / span 2;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -1277,6 +1242,7 @@ tbody tr:hover {
 }
 .profilo-main {
   grid-column: 2;
+  grid-row: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1286,6 +1252,7 @@ tbody tr:hover {
 }
 .profilo-caratteristiche {
   grid-column: 3;
+  grid-row: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

@@ -7,6 +7,7 @@
 import { useState } from 'react';
 import { C } from './tema.js';
 import { styles } from './stili.js';
+import { Editable } from './componenti.jsx';
 import {
   normalizzaPoteri,
   trovaContatore,
@@ -14,29 +15,33 @@ import {
   livelloTotaleScheda,
   potereSbloccato,
 } from '../rules/poteri.js';
-import { SOGLIE_DEBITO_ARALDI, LISTA_AMPLIATA_ARALDI } from '../data/modelliPoteri.js';
+import {
+  SOGLIE_DEBITO_ARALDI,
+  LISTA_AMPLIATA_ARALDI,
+  ID_MODELLO_ARALDI as ID_MODELLO,
+  DEBITO_PER_USO_ARALDI as DEBITO_PER_USO,
+  RECUPERO_CON_SEGRETI_ARALDI as RECUPERO_CON_SEGRETI,
+  AZIONI_PRIVILEGI_ARALDI,
+} from '../data/modelliPoteri.js';
 
-const ID_MODELLO = 'araldi-del-segreto';
-// Debito che si guadagna a ogni uso di un privilegio (dal manuale).
-const DEBITO_PER_USO = { 'Inquisire': 1, 'Trasferire Empatico': 2, 'Braccare!': 1 };
-// Recupero di un uso spendendo Segreti (dal manuale).
-const RECUPERO_CON_SEGRETI = { 'Affabilità': 1, 'Trasferire Empatico': 2 };
 const NOMI_BASE = ['Segreti', 'Debito'];
 
 const scatola = { border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 10px', background: C.panelLight };
 const etichetta = { fontSize: 11, fontWeight: 700, color: C.inkDim, textTransform: 'uppercase', letterSpacing: 0.5 };
 
-function Contatore({ titolo, valore, max, onMeno, onPiu, sotto, suggerimento }) {
+function Contatore({ titolo, valore, max, onMeno, onPiu, onImposta, sotto, suggerimento, children }) {
   return (
-    <div style={{ ...scatola, flex: '1 1 150px', minWidth: 140, textAlign: 'center' }} title={suggerimento}>
+    <div style={{ ...scatola, flex: '1 1 200px', minWidth: 160, textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 4 }} title={suggerimento}>
       <div style={etichetta}>{titolo}</div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, margin: '4px 0' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
         <button type="button" style={{ ...styles.buttonMini, padding: '2px 10px', fontSize: 15 }} onClick={onMeno} disabled={valore <= 0} aria-label={`${titolo} −1`}>−</button>
-        <span style={{ fontSize: 26, fontWeight: 800, color: C.ink, minWidth: 34, fontVariantNumeric: 'tabular-nums' }}>
-          {valore}{max != null && <span style={{ fontSize: 14, fontWeight: 600, color: C.inkDim }}> / {max}</span>}
+        <span style={{ fontSize: 26, fontWeight: 800, color: C.ink, minWidth: 34, fontVariantNumeric: 'tabular-nums', display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
+          <Editable value={valore} tipo="numero" width={46} style={{ fontSize: 26, fontWeight: 800, textAlign: 'center' }} onChange={(v) => onImposta(Math.max(0, Math.floor(Number(v) || 0)))} title={`${titolo}: clicca per scrivere il valore`} />
+          {max != null && <span style={{ fontSize: 14, fontWeight: 600, color: C.inkDim }}>/ {max}</span>}
         </span>
         <button type="button" style={{ ...styles.buttonMini, padding: '2px 10px', fontSize: 15 }} onClick={onPiu} disabled={max != null && valore >= max} aria-label={`${titolo} +1`}>+</button>
       </div>
+      {children}
       {sotto && <div style={{ fontSize: 11, color: C.inkDim }}>{sotto}</div>}
     </div>
   );
@@ -94,6 +99,11 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
     </button>
   );
 
+  const imposta = (nome, attuale) => (v) => applica([{ nome, delta: v - attuale }]);
+  const precedente = [...SOGLIE_DEBITO_ARALDI].reverse().find((s) => valDebito >= s.soglia);
+  const baseBarra = precedente ? precedente.soglia : 0;
+  const percentuale = prossima ? Math.max(0, Math.min(100, ((valDebito - baseBarra) / (prossima.soglia - baseBarra)) * 100)) : 100;
+
   return (
     <div data-testid="araldi-pannello" style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 10 }}>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -105,37 +115,64 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
           suggerimento={en ? 'Secrets you hold. Spend them below.' : 'I Segreti che possiedi. Spendili qui sotto.'}
           onMeno={() => applica([{ nome: 'Segreti', delta: -1 }])}
           onPiu={() => applica([{ nome: 'Segreti', delta: 1 }])}
-        />
+          onImposta={imposta('Segreti', valSegreti)}
+        >
+          {segreti.max > 0 && segreti.max <= 12 && (
+            <div style={{ display: 'flex', gap: 4, justifyContent: 'center', flexWrap: 'wrap' }} aria-hidden>
+              {Array.from({ length: segreti.max }, (_, i) => (
+                <span key={i} style={{ width: 10, height: 10, borderRadius: 2, transform: 'rotate(45deg)', border: `1.5px solid ${C.goldDark}`, background: i < valSegreti ? C.goldDark : 'transparent' }} />
+              ))}
+            </div>
+          )}
+        </Contatore>
         <Contatore
           titolo={en ? 'Debt' : 'Debito'}
           valore={valDebito}
           sotto={prossima
-            ? (en ? `Next threshold: ${prossima.soglia} (${prossima.nomeEn}) · ${prossima.soglia - valDebito} to go` : `Prossima soglia: ${prossima.soglia} (${prossima.nome}) · mancano ${prossima.soglia - valDebito}`)
+            ? (en ? `Next: ${prossima.soglia} · ${prossima.nomeEn} (${prossima.soglia - valDebito} to go)` : `Prossima: ${prossima.soglia} · ${prossima.nome} (mancano ${prossima.soglia - valDebito})`)
             : (en ? 'All thresholds reached' : 'Tutte le soglie raggiunte')}
           suggerimento={en ? 'Debt grows when you use Secrets and some features.' : 'Il Debito cresce usando i Segreti e alcuni privilegi.'}
           onMeno={() => applica([{ nome: 'Debito', delta: -1 }])}
           onPiu={() => applica([{ nome: 'Debito', delta: 1 }])}
-        />
+          onImposta={imposta('Debito', valDebito)}
+        >
+          <div
+            role="progressbar"
+            aria-valuemin={baseBarra}
+            aria-valuemax={prossima ? prossima.soglia : valDebito}
+            aria-valuenow={valDebito}
+            aria-label={en ? 'Progress to the next Debt threshold' : 'Avanzamento verso la prossima soglia del Debito'}
+            style={{ height: 6, borderRadius: 3, background: C.border, overflow: 'hidden', margin: '2px 8px 0' }}
+          >
+            <div style={{ width: `${percentuale}%`, height: '100%', background: C.goldDark, transition: 'width 0.25s ease' }} />
+          </div>
+        </Contatore>
       </div>
 
       <div style={scatola}>
         <div style={{ ...etichetta, marginBottom: 6 }}>{en ? 'Debt thresholds' : 'Soglie del Debito'}</div>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {SOGLIE_DEBITO_ARALDI.map((s) => {
             const raggiunta = valDebito >= s.soglia;
+            const eProssima = prossima && prossima.soglia === s.soglia;
             return (
-              <span
+              <div
                 key={s.soglia}
-                title={`${en ? s.nomeEn : s.nome}: ${en ? s.effettoEn : s.effetto}`}
-                style={{
-                  fontSize: 12, fontWeight: 700, padding: '2px 8px', borderRadius: 4, cursor: 'help',
-                  border: `1px ${raggiunta ? 'solid' : 'dashed'} ${raggiunta ? C.goldDark : C.border}`,
-                  background: raggiunta ? 'rgba(201,162,39,0.14)' : 'transparent',
-                  color: raggiunta ? C.goldDark : C.inkDim,
-                }}
+                data-testid={`soglia-${s.soglia}`}
+                data-raggiunta={raggiunta ? 'si' : 'no'}
+                style={{ display: 'flex', gap: 8, alignItems: 'baseline', fontSize: 12, opacity: raggiunta || eProssima ? 1 : 0.55 }}
               >
-                {raggiunta ? '✓ ' : ''}{s.soglia} · {en ? s.nomeEn : s.nome}
-              </span>
+                <span style={{
+                  flexShrink: 0, minWidth: 42, textAlign: 'center', fontWeight: 800, padding: '1px 6px', borderRadius: 4,
+                  border: `1px ${raggiunta ? 'solid' : 'dashed'} ${raggiunta ? C.goldDark : C.border}`,
+                  color: raggiunta ? C.goldDark : C.inkDim,
+                  background: raggiunta ? 'rgba(201,162,39,0.12)' : 'transparent',
+                }}>{raggiunta ? '✓ ' : ''}{s.soglia}</span>
+                <span style={{ minWidth: 0 }}>
+                  <strong style={{ color: raggiunta ? C.ink : C.inkDim }}>{en ? s.nomeEn : s.nome}</strong>
+                  <span style={{ color: C.inkDim }}> — {en ? s.effettoEn : s.effetto}</span>
+                </span>
+              </div>
             );
           })}
         </div>
@@ -170,6 +207,13 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
             {en ? 'Cast' : 'Lancia'} <span style={{ color: C.inkDim }}>(−{cerchioScelto}, +1 {en ? 'Debt' : 'Debito'})</span>
           </button>
         </div>
+        {valSegreti === 0 && (
+          <p style={{ ...styles.detail, fontSize: 11, margin: '8px 0 0' }}>
+            {en
+              ? 'No Secrets yet: you gain them with Inquire (Brain), by killing with Empathic Transfer, or from the DM.'
+              : 'Nessun Segreto: li ottieni con Inquisire (Cervello), uccidendo con Trasferire Empatico o dal DM.'}
+          </p>
+        )}
       </div>
 
       {privilegi.length > 0 && (
@@ -251,6 +295,23 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
                                   {en ? 'Regain' : 'Recupera'} <span style={{ color: C.inkDim }}>(−{costoRecupero})</span>
                                 </button>
                               )}
+                              {(AZIONI_PRIVILEGI_ARALDI[c.nome] || []).map((az) => {
+                                const costo = az.variazioni.filter((v) => v.nome === 'Segreti' && v.delta < 0).reduce((t, v) => t - v.delta, 0);
+                                const guadagno = az.variazioni.filter((v) => v.nome === 'Segreti' && v.delta > 0).reduce((t, v) => t + v.delta, 0);
+                                const pieno = guadagno > 0 && segreti.max != null && valSegreti >= segreti.max;
+                                return (
+                                  <button
+                                    key={az.etichetta}
+                                    type="button"
+                                    style={styles.buttonMini}
+                                    disabled={valSegreti < costo || pieno}
+                                    onClick={() => applica(az.variazioni, `${nomeBreve} · ${en ? az.etichettaEn : az.etichetta}`, en ? az.spiegazioneEn : az.spiegazione)}
+                                    title={(en ? az.spiegazioneEn : az.spiegazione) + (pieno ? (en ? ' (Secrets already at max)' : ' (Segreti già al massimo)') : '')}
+                                  >
+                                    {en ? az.etichettaEn : az.etichetta} <span style={{ color: C.inkDim }}>({costo ? `−${costo}` : `+${guadagno}`})</span>
+                                  </button>
+                                );
+                              })}
                             </span>
                           </div>
                         )}

@@ -1204,21 +1204,8 @@ function mescola(a, b, t) {
   return `#${canale(x.r, y.r)}${canale(x.g, y.g)}${canale(x.b, y.b)}`;
 }
 
-/** Quanto "pesa" il colore della classe sul tema (1 = intensità storica, 0 = nessuna tinta). */
+/** Intensità del bagliore dorato attorno alle sezioni (1 = intensità storica). */
 const INTENSITA_CLASSE = 0.5;
-
-/** Applica al tema la tinta della classe: accento attenuato verso l'inchiostro e sfondi/bordi appena tinti. */
-function applicaTintaClasse(t, colore, scuroEff) {
-  const accento = mescola(colore, t.ink, 0.35);
-  t.title = accento;
-  t.gold = accento;
-  t.goldDark = accento;
-  if (scuroEff) {
-    t.bg = mescola(t.bg, colore, 0.07 * INTENSITA_CLASSE);
-    t.panelLight = mescola(t.panelLight, colore, 0.1 * INTENSITA_CLASSE);
-  }
-  t.border = mescola(t.border, colore, 0.2 * INTENSITA_CLASSE);
-}
 
 /** Luminanza relativa (WCAG) di un colore esadecimale. */
 function luminanzaRelativa(hex) {
@@ -1248,7 +1235,8 @@ function garantisciContrastoTema(t) {
   const sfondi = [t.bg, t.panel, t.panelLight];
   // Verde e rosso servono spesso su pulsanti con uno sfondo appena tinto dello stesso colore (che ne abbassa
   // il contrasto): per questo la soglia è più alta di quella del testo attenuato.
-  for (const [chiave, minimo] of [['inkDim', 5], ['green', 6.4], ['red', 6]]) {
+  // L'oro (titoli, etichette, accenti) va scritto su carta chiara come su pergamena scura: stessa regola.
+  for (const [chiave, minimo] of [['inkDim', 5], ['green', 6.4], ['red', 6], ['gold', 4.8], ['goldDark', 5.5], ['title', 5]]) {
     let c = t[chiave];
     for (let i = 0; i < 40 && Math.min(...sfondi.map((bg) => contrastoTra(c, bg))) < minimo; i++) c = mescola(c, t.ink, 0.06);
     t[chiave] = c;
@@ -1348,7 +1336,8 @@ const INCANTESIMI_NOMI = Array.from(new Set([...NOMI_SPIEG_INC, ...Object.keys(I
 import { NOMI_CLASSI, BACKGROUND_5E, TAGLIE_5E, ALLINEAMENTI_5E, SESSO_5E, SOTTOCLASSI_5E, INCANTESIMI_CLASSE, DANNI_5E, SENSI_5E, CONDIZIONI_5E, NOMI_OGGETTI, LINGUE_5E, ARMI_5E, STRUMENTI_5E, REAZIONI_5E, AZIONI_BONUS_5E, GRUPPI_ARMI_5E, GRUPPI_STRUMENTI_5E, GRUPPI_LINGUE_5E, DEFAULT_MANUALI, SOTTOCLASSI_FONTI, talentiPerManuali, PE_PER_LIVELLO, BACKGROUND_COMPETENZE, BACKGROUND_TALENTO_ORIGINE_2024, SPECIE_5E, tabellaPrivilegiSottoclasse, CARATT_INCANTATORE, PRIORITA_CARATT, DADO_VITA_CLASSE, BACKGROUND_CARATT, TS_CLASSE, ADDESTRAMENTO_CLASSE, COMPETENZE_CLASSE, PRIVILEGI_CLASSE_L1, PRIVILEGI_CLASSE_L1_2014, ASI_LIV, SOTTOCLASSE_LIV, COMPETENZE_SPECIE, NOMI_SPECIE, NOMI_SPECIE_GENERE, COGNOMI_SPECIE, NOMI_GENERICI, SPECIE_DATI, SPECIE_DATI_2014, BONUS_CARATT_SPECIE_2014, SFINIMENTO_2014, BASE_ARMATURA_DEFAULT, ESEMPI_ARMATURA } from "./data/dati5e.js";
 import { modificatore, conSegno, tiraDado, parseEspressioneDado, facceDadoVita, esprDadiVita, gruppiDadoVita, bonusCompetenzaDaLivello, tiraDanni, tiraD20, capacitaCarico, modalitaEffettiva } from "./rules/dadi.js";
 import { risorseAutoClasse, trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from "./rules/regole.js";
-import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda } from './rules/poteri.js';
+import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda, contatoriInGioco } from './rules/poteri.js';
+import { PoteriRisorse } from './ui/PoteriRisorse.jsx';
 import { DadiModal } from './ui/modali/DadiModal.jsx';
 import { DiarioModal } from './ui/modali/DiarioModal.jsx';
 import { IspirazioneBgModal } from './ui/modali/IspirazioneBgModal.jsx';
@@ -1963,7 +1952,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.71.0';
+const APP_VERSION = '4.72.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4141,16 +4130,15 @@ export default function App() {
       tema === 'scuro' || (tema === 'auto' && (sistemaScuro || eNotte()));
     const modo = scuroEff ? 'scuro' : 'chiaro';
     const presetDati = PRESET_COLORI.find((p) => p.id === presetColori) || PRESET_COLORI[0];
-    const t = { ...BASE_TEMA[modo], ...presetDati[modo] };
-    const acc = coloreClasse(classeAttiva);
-    if (acc) applicaTintaClasse(t, acc[modo], scuroEff);
+    // Un solo tema: l'ambientazione cambia scena, sfondo e audio, non i colori dell'interfaccia.
+    const t = { ...BASE_TEMA[modo] };
     const hexRgba = (hex, a) => {
       const m = /^#?([0-9a-fA-F]{6})$/.exec(hex || '');
       if (!m) return `rgba(0,0,0,${a})`;
       const n = parseInt(m[1], 16);
       return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
     };
-    const tintaClasse = acc ? acc[modo] : t.gold;
+    const tintaClasse = t.gold;
     const coloreGlow = mescola(t.bg, tintaClasse, scuroEff ? 0.22 : 0.12);
     const glowClasse = `radial-gradient(150% 110% at 50% -18%, ${hexRgba(coloreGlow, (scuroEff ? 0.15 : 0.08) * INTENSITA_CLASSE)}, transparent 75%)`;
     const auraClasseSotto = `radial-gradient(120% 90% at 50% 110%, ${hexRgba(tintaClasse, (scuroEff ? 0.13 : 0.05) * INTENSITA_CLASSE)}, transparent 80%)`;
@@ -4173,7 +4161,7 @@ export default function App() {
     return [sfondoAmbiente, glowClasse, auraClasseSotto, ambra, vignetta, velo, imgLayer, t.bg]
       .filter(Boolean)
       .join(', ');
-  }, [tema, sistemaScuro, oraTick, classeAttiva, presetColori]);
+  }, [tema, sistemaScuro, oraTick, presetColori]);
 
   useEffect(() => {
     const scuroEff =
@@ -4181,10 +4169,9 @@ export default function App() {
     const modo = scuroEff ? 'scuro' : 'chiaro';
     setNotteAttiva(scuroEff); // notte = tema scuro: pilota sfondi notturni e audio più cupo
     // Parti dal tema base, poi applica l'override del preset colori
-    const presetDati = PRESET_COLORI.find((p) => p.id === presetColori) || PRESET_COLORI[0];
-    const t = { ...BASE_TEMA[modo], ...presetDati[modo] };
-    const acc = coloreClasse(classeAttiva);
-    if (acc) applicaTintaClasse(t, acc[modo], scuroEff);
+    // Un solo tema per tutta l'app: né l'ambientazione né la classe ricolorano testi,
+    // bordi e pulsanti. La classe resta riconoscibile dalla forma degli angoli delle sezioni.
+    const t = { ...BASE_TEMA[modo] };
     garantisciContrastoTema(t);
     const root = document.documentElement;
     root.dataset.tema = modo;
@@ -4203,9 +4190,7 @@ export default function App() {
     set('--c-green', t.green); set('--c-title', t.title);
     set('--c-on-gold', testoSu(t.goldDark));
 
-    const accTema = (temaCornici && temaCornici !== 'auto' && temaCornici !== 'disattivato') ? coloreClasse(temaCornici) : null;
-    const accEffettivo = accTema || acc;
-    const tintaClasse = accEffettivo ? accEffettivo[modo] : t.gold;
+    const tintaClasse = t.gold;
     const hexRgba = (hex, a) => {
       const m = /^#?([0-9a-fA-F]{6})$/.exec(hex || '');
       if (!m) return `rgba(0,0,0,${a})`;
@@ -9919,7 +9904,7 @@ export default function App() {
                         borderRadius: 14, overflow: 'hidden',
                         background: isTrasformato
                           ? '#1b4332'
-                          : ((!scheda.ritratto || scheda.ritratto.startsWith('data:image/svg')) ? (coloreClasse(scheda.classe) ? `color-mix(in srgb, ${coloreClasse(scheda.classe).chiaro} ${Math.round(100 * INTENSITA_CLASSE * 0.5)}%, var(--c-panel))` : C.panel) : C.panel),
+                          : C.panel,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         boxShadow: isTrasformato ? '0 0 16px rgba(46,125,50,0.6)' : 'inset 0 0 8px rgba(0,0,0,0.2)',
                         border: isTrasformato ? '2.5px solid #52b788' : `2px solid ${coloreClasse(scheda.classe) ? C.gold : C.border}`,
@@ -10147,8 +10132,8 @@ export default function App() {
               {/* Tier 3: Risorse di classe */}
               <div className="risorse-tier-3 profilo-risorse-box">
                 <Sezione titolo={t("sez.risorse")} senzaAngoli={true} {...apertoProps('risorse')}>
-                  {/* I contatori dei Poteri (Segreti, Debito, usi dei privilegi...) vivono nella
-                      sezione Poteri: qui restano solo le risorse di classe. */}
+                  {/* I contatori dei Poteri (Segreti, Debito, usi dei privilegi...) hanno un
+                      riquadro tutto loro qui sotto: qui restano solo le risorse di classe. */}
                   {scheda.risorse.filter((r) => !String(r.id || '').startsWith('potere-')).length === 0 && (
                     <p style={{ ...styles.detail, marginTop: 0, fontSize: 11 }}>
                       {t('res.nessuna_risorsa')}
@@ -10225,6 +10210,15 @@ export default function App() {
                   })}
                 </Sezione>
               </div>
+
+              {/* Tier 3b: Poteri (Segreti, Debito, usi dei privilegi...) separati dalle risorse di classe */}
+              {contatoriInGioco(scheda).length > 0 && (
+                <div className="risorse-tier-3 profilo-risorse-box" style={{ marginTop: 10 }}>
+                  <Sezione titolo={lingua === 'en' ? 'Powers' : 'Poteri'} senzaAngoli={true} {...apertoProps('poteriRisorse')}>
+                    <PoteriRisorse scheda={scheda} aggiorna={aggiorna} lingua={lingua} registra={registra} mostraInfo={setInfo} />
+                  </Sezione>
+                </div>
+              )}
             </div>
 
             {/* COLONNA CENTRALE: anagrafica + riquadri vitali */}

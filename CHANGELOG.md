@@ -2,6 +2,39 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.72.0] – 2026-10-06
+
+### Aggiunto
+- **Riquadro Poteri sotto Risorse di classe** (`src/ui/PoteriRisorse.jsx`): i
+  contatori dei Poteri in gioco (Segreti, Debito, usi dei privilegi degli
+  Araldi o di qualsiasi potere) tornano nella colonna sinistra, in un riquadro
+  separato dalle risorse di classe, una riga per contatore: perle per gli usi
+  (un tocco = usa, con il Debito del manuale; tocco su una perla spenta =
+  ripristina), − / + per i contatori senza massimo, prossima soglia del Debito.
+  Nuova funzione `contatoriInGioco` in `src/rules/poteri.js`.
+- **Pannello Araldi**: soglie del Debito in elenco con il loro effetto (quelle
+  raggiunte evidenziate), barra di avanzamento verso la prossima soglia,
+  Segreti come rombi pieni/vuoti, Segreti e Debito scrivibili a mano, azioni
+  del manuale accanto ai privilegi (Inquisire → Cervello +1 Segreto,
+  Trasferire Empatico → Nemico ucciso +1 Segreto, Braccare! → Ora in più −1 e
+  Teletrasporto −3), suggerimento su come ottenere Segreti quando sono 0.
+- Sezione Poteri: titolo con lo stesso stile degli altri riquadri, gruppi
+  "Araldi del Segreto" / "Altri poteri"; nelle schede degli altri poteri
+  Segreti e Debito compaiono in sola lettura (si gestiscono nel pannello), così
+  non sono più duplicati.
+
+### Cambiato
+- **Un solo tema**: né la classe né l'ambientazione ricolorano più testi, bordi,
+  titoli e pulsanti. L'ambientazione cambia scena (immagine e luci ai margini) e
+  audio; la classe resta riconoscibile dalla forma degli angoli delle sezioni,
+  ora sempre nel colore del tema (maschere CSS invece di SVG colorati). Il
+  riquadro del ritratto usa lo sfondo del pannello.
+- Il contrasto minimo automatico vale anche per oro, oro scuro e titoli.
+- Tolto il filetto doppio sotto la barra superiore.
+- Griglia del profilo: la colonna sinistra occupa anche una seconda riga
+  elastica, così un riquadro Poteri lungo non stira i riquadri dei PF e delle
+  caratteristiche.
+
 ## [4.71.0] – 2026-10-06
 
 ### Manutenzione

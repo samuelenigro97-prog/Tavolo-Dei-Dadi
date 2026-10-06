@@ -8,9 +8,36 @@ export const SOGLIE_DEBITO_ARALDI = [
   { soglia: 5, nome: 'Voce nell\'Ombra', nomeEn: 'Voice in the Shadows', effetto: 'Messaggio a volontà come azione bonus e vantaggio alle prove di Intuizione.', effettoEn: 'Message at will as a bonus action and advantage on Insight checks.' },
   { soglia: 15, nome: 'Occhio Risvegliato', nomeEn: 'Awakened Eye', effetto: 'Vantaggio a Percezione e Indagare; +1 CA (applicato in automatico).', effettoEn: 'Advantage on Perception and Investigation; +1 AC (applied automatically).' },
   { soglia: 35, nome: 'Coraggio', nomeEn: 'Courage', effetto: 'Vantaggio ai TS contro spaventato.', effettoEn: 'Advantage on saves against being frightened.' },
-  { soglia: 70, nome: 'Veglia', nomeEn: 'Vigil', effetto: 'Truesight 9 m per 1 ora al giorno; +1 ai tiri per colpire.', effettoEn: 'Truesight 9 ft... 30 ft for 1 hour a day; +1 to attack rolls.' },
+  { soglia: 70, nome: 'Veglia', nomeEn: 'Vigil', effetto: 'Truesight 9 m per 1 ora al giorno; +1 ai tiri per colpire.', effettoEn: 'Truesight 30 ft for 1 hour a day; +1 to attack rolls.' },
   { soglia: 150, nome: 'Non questa volta', nomeEn: 'Not This Time', effetto: 'Una volta nella vita, a 0 PF resti a 1 PF; puoi riutilizzare il privilegio solo chiedendolo a Tim.', effettoEn: 'Once in your life, at 0 HP you stay at 1 HP; you can reuse it only by asking Tim.' },
 ];
+
+/** Id del modello degli Araldi (campo `modello` dei poteri aggiunti da lì). */
+export const ID_MODELLO_ARALDI = 'araldi-del-segreto';
+
+/** Debito guadagnato a ogni uso di un privilegio degli Araldi (dal manuale). */
+export const DEBITO_PER_USO_ARALDI = { 'Inquisire': 1, 'Trasferire Empatico': 2, 'Braccare!': 1 };
+
+/** Segreti da spendere per recuperare un uso di un privilegio (dal manuale). */
+export const RECUPERO_CON_SEGRETI_ARALDI = { 'Affabilità': 1, 'Trasferire Empatico': 2 };
+
+/**
+ * Azioni rapide legate a un privilegio, oltre a "Usa": gli effetti del manuale
+ * che toccano Segreti o Debito (es. Inquisire → Cervello dà 1 Segreto).
+ * `variazioni` è nel formato di patchVariaContatori.
+ */
+export const AZIONI_PRIVILEGI_ARALDI = {
+  'Inquisire': [
+    { etichetta: 'Cervello', etichettaEn: 'Brain', variazioni: [{ nome: 'Segreti', delta: 1 }], spiegazione: 'Prova superata, scegli Cervello: prendi un ricordo della creatura e ottieni 1 Segreto.', spiegazioneEn: 'Save succeeded, choose Brain: take a memory from the creature and gain 1 Secret.' },
+  ],
+  'Trasferire Empatico': [
+    { etichetta: 'Nemico ucciso', etichettaEn: 'Enemy slain', variazioni: [{ nome: 'Segreti', delta: 1 }], spiegazione: 'Se con quest\'azione il nemico muore prendi 1 Segreto.', spiegazioneEn: 'If the enemy dies from this action you take 1 Secret.' },
+  ],
+  'Braccare!': [
+    { etichetta: 'Ora in più', etichettaEn: 'Extra hour', variazioni: [{ nome: 'Segreti', delta: -1 }], spiegazione: 'Spendi 1 Segreto per ogni ora di durata del marchio dopo la prima (massimo 8 ore).', spiegazioneEn: 'Spend 1 Secret for each hour of the mark after the first (max 8 hours).' },
+    { etichetta: 'Teletrasporto', etichettaEn: 'Teleport', variazioni: [{ nome: 'Segreti', delta: -3 }], spiegazione: 'Con un\'azione spendi 3 Segreti per teletrasportarti entro 1,5 m dalla creatura marchiata.', spiegazioneEn: 'As an action, spend 3 Secrets to teleport within 5 ft of the marked creature.' },
+  ],
+};
 
 /** Incantesimi della lista ampliata per cerchio (si lanciano spendendo Segreti). */
 export const LISTA_AMPLIATA_ARALDI = {
