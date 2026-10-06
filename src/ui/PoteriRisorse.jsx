@@ -16,11 +16,36 @@ function etichettaRicarica(ricarica, en) {
   return en ? 'by hand' : 'a mano';
 }
 
-/** Elenco dei contatori dei Poteri in gioco; null se non ce ne sono (il riquadro non compare). */
-export function PoteriRisorse({ scheda, aggiorna, lingua = 'it', registra, mostraInfo }) {
+/**
+ * Elenco dei contatori dei Poteri in gioco. Senza contatori il riquadro resta
+ * comunque visibile con una spiegazione e, se in Cronologia versioni c'è una copia
+ * di questo personaggio con dei Poteri (es. persi collegando un altro dispositivo),
+ * il pulsante per recuperarli: `recupero` = { quando, applica }.
+ */
+export function PoteriRisorse({ scheda, aggiorna, lingua = 'it', registra, mostraInfo, recupero }) {
   const en = lingua === 'en';
   const voci = contatoriInGioco(scheda);
-  if (!voci.length) return null;
+  if (!voci.length) {
+    return (
+      <div data-testid="poteri-risorse" style={{ fontSize: 12 }}>
+        <p style={{ ...styles.detail, fontSize: 11, margin: '0 0 6px' }}>
+          {en
+            ? 'No power counters yet. Add powers in Features, traits and feats → Powers.'
+            : 'Nessun contatore dei Poteri. Si aggiungono in Privilegi, tratti e talenti → Poteri.'}
+        </p>
+        {recupero && (
+          <button
+            type="button"
+            data-testid="recupera-poteri"
+            style={{ ...styles.buttonMini, width: '100%', padding: '5px 8px', fontWeight: 700, color: C.goldDark, borderColor: C.goldDark }}
+            onClick={recupero.applica}
+          >
+            {en ? `Restore powers from history (${recupero.quando})` : `Recupera i Poteri dalla cronologia (${recupero.quando})`}
+          </button>
+        )}
+      </div>
+    );
+  }
   const araldi = voci.some((v) => v.potere.modello === ID_MODELLO_ARALDI);
 
   const applica = (variazioni, titolo, dettaglio) => {

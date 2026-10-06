@@ -1910,6 +1910,59 @@ const SPIEG_RISORSE = {
 };
 
 /** Spiegazione di una risorsa di classe: prima la mappa dedicata, poi i privilegi (case-insensitive). */
+/**
+ * Spiegazione di una risorsa di classe per la nuvoletta: prima le spiegazioni
+ * note (spiegaRisorsa), poi le righe "Nome: descrizione" dei tratti e dei
+ * privilegi della scheda, la nota di un attacco omonimo, infine l'incantesimo
+ * con lo stesso nome ("Paura (3/giorno)" → Paura). Serve alle risorse
+ * personalizzate, es. un mostro trasformato in personaggio.
+ */
+/**
+ * Il personaggio può avere compagni, famigli o evocazioni? Solo allora la scheda
+ * mostra la sezione "Compagni, famigli ed evocazioni". Sì se ne ha già uno, se ha
+ * incantesimi di evocazione/famiglio, o per classe e sottoclasse (Patto della
+ * Catena, Ranger con compagno animale, Artefice, Druido 2024 con Compagno
+ * Selvatico, Paladino 2024 dal 5° con Destriero Fedele) o se un suo privilegio
+ * parla di famiglio, compagno animale o destriero.
+ */
+function puoAvereCompagni(s) {
+  if (!s) return false;
+  if (Array.isArray(s.alleati) && s.alleati.length > 0) return true;
+  const v24 = s.versione !== '2014';
+  const classi = [{ classe: s.classe, livello: Number(s.livello) || 1, sottoclasse: s.sottoclasse }, ...(Array.isArray(s.multiclasse) ? s.multiclasse : [])];
+  for (const c of classi) {
+    const cl = String(c?.classe || '');
+    const sc = String(c?.sottoclasse || '');
+    if (/warlock/i.test(cl) && /catena|chain/i.test(sc)) return true;
+    if (/ranger/i.test(cl) && /bestie|beast|fey|fatat|drake|drag|swarm|sciame/i.test(sc)) return true;
+    if (/artefice|artificer/i.test(cl)) return true;
+    if (v24 && /druido|druid/i.test(cl) && (Number(c?.livello) || 1) >= 2) return true;
+    if (v24 && /paladino|paladin/i.test(cl) && (Number(c?.livello) || 1) >= 5) return true;
+  }
+  const testi = [s.privilegi, s.privilegiSottoclasse, s.talenti, s.invocazioni, s.trattiSpecie].map((x) => String(x || '')).join('\n');
+  if (/famiglio|familiar|patto della catena|pact of the chain|compagno (animale|bestiale|primordiale|selvatico)|beast companion|primal companion|destriero|steed/i.test(testi)) return true;
+  return (s.incantesimiLista || []).some((x) => /famiglio|familiar|evoca|evocare|spiriti|spirit|elementale|summon|conjure|destriero|steed|trova famiglio|omuncolo|homunculus|guardiano|animare morti|animate dead|creare non morti|create undead/i.test(x?.nome || ''));
+}
+
+function spiegazioneRisorsaScheda(risorsa, scheda) {
+  const diretta = spiegaRisorsa(risorsa?.nome);
+  if (diretta) return diretta;
+  const base = String(risorsa?.nome || '').replace(/\s*\(.*$/, '').trim();
+  const chiave = base.toLowerCase();
+  if (!chiave) return '';
+  for (const testo of [scheda?.trattiSpecie, scheda?.privilegi, scheda?.privilegiSottoclasse, scheda?.talenti]) {
+    for (const riga of String(testo || '').split('\n')) {
+      const i = riga.indexOf(':');
+      if (i > 0 && riga.slice(0, i).replace(/\s*\(.*$/, '').trim().toLowerCase() === chiave) return riga.slice(i + 1).trim();
+    }
+  }
+  const attacco = (scheda?.attacchi || []).find((a) => String(a?.nome || '').trim().toLowerCase() === chiave && a.note);
+  if (attacco) return attacco.note;
+  const inc = spiegaIncantesimo(base) || datiIncantesimo(base)?.desc;
+  if (inc) return inc;
+  return (scheda?.incantesimiLista || []).find((x) => String(x?.nome || '').trim().toLowerCase() === chiave)?.note || '';
+}
+
 function spiegaRisorsa(nome) {
   const n = String(nome || '').trim();
   if (!n) return '';
@@ -1961,7 +2014,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.80.0';
+const APP_VERSION = '4.81.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -3261,9 +3314,9 @@ function riassumiDescrizione(testo, maxFrasi = 2, maxCaratteri = 320) {
   if (breve.length > maxCaratteri) breve = `${breve.slice(0, maxCaratteri - 1).trimEnd()}…`;
   return breve;
 }
-function testoNuvoletta(righe, descrizione) {
+function testoNuvoletta(righe, descrizione, maxFrasi = 2, maxCaratteri = 320) {
   const essenziale = righe.filter(Boolean).join('\n');
-  const breve = riassumiDescrizione(descrizione);
+  const breve = riassumiDescrizione(descrizione, maxFrasi, maxCaratteri);
   return [essenziale, breve].filter(Boolean).join('\n\n');
 }
 
@@ -6022,6 +6075,35 @@ export default function App() {
 
   // Snapshot automatici: rete di sicurezza contro cancellazioni/reset accidentali.
   // Sono leggeri (senza immagini) per non riempire lo spazio del browser.
+  /**
+   * Poteri di questo personaggio nella copia più recente della Cronologia versioni
+   * che ne aveva (stesso id, o stesso nome): { quando, applica } oppure null.
+   * Serve quando un caricamento online li ha tolti (es. collegando un dispositivo).
+   */
+  function recuperoPoteriDaCronologia() {
+    if (!scheda || (Array.isArray(scheda.poteri) && scheda.poteri.length)) return null;
+    const idAttivo = roster?.attivo;
+    const nome = String(scheda.nome || '').trim().toLowerCase();
+    for (const snap of [...leggiSnapshots()].sort((a, b) => (b.ts || 0) - (a.ts || 0))) {
+      const pgs = snap?.roster?.personaggi || {};
+      const pg = pgs[idAttivo] || Object.values(pgs).find((x) => String(x?.nome || '').trim().toLowerCase() === nome);
+      if (Array.isArray(pg?.poteri) && pg.poteri.length) {
+        const quando = new Date(snap.ts || Date.now()).toLocaleString(lingua === 'en' ? 'en-GB' : 'it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+        return {
+          quando,
+          applica: () => {
+            const poteri = normalizzaPoteri(pg.poteri);
+            // Riporta anche i valori dei contatori salvati nella copia (Segreti, Debito...).
+            const risorsePrecedenti = (pg.risorse || []).filter((r) => String(r?.id || '').startsWith('potere-'));
+            const base = [...(scheda.risorse || []).filter((r) => !String(r?.id || '').startsWith('potere-')), ...risorsePrecedenti];
+            aggiorna({ poteri, risorse: sincronizzaRisorsePoteri(poteri, base, livelloTotaleScheda(scheda), scheda.bonusCompetenza) });
+            registra({ etichetta: tr('Poteri recuperati', 'Powers restored'), tipo: 'privilegio', dettaglio: tr(`Dalla cronologia del ${quando}`, `From the history of ${quando}`) });
+          },
+        };
+      }
+    }
+    return null;
+  }
   function leggiSnapshots() {
     try { return JSON.parse(localStorage.getItem('scheda-interattiva:snapshots')) || []; } catch { return []; }
   }
@@ -6799,7 +6881,12 @@ export default function App() {
       // Merge SEMPRE non distruttivo: unisci server + locale, server vince per conflitti (stesso ID)
       const personaggi = { ...(base.personaggi || {}) };
       for (const [id, pg] of Object.entries(conImmaginiLocali.personaggi || {})) {
-        personaggi[id] = pg;
+        // Il server vince, ma una copia online senza Poteri non cancella quelli di
+        // questo dispositivo (succedeva collegando un dispositivo con dati più vecchi).
+        const locale = base.personaggi?.[id];
+        personaggi[id] = (Array.isArray(locale?.poteri) && locale.poteri.length && !(Array.isArray(pg?.poteri) && pg.poteri.length))
+          ? { ...pg, poteri: locale.poteri, risorse: [...(pg.risorse || []).filter((r) => !String(r?.id || '').startsWith('potere-')), ...(locale.risorse || []).filter((r) => String(r?.id || '').startsWith('potere-'))] }
+          : pg;
       }
       // preserva immagini locali per i PG che arrivano senza
       for (const [id, pg] of Object.entries(personaggi)) {
@@ -10322,9 +10409,25 @@ export default function App() {
                   {scheda.risorse.filter((r) => !String(r.id || '').startsWith('potere-')).map((r) => {
                     const modifica = (patch) =>
                       aggiorna({ risorse: scheda.risorse.map((x) => (x.id === r.id ? { ...x, ...patch } : x)) });
-                    const spiegazione = spiegaRisorsa(r.nome);
+                    const spiegazione = spiegazioneRisorsaScheda(r, scheda);
                     const automatica = String(r.id || '').startsWith('auto-');
                     const nomeVisualizzato = traduciDato(r.nome);
+                    // Nuvoletta unica: usi e ricarica, poi cosa fa (dalle spiegazioni, dai
+                    // tratti della scheda o dall'incantesimo con lo stesso nome).
+                    const apriInfoRisorsa = () => {
+                      const en = lingua === 'en';
+                      const ricarica = r.reset === 'breve' ? (en ? 'short or long rest (all uses)' : 'riposo breve o lungo (tutti gli usi)')
+                        : r.reset === 'breve-uno' ? (en ? 'short rest: 1 use · long rest: all' : 'riposo breve: 1 uso · riposo lungo: tutti')
+                        : r.reset === 'lungo' ? (en ? 'long rest' : 'riposo lungo')
+                        : (en ? 'by hand' : 'a mano');
+                      setInfo({
+                        titolo: nomeVisualizzato,
+                        testo: testoNuvoletta([
+                          `${en ? 'Uses' : 'Usi'}: ${r.attuali} / ${r.max}`,
+                          `${en ? 'Recharge' : 'Ricarica'}: ${ricarica}`,
+                        ], spiegazione || (en ? 'No description for this resource.' : 'Nessuna descrizione per questa risorsa.'), 3, 420),
+                      });
+                    };
                     // La risorsa "Forma Selvatica" apre direttamente il catalogo delle creature
                     // (invece della sola descrizione): è qui che si "spende" un uso scegliendo
                     // la forma, non con un bottone Trasformazioni separato altrove nella scheda.
@@ -10339,15 +10442,22 @@ export default function App() {
                               onClick={() => setTabTrasformazione('animale')}
                               style={{ padding: 0, border: 0, background: 'transparent', color: C.goldDark, font: 'inherit', fontWeight: 600, textAlign: 'left', cursor: 'pointer', textDecoration: 'none', marginRight: 'auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}
                             >{nomeVisualizzato}</button>
-                          ) : spiegazione ? (
+                          ) : (
                             <button
                               type="button"
-                              title={spiegazione}
-                              onClick={() => setInfo({ titolo: nomeVisualizzato, testo: spiegazione })}
-                              style={{ padding: 0, border: 0, background: 'transparent', color: C.ink, font: 'inherit', fontWeight: 600, textAlign: 'left', cursor: 'pointer', textDecoration: 'none', marginRight: 'auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}
+                              className="risorsa-nome"
+                              onClick={apriInfoRisorsa}
+                              style={{ padding: 0, border: 0, background: 'transparent', color: C.ink, font: 'inherit', fontWeight: 600, textAlign: 'left', cursor: 'help', textDecoration: 'underline dotted', textUnderlineOffset: 3, textDecorationColor: C.inkDim, marginRight: 'auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}
                             >{nomeVisualizzato}</button>
-                          ) : (
-                            <span style={{ marginRight: 'auto', minWidth: 0, fontWeight: 600, color: C.ink, overflow: 'hidden', textOverflow: 'ellipsis' }}>{nomeVisualizzato}</span>
+                          )}
+                          {isFormaSelvatica && (
+                            <button
+                              type="button"
+                              className="risorsa-info"
+                              onClick={apriInfoRisorsa}
+                              aria-label={tr(`Spiegazione: ${nomeVisualizzato}`, `Explanation: ${nomeVisualizzato}`)}
+                              style={{ ...styles.buttonMini, padding: '0 6px', fontSize: 11, flexShrink: 0 }}
+                            >?</button>
                           )}
                           {!automatica && (
                             <button
@@ -10392,13 +10502,18 @@ export default function App() {
               </div>
 
               {/* Tier 3b: Poteri (Segreti, Debito, usi dei privilegi...) separati dalle risorse di classe */}
-              {contatoriInGioco(scheda).length > 0 && (
-                <div className="risorse-tier-3 profilo-risorse-box" style={{ marginTop: 10 }}>
-                  <Sezione titolo={lingua === 'en' ? 'Powers' : 'Poteri'} senzaAngoli={true} {...apertoProps('poteriRisorse')}>
-                    <PoteriRisorse scheda={scheda} aggiorna={aggiorna} lingua={lingua} registra={registra} mostraInfo={setInfo} />
-                  </Sezione>
-                </div>
-              )}
+              <div className="risorse-tier-3 profilo-risorse-box" style={{ marginTop: 10 }}>
+                <Sezione titolo={lingua === 'en' ? 'Powers' : 'Poteri'} senzaAngoli={true} {...apertoProps('poteriRisorse')}>
+                  <PoteriRisorse
+                    scheda={scheda}
+                    aggiorna={aggiorna}
+                    lingua={lingua}
+                    registra={registra}
+                    mostraInfo={setInfo}
+                    recupero={!isSolaLettura && contatoriInGioco(scheda).length === 0 ? recuperoPoteriDaCronologia() : null}
+                  />
+                </Sezione>
+              </div>
             </div>
 
             {/* COLONNA CENTRALE: anagrafica + riquadri vitali */}
@@ -13489,6 +13604,9 @@ export default function App() {
                       </div>
                     );
                   }
+                  // Il menu di aggiunta compare solo quando mancano incantesimi da scegliere
+                  // (riquadro verde): altrimenti la lista resta pulita, senza barre vuote.
+                  if (!(isLivMancante && numMancanti > 0)) return null;
                   const suggeriti = incantesimiClasseLivello(scheda.classe, liv, scheda.sottoclasse, versione);
                   const gia = new Set(scheda.incantesimiLista.filter((s) => s.livello === liv).map((s) => (s.nome || '').toLowerCase()));
                   return (
@@ -14851,15 +14969,10 @@ export default function App() {
             )}
 
             {/* Sezione Compagni, Famigli ed Evocazioni Integrata */}
+            {puoAvereCompagni(scheda) && (
             <Sezione
               titolo={lingua === 'en' ? 'Companions, familiars and summons' : 'Compagni, famigli ed evocazioni'}
-              {...apertoProps('famigliEvocazioni', Boolean(
-                (Array.isArray(scheda.alleati) && scheda.alleati.length > 0) ||
-                (/warlock/i.test(scheda.classe || '') && /catena|chain/i.test(scheda.sottoclasse || '')) ||
-                (/ranger/i.test(scheda.classe || '') && /bestie|beast|fey|drake|swarm/i.test(scheda.sottoclasse || '')) ||
-                (/artefice|artificer/i.test(scheda.classe || '')) ||
-                (scheda.incantesimiLista || []).some((s) => /famiglio|evoca|spiriti|spirit|elementale|summon|conjure|destriero|steed|trova|omuncolo|guardiano/i.test(s.nome || ''))
-              ))}
+              {...apertoProps('famigliEvocazioni', true)}
             >
               {(() => {
                 const alleati = Array.isArray(scheda.alleati) ? scheda.alleati : [];
@@ -15188,6 +15301,7 @@ export default function App() {
                 );
               })()}
             </Sezione>
+            )}
 
             {/* Modale Evoca / Aggiungi Compagno */}
             {mostraModalAggiungiCompagno && <AggiungiCompagnoModal

@@ -2,6 +2,31 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.81.0] – 2026-10-06
+
+### Aggiunto
+- **Nuvolette delle risorse di classe**: il nome di ogni risorsa apre la
+  nuvoletta unica con usi, ricarica (breve / 1 uso con breve / lungo / a mano) e
+  spiegazione. `spiegazioneRisorsaScheda` la cerca nelle spiegazioni note, poi
+  nelle righe "Nome: descrizione" di tratti e privilegi della scheda, nella nota
+  di un attacco omonimo e nell'incantesimo con lo stesso nome ("Paura (3/giorno)").
+  Forma Selvatica tiene il catalogo sul nome e ha un "?" per la spiegazione.
+- **Recupero dei Poteri**: il riquadro Poteri sotto Risorse di classe è sempre
+  visibile; se il personaggio non ha più Poteri ma la Cronologia versioni ne ha
+  una copia, un pulsante li ripristina (con i valori dei contatori).
+
+### Corretto
+- **Poteri persi collegando un dispositivo**: con "Usa codice" la copia online
+  sostituiva i personaggi locali con lo stesso id; se online i Poteri mancavano,
+  sparivano anche qui. Ora quelli locali restano (e poi vengono inviati).
+- Tolti i menu "Aggiungi…" (barre bianche) sotto ogni livello di incantesimi:
+  compaiono solo, in verde, quando mancano incantesimi da scegliere.
+- La sezione **Compagni, famigli ed evocazioni** compare solo a chi può averne
+  (`puoAvereCompagni`): compagni già presenti, incantesimi di evocazione/famiglio,
+  Patto della Catena, Ranger con compagno, Artefice, Druido 2024 (Compagno
+  Selvatico), Paladino 2024 dal 5° (Destriero Fedele), privilegi che parlano di
+  famiglio, compagno animale o destriero.
+
 ## [4.80.0] – 2026-10-06
 
 ### Corretto

@@ -5,6 +5,23 @@
 
 export const NOVITA = [
   {
+    versione: '4.81.0',
+    voci: {
+      it: [
+        'Risorse di classe: tocca il nome per una nuvoletta con usi, ricarica e cosa fa (anche per le risorse personalizzate, prese dai tratti o dagli incantesimi con lo stesso nome).',
+        'Il riquadro Poteri resta sempre sotto Risorse di classe; se i Poteri sono spariti (es. collegando un altro dispositivo) un pulsante li recupera dalla Cronologia versioni. Collegando un dispositivo i Poteri non vengono più cancellati.',
+        'Tolti i menu bianchi "Aggiungi…" sotto ogni livello di incantesimi (resta quello verde quando mancano incantesimi da scegliere).',
+        'La sezione Compagni, famigli ed evocazioni compare solo ai personaggi che possono averne.',
+      ],
+      en: [
+        'Class resources: tap the name for a bubble with uses, recharge and what it does (custom resources too, taken from traits or same-named spells).',
+        'The Powers box always stays under Class resources; if powers disappeared (e.g. when linking another device) a button restores them from Version history. Linking a device no longer deletes them.',
+        'Removed the white "Add…" menus under every spell level (the green one stays when spells are left to choose).',
+        'The Companions, familiars and summons section only appears for characters who can have them.',
+      ],
+    },
+  },
+  {
     versione: '4.80.0',
     voci: {
       it: ['Personaggi con una "classe" non standard (es. un mostro trasformato in PG): i Dadi Vita restano quelli della scheda e le azioni senza tiro né danno non mostrano più "Attacco +0".'],
