@@ -2,6 +2,19 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.71.0] – 2026-10-06
+
+### Manutenzione
+- **Altre 11 finestre fuori da App.jsx** (`src/ui/modali/`): Avvisi e novità,
+  Atmosfera e audio, Importa ed esporta, Menu dei personaggi, Menu e strumenti
+  su telefono, Guida di benvenuto, Note legali, Sostieni il progetto, Versioni
+  precedenti, Scelta della versione, Privilegi di sottoclasse. `App.jsx` scende
+  a ~17.400 righe (da ~21.500). Nessun cambiamento visibile.
+- Nuovo `src/utils/ambiente.js` con gli indirizzi dei servizi online, l'ordine
+  delle ambientazioni e gli aiuti `iconaAmbientazione` / `nuovoId`.
+- `e2e/finestre.spec.js` ora copre 18 finestre (anche menu, note legali,
+  donazioni, cronologia versioni, tutorial e menu del telefono).
+
 ## [4.70.0] – 2026-10-06
 
 ### Manutenzione

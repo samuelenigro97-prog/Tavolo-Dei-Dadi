@@ -76,4 +76,49 @@ test.describe('Finestre estratte', () => {
     await expect(page.getByRole('button', { name: /Metamorfosi \(4 PF\)/ })).toBeVisible();
     await page.keyboard.press('Escape');
   });
+
+  test('Avvisi e novità (NotificheModal)', async ({ page }) => {
+    await page.getByRole('button', { name: /^Avvisi e novità/ }).first().click();
+    await expect(page.getByText('Avvisi e novità', { exact: true }).first()).toBeVisible();
+    await page.keyboard.press('Escape');
+  });
+
+  test('Atmosfera e audio (PannelloAudioModal)', async ({ page }) => {
+    await page.getByRole('button', { name: /^Atmosfera:/ }).first().click();
+    await expect(page.getByRole('button', { name: 'Chiudi pannello audio' })).toBeVisible();
+    await page.getByRole('button', { name: 'Chiudi pannello audio' }).click();
+  });
+
+  test('Importa ed esporta (MenuEsportaModal)', async ({ page }) => {
+    await page.getByRole('button', { name: /^Importa ed esporta/ }).first().click();
+    await expect(page.getByText('Importa ed esporta', { exact: true }).first()).toBeVisible();
+    await page.keyboard.press('Escape');
+  });
+
+  test('Benvenuto / tutorial (GuidaModal)', async ({ page }) => {
+    await page.getByRole('button', { name: 'Nuovo personaggio' }).first().click();
+    await page.getByRole('button', { name: 'ℹ️' }).first().click();
+    await expect(page.getByText('Benvenuto al Tavolo dei Dadi')).toBeVisible();
+  });
+
+  test('Menu e strumenti su telefono (MenuHubMobile)', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.getByRole('button', { name: 'Apri menu e strumenti' }).first().click();
+    await expect(page.getByText('Menu e strumenti', { exact: true })).toBeVisible();
+  });
+
+  for (const [pulsante, titolo, nome] of [
+    [/Note legali/, 'Note legali e licenza', 'NoteLegaliModal'],
+    [/Sostieni il progetto/, 'Sostieni Tavolo dei Dadi', 'DonazioniModal'],
+    [/Cronologia versioni/, 'Versioni precedenti', 'RipristinoModal'],
+  ]) {
+    test(`${titolo} (${nome}, dal menu)`, async ({ page }) => {
+      // la cronologia compare solo se esiste almeno un salvataggio automatico
+      await page.evaluate(() => localStorage.setItem('scheda-interattiva:snapshots', JSON.stringify([{ ts: Date.now(), n: 1, roster: { personaggi: {} } }])));
+      await page.reload();
+      await page.getByRole('button', { name: /^Menu: nuovo personaggio/ }).first().click();
+      await page.getByRole('button', { name: pulsante }).first().click();
+      await expect(page.getByText(titolo, { exact: true })).toBeVisible();
+    });
+  }
 });
