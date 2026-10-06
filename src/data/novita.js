@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.73.0',
+    voci: {
+      it: ['Colori: base generica (oro e neutri) con tocchi del colore della classe su titoli, nome del personaggio, angoli delle sezioni e un alone leggero (es. il verde per un Druido).'],
+      en: ['Colours: a generic base (gold and neutrals) with touches of the class colour on headings, the character name, section corners and a light glow (e.g. green for a Druid).'],
+    },
+  },
+  {
     versione: '4.72.0',
     voci: {
       it: [

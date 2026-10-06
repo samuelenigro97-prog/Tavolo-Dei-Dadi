@@ -1952,7 +1952,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.72.0';
+const APP_VERSION = '4.73.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4130,7 +4130,7 @@ export default function App() {
       tema === 'scuro' || (tema === 'auto' && (sistemaScuro || eNotte()));
     const modo = scuroEff ? 'scuro' : 'chiaro';
     const presetDati = PRESET_COLORI.find((p) => p.id === presetColori) || PRESET_COLORI[0];
-    // Un solo tema: l'ambientazione cambia scena, sfondo e audio, non i colori dell'interfaccia.
+    // Tema generico: l'ambientazione cambia scena, sfondo e audio, non i colori dell'interfaccia.
     const t = { ...BASE_TEMA[modo] };
     const hexRgba = (hex, a) => {
       const m = /^#?([0-9a-fA-F]{6})$/.exec(hex || '');
@@ -4138,7 +4138,8 @@ export default function App() {
       const n = parseInt(m[1], 16);
       return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
     };
-    const tintaClasse = t.gold;
+    const accClasse = temaCornici === 'disattivato' ? null : coloreClasse(classeAttiva);
+    const tintaClasse = accClasse ? accClasse[modo] : t.gold;
     const coloreGlow = mescola(t.bg, tintaClasse, scuroEff ? 0.22 : 0.12);
     const glowClasse = `radial-gradient(150% 110% at 50% -18%, ${hexRgba(coloreGlow, (scuroEff ? 0.15 : 0.08) * INTENSITA_CLASSE)}, transparent 75%)`;
     const auraClasseSotto = `radial-gradient(120% 90% at 50% 110%, ${hexRgba(tintaClasse, (scuroEff ? 0.13 : 0.05) * INTENSITA_CLASSE)}, transparent 80%)`;
@@ -4161,17 +4162,20 @@ export default function App() {
     return [sfondoAmbiente, glowClasse, auraClasseSotto, ambra, vignetta, velo, imgLayer, t.bg]
       .filter(Boolean)
       .join(', ');
-  }, [tema, sistemaScuro, oraTick, presetColori]);
+  }, [tema, sistemaScuro, oraTick, presetColori, classeAttiva, temaCornici]);
 
   useEffect(() => {
     const scuroEff =
       tema === 'scuro' || (tema === 'auto' && (sistemaScuro || eNotte()));
     const modo = scuroEff ? 'scuro' : 'chiaro';
     setNotteAttiva(scuroEff); // notte = tema scuro: pilota sfondi notturni e audio più cupo
-    // Parti dal tema base, poi applica l'override del preset colori
-    // Un solo tema per tutta l'app: né l'ambientazione né la classe ricolorano testi,
-    // bordi e pulsanti. La classe resta riconoscibile dalla forma degli angoli delle sezioni.
+    // Un tema generico (oro e neutri) per testi, bordi e pulsanti; il colore della classe
+    // compare solo a tocchi: titoli delle sezioni, nome del personaggio, angoli decorati
+    // e un alone leggero attorno alle sezioni. L'ambientazione cambia scena e audio.
     const t = { ...BASE_TEMA[modo] };
+    const accTema = (temaCornici && temaCornici !== 'auto' && temaCornici !== 'disattivato') ? coloreClasse(temaCornici) : null;
+    const accClasse = temaCornici === 'disattivato' ? null : (accTema || coloreClasse(classeAttiva));
+    if (accClasse) t.title = mescola(accClasse[modo], t.ink, 0.2);
     garantisciContrastoTema(t);
     const root = document.documentElement;
     root.dataset.tema = modo;
@@ -4189,8 +4193,10 @@ export default function App() {
     set('--c-gold', t.gold); set('--c-gold-dark', t.goldDark); set('--c-red', t.red);
     set('--c-green', t.green); set('--c-title', t.title);
     set('--c-on-gold', testoSu(t.goldDark));
+    // Colore della classe per i piccoli accenti (angoli delle sezioni): stesso tono dei titoli.
+    set('--c-classe', t.title);
 
-    const tintaClasse = t.gold;
+    const tintaClasse = accClasse ? accClasse[modo] : t.gold;
     const hexRgba = (hex, a) => {
       const m = /^#?([0-9a-fA-F]{6})$/.exec(hex || '');
       if (!m) return `rgba(0,0,0,${a})`;

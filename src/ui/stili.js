@@ -627,8 +627,8 @@ tbody tr:hover {
   width: 22px;
   height: 22px;
   pointer-events: none;
-  /* La forma degli angoli cambia con la classe, il colore resta quello del tema. */
-  background-color: var(--c-gold);
+  /* Forma e colore degli angoli seguono la classe (uno dei pochi accenti di classe). */
+  background-color: var(--c-classe, var(--c-gold));
   -webkit-mask-size: contain;
   mask-size: contain;
   -webkit-mask-repeat: no-repeat;

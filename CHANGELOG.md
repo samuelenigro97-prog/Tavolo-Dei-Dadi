@@ -2,6 +2,16 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.73.0] – 2026-10-06
+
+### Cambiato
+- **Colore della classe a tocchi**: la base resta generica (oro e neutri per
+  testi, bordi, pulsanti), mentre il colore della classe torna come accento su
+  titoli delle sezioni e dell'app, nome del personaggio (`--c-title`), angoli
+  decorati (nuova variabile `--c-classe`) e alone leggero attorno alle sezioni
+  e ai margini. Rispetta la scelta "Cornici" (classe fissa o disattivato) e il
+  contrasto minimo automatico dei titoli.
+
 ## [4.72.0] – 2026-10-06
 
 ### Aggiunto
