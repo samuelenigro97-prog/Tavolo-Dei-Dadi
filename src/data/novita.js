@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.68.0',
+    voci: {
+      it: ['Testi più leggibili in tema chiaro e scuro: etichette, chip e righe degli incantesimi hanno ora un contrasto adeguato in ogni ambientazione.'],
+      en: ['More legible text in light and dark themes: labels, chips and spell rows now have adequate contrast in every setting.'],
+    },
+  },
+  {
     versione: '4.64.0',
     voci: {
       it: [

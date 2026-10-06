@@ -573,7 +573,7 @@ export function ListaQuadratini({ value, onChange, lookup, placeholder, opzioni,
               </button>
               {isMagiaSelvaggia && (
                 <button
-                  style={{ ...chip, background: C.gold, color: '#fff', borderLeft: '1px solid rgba(0,0,0,0.1)', borderTopLeftRadius: 0, borderBottomLeftRadius: 0, paddingLeft: 6, paddingRight: 6 }}
+                  style={{ ...chip, background: C.gold, color: C.onGold, borderLeft: '1px solid rgba(0,0,0,0.1)', borderTopLeftRadius: 0, borderBottomLeftRadius: 0, paddingLeft: 6, paddingRight: 6 }}
                   title={tr('Tira 1d100 (Impulso di Magia Selvaggia)', 'Roll 1d100 (Wild Magic Surge)')}
                   onClick={(e) => {
                     e.stopPropagation();

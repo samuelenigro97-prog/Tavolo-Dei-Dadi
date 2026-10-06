@@ -1220,6 +1220,41 @@ function applicaTintaClasse(t, colore, scuroEff) {
   t.border = mescola(t.border, colore, 0.2 * INTENSITA_CLASSE);
 }
 
+/** Luminanza relativa (WCAG) di un colore esadecimale. */
+function luminanzaRelativa(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  const c = [r, g, b].map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; });
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+
+/** Rapporto di contrasto WCAG tra due colori (1 = identici, 21 = bianco su nero). */
+function contrastoTra(a, b) {
+  const x = luminanzaRelativa(a), y = luminanzaRelativa(b);
+  return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+}
+
+/** Colore di testo (bianco o quasi nero) più leggibile sopra uno sfondo dato. */
+function testoSu(hex) {
+  return contrastoTra('#ffffff', hex) >= contrastoTra('#16130f', hex) ? '#ffffff' : '#16130f';
+}
+
+/**
+ * Rende leggibili i colori di testo "secondari" (inkDim, green, red) su TUTTI gli sfondi
+ * del tema, qualunque sia l'ambientazione o la classe: se il contrasto scende sotto
+ * `minimo` il colore si avvicina all'inchiostro finché non lo raggiunge. Così una palette
+ * d'ambientazione troppo tenue non rende illeggibili etichette e valori (WCAG AA = 4,5:1).
+ */
+function garantisciContrastoTema(t) {
+  const sfondi = [t.bg, t.panel, t.panelLight];
+  // Verde e rosso servono spesso su pulsanti con uno sfondo appena tinto dello stesso colore (che ne abbassa
+  // il contrasto): per questo la soglia è più alta di quella del testo attenuato.
+  for (const [chiave, minimo] of [['inkDim', 5], ['green', 6.4], ['red', 6]]) {
+    let c = t[chiave];
+    for (let i = 0; i < 40 && Math.min(...sfondi.map((bg) => contrastoTra(c, bg))) < minimo; i++) c = mescola(c, t.ink, 0.06);
+    t[chiave] = c;
+  }
+}
+
 /** È notte? (dalle 20:00 alle 06:59). Serve al tema automatico per orario. */
 function eNotte(d = new Date()) {
   const h = d.getHours();
@@ -1903,7 +1938,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.67.0';
+const APP_VERSION = '4.68.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -3043,7 +3078,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
                         </div>
                         <div style={{ display: 'flex', gap: 6, flexShrink: 0, alignItems: 'center', flexWrap: 'wrap' }}>
                           <button
-                            style={{ ...styles.buttonMini, fontWeight: 700, borderColor: C.goldDark, color: '#fff', background: C.goldDark, minWidth: 68 }}
+                            style={{ ...styles.buttonMini, fontWeight: 700, borderColor: C.goldDark, color: C.onGold, background: C.goldDark, minWidth: 68 }}
                             disabled={aprendoId === s.id}
                             onClick={() => apriInSolaLettura(s)}
                             title={tr('Apri e consulta la scheda completa nel tavolo in sola lettura (senza modificarla)', 'Open the full sheet read-only (without changing it)')}
@@ -4150,6 +4185,7 @@ export default function App() {
     const t = { ...BASE_TEMA[modo], ...presetDati[modo] };
     const acc = coloreClasse(classeAttiva);
     if (acc) applicaTintaClasse(t, acc[modo], scuroEff);
+    garantisciContrastoTema(t);
     const root = document.documentElement;
     root.dataset.tema = modo;
     root.dataset.preset = presetColori;
@@ -4165,6 +4201,7 @@ export default function App() {
     set('--c-border', t.border); set('--c-ink', t.ink); set('--c-ink-dim', t.inkDim);
     set('--c-gold', t.gold); set('--c-gold-dark', t.goldDark); set('--c-red', t.red);
     set('--c-green', t.green); set('--c-title', t.title);
+    set('--c-on-gold', testoSu(t.goldDark));
 
     const accTema = (temaCornici && temaCornici !== 'auto' && temaCornici !== 'disattivato') ? coloreClasse(temaCornici) : null;
     const accEffettivo = accTema || acc;
@@ -8648,7 +8685,7 @@ export default function App() {
                       style={{
                         ...styles.buttonMini,
                         background: C.goldDark,
-                        color: '#fff',
+                        color: C.onGold,
                         fontSize: 12,
                         fontWeight: 700,
                         padding: '6px 14px',
@@ -11898,7 +11935,7 @@ export default function App() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, userSelect: 'none', flexShrink: 0, alignSelf: 'center' }}>
                     <span style={{ fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", fontSize: 16, fontWeight: 800, color: 'var(--c-title)', letterSpacing: 0.5, whiteSpace: 'nowrap', transition: 'color 0.2s ease', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
                       Tavolo dei Dadi
-                      <span className="app-version" style={{ fontSize: 11, color: C.inkDim, opacity: 0.75, fontWeight: 600, fontVariantNumeric: 'tabular-nums', letterSpacing: 0.3, whiteSpace: 'nowrap', lineHeight: 1, transform: 'translateY(1px)' }}>
+                      <span className="app-version" style={{ fontSize: 11, color: C.inkDim, fontWeight: 600, fontVariantNumeric: 'tabular-nums', letterSpacing: 0.3, whiteSpace: 'nowrap', lineHeight: 1, transform: 'translateY(1px)' }}>
                         v{APP_VERSION}
                       </span>
                     </span>
@@ -12144,7 +12181,7 @@ export default function App() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, userSelect: 'none', flexShrink: 0 }}>
                     <span style={{ fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", fontSize: 15, fontWeight: 800, color: 'var(--c-title)', letterSpacing: 0.4, whiteSpace: 'nowrap', transition: 'color 0.2s ease', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
                       Tavolo dei Dadi
-                      <span className="app-version" style={{ fontSize: 11, color: C.inkDim, opacity: 0.7, fontWeight: 600, fontVariantNumeric: 'tabular-nums', letterSpacing: 0.2, whiteSpace: 'nowrap', lineHeight: 1, transform: 'translateY(1px)' }}>
+                      <span className="app-version" style={{ fontSize: 11, color: C.inkDim, fontWeight: 600, fontVariantNumeric: 'tabular-nums', letterSpacing: 0.2, whiteSpace: 'nowrap', lineHeight: 1, transform: 'translateY(1px)' }}>
                         v{APP_VERSION}
                       </span>
                     </span>
@@ -12932,6 +12969,7 @@ export default function App() {
                       title={t('nome.tooltip_selettore') + (!isSolaLettura ? (lingua === 'en' ? ' · Double click to rename' : ' · Doppio clic per rinominare') : '')}
                     >
                       <select
+                        aria-label={tr('Personaggio attivo', 'Active character')}
                         style={{ ...styles.inlineInput, flex: 1, minWidth: 0, fontSize: 16, fontWeight: 'bold', fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", color: 'var(--c-title)', padding: '4px 74px 4px 12px', textOverflow: 'ellipsis', background: 'transparent', position: 'relative', zIndex: 2, border: 'none', height: '100%' }}
                         value={roster.attivo}
                         onChange={(e) => { setSchedaSolaLettura(null); setRoster((r) => ({ ...r, attivo: e.target.value })); }}
@@ -13623,6 +13661,7 @@ export default function App() {
                   )}
                 </div>
                 <select
+                  aria-label={tr('Tipo di armatura', 'Armor type')}
                   style={{ ...styles.inlineInput, fontSize: 11, padding: '1px 3px', maxWidth: '100%', marginTop: 2 }}
                   value={scheda.armatura.tipo}
                   onChange={(e) => {
@@ -14063,7 +14102,8 @@ export default function App() {
                         as="div"
                         style={{
                           ...styles.skillRow(true),
-                          opacity: scheda.tiriSalvezza[key] ? 1 : 0.5,
+                          // Non competente: testo attenuato (colore), non trasparenza: l'opacità fa scendere il contrasto sotto la soglia di leggibilità.
+                          color: scheda.tiriSalvezza[key] ? undefined : C.inkDim,
                           position: 'relative',
                           border: tsMancante ? `1px solid ${C.red}` : 'none',
                           borderRadius: tsMancante ? 6 : 0,
@@ -14135,7 +14175,7 @@ export default function App() {
                         key={a.key}
                         style={{
                           ...styles.skillRow(true),
-                          opacity: liv === 0 ? 0.5 : 1,
+                          color: liv === 0 ? C.inkDim : undefined,
                           border: abMancante ? `1px solid ${C.red}` : 'none',
                           borderRadius: abMancante ? 6 : 0,
                           background: abMancante ? 'rgba(231,76,60,0.12)' : 'transparent',
@@ -16078,6 +16118,7 @@ export default function App() {
                       <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
                         <select
                           className={`add-spell ${isLivMancante ? 'incantesimo-mancante-controllo' : ''}`}
+                          aria-label={liv === 0 ? t('spell.aggiungi_trucchetto') : t('spell.aggiungi_incantesimo_liv').replace('{n}', liv)}
                           value=""
                           style={{
                             ...styles.buttonMini,
@@ -16322,7 +16363,7 @@ export default function App() {
                                       ? '2px solid var(--c-green)'
                                       : (isRowUnpreparedMancante
                                         ? '1.5px dashed var(--c-green)'
-                                        : `1px solid ${C.border}`)),
+                                        : `1px ${(classePreparata && s.livello >= 1 && s.preparato === false) ? 'dashed' : 'solid'} ${C.border}`)),
                                   borderRadius: 6,
                                   padding: '4px 8px',
                                   background: isRowInEccesso
@@ -16339,8 +16380,7 @@ export default function App() {
                                       : (isRowUnpreparedMancante
                                         ? '0 0 8px rgba(46,157,77,0.2)'
                                         : 'none')),
-                                  opacity: (classePreparata && s.livello >= 1 && s.preparato === false && !isRowUnpreparedMancante) ? 0.5 : 1,
-                                  transition: 'all 0.2s ease',
+                                                                    transition: 'all 0.2s ease',
                                 }}
                               >
                                 <div className="spell-row" style={{ display: 'flex', flexWrap: 'nowrap', alignItems: 'center', gap: 4 }}>
@@ -16579,7 +16619,7 @@ export default function App() {
                                         type="button"
                                         style={{
                                           ...styles.buttonRiga,
-                                          color: '#fff',
+                                          color: isRowCatalogoMancante ? '#fff' : C.onGold,
                                           background: isRowCatalogoMancante ? '#2e9d4d' : C.goldDark,
                                           borderColor: isRowCatalogoMancante ? C.green : C.goldDark,
                                           boxShadow: isRowCatalogoMancante ? '0 0 6px rgba(46,157,77,0.4)' : 'none',
@@ -17916,7 +17956,7 @@ export default function App() {
                             aggiorna({ alleati: [...(scheda.alleati || []), nuovo] });
                             setMostraModalAggiungiCompagno(false);
                           }}
-                          style={{ ...styles.buttonMini, fontSize: 12, padding: '6px 14px', background: C.goldDark, color: '#fff', alignSelf: 'flex-start', fontWeight: 700 }}
+                          style={{ ...styles.buttonMini, fontSize: 12, padding: '6px 14px', background: C.goldDark, color: C.onGold, alignSelf: 'flex-start', fontWeight: 700 }}
                         >
                           {lingua === 'en' ? 'Add Empty Custom Creature' : 'Aggiungi Creatura Vuota'}
                         </button>
@@ -18000,7 +18040,7 @@ export default function App() {
                                     setMostraModalAggiungiCompagno(false);
                                     registra({ etichetta: `${c.nome}`, tipo: 'evoca', dettaglio: `Evocato/aggiunto compagno: ${c.nome} (${pfCalc} PF, CA ${c.ca})` });
                                   }}
-                                  style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px', background: C.goldDark, color: '#fff', fontWeight: 700, flex: 1 }}
+                                  style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px', background: C.goldDark, color: C.onGold, fontWeight: 700, flex: 1 }}
                                 >
                                   {lingua === 'en' ? 'Summon / Add' : 'Evoca / Aggiungi'}
                                 </button>
@@ -18480,7 +18520,7 @@ export default function App() {
 
                               return (
                                 <Fragment key={o.id}>
-                                <tr className="inventario-riga" style={{ opacity: isEquip ? 1 : 0.82 }}>
+                                <tr className="inventario-riga" style={{ opacity: isEquip ? 1 : 0.92 }}>
                                   <td data-label={t('inv.equip')} style={{ ...styles.td, textAlign: 'center', ...((mostraEffetto || mostraUtilizzi || mostraContenuto) && senzaBordo) }}>
                                     <input type="checkbox" checked={isEquip} onChange={(e) => toggleEquip(o, e.target.checked)} title={t('inv.equip_tooltip')} />
                                   </td>
@@ -18786,6 +18826,7 @@ export default function App() {
                                               {t('inv.effetto')}:
                                             </span>
                                             <select
+                                              aria-label={t('inv.effetto')}
                                               value={o.effettoMeccanico || ''}
                                               onChange={(e) => modInv(o.id, { effettoMeccanico: e.target.value, richiedeSintonia: !!e.target.value })}
                                               style={{ ...styles.inlineInput, padding: '3px 6px', fontSize: 12, maxWidth: 260 }}
@@ -18856,6 +18897,7 @@ export default function App() {
                                             </div>
                                             <span style={{ fontSize: 11, color: C.inkDim, marginLeft: 2 }}>{t('inv.ricarica')}:</span>
                                             <select
+                                              aria-label={t('inv.ricarica')}
                                               value={o.ricarica || 'manuale'}
                                               onChange={(e) => modInv(o.id, { ricarica: e.target.value })}
                                               style={{ ...styles.inlineInput, padding: '3px 6px', fontSize: 12 }}
@@ -19879,7 +19921,7 @@ export default function App() {
                 </div>
                 <button
                   type="button"
-                  style={{ ...styles.button, background: C.gold, color: '#fff', fontSize: 13, fontWeight: 700, padding: '6px 14px', border: 'none', borderRadius: 6, display: 'flex', alignItems: 'center', gap: 6 }}
+                  style={{ ...styles.button, background: C.gold, color: C.onGold, fontSize: 13, fontWeight: 700, padding: '6px 14px', border: 'none', borderRadius: 6, display: 'flex', alignItems: 'center', gap: 6 }}
                   onClick={() => tiraTuttoIspirazione(bgIspirazioneScelto)}
                 >
                   {t('aspetto.tira_tutto')} (d8, d6, d6, d6)
@@ -20090,7 +20132,7 @@ export default function App() {
                 </button>
                 <button
                   type="button"
-                  style={{ ...styles.button, background: C.gold, color: '#fff', fontSize: 13, fontWeight: 700, padding: '6px 18px' }}
+                  style={{ ...styles.button, background: C.gold, color: C.onGold, fontSize: 13, fontWeight: 700, padding: '6px 18px' }}
                   onClick={applicaIspirazioneBg}
                 >
                   {t('aspetto.applica')}

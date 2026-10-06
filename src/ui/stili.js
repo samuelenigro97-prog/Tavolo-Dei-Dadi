@@ -191,7 +191,7 @@ export const styles = {
     background: C.gold,
     border: 'none',
     borderRadius: 8,
-    color: '#fff',
+    color: C.onGold,
     fontFamily: 'inherit',
     fontSize: 15,
     fontWeight: 'bold',

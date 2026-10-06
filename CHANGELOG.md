@@ -2,6 +2,34 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.68.0] – 2026-10-06
+
+### Accessibilità (misurata con axe-core, WCAG 2 AA)
+- **Contrasto dei testi**: prima 600–700 testi per schermata sotto la soglia di
+  leggibilità (4,5:1), soprattutto chip di gittata/tempo/scuola e righe
+  incantesimo "non preparate". Ora **zero violazioni** in tema chiaro e scuro,
+  con tutte le ambientazioni provate.
+  - Palette dei chip (`scheda.js`) ricalcolata per avere almeno 5,6:1 sul chip
+    stesso (nel tema chiaro i verdi, ambra, blu e rossi erano troppo chiari).
+  - Gli incantesimi non preparati non sono più "sbiaditi" (opacità 0,5, che
+    abbassava il contrasto di ogni chip) ma hanno il bordo tratteggiato; stessa
+    cosa per le abilità/TS non competenti (testo attenuato invece di opacità).
+  - `--c-ink-dim`, verde e rosso del tema sono garantiti leggibili su tutti gli
+    sfondi: se un'ambientazione o la tinta della classe li renderebbe troppo
+    tenui, vengono scuriti/schiariti da soli (`garantisciContrastoTema`). Il
+    testo sui pulsanti dorati sceglie da solo bianco o nero (`--c-on-gold`):
+    dopo l'attenuazione della tinta di classe (4.64) il bianco su accento
+    chiaro non si leggeva.
+- **Campi a tendina senza nome** (12 sulla scheda: personaggio attivo, tipo di
+  armatura, "Aggiungi incantesimo" per livello, effetto e ricarica degli
+  oggetti): ora hanno `aria-label`.
+- Nuovo test e2e `accessibilita.spec.js` (axe-core): 14 combinazioni
+  tema × ambientazione (le più tenui) senza violazioni di contrasto, nomi dei
+  campi, pulsanti senza nome.
+- Resta da fare: 7 intestazioni cliccabili che contengono altri pulsanti
+  (ritratto, titoli di sezione, livelli incantesimi), che per gli screen reader
+  sono "interattivi annidati".
+
 ## [4.67.0] – 2026-10-06
 
 ### Sicurezza (Worker + app)

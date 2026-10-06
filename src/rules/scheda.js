@@ -484,28 +484,30 @@ export function analizzaMunizioniArma(attacco, inventario = [], armaDb = null) {
 // colpire) + un neutro per le etichette descrittive; troppi colori diversi
 // sulla stessa riga competono tra loro e nessuno spicca più.
 // Coppie chiaro/scuro perché un solo hex non regge sfondo bianco e quasi-nero.
-const NEUTRO = { chiaro: '#57534e', scuro: '#d6d3d1' };
-const QUANDO = { chiaro: '#15803d', scuro: '#4ade80' };
+const NEUTRO = { chiaro: '#514d48', scuro: '#d6d3d1' };
+const QUANDO = { chiaro: '#0c582b', scuro: '#4ade80' };
 // "Come si lancia": Concentrazione (fucsia) e Rituale (viola), due tinte che nessun
 // altro chip usa (le scuole sono neutre): con il grigio neutro la Concentrazione
 // si confondeva con la scuola di magia accanto, e il Rituale deve distinguersi
-// dalla Concentrazione. Contrasto del testo: Concentrazione ~6,6:1 su bianco
-// (#a21caf) e ~11:1 sul pannello scuro (#f0abfc); Rituale ~7,1:1 (#6d28d9) e
-// ~7:1 (#a78bfa).
-const CONCENTRAZIONE = { chiaro: '#a21caf', scuro: '#f0abfc' };
-const RITUALE = { chiaro: '#6d28d9', scuro: '#a78bfa' };
+// dalla Concentrazione.
+// CONTRASTO: tutti i colori di questa palette sono calcolati per avere almeno 5,6:1 come
+// testo sul chip (sfondo = pannello + 12% del colore stesso), nei due temi e anche sui
+// pannelli tinti dalla classe: sotto i 4,5:1 (WCAG AA) il testo piccolo non si legge
+// (misurato con axe-core: prima il tema chiaro ne mancava il 3,6:1 per il verde "quando").
+const CONCENTRAZIONE = { chiaro: '#84178f', scuro: '#f0abfc' };
+const RITUALE = { chiaro: '#6123c0', scuro: '#b49cfa' };
 
 /** Palette per tipo di informazione, condivisa da Combattimento e Incantesimi. */
 export const COLORE_CATEGORIA_INFO = {
-  gittata:      { chiaro: '#1d4ed8', scuro: '#60a5fa' }, // dove: gittata, portata, area
+  gittata:      { chiaro: '#1942b7', scuro: '#6cacfa' }, // dove: gittata, portata, area
   tempo:        QUANDO,                                   // quando: tempo di lancio
   durata:       QUANDO,                                   // quando: durata
   innesco:      QUANDO,                                   // quando: innesco di una reazione
-  tiroSalvezza: { chiaro: '#b45309', scuro: '#fbbf24' }, // tiro salvezza / CD
-  danno:        { chiaro: '#b91c1c', scuro: '#f87171' }, // costo: danno
-  guarigione:   { chiaro: '#0f766e', scuro: '#5eead4' }, // cura (non è un danno)
-  attacco:      { chiaro: '#a16207', scuro: '#fde047' }, // tiro per colpire, non tinto dalla classe
-  modificato:   { chiaro: '#2563eb', scuro: '#93c5fd' }, // valore modificato da Poteri/Sfinimento
+  tiroSalvezza: { chiaro: '#7d3a09', scuro: '#fbbf24' }, // tiro salvezza / CD
+  danno:        { chiaro: '#971717', scuro: '#f88686' }, // costo: danno
+  guarigione:   { chiaro: '#0c5853', scuro: '#5eead4' }, // cura (non è un danno)
+  attacco:      { chiaro: '#704407', scuro: '#fde047' }, // tiro per colpire, non tinto dalla classe
+  modificato:   { chiaro: '#1d48aa', scuro: '#93c5fd' }, // valore modificato da Poteri/Sfinimento
   proprieta:    NEUTRO,                                   // descrittivo: Magico, Versatile, Maestria
   effetto:      NEUTRO,                                   // descrittivo: effetto di una reazione
   concentrazione: CONCENTRAZIONE,                         // come si lancia: Concentrazione

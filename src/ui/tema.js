@@ -10,6 +10,7 @@ export const C = {
   inkDim: 'var(--c-ink-dim)',
   gold: 'var(--c-gold)',
   goldDark: 'var(--c-gold-dark)',
+  onGold: 'var(--c-on-gold)', // testo leggibile sopra gold/goldDark (bianco o quasi nero, scelto dal contrasto)
   red: 'var(--c-red)',
   green: 'var(--c-green)',
   title: 'var(--c-title)',
@@ -29,8 +30,8 @@ export const COLORE_DADO = {
 // Palette base del tema (chiaro/scuro): i preset qui sotto la sovrascrivono, e la
 // tinta per classe agisce sopra. NON rimuovere: è usata per costruire il tema.
 export const BASE_TEMA = {
-  chiaro: { bg: '#f4f1ea', panel: '#ffffff', panelLight: '#f7f4ee', border: '#ddd5c6', ink: '#2b2620', inkDim: '#736858', gold: '#b8860b', goldDark: '#8a6508', red: '#b03a2e', green: '#3e7d32', title: '#9e2b25' },
-  scuro: { bg: '#050506', panel: '#0e0e11', panelLight: '#16161b', border: '#24242d', ink: '#ebecee', inkDim: '#868692', gold: '#c9a227', goldDark: '#dcb84f', red: '#d0685a', green: '#7fb069', title: '#de8f88' },
+  chiaro: { bg: '#f4f1ea', panel: '#ffffff', panelLight: '#f7f4ee', border: '#ddd5c6', ink: '#2b2620', inkDim: '#61564a', gold: '#b8860b', goldDark: '#8a6508', red: '#b03a2e', green: '#3e7d32', title: '#9e2b25' },
+  scuro: { bg: '#050506', panel: '#0e0e11', panelLight: '#16161b', border: '#24242d', ink: '#ebecee', inkDim: '#8e8e98', gold: '#c9a227', goldDark: '#dcb84f', red: '#d0685a', green: '#7fb069', title: '#de8f88' },
 };
 
 // Preset di colori aggiuntivi (Temi di Ambientazione D&D):

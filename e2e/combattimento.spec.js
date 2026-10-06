@@ -2,6 +2,7 @@
 // colonna Note non ripete due volte la stessa informazione.
 import { test, expect } from '@playwright/test';
 import { apriScheda } from './helpers.js';
+import { coloreCategoria } from '../src/rules/scheda.js';
 
 test.describe('Combattimento', () => {
   test.beforeEach(async ({ page }) => {
@@ -91,7 +92,10 @@ test.describe('Combattimento', () => {
     await expect(box).toContainText('13.5');
     await expect(box).not.toContainText('+3m');
     const colore = await box.locator('span').first().evaluate((e) => getComputedStyle(e).color);
-    expect(colore).toBe('rgb(37, 99, 235)');
+    // Il blu "valore modificato" è quello della palette dei chip (tema chiaro), non un numero scritto a mano nel test.
+    const hex = coloreCategoria('modificato', false);
+    const atteso = `rgb(${parseInt(hex.slice(1, 3), 16)}, ${parseInt(hex.slice(3, 5), 16)}, ${parseInt(hex.slice(5, 7), 16)})`;
+    expect(colore).toBe(atteso);
   });
 
   test('Randello Incantato ha lo stesso danno (1d8 + mod SAG) in Azioni Bonus e in Trucchetti', async ({ page }) => {
