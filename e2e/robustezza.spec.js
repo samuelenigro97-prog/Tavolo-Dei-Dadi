@@ -71,11 +71,14 @@ test.describe('Robustezza e accessibilità', () => {
 
   test('un chip role="button" si attiva con Invio', async ({ page }) => {
     await apriScheda(page);
-    const intestazione = page.locator('.sottosezione-titolo[role="button"]').first();
+    // L'intestazione dei Trucchetti: il "pulsante" è la freccia, il titolo cambia quando si apre/chiude.
+    const intestazione = page.locator('.sottosezione-titolo:has([role="button"])').first();
+    const pulsante = intestazione.locator('[role="button"]').first();
     await intestazione.scrollIntoViewIfNeeded();
     const prima = await intestazione.getAttribute('title');
-    await intestazione.focus();
+    await pulsante.focus();
     await page.keyboard.press('Enter');
     await expect(intestazione).not.toHaveAttribute('title', prima);
+    await expect(pulsante).toHaveAttribute('aria-expanded', /true|false/);
   });
 });

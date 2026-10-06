@@ -1938,7 +1938,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.68.0';
+const APP_VERSION = '4.69.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -12236,7 +12236,7 @@ export default function App() {
                         gap: 3,
                         position: 'relative',
                         background: mostraMenuHubMobile ? 'rgba(201,162,39,0.2)' : C.gold,
-                        color: mostraMenuHubMobile ? C.goldDark : '#ffffff',
+                        color: mostraMenuHubMobile ? C.goldDark : C.onGold,
                         border: 'none',
                         borderRadius: 6,
                         flexShrink: 0,
@@ -12615,7 +12615,7 @@ export default function App() {
                 )}
                 {(scheda.sezioniAperte?.ritratto ?? true) && (
                   <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div role="button" tabIndex={0}
+                    <div
                       className="ritratto-box"
                       style={{
                         borderRadius: 14, overflow: 'hidden',
@@ -12636,6 +12636,8 @@ export default function App() {
                         }
                       }}
                     >
+                      {/* Per tastiera e screen reader: un vero pulsante (visivamente nascosto) che apre il cambio ritratto; il clic risale al riquadro. */}
+                      <button type="button" className="solo-sr" aria-label={isTrasformato ? tr('Cambia illustrazione della forma', 'Change the form art') : tr('Cambia il ritratto', 'Change the portrait')} />
                       {/* Freccia di riduzione */}
                       <button
                         type="button"
@@ -16174,7 +16176,7 @@ export default function App() {
                     <div key={liv} style={{ marginBottom: 12 }}>
                       {/* Intestazione livello collassabile (solo per livelli >= 1, trucchetti ha la sua intestazione principale) */}
                       {liv >= 1 && (
-                        <div role="button" tabIndex={0}
+                        <div
                           onClick={() => setLivelliIncChiusi((prev) => ({ ...prev, [liv]: !prev[liv] }))}
                           title={chiuso ? (lingua === 'en' ? 'Click to show all spells (including unprepared)' : 'Clicca per mostrare tutti gli incantesimi (inclusi i non preparati)') : (lingua === 'en' ? 'Click to minimize and show only prepared spells' : 'Clicca per minimizzare e mostrare solo i preparati')}
                           style={{
@@ -16185,9 +16187,12 @@ export default function App() {
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                            <span style={{ color: C.goldDark, fontSize: 13, fontWeight: 800 }}>{chiuso ? '▸' : '▾'}</span>
-                            <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 0.3, color: C.ink }}>
-                              {t('spell.n_livello', { n: liv })}
+                            {/* Il "pulsante" è solo l'etichetta: i bollini degli slot accanto sono pulsanti a sé (niente interattivi annidati). */}
+                            <span role="button" tabIndex={0} aria-expanded={!chiuso} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ color: C.goldDark, fontSize: 13, fontWeight: 800 }}>{chiuso ? '▸' : '▾'}</span>
+                              <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 0.3, color: C.ink }}>
+                                {t('spell.n_livello', { n: liv })}
+                              </span>
                             </span>
                             {slot && slot.totale > 0 && (
                               <div style={{ display: 'flex', alignItems: 'center', gap: 5 }} onClick={(e) => e.stopPropagation()}>
@@ -16497,7 +16502,7 @@ export default function App() {
                                       onClick={() => aggiorna({ incantesimiLista: scheda.incantesimiLista.map((x) => (x.id === s.id ? { ...x, bonus: false } : x)) })}
                                     >✦ {t('spell.bonus_badge')}</span>
                                   )}
-                                  <div className="spell-chips" style={{ display: 'flex', flexWrap: 'nowrap', gap: 4, alignItems: 'center', overflowX: 'auto', flex: '1 1 auto', minWidth: 0 }}>
+                                  <div className="spell-chips" tabIndex={0} role="group" aria-label={tr('Dettagli dell\'incantesimo', 'Spell details')} style={{ display: 'flex', flexWrap: 'nowrap', gap: 4, alignItems: 'center', overflowX: 'auto', flex: '1 1 auto', minWidth: 0 }}>
                                     {chip('', t('spell.chip_tempo'), tempoLabel, coloreCategoria('tempo', notteAttiva), 'chip-tempo')}
                                     {chip('', t('spell.chip_gittata'), traduciDato(gittata), coloreCategoria('gittata', notteAttiva), 'chip-gittata')}
                                     {area && chip('', 'Area', traduciDato(area), coloreCategoria('gittata', notteAttiva), 'chip-area')}
@@ -16697,7 +16702,7 @@ export default function App() {
                 }
                 return (
                   <>
-                    <div role="button" tabIndex={0}
+                    <div
                       className="sottosezione-titolo"
                       onClick={() => setLivelliIncChiusi((prev) => ({ ...prev, [0]: !prev[0] }))}
                       title={livelliIncChiusi[0] ? (lingua === 'en' ? 'Click to expand cantrips' : 'Clicca per espandere i trucchetti') : (lingua === 'en' ? 'Click to collapse cantrips' : 'Clicca per comprimere i trucchetti')}
@@ -16712,7 +16717,7 @@ export default function App() {
                         userSelect: 'none',
                       }}
                     >
-                      <div style={{ justifySelf: 'start', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                      <div role="button" tabIndex={0} aria-expanded={!livelliIncChiusi[0]} aria-label={t('spell.trucchetti')} style={{ justifySelf: 'start', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                         <span style={{ color: C.goldDark, fontSize: 13, fontWeight: 800 }}>
                           {livelliIncChiusi[0] ? '▸' : '▾'}
                         </span>
@@ -20844,7 +20849,7 @@ export default function App() {
                   {t('ct.prec')}
                 </button>
                 <button
-                  style={{ ...styles.buttonMini, background: 'var(--c-gold-dark)', color: '#ffffff', borderColor: 'var(--c-gold-dark)', fontWeight: 800, padding: '4px 10px', fontSize: 12, whiteSpace: 'nowrap' }}
+                  style={{ ...styles.buttonMini, background: 'var(--c-gold-dark)', color: C.onGold, borderColor: 'var(--c-gold-dark)', fontWeight: 800, padding: '4px 10px', fontSize: 12, whiteSpace: 'nowrap' }}
                   onClick={prossimoTurno}
                   title={t('ct.succ')}
                 >
@@ -21071,7 +21076,7 @@ export default function App() {
                       >
                         {/* Banner Ruolo / Turno Attivo / Prossimo Turno — animato */}
                         {inTurno ? (
-                          <div className="icona-campanello" style={{ background: 'var(--c-gold-dark)', color: '#ffffff', fontSize: 11, fontWeight: 800, textAlign: 'center', padding: '3px 6px', letterSpacing: 0.6, textTransform: 'uppercase' }}>
+                          <div className="icona-campanello" style={{ background: 'var(--c-gold-dark)', color: C.onGold, fontSize: 11, fontWeight: 800, textAlign: 'center', padding: '3px 6px', letterSpacing: 0.6, textTransform: 'uppercase' }}>
                             {t('ct.in_turno')}
                           </div>
                         ) : prossimo ? (

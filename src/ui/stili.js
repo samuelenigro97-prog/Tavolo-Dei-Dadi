@@ -1224,6 +1224,16 @@ tbody tr:hover {
               0 1px 3px rgba(0, 0, 0, 0.25) !important;
   /* un solo bordo: niente filetto interno (outline) come nelle sezioni grandi */
 }
+/* Contenuto solo per tecnologie assistive (visivamente nascosto ma raggiungibile da tastiera). */
+.solo-sr {
+  position: absolute !important;
+  width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.solo-sr:focus-visible {
+  clip: auto; width: auto; height: auto; margin: 0; padding: 4px 8px; z-index: 5;
+  background: var(--c-panel); color: var(--c-ink); border: 2px solid var(--c-gold);
+}
 /* Filetto oro doppio sotto la barra superiore, come le cornici titolo dei
    vecchi manuali — fisso, sempre presente. */
 .barra-superiore-fissa {

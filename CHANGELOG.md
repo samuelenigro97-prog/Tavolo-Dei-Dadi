@@ -2,6 +2,21 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.69.0] – 2026-10-06
+
+### Accessibilità
+- **Intestazioni cliccabili senza pulsanti annidati**: le 7 intestazioni che
+  contenevano altri pulsanti (livelli degli incantesimi con i bollini degli
+  slot, Trucchetti, ritratto) ora hanno il ruolo "pulsante" solo sull'etichetta
+  (con `aria-expanded`); il clic sull'intera riga funziona come prima. Il
+  ritratto ha un vero pulsante nascosto "Cambia il ritratto" per tastiera e
+  screen reader (`.solo-sr`).
+- L'area scorrevole dei chip di un incantesimo (telefono) è raggiungibile da
+  tastiera. Il testo del pulsante Menu e degli altri pulsanti dorati segue
+  `--c-on-gold`.
+- Il test axe-core ora controlla anche i controlli annidati e un'esecuzione
+  con schermo da telefono (390 px): 15 test, zero violazioni.
+
 ## [4.68.0] – 2026-10-06
 
 ### Accessibilità (misurata con axe-core, WCAG 2 AA)

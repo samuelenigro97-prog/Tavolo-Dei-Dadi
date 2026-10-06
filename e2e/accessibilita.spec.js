@@ -1,12 +1,12 @@
 // Accessibilità automatica (axe-core, WCAG 2 A/AA) sulla scheda: contrasto dei testi,
-// nome dei campi a tendina, pulsanti senza nome. Il contrasto è la regola che
+// nome dei campi a tendina, pulsanti senza nome, controlli interattivi annidati. Il contrasto è la regola che
 // più spesso si rompe cambiando tema, ambientazione o classe: si prova con le
 // ambientazioni dalla palette più tenue, in chiaro e in scuro.
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 
 const axeSorgente = readFileSync('node_modules/axe-core/axe.min.js', 'utf8');
-const REGOLE = ['color-contrast', 'select-name', 'button-name', 'label', 'image-alt'];
+const REGOLE = ['color-contrast', 'select-name', 'button-name', 'label', 'image-alt', 'nested-interactive'];
 const AMBIENTAZIONI = ['taverna', 'tempesta', 'dungeon', 'tempio', 'deserto', 'accampamento', 'tundra'];
 
 async function apri(page, { tema, preset }) {
@@ -40,3 +40,14 @@ for (const tema of ['scuro', 'chiaro']) {
     });
   }
 }
+
+test('telefono (390 px): niente violazioni, nemmeno nelle aree che scorrono', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 900 });
+  await apri(page, { tema: 'scuro', preset: 'taverna' });
+  await page.evaluate(axeSorgente);
+  const v = await page.evaluate(async (regole) => {
+    const esito = await window.axe.run(document, { runOnly: regole });
+    return esito.violations.map((x) => `${x.id} ×${x.nodes.length}: ${x.nodes.slice(0, 2).map((n) => n.html.slice(0, 90)).join(' | ')}`);
+  }, [...REGOLE, 'scrollable-region-focusable']);
+  expect(v).toEqual([]);
+});
