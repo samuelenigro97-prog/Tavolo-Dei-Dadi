@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.80.0',
+    voci: {
+      it: ['Personaggi con una "classe" non standard (es. un mostro trasformato in PG): i Dadi Vita restano quelli della scheda e le azioni senza tiro né danno non mostrano più "Attacco +0".'],
+      en: ['Characters with a non-standard "class" (e.g. a monster turned into a PC): Hit Dice stay as written on the sheet and actions with no roll or damage no longer show "Attack +0".'],
+    },
+  },
+  {
     versione: '4.79.0',
     voci: {
       it: [

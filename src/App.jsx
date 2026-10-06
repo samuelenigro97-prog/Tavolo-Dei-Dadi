@@ -641,6 +641,9 @@ function gruppiDadoVitaClassi(classePrincipale, livPrincipale, multiclasseArray)
 
 // Calcola la formula unificata dei Dadi Vita (es. "5d10 + 2d6") per PG persino multiclasse
 function calcolaFormulaDadiVita(classePrincipale, livPrincipale, multiclasseArray) {
+  // Classe non riconosciuta (es. un mostro trasformato in personaggio) e niente
+  // multiclasse: nessuna formula, così resta il dado vita scritto nella scheda.
+  if (!coloreClasse(classePrincipale) && !(Array.isArray(multiclasseArray) && multiclasseArray.length)) return '';
   return gruppiDadoVitaClassi(classePrincipale, livPrincipale, multiclasseArray)
     .map((g) => `${g.quantita}d${g.facce}`)
     .join(' + ');
@@ -1958,7 +1961,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.79.0';
+const APP_VERSION = '4.80.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -2200,7 +2203,7 @@ function loadState() {
         const s = { ...schedaVuota(), ...roster.personaggi[id] };
         // i dadi vita seguono sempre livello e classi correnti (anche multiclasse:
         // ricalcolare da un solo termine cancellerebbe il dado della seconda classe)
-        s.dadiVita = calcolaFormulaDadiVita(s.classe, s.livello, s.multiclasse);
+        s.dadiVita = calcolaFormulaDadiVita(s.classe, s.livello, s.multiclasse) || s.dadiVita;
         // Poteri personalizzati: normalizza i dati (schede vecchie/importate
         // senza il campo) e ricrea le risorse "manuale" collegate ai contatori,
         // così sono presenti anche appena dopo un import/una sincronizzazione
@@ -4875,7 +4878,7 @@ export default function App() {
     }
     if (multiclasseDaCreazione.length) {
       s.multiclasse = multiclasseDaCreazione;
-      s.dadiVita = calcolaFormulaDadiVita(classe, s.livello, s.multiclasse);
+      s.dadiVita = calcolaFormulaDadiVita(classe, s.livello, s.multiclasse) || s.dadiVita;
       for (const mc of s.multiclasse) {
         const priv = privilegiClasseFinoA(mc.classe, mc.livello, regoleVersione);
         if (priv) s.privilegi = [s.privilegi, `[${mc.classe}]`, priv].filter(Boolean).join('\n');
@@ -8491,7 +8494,7 @@ export default function App() {
 
                 const nextLivMain = isNewMc || isSecMc ? (scheda.livello || 1) : patch.livello;
                 const nextMcArray = patch.multiclasse || mcArray;
-                patch.dadiVita = calcolaFormulaDadiVita(scheda.classe, nextLivMain, nextMcArray);
+                patch.dadiVita = calcolaFormulaDadiVita(scheda.classe, nextLivMain, nextMcArray) || scheda.dadiVita;
 
                 if (slotNuovi) {
                   const cur = scheda.slotIncantesimo || {};
@@ -12778,7 +12781,7 @@ export default function App() {
                                     {a.isTS ? (
                                       // Incantesimo a tiro salvezza: solo la CD, mai un tiro per colpire.
                                       <BadgeTiroSalvezza cd={a.cd} caratteristica={a.caratteristicaTS} colore={coloreCategoria('tiroSalvezza', notteAttiva)} />
-                                    ) : a.bonus === undefined || a.bonus === null || (cat === 'Reazione' && !a.danno) ? null : typeof a.bonus === 'string' && isNaN(Number(a.bonus)) ? (
+                                    ) : a.bonus === undefined || a.bonus === null || (!a.danno && (cat === 'Reazione' || !Number(a.bonus))) ? null : typeof a.bonus === 'string' && isNaN(Number(a.bonus)) ? (
                                       <span style={{ ...styles.badge, background: 'rgba(59,130,246,0.12)', color: '#2563eb', border: '1px solid #3b82f6', padding: '2px 6px', fontWeight: 700 }}>
                                         {a.bonus}
                                       </span>

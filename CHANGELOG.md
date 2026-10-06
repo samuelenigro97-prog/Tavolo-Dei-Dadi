@@ -2,6 +2,16 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.80.0] – 2026-10-06
+
+### Corretto
+- **Classi non riconosciute** (mostri trasformati in personaggio, es. il Myrdhal):
+  `calcolaFormulaDadiVita` non inventa più dei d8 per una classe sconosciuta
+  senza multiclasse; resta il dado vita della scheda (es. 20d10), anche al
+  caricamento, al cambio classe e al passaggio di livello.
+- Le azioni senza danno e con bonus 0 (es. Sguardo Atterrente, Passo d'Ombra)
+  non mostrano più il badge "Attacco +0" in nessuna sezione del Combattimento.
+
 ## [4.79.0] – 2026-10-06
 
 ### Cambiato
