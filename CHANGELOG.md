@@ -2,6 +2,19 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.70.0] – 2026-10-06
+
+### Manutenzione
+- **App.jsx più piccolo**: 13 finestre (Tavolo dei dadi, Diario, Ispirazione e
+  background, Aggiungi compagno, Ritratto della bestia, Manuali e fonti, Guida
+  delle abilità, Inneschi e reazioni, Movimento, Esperienza, Sincronizzazione,
+  Concentrazione, Dettaglio creatura) sono state spostate in `src/ui/modali/`,
+  una per file. Il file principale passa da ~21.500 a ~18.800 righe. Nessun
+  cambiamento visibile.
+- Nuovo `src/utils/idUnici.js` per generare identificativi fuori dal rendering.
+- Nuovo test `e2e/finestre.spec.js`: apre ognuna delle finestre estratte e
+  verifica che non si generino errori JavaScript.
+
 ## [4.69.0] – 2026-10-06
 
 ### Accessibilità
