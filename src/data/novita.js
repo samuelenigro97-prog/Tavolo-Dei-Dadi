@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.74.0',
+    voci: {
+      it: [
+        'Sincronizzazione tra dispositivi: ora c\'è il pulsante "Crea un codice" (mancava). Crealo sul dispositivo con la scheda giusta e inseriscilo sull\'altro.',
+        'Su telefono la nuvola nella barra in alto mostra se la sincronizzazione è attiva (bordo rosso = personaggi solo su questo dispositivo).',
+      ],
+      en: [
+        'Sync between devices: the "Create a code" button is now there (it was missing). Create it on the device with the right sheet and enter it on the other.',
+        'On phones the cloud in the top bar shows whether sync is on (red border = characters on this device only).',
+      ],
+    },
+  },
+  {
     versione: '4.73.0',
     voci: {
       it: ['Colori: base generica (oro e neutri) con tocchi del colore della classe su titoli, nome del personaggio, angoli delle sezioni e un alone leggero (es. il verde per un Druido).'],

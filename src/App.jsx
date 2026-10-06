@@ -1952,7 +1952,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.73.0';
+const APP_VERSION = '4.74.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -6741,6 +6741,17 @@ export default function App() {
     }
   }
 
+  /** Riattiva un codice già usato su questo dispositivo (dopo "Disattiva"):
+   *  prima rilegge la copia online, come all'avvio, poi invia solo se serve. */
+  function riattivaCodiceSync() {
+    if (!codiceSync) return;
+    codiceSyncRef.current = codiceSync;
+    autoSyncCodiceRef.current = true;
+    setAutoSyncCodice(true);
+    localStorage.setItem('scheda-interattiva:auto-sync-codice', 'on');
+    salvaSuCodiceSync(false);
+  }
+
   function disattivaSyncCodice() {
     setAutoSyncCodice(false);
     localStorage.setItem('scheda-interattiva:auto-sync-codice', 'off');
@@ -7170,7 +7181,7 @@ export default function App() {
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 <button style={{ ...styles.buttonPrimary, fontSize: 12, padding: '6px 12px', minHeight: 36 }} onClick={esportaBackupCompleto}>{tr('Scarica backup', 'Download backup')}</button>
                 {!isCloudAttivo && (
-                  <button style={{ ...styles.buttonMini, fontSize: 12, minHeight: 36 }} onClick={() => { setCloudStatus({ text: '', type: '' }); setMostraCloud(true); }}>{tr('Attiva la sincronizzazione', 'Turn on sync')}</button>
+                  <button style={{ ...styles.buttonMini, fontSize: 12, minHeight: 36 }} onClick={() => { setCloudStatus({ text: '', type: '' }); setTabBackup('online'); setMostraCloud(true); }}>{tr('Attiva la sincronizzazione', 'Turn on sync')}</button>
                 )}
               </div>
             </div>
@@ -7186,7 +7197,7 @@ export default function App() {
               </div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 <button style={{ ...styles.buttonPrimary, fontSize: 12, padding: '6px 12px', minHeight: 36 }} onClick={esportaBackupCompleto}>{tr('Scarica backup', 'Download backup')}</button>
-                <button style={{ ...styles.buttonMini, fontSize: 12, minHeight: 36 }} onClick={() => { setBannerBackupChiuso(true); setCloudStatus({ text: '', type: '' }); setMostraCloud(true); }}>{tr('Attiva la sincronizzazione', 'Turn on sync')}</button>
+                <button style={{ ...styles.buttonMini, fontSize: 12, minHeight: 36 }} onClick={() => { setBannerBackupChiuso(true); setCloudStatus({ text: '', type: '' }); setTabBackup('online'); setMostraCloud(true); }}>{tr('Attiva la sincronizzazione', 'Turn on sync')}</button>
                 <button style={{ ...styles.buttonMini, fontSize: 12, minHeight: 36 }} onClick={rimandaBackup} title={tr('Ricordamelo tra qualche giorno', 'Remind me in a few days')}>{tr('Più tardi', 'Later')}</button>
               </div>
             </div>
@@ -7568,6 +7579,8 @@ export default function App() {
            tabBackup={tabBackup}
            ultimoSyncCodice={ultimoSyncCodice}
            usaCodiceSyncEsistente={usaCodiceSyncEsistente}
+           creaCodiceSync={creaCodiceSync}
+           riattivaCodiceSync={riattivaCodiceSync}
          />}
 
       {mostraSceltaVersione && <SceltaVersioneModal eseguiImportConVersione={eseguiImportConVersione} importPending={importPending} setImportPending={setImportPending} setMostraSceltaVersione={setMostraSceltaVersione} />}
@@ -9383,7 +9396,7 @@ export default function App() {
                                 : (lingua === 'en' ? 'Sync is off: click to set it up' : 'Sincronizzazione non attiva: clicca per configurarla')
                         }
                         aria-label={t('aria.sync')}
-                        onClick={() => { setCloudStatus({ text: '', type: '' }); setSyncCodiceStatus({ text: '', type: '' }); setMostraCloud(true); }}
+                        onClick={() => { setCloudStatus({ text: '', type: '' }); setSyncCodiceStatus({ text: '', type: '' }); if (!isCloudConfigurato) setTabBackup('online'); setMostraCloud(true); }}
                       >
                         <span style={{ fontSize: 14 }}>☁️</span>
                       </button>
@@ -9477,6 +9490,21 @@ export default function App() {
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                    {/* Stato della sincronizzazione sempre visibile anche su telefono: bordo
+                        rosso = i personaggi restano solo su questo dispositivo. */}
+                    <button
+                      data-testid="cloud-mobile"
+                      style={{ ...btnAzione, width: 28, height: 28, minWidth: 28, maxWidth: 28, minHeight: 28, maxHeight: 28, fontSize: 13, color: statoColoreCloud, borderColor: statoColoreCloud, background: statoBgCloud, boxShadow: statoGlowCloud }}
+                      onClick={() => { setCloudStatus({ text: '', type: '' }); setSyncCodiceStatus({ text: '', type: '' }); setTabBackup('online'); setMostraCloud(true); }}
+                      title={isCloudAttivo
+                        ? (lingua === 'en' ? 'Sync is on' : 'Sincronizzazione attiva')
+                        : conflittoSync
+                          ? t('conflitto.banner')
+                          : (lingua === 'en' ? 'Sync is off: characters stay on this device only' : 'Sincronizzazione non attiva: i personaggi restano solo su questo dispositivo')}
+                      aria-label={t('aria.sync')}
+                    >
+                      ☁️
+                    </button>
                     <button
                       style={{ ...btnAzione, width: 28, height: 28, minWidth: 28, maxWidth: 28, minHeight: 28, maxHeight: 28, fontSize: 13 }}
                       onClick={() => setMostraDadiModal(true)}

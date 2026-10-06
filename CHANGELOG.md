@@ -2,6 +2,24 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.74.0] – 2026-10-06
+
+### Corretto
+- **Mancava il pulsante per creare il codice di sincronizzazione**: la funzione
+  `creaCodiceSync` esisteva ma nessun pulsante la chiamava, quindi due
+  dispositivi non si potevano collegare se non si aveva già un codice. La scheda
+  Online ora guida in due passi: "Crea un codice e salva online questi
+  personaggi" sul dispositivo con la scheda giusta, poi inserire lo stesso
+  codice sull'altro. Se il codice era stato disattivato c'è "Riattiva il codice".
+
+### Aggiunto
+- Su telefono, icona della sincronizzazione nella barra in alto (stessi colori
+  di stato del desktop): apre direttamente la scheda Online.
+- La finestra si apre sulla scheda Online quando la sincronizzazione non è
+  ancora configurata (pulsante nuvola e avviso "Attiva la sincronizzazione").
+- Test e2e `collega-dispositivi.spec.js`: due dispositivi simulati, il primo crea
+  il codice, il secondo lo inserisce e riceve la scheda giusta.
+
 ## [4.73.0] – 2026-10-06
 
 ### Cambiato

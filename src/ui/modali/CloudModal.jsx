@@ -4,7 +4,7 @@ import { C } from '../tema.js';
 import { styles } from '../stili.js';
 import { normalizzaCodiceSync, formattaCodiceSync } from '../../utils/sync.js';
 
-export function CloudModal({ autoSyncCodice, codiceSync, codiceSyncInput, conflittoSync, disattivaSyncCodice, esportaBackupCompleto, isCloudAttivo, isCloudConfigurato, lingua, ripristinaArchivioLocale, ripristinaArchivioRef, roster, setCodiceSyncInput, setConflittoSync, setMostraCloud, setSyncCodiceStatus, setTabBackup, sincronizzando, statoBgCloud, statoColoreCloud, statoGlowCloud, syncCodiceStatus, tabBackup, ultimoSyncCodice, usaCodiceSyncEsistente }) {
+export function CloudModal({ autoSyncCodice, codiceSync, codiceSyncInput, conflittoSync, disattivaSyncCodice, esportaBackupCompleto, isCloudAttivo, isCloudConfigurato, lingua, ripristinaArchivioLocale, ripristinaArchivioRef, roster, setCodiceSyncInput, setConflittoSync, setMostraCloud, setSyncCodiceStatus, setTabBackup, sincronizzando, statoBgCloud, statoColoreCloud, statoGlowCloud, syncCodiceStatus, tabBackup, ultimoSyncCodice, usaCodiceSyncEsistente, creaCodiceSync, riattivaCodiceSync }) {
   return (
     <div
       style={{
@@ -148,6 +148,31 @@ export function CloudModal({ autoSyncCodice, codiceSync, codiceSyncInput, confli
                 <p style={{ ...styles.detail, fontSize: 12, marginTop: 0, marginBottom: 8, lineHeight: 1.5 }}>
                   {t('cloud.crea_desc')}
                 </p>
+                {codiceSync && !autoSyncCodice && (
+                  <button
+                    type="button"
+                    data-testid="riattiva-codice-sync"
+                    style={{ ...styles.button, width: '100%', marginBottom: 8 }}
+                    onClick={riattivaCodiceSync}
+                  >
+                    {tr(`Riattiva il codice ${formattaCodiceSync(codiceSync)}`, `Turn code ${formattaCodiceSync(codiceSync)} back on`)}
+                  </button>
+                )}
+                <div style={{ ...styles.detail, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>
+                  {tr('1 · Sul dispositivo con la scheda giusta', '1 · On the device with the right sheet')}
+                </div>
+                <button
+                  type="button"
+                  data-testid="crea-codice-sync"
+                  style={{ ...styles.buttonPrimary, width: '100%', marginBottom: 10 }}
+                  disabled={sincronizzando}
+                  onClick={creaCodiceSync}
+                >
+                  {tr('Crea un codice e salva online questi personaggi', 'Create a code and save these characters online')}
+                </button>
+                <div style={{ ...styles.detail, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>
+                  {tr('2 · Sull\'altro dispositivo: inserisci lo stesso codice', '2 · On the other device: enter the same code')}
+                </div>
                 <div style={{ display: 'flex', gap: 6 }}>
                   <input
                     type="text"
