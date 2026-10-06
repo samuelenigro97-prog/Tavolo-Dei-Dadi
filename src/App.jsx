@@ -1306,7 +1306,7 @@ function avatarSvgFallback(classe, specie, nome) {
 
 
 
-import { spiegaPrivilegio, spiegaIncantesimo, spiegaTratto, spiegaTalento, spiegaMetamagia, spiegaInvocazione, spiegaInfusione, setEdizioneAttuale, METAMAGIA_5E, TALENTI_5E, INVOCAZIONI_5E, INFUSIONI_ARTEFICE_5E, INCANTESIMI_NOMI as NOMI_SPIEG_INC } from './data/spiegazioni.js';
+import { caricaSpiegazioniEn, spiegaPrivilegio, spiegaIncantesimo, spiegaTratto, spiegaTalento, spiegaMetamagia, spiegaInvocazione, spiegaInfusione, setEdizioneAttuale, METAMAGIA_5E, TALENTI_5E, INVOCAZIONI_5E, INFUSIONI_ARTEFICE_5E, INCANTESIMI_NOMI as NOMI_SPIEG_INC } from './data/spiegazioni.js';
 import { INCANTESIMI_DB, ALIAS_INCANTESIMI, datiIncantesimo, valoreIncantesimoPerEdizione } from './data/incantesimi.js';
 
 const INCANTESIMI_NOMI = Array.from(new Set([...NOMI_SPIEG_INC, ...Object.keys(INCANTESIMI_DB)])).sort((a, b) => a.localeCompare(b, 'it'));
@@ -1903,7 +1903,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.65.0';
+const APP_VERSION = '4.66.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -3491,6 +3491,14 @@ export default function App() {
   // tema: 'auto' = scuro se è notte OPPURE se il sistema è in scuro; oppure forzato
   const [tema, setTema] = useState(() => localStorage.getItem('scheda-interattiva:tema') || 'auto');
   const [lingua, setLingua] = useState(() => localStorage.getItem('scheda-interattiva:lingua') || 'it');
+  // Spiegazioni inglesi: scaricate solo se serve; al termine si ridisegna per mostrarle.
+  const [, setSpiegazioniEnPronte] = useState(0);
+  useEffect(() => {
+    if (lingua !== 'en') return undefined;
+    let annullato = false;
+    caricaSpiegazioniEn().then((nuove) => { if (nuove && !annullato) setSpiegazioniEnPronte((n) => n + 1); }).catch(() => { /* offline: restano i testi italiani */ });
+    return () => { annullato = true; };
+  }, [lingua]);
   // Allinea SUBITO la lingua del dizionario durante il render: così tutti i
   // {t('...')} in questo render usano già la lingua corrente (niente ritardo di
   // un render come accadrebbe aspettando l'useEffect).

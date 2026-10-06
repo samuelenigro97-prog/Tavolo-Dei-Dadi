@@ -2,6 +2,18 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.66.0] – 2026-10-06
+
+### Cambiato
+- **Avvio più leggero**: le spiegazioni in inglese (~200 KB, 58 KB compressi)
+  non fanno più parte del caricamento iniziale: il file
+  `spiegazioni.en` si scarica solo quando l'interfaccia è in inglese (e
+  viene messo in cache per l'uso offline). Chi usa l'italiano scarica l'8% di
+  JavaScript in meno (data5e: 247 → 190 KB compressi). Nuova
+  `caricaSpiegazioniEn()` in `spiegazioni.js`; finché non è pronta valgono i
+  testi italiani, poi l'app si ridisegna da sola. Test e2e: l'italiano non
+  scarica il file, l'inglese mostra le spiegazioni inglesi.
+
 ## [4.65.0] – 2026-10-06
 
 ### Aggiunto (test e CI, nessun cambio per chi usa l'app)

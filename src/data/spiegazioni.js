@@ -1040,14 +1040,35 @@ export const SPIEG_PRIVILEGI = {
 const _lcMap = (obj) => { const m = {}; for (const k in obj) m[k.toLowerCase()] = obj[k]; return m; };
 
 import { linguaAttuale } from '../i18n.js';
-import { EN_METAMAGIA, EN_TALENTI, EN_TRATTI, EN_PRIVILEGI, EN_INCANTESIMI, EN_PRIVILEGI_CLASSE, EN_INVOCAZIONI, EN_INFUSIONI, EN_VARIANTI_INCANTESIMI } from './spiegazioni.en.js';
-const EN_METAMAGIA_LC = _lcMap(EN_METAMAGIA);
-const EN_TALENTI_LC = _lcMap(EN_TALENTI);
-const EN_TRATTI_LC = _lcMap(EN_TRATTI);
-const EN_PRIVILEGI_LC = _lcMap({ ...EN_PRIVILEGI_CLASSE, ...EN_PRIVILEGI });
-const EN_INCANTESIMI_LC = _lcMap(EN_INCANTESIMI);
-const EN_INVOCAZIONI_LC = _lcMap(EN_INVOCAZIONI || {});
-const EN_INFUSIONI_LC = _lcMap(EN_INFUSIONI || {});
+// Le spiegazioni in inglese (~200 KB) si caricano solo quando l'interfaccia è in
+// inglese: chi usa l'italiano non le scarica né le esegue. Finché non sono
+// pronte, `_en` restituisce null e vale il testo italiano.
+let EN_METAMAGIA_LC = {};
+let EN_TALENTI_LC = {};
+let EN_TRATTI_LC = {};
+let EN_PRIVILEGI_LC = {};
+let EN_INCANTESIMI_LC = {};
+let EN_INVOCAZIONI_LC = {};
+let EN_INFUSIONI_LC = {};
+let EN_VARIANTI_INCANTESIMI = {};
+let _enCaricate = false;
+
+/** Carica (una sola volta) le spiegazioni inglesi. Restituisce true se è stata appena caricata. */
+export async function caricaSpiegazioniEn() {
+  if (_enCaricate) return false;
+  const m = await import('./spiegazioni.en.js');
+  EN_METAMAGIA_LC = _lcMap(m.EN_METAMAGIA);
+  EN_TALENTI_LC = _lcMap(m.EN_TALENTI);
+  EN_TRATTI_LC = _lcMap(m.EN_TRATTI);
+  EN_PRIVILEGI_LC = _lcMap({ ...m.EN_PRIVILEGI_CLASSE, ...m.EN_PRIVILEGI });
+  EN_INCANTESIMI_LC = _lcMap(m.EN_INCANTESIMI);
+  EN_INVOCAZIONI_LC = _lcMap(m.EN_INVOCAZIONI || {});
+  EN_INFUSIONI_LC = _lcMap(m.EN_INFUSIONI || {});
+  EN_VARIANTI_INCANTESIMI = m.EN_VARIANTI_INCANTESIMI || {};
+  _enCaricate = true;
+  return true;
+}
+
 /** Cerca la voce inglese solo se l'interfaccia è in inglese (altrimenti null). */
 function _en(mappaLc, chiave) {
   if (linguaAttuale !== 'en') return null;

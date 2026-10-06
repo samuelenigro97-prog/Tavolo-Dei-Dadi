@@ -9,7 +9,8 @@ import { dirname, join } from 'node:path';
 const RADICE_TEST = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 import { setLinguaAttuale, traduciDato } from '../src/i18n.js';
-import { INCANTESIMI_NOMI } from '../src/data/spiegazioni.js';
+import { INCANTESIMI_NOMI, caricaSpiegazioniEn } from '../src/data/spiegazioni.js';
+await caricaSpiegazioniEn();
 import { spiegaTratto, spiegaTalento, spiegaMetamagia, spiegaPrivilegio, spiegaIncantesimo } from '../src/data/spiegazioni.js';
 import { EN_TRATTI, EN_TALENTI, EN_METAMAGIA, EN_PRIVILEGI, EN_INCANTESIMI, EN_PRIVILEGI_CLASSE } from '../src/data/spiegazioni.en.js';
 

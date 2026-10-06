@@ -9,6 +9,8 @@ import { join } from 'node:path';
 import { effettiCondizione } from '../src/data/condizioni.js';
 import { riepilogoCondizioni, dannoTrucchettoScalato, dannoExtraColpoAccurato, classificaIncantesimoCombattimento, incantesimoSenzaTiroPerColpire } from '../src/rules/regole.js';
 import { spiegaIncantesimo, spiegaPrivilegio, setEdizioneAttuale } from '../src/data/spiegazioni.js';
+import { caricaSpiegazioniEn } from '../src/data/spiegazioni.js';
+await caricaSpiegazioniEn();
 import { EN_VARIANTI_INCANTESIMI } from '../src/data/spiegazioni.en.js';
 import { VARIANTI_EDIZIONE_INCANTESIMI } from '../src/data/incantesimi.js';
 import { setLinguaAttuale } from '../src/i18n.js';
