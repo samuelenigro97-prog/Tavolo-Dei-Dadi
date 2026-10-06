@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.75.0',
+    voci: {
+      it: [
+        'Sincronizzazione: un ritratto o una mappa cambiati ora arrivano anche sull\'altro dispositivo (prima contavano solo i dati della scheda).',
+        'Se i due dispositivi cambiano parti diverse della stessa scheda (es. il ritratto su uno e i PF sull\'altro), le modifiche si uniscono da sole invece di mettere in pausa la sincronizzazione.',
+      ],
+      en: [
+        'Sync: a changed portrait or map now reaches the other device too (before, only the sheet data counted).',
+        'If the two devices change different parts of the same sheet (e.g. the portrait on one and HP on the other), the changes are merged automatically instead of pausing sync.',
+      ],
+    },
+  },
+  {
     versione: '4.74.0',
     voci: {
       it: [

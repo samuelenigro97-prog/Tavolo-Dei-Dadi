@@ -20,7 +20,7 @@ import { creaStanza, apriStanza, normalizzaCodiceStanza, formattaCodiceStanza, D
 import { generaCodiceSync, normalizzaCodiceSync, salvaSync, caricaSync, messaggioErroreSync } from './utils/sync.js';
 import { posizionePopover, stilePopover } from './utils/popover.js';
 import { normalizzaPreferenze } from './utils/preferenze.js';
-import { improntaRoster, decidiSync, riepilogoConflitto, leggiBaseSync, salvaBaseSync, revisioneGist } from './utils/conflittiSync.js';
+import { improntaRoster, contenutoBase, decidiSync, riepilogoConflitto, leggiBaseSync, salvaBaseSync, revisioneGist } from './utils/conflittiSync.js';
 import { trovaBackdropInCima, eCampoModificabile, deveAttivareDaTastiera } from './utils/accessibilita.js';
 import { salvaJsonLiberandoSpazio, deveRicordareBackup, rosterSenzaImmagini, riagganciaImmagini, salvaImmaginiRoster, caricaImmaginiRoster, rimuoviImmaginePersonaggio, preservaImmaginiSeMancanti } from './utils/persistenza.js';
 import { datiTabelleBackground } from './data/tabelleBackground.js';
@@ -1952,7 +1952,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.74.0';
+const APP_VERSION = '4.75.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -6211,7 +6211,9 @@ export default function App() {
     // non si sostituisce nulla (lo gestirà il prossimo controllo come conflitto).
     if (atteso && rosterSyncRef.current !== atteso) return false;
     const { preferenze: prefRemote, ...finale } = preservaImmaginiSeMancanti(conImmaginiLocali, rosterSyncRef.current);
-    salvaBaseCanale(canale, { rev: remoto.rev, ts: remoto.ts, hash: improntaRoster(remoto.roster) });
+    // La base è la copia online così com'è: se qui resta un'immagine che online manca,
+    // il roster risulta modificato e l'immagine viene inviata al prossimo salvataggio.
+    salvaBaseCanale(canale, { rev: remoto.rev, ts: remoto.ts, hash: improntaRoster(remoto.roster), contenuto: contenutoBase(remoto.roster) });
     rosterSyncRef.current = finale;
     setRoster(finale);
     applicaPreferenzeRemote(remoto.roster?.preferenze);
@@ -6230,8 +6232,23 @@ export default function App() {
       return true;
     }
     if (decisione.azione === 'allineato') {
-      salvaBaseCanale(canale, { rev: remoto.rev, ts: remoto.ts, hash: improntaRoster(rosterValutato) });
+      salvaBaseCanale(canale, { rev: remoto.rev, ts: remoto.ts, hash: improntaRoster(rosterValutato), contenuto: contenutoBase(rosterValutato) });
       if (!silenzioso) setStato({ text: t('conflitto.gia_allineato'), type: 'success' });
+      return true;
+    }
+    if (decisione.azione === 'unisci') {
+      // Modifiche nel frattempo: le gestirà il prossimo controllo (parte da solo).
+      if (rosterSyncRef.current !== rosterValutato) return true;
+      salvaSnapshot(rosterSyncRef.current);
+      const finale = preservaImmaginiSeMancanti(decisione.roster, rosterSyncRef.current);
+      // Nuova base = la copia online: il roster unito risulta "modificato" e si invia
+      // col prossimo salvataggio automatico, così l'altro dispositivo riceve tutto.
+      salvaBaseCanale(canale, { rev: remoto.rev, ts: remoto.ts, hash: improntaRoster(remoto.roster), contenuto: contenutoBase(remoto.roster) });
+      rosterSyncRef.current = finale;
+      setRoster(finale);
+      const tsPrefRemote = Number(remoto.roster?.preferenze?.ts) || 0;
+      if (tsPrefRemote > (Number(rosterValutato?.preferenze?.ts) || 0)) applicaPreferenzeRemote(remoto.roster?.preferenze);
+      setStato({ text: tr('Unite le modifiche di questo dispositivo con quelle dell’altro.', 'Merged the changes from this device with those from the other one.'), type: 'success' });
       return true;
     }
     if (decisione.azione === 'carica') {
@@ -6368,7 +6385,7 @@ export default function App() {
       }
       // La nuova base è la versione appena scritta. Se la revisione non è
       // leggibile resta vuota: il prossimo controllo userà il timestamp.
-      salvaBaseCanale('gist', { rev: revisioneGist(outScrittura), ts: quando, hash: improntaRoster(rosterLocale) });
+      salvaBaseCanale('gist', { rev: revisioneGist(outScrittura), ts: quando, hash: improntaRoster(rosterLocale), contenuto: contenutoBase(rosterLocale) });
       const orario = new Date(quando).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
       setUltimoSync(orario);
       localStorage.setItem('scheda-interattiva:ultimo-sync', orario);
@@ -6562,7 +6579,7 @@ export default function App() {
         }
         throw errScrittura;
       }
-      salvaBaseCanale('codice', { rev: String(quando), ts: quando, hash: improntaRoster(rosterLocale) });
+      salvaBaseCanale('codice', { rev: String(quando), ts: quando, hash: improntaRoster(rosterLocale), contenuto: contenutoBase(rosterLocale) });
       const orario = new Date(quando).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
       setUltimoSyncCodice(orario);
       localStorage.setItem('scheda-interattiva:ultimo-sync-codice', orario);
@@ -6681,7 +6698,7 @@ export default function App() {
     conflittoPausaRef.current.codice = false;
     setConflittoSync((c) => (c?.canale === 'codice' ? null : c));
     salvaSnapshot(rosterSyncRef.current);
-    salvaBaseCanale('codice', { rev: String(updatedAt || ''), ts: updatedAt, hash: improntaRoster(caricato) });
+    salvaBaseCanale('codice', { rev: String(updatedAt || ''), ts: updatedAt, hash: improntaRoster(caricato), contenuto: contenutoBase(caricato) });
     setRoster(merged);
     return updatedAt;
   }

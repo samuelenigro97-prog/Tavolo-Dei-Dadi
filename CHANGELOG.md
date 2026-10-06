@@ -2,6 +2,29 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.75.0] – 2026-10-06
+
+### Corretto
+- **Ritratti e mappe non si sincronizzavano**: l'impronta usata per capire se
+  qualcosa è cambiato escludeva le immagini, quindi un ritratto nuovo non veniva
+  mai inviato e l'altro dispositivo non lo scaricava. Ora `improntaRoster`
+  include un'impronta breve di ogni immagine (calcolata una volta e ricordata).
+  Le basi salvate dalle versioni precedenti (senza contenuto) restano
+  riconosciute con `improntaRosterSenzaImmagini`, senza falsi conflitti.
+- Dopo aver caricato la copia online la base è esattamente quella copia: se qui
+  resta un'immagine che online manca, viene inviata al salvataggio successivo.
+
+### Aggiunto
+- **Unione automatica a tre vie** (`unisciTreVie`, `contenutoBase`): la base
+  conserva anche il contenuto della versione online (senza immagini, con le loro
+  impronte). Se i due dispositivi hanno cambiato campi diversi della scheda le
+  modifiche si sommano da sole (nuova azione `unisci` di `decidiSync`); la
+  finestra di conflitto resta solo quando lo stesso campo è cambiato in modo
+  diverso da entrambe le parti. Evita i falsi conflitti dovuti ai ritocchi
+  automatici che l'app fa alle schede appena scaricate.
+- Test: unit per impronta con immagini, basi vecchie, unione a tre vie;
+  e2e "un ritratto nuovo caricato su un dispositivo arriva anche sull'altro".
+
 ## [4.74.0] – 2026-10-06
 
 ### Corretto

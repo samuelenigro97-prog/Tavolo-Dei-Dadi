@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   improntaRoster, remotoCambiato, decidiSync, riepilogoConflitto,
-  leggiBaseSync, salvaBaseSync, revisioneGist,
+  leggiBaseSync, salvaBaseSync, revisioneGist, improntaRosterSenzaImmagini,
 } from '../src/utils/conflittiSync.js';
 import worker from '../worker/transcribe-worker.js';
 import { salvaSync } from '../src/utils/sync.js';
@@ -202,11 +202,32 @@ test('remotoCambiato usa il timestamp come versione (anche con orologi sfasati)'
   assert.equal(remotoCambiato({ ts: 1 }, null), false);
 });
 
-test('improntaRoster ignora immagini, ordine delle chiavi e metadati; cambia con i dati', () => {
+test('improntaRoster ignora ordine delle chiavi e metadati; cambia con i dati e con le immagini', () => {
   const a = { attivo: 'p', personaggi: { p: { nome: 'A', pf: 3, ritratto: 'data:image/png;base64,xx' } } };
-  const b = { personaggi: { p: { pf: 3, nome: 'A' } }, attivo: 'p', _updatedAt: 123 };
-  assert.equal(improntaRoster(a), improntaRoster(b));
-  assert.notEqual(improntaRoster(a), improntaRoster({ attivo: 'p', personaggi: { p: { nome: 'A', pf: 4 } } }));
+  const a2 = { personaggi: { p: { pf: 3, nome: 'A', ritratto: 'data:image/png;base64,xx' } }, attivo: 'p', _updatedAt: 123 };
+  assert.equal(improntaRoster(a), improntaRoster(a2));
+  assert.notEqual(improntaRoster(a), improntaRoster({ attivo: 'p', personaggi: { p: { nome: 'A', pf: 4, ritratto: 'data:image/png;base64,xx' } } }));
+  // Un ritratto nuovo (o tolto) è una modifica: deve viaggiare tra i dispositivi.
+  assert.notEqual(improntaRoster(a), improntaRoster({ attivo: 'p', personaggi: { p: { nome: 'A', pf: 3, ritratto: 'data:image/png;base64,yy' } } }));
+  assert.notEqual(improntaRoster(a), improntaRoster({ attivo: 'p', personaggi: { p: { nome: 'A', pf: 3 } } }));
+});
+
+test('ritratto cambiato solo qui: si invia; cambiato solo online: si carica (v4.75.0)', () => {
+  const vecchio = { attivo: 'p', personaggi: { p: { nome: 'Vaelion', ritratto: 'data:image/jpeg;base64,VECCHIO' } } };
+  const nuovo = { attivo: 'p', personaggi: { p: { nome: 'Vaelion', ritratto: 'data:image/jpeg;base64,NUOVO' } } };
+  const base = { rev: 'r1', ts: 1, hash: improntaRoster(vecchio) };
+  // Desktop: ha cambiato il ritratto, online è ancora quello della base → invia.
+  assert.equal(decidiSync({ base, remoto: { rev: 'r1', ts: 1, roster: vecchio }, locale: nuovo }).azione, 'invia');
+  // Telefono: nessuna modifica, online c'è il ritratto nuovo → carica.
+  assert.equal(decidiSync({ base, remoto: { rev: 'r2', ts: 2, roster: nuovo }, locale: vecchio }).azione, 'carica');
+});
+
+test('base salvata dalle versioni che non contavano le immagini: nessun falso conflitto', () => {
+  const locale = { attivo: 'p', personaggi: { p: { nome: 'Vaelion', ritratto: 'data:image/jpeg;base64,AAA' } } };
+  const online = { attivo: 'p', personaggi: { p: { nome: 'Vaelion', livello: 11, ritratto: 'data:image/jpeg;base64,AAA' } } };
+  const baseVecchia = { rev: 'r1', ts: 1, hash: improntaRosterSenzaImmagini(locale) };
+  assert.equal(decidiSync({ base: baseVecchia, remoto: { rev: 'r2', ts: 2, roster: online }, locale }).azione, 'carica');
+  assert.equal(decidiSync({ base: baseVecchia, remoto: { rev: 'r1', ts: 1, roster: locale }, locale }).azione, 'niente');
 });
 
 test('leggiBaseSync / salvaBaseSync: andata e ritorno, e aggiornano anche il vecchio timestamp', () => {
@@ -265,4 +286,37 @@ test('salvaSync invia baseUpdatedAt e traduce il 409 in SYNC_CONFLICT', async ()
   const fetchOk = async (_url, init) => { corpoInviato = JSON.parse(init.body); return new Response(JSON.stringify({ ok: true, updatedAt: 10 }), { status: 200 }); };
   await salvaSync('https://w.example', codice, rosterCorretto(), 10, fetchOk);
   assert.equal('baseUpdatedAt' in corpoInviato, false);
+});
+
+test('unione a tre vie: campi diversi cambiati sui due dispositivi si sommano (v4.75.0)', async () => {
+  const { unisciTreVie, contenutoBase } = await import('../src/utils/conflittiSync.js');
+  const base = { attivo: 'p', personaggi: { p: { nome: 'Vaelion', pf: 30, risorse: [1], ritratto: 'data:image/jpeg;base64,VECCHIO' } } };
+  const qui = { attivo: 'p', personaggi: { p: { nome: 'Vaelion', pf: 30, risorse: [1], ritratto: 'data:image/jpeg;base64,NUOVO' } } };
+  const online = { attivo: 'p', personaggi: { p: { nome: 'Vaelion', pf: 22, risorse: [1, 2] } } }; // online senza immagine
+  const unito = unisciTreVie(contenutoBase(base), qui, online);
+  assert.deepEqual(unito.personaggi.p, { nome: 'Vaelion', pf: 22, risorse: [1, 2], ritratto: 'data:image/jpeg;base64,NUOVO' });
+
+  // Lo stesso campo cambiato in modo diverso: vero conflitto.
+  const quiPf = { attivo: 'p', personaggi: { p: { ...base.personaggi.p, pf: 10 } } };
+  assert.equal(unisciTreVie(contenutoBase(base), quiPf, online), null);
+
+  // Personaggi nuovi da una parte sola si tengono; eliminato da una parte e intatto dall'altra si elimina.
+  const conNuovo = { attivo: 'p', personaggi: { ...qui.personaggi, n: { nome: 'Frost' } } };
+  const senzaP = { attivo: '', personaggi: {} };
+  assert.deepEqual(Object.keys(unisciTreVie(contenutoBase(base), conNuovo, online).personaggi).sort(), ['n', 'p']);
+  assert.deepEqual(unisciTreVie(contenutoBase(base), base, senzaP).personaggi, {});
+  assert.equal(unisciTreVie(contenutoBase(base), qui, senzaP), null, 'eliminato là ma modificato qui: si chiede');
+});
+
+test('decidiSync propone "unisci" quando la base ha il contenuto e le modifiche sono compatibili', async () => {
+  const { contenutoBase } = await import('../src/utils/conflittiSync.js');
+  const base = { attivo: 'p', personaggi: { p: { nome: 'V', pf: 30, livello: 10 } } };
+  const qui = { attivo: 'p', personaggi: { p: { nome: 'V', pf: 30, livello: 11 } } };
+  const online = { attivo: 'p', personaggi: { p: { nome: 'V', pf: 12, livello: 10 } } };
+  const b = { rev: 'r1', ts: 1, hash: improntaRoster(base), contenuto: contenutoBase(base) };
+  const d = decidiSync({ base: b, remoto: { rev: 'r2', ts: 2, roster: online }, locale: qui });
+  assert.equal(d.azione, 'unisci');
+  assert.deepEqual(d.roster.personaggi.p, { nome: 'V', pf: 12, livello: 11 });
+  // Senza contenuto (base delle versioni precedenti) resta il conflitto.
+  assert.equal(decidiSync({ base: { ...b, contenuto: undefined }, remoto: { rev: 'r2', ts: 2, roster: online }, locale: qui }).azione, 'conflitto');
 });
