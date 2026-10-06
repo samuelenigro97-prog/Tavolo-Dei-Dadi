@@ -2,6 +2,21 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.76.0] – 2026-10-06
+
+### Corretto
+- **iPhone fermo sulla versione vecchia**: quando `version.json` annunciava una
+  build nuova, l'app ricaricava subito, spesso prima che il nuovo service
+  worker fosse attivo, e Safari ripresentava la pagina dalla cache. Ora
+  `forzaAggiornamento` chiede al browser il nuovo worker
+  (`attendiNuovoServiceWorker`) e aspetta il `controllerchange` (max 8 s) prima
+  di ricaricare. Al terzo tentativo per la stessa versione svuota solo le cache
+  del service worker e lo deregistra (`svuotaCacheProgramma`): personaggi,
+  immagini e impostazioni non si toccano. Dopo tre tentativi automatici si
+  ferma: niente ricariche infinite.
+- Test sulla build di produzione: con una versione annunciata che non arriva
+  mai, la pagina prova ad aggiornarsi e poi smette (al massimo 3 ricariche).
+
 ## [4.75.0] – 2026-10-06
 
 ### Corretto

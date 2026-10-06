@@ -49,3 +49,22 @@ test('nessun errore JavaScript all\'avvio della build', async ({ page }) => {
   await expect(page.getByText(`v${versioneInSorgente}`).first()).toBeVisible();
   expect(errori).toEqual([]);
 });
+
+test('versione nuova pubblicata: la pagina si ricarica da sola e non entra mai in un ciclo infinito', async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.goto('./');
+  await chiudiIniziali(page);
+  await page.waitForFunction(async () => Boolean((await navigator.serviceWorker.getRegistration())?.active), null, { timeout: 20_000 });
+  // Da qui in poi version.json annuncia una build diversa (che però non arriva mai):
+  // l'app deve provare ad aggiornarsi, poi (dopo 3 tentativi) fermarsi.
+  let caricamenti = 0;
+  page.on('load', () => { caricamenti += 1; });
+  await page.route('**/version.json*', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ build: 'build-futura' }) }));
+  await expect.poll(() => caricamenti, { timeout: 40_000 }).toBeGreaterThanOrEqual(1);
+  await page.waitForTimeout(45_000);
+  const finali = caricamenti;
+  expect(finali).toBeLessThanOrEqual(3);
+  await page.waitForTimeout(15_000);
+  expect(caricamenti).toBe(finali);
+  await expect(page.getByText(`v${versioneInSorgente}`).first()).toBeVisible();
+});

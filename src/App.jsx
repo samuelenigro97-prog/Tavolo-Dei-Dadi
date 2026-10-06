@@ -1952,7 +1952,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.75.0';
+const APP_VERSION = '4.76.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -3225,6 +3225,57 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
   );
 }
 
+function leggiTentativiAggiornamento(build) {
+  try {
+    const prec = JSON.parse(sessionStorage.getItem('scheda-interattiva:tentativi-aggiornamento') || '{}');
+    return prec.build === String(build) ? Number(prec.n) || 0 : 0;
+  } catch { return 0; }
+}
+
+/** Conta (in sessionStorage) i tentativi di aggiornamento verso la stessa versione. */
+function registraTentativoAggiornamento(build) {
+  try {
+    const chiave = 'scheda-interattiva:tentativi-aggiornamento';
+    const prec = JSON.parse(sessionStorage.getItem(chiave) || '{}');
+    const n = prec.build === String(build) ? (Number(prec.n) || 0) + 1 : 1;
+    sessionStorage.setItem(chiave, JSON.stringify({ build: String(build), n }));
+    return n;
+  } catch { return 1; }
+}
+
+/**
+ * Chiede al browser di cercare subito il nuovo service worker e aspetta (al
+ * massimo `ms`) che prenda il controllo della pagina: con skipWaiting e
+ * clientsClaim succede appena è installato.
+ */
+async function attendiNuovoServiceWorker(ms) {
+  const sw = typeof navigator !== 'undefined' ? navigator.serviceWorker : null;
+  if (!sw) return;
+  const reg = await sw.getRegistration().catch(() => null);
+  if (!reg) return;
+  await new Promise((resolve) => {
+    const fine = () => { clearTimeout(timer); sw.removeEventListener('controllerchange', fine); resolve(); };
+    const timer = setTimeout(fine, ms);
+    sw.addEventListener('controllerchange', fine);
+    reg.update().then(() => {
+      // Nessun worker nuovo in arrivo: inutile aspettare.
+      if (!reg.installing && !reg.waiting) fine();
+    }).catch(fine);
+  });
+}
+
+/** Elimina le cache del service worker e lo deregistra: il codice si riscarica dalla rete. */
+async function svuotaCacheProgramma() {
+  try {
+    const nomi = (typeof caches !== 'undefined') ? await caches.keys() : [];
+    await Promise.all(nomi.filter((n) => /workbox|precache|pages/i.test(n)).map((n) => caches.delete(n)));
+  } catch { /* niente */ }
+  try {
+    const regs = await navigator.serviceWorker?.getRegistrations?.() || [];
+    await Promise.all(regs.map((r) => r.unregister()));
+  } catch { /* niente */ }
+}
+
 export default function App() {
   // Dichiarato prima del rilevatore PWA: un aggiornamento aspetta che il
   // salvataggio cloud corrente sia terminato prima di ricaricare la pagina.
@@ -3243,8 +3294,11 @@ export default function App() {
   // cache e non deregistriamo il worker: quella procedura poteva interrompere
   // audio, immagini IndexedDB o un salvataggio ancora in corso.
   const [aggiornando, setAggiornando] = useState(false);
-  async function forzaAggiornamento() {
+  async function forzaAggiornamento(automatico = false) {
     if (aggiornando) return;
+    // Mai ricaricare all'infinito: dopo tre tentativi automatici per la stessa
+    // versione si lascia solo l'avviso (il pulsante di aggiornamento resta).
+    if (automatico && leggiTentativiAggiornamento(aggiornamentoPronto) >= 3) return;
     setAggiornando(true);
     let navigazioneAvviata = false;
     const ricaricaUnaVolta = () => {
@@ -3252,11 +3306,24 @@ export default function App() {
       navigazioneAvviata = true;
       window.location.reload();
     };
-    // Safari può lasciare pendente updateServiceWorker senza risolvere né
-    // rifiutare la Promise. Il watchdog impedisce "Aggiornamento…" infinito.
-    const watchdog = setTimeout(ricaricaUnaVolta, 4500);
+    // Safari (soprattutto su iPhone) può lasciare pendente updateServiceWorker o
+    // ricaricare prima che il nuovo service worker sia attivo, ritrovandosi la
+    // versione vecchia dalla cache. Quindi: si chiede al browser di scaricare il
+    // nuovo worker e si aspetta che prenda il controllo, poi si ricarica.
+    // Il watchdog impedisce comunque "Aggiornamento…" infinito.
+    const watchdog = setTimeout(ricaricaUnaVolta, 9000);
     try {
-      await updateServiceWorker(true);
+      const tentativi = registraTentativoAggiornamento(aggiornamentoPronto);
+      if (tentativi >= 3) {
+        // Terzo tentativo per la stessa versione: la cache del programma è rimasta
+        // incastrata. Si eliminano solo le cache del service worker (codice
+        // dell'app): personaggi, immagini (IndexedDB) e impostazioni restano.
+        await svuotaCacheProgramma();
+        ricaricaUnaVolta();
+        return;
+      }
+      await attendiNuovoServiceWorker(8000);
+      try { await Promise.race([updateServiceWorker(false), new Promise((r) => setTimeout(r, 1500))]); } catch { /* niente */ }
       ricaricaUnaVolta();
     } catch { ricaricaUnaVolta(); }
     finally { clearTimeout(watchdog); }
@@ -3298,7 +3365,7 @@ export default function App() {
   // Aggiornamento automatico in OGNI browser: appena version.json è nuova, ricarica da solo (senza tap su 🔄)
   useEffect(() => {
     if (!aggiornamentoPronto || aggiornando || sincronizzando) return;
-    const timer = setTimeout(forzaAggiornamento, 1200);
+    const timer = setTimeout(() => forzaAggiornamento(true), 1200);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [aggiornamentoPronto, aggiornando, sincronizzando]);

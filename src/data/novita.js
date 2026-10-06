@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.76.0',
+    voci: {
+      it: ['Aggiornamenti più affidabili, soprattutto su iPhone: l\'app aspetta che la versione nuova sia installata prima di ricaricarsi, e se resta bloccata sulla vecchia svuota da sola la cache del programma (personaggi e immagini restano).'],
+      en: ['More reliable updates, especially on iPhone: the app waits for the new version to be installed before reloading, and if it stays stuck on the old one it clears its own program cache (characters and images are kept).'],
+    },
+  },
+  {
     versione: '4.75.0',
     voci: {
       it: [
