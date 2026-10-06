@@ -2,6 +2,29 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.64.0] – 2026-10-06
+
+### Cambiato
+- **Colore della classe meno marcato**: la tinta della classe pesa ora la metà
+  (`INTENSITA_CLASSE = 0.5` in `App.jsx`, un solo numero da regolare: 1 =
+  vecchia intensità). Sfondi, bordi, aloni e il segnaposto del ritratto sono
+  più discreti; i colori di titoli e accenti sono attenuati verso il colore
+  del testo, quindi restano riconoscibili ma non gridano. Il codice che applica
+  la tinta, prima duplicato in due punti, è una sola funzione
+  (`applicaTintaClasse`).
+
+### Corretto
+- **Riposo breve nelle regole 2024** per Ira (Barbaro), Recuperare Energie
+  (Guerriero) e Incanalare Divinità (Chierico e Paladino): restituisce **un
+  solo uso**, il riposo lungo tutti (prima tornavano tutti con il riposo
+  breve; Paladino 2014 si ricaricava solo con il lungo). Nella 2014 restano:
+  Ira solo a riposo lungo, gli altri interi con breve o lungo.
+- **Incanalare Divinità**: Chierico 2024 arriva a 4 usi al 18° (prima 3);
+  Paladino 2014 ha 1 uso (prima 2 dal 18°), che torna con riposo breve o lungo.
+  Spiegazioni delle risorse allineate.
+- `risorseAutoClasse` spostata in `regole.js` ed esportata: ora le risorse di
+  classe per edizione hanno un test unitario.
+
 ## [4.63.0] – 2026-10-05
 
 ### Cambiato

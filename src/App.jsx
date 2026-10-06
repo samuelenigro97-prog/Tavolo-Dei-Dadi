@@ -1204,6 +1204,22 @@ function mescola(a, b, t) {
   return `#${canale(x.r, y.r)}${canale(x.g, y.g)}${canale(x.b, y.b)}`;
 }
 
+/** Quanto "pesa" il colore della classe sul tema (1 = intensità storica, 0 = nessuna tinta). */
+const INTENSITA_CLASSE = 0.5;
+
+/** Applica al tema la tinta della classe: accento attenuato verso l'inchiostro e sfondi/bordi appena tinti. */
+function applicaTintaClasse(t, colore, scuroEff) {
+  const accento = mescola(colore, t.ink, 0.35);
+  t.title = accento;
+  t.gold = accento;
+  t.goldDark = accento;
+  if (scuroEff) {
+    t.bg = mescola(t.bg, colore, 0.07 * INTENSITA_CLASSE);
+    t.panelLight = mescola(t.panelLight, colore, 0.1 * INTENSITA_CLASSE);
+  }
+  t.border = mescola(t.border, colore, 0.2 * INTENSITA_CLASSE);
+}
+
 /** È notte? (dalle 20:00 alle 06:59). Serve al tema automatico per orario. */
 function eNotte(d = new Date()) {
   const h = d.getHours();
@@ -1296,7 +1312,7 @@ import { INCANTESIMI_DB, ALIAS_INCANTESIMI, datiIncantesimo, valoreIncantesimoPe
 const INCANTESIMI_NOMI = Array.from(new Set([...NOMI_SPIEG_INC, ...Object.keys(INCANTESIMI_DB)])).sort((a, b) => a.localeCompare(b, 'it'));
 import { NOMI_CLASSI, BACKGROUND_5E, TAGLIE_5E, ALLINEAMENTI_5E, SESSO_5E, SOTTOCLASSI_5E, INCANTESIMI_CLASSE, DANNI_5E, SENSI_5E, CONDIZIONI_5E, NOMI_OGGETTI, LINGUE_5E, ARMI_5E, STRUMENTI_5E, REAZIONI_5E, AZIONI_BONUS_5E, GRUPPI_ARMI_5E, GRUPPI_STRUMENTI_5E, GRUPPI_LINGUE_5E, DEFAULT_MANUALI, MANUALI_INFO, manualeAttivo, SOTTOCLASSI_FONTI, talentiPerManuali, PE_PER_LIVELLO, BACKGROUND_COMPETENZE, BACKGROUND_TALENTO_ORIGINE_2024, SPECIE_5E, tabellaPrivilegiSottoclasse, CARATT_INCANTATORE, PRIORITA_CARATT, DADO_VITA_CLASSE, BACKGROUND_CARATT, TS_CLASSE, ADDESTRAMENTO_CLASSE, COMPETENZE_CLASSE, PRIVILEGI_CLASSE_L1, PRIVILEGI_CLASSE_L1_2014, ASI_LIV, SOTTOCLASSE_LIV, COMPETENZE_SPECIE, NOMI_SPECIE, NOMI_SPECIE_GENERE, COGNOMI_SPECIE, NOMI_GENERICI, SPECIE_DATI, SPECIE_DATI_2014, BONUS_CARATT_SPECIE_2014, SFINIMENTO_2014, BASE_ARMATURA_DEFAULT, ESEMPI_ARMATURA } from "./data/dati5e.js";
 import { modificatore, conSegno, tiraDado, parseEspressioneDado, facceDadoVita, esprDadiVita, gruppiDadoVita, bonusCompetenzaDaLivello, tiraDanni, tiraD20, capacitaCarico, modalitaEffettiva } from "./rules/dadi.js";
-import { trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, dettagliAbilita, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from "./rules/regole.js";
+import { risorseAutoClasse, trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, dettagliAbilita, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from "./rules/regole.js";
 import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda } from './rules/poteri.js';
 
 /**
@@ -1708,76 +1724,6 @@ const ORO_INIZIALE = {
   mago: 55, monaco: 50, paladino: 150, ranger: 150, stregone: 50, warlock: 100,
 };
 
-/** Risorse di classe generate automaticamente da classe e livello (valori 5e
- *  indicativi). Restituisce voci { id, nome, attuali, max, reset }. */
-function risorseAutoClasse(classe, livello, caratteristiche, versione = '2024') {
-  const L = Math.max(1, Number(livello) || 1);
-  const v24 = String(versione) !== '2014';
-  const modCar = (v) => Math.floor(((Number(v) || 10) - 10) / 2);
-  const k = chiaveClasse(classe) || 'cls';
-  const mk = (nome, max, reset) => ({
-    id: `auto-${k}-${nome.toLowerCase().replace(/\s+/g, '-')}`,
-    nome,
-    attuali: Math.max(0, max),
-    max: Math.max(0, max),
-    reset,
-  });
-  switch (k) {
-    case 'barbaro':
-      // Stessa progressione nelle due edizioni; nella 5.5 un uso torna anche
-      // con un riposo breve, nella 5.0 solo con quello lungo.
-      return [mk('Ira', L >= 17 ? 6 : L >= 12 ? 5 : L >= 6 ? 4 : L >= 3 ? 3 : 2, v24 ? 'breve' : 'lungo')];
-    case 'bardo':
-      return [mk('Ispirazione Bardica', Math.max(1, modCar(caratteristiche?.carisma)), L >= 5 ? 'breve' : 'lungo')];
-    case 'monaco':
-      // 5.0: Punti Ki. 5.5: Punti Focus (stesso numero, nome diverso).
-      return L >= 2 ? [mk(v24 ? 'Punti Focus' : 'Punti Ki', L, 'breve')] : [];
-    case 'stregone':
-      return [
-        ...(v24 ? [mk('Stregoneria Innata', 2, 'lungo')] : []),
-        ...(L >= 2 ? [mk('Punti Stregoneria', L, 'lungo')] : []),
-      ];
-    case 'mago':
-      // Recupero Arcano: un uso per riposo lungo, si spende durante un riposo breve.
-      return [mk('Recupero Arcano', 1, 'lungo')];
-    case 'guerriero':
-      // Recuperare Energie: 1 uso nella 5.0, 2/3/4 nella 5.5.
-      return [
-        mk('Recuperare Energie', v24 ? (L >= 10 ? 4 : L >= 4 ? 3 : 2) : 1, 'breve'),
-        ...(L >= 2 ? [mk('Azione Impetuosa', L >= 17 ? 2 : 1, 'breve')] : []),
-        ...(L >= 9 ? [mk('Indomito', L >= 17 ? 3 : L >= 13 ? 2 : 1, 'lungo')] : []),
-      ];
-    case 'druido':
-      // Forma Selvatica: 2 usi nella 5.0, 2/3/4 nella 5.5.
-      // Riposo breve: nella 5.0 restituisce tutti gli usi, nella 5.5 solo uno (il lungo tutti).
-      return L >= 2 ? [mk('Forma Selvatica', v24 ? (L >= 17 ? 4 : L >= 6 ? 3 : 2) : 2, v24 ? 'breve-uno' : 'breve')] : [];
-    case 'chierico':
-      // Incanalare Divinità: 1/2/3 nella 5.0 (liv. 2/6/18), 2/3 nella 5.5.
-      return L >= 2
-        ? [mk('Incanalare Divinità', v24 ? (L >= 6 ? 3 : 2) : (L >= 18 ? 3 : L >= 6 ? 2 : 1), 'breve')]
-        : [];
-    case 'paladino':
-      // Incanalare Divinità: 1 uso nella 5.0 (2 dal 18°), 2/3 nella 5.5.
-      return [
-        mk('Imposizione delle Mani', L * 5, 'lungo'),
-        ...(L >= 3 ? [mk('Incanalare Divinità', v24 ? (L >= 11 ? 3 : 2) : (L >= 18 ? 2 : 1), 'lungo')] : []),
-      ];
-    case 'ranger':
-      // 2024: Marchio del Cacciatore (Hunter's Mark) senza slot.
-      // 2014: Consapevolezza Primordiale (Sensi Primordiali) NON ha usi propri: costa uno slot
-      // incantesimo, quindi nessun contatore automatico (quelli già salvati non vengono toccati).
-      return v24
-        ? [mk('Marchio del Cacciatore', L >= 17 ? 6 : L >= 13 ? 5 : L >= 9 ? 4 : L >= 5 ? 3 : 2, 'lungo')]
-        : [];
-    case 'ladro':
-      return L >= 20 ? [mk('Colpo di Fortuna', 1, 'breve')] : [];
-    case 'warlock':
-      return L >= 20 ? [mk('Contatto Mistico', 1, 'lungo')] : [];
-    default:
-      return [];
-  }
-}
-
 /**
  * Completa e aggiorna le risorse automatiche per la classe principale e per
  * tutte le classi multiclasse, senza toccare quelle aggiunte a mano.
@@ -1845,7 +1791,7 @@ function sincronizzaRisorseClasse(scheda, versione = '2024') {
 // mostrate al passaggio del cursore sul nome, come per le altre sezioni.
 const SPIEG_RISORSE = {
   // Barbaro
-  'Ira': 'Azione bonus: entri in Ira, ottenendo resistenza ai danni contundenti, perforanti e taglienti, vantaggio alle prove e TS su Forza, e un bonus ai danni degli attacchi basati sulla Forza. Termina se resti privo di sensi o non la mantieni secondo le regole della tua edizione. Si ricarica con un riposo lungo (o breve nella 2024).',
+  'Ira': 'Azione bonus: entri in Ira, ottenendo resistenza ai danni contundenti, perforanti e taglienti, vantaggio alle prove e TS su Forza, e un bonus ai danni degli attacchi basati sulla Forza. Termina se resti privo di sensi o non la mantieni secondo le regole della tua edizione. Si ricarica con un riposo lungo; nella 2024 un riposo breve ne restituisce uno.',
   'Ira Implacabile': 'Se scendi a 0 PF mentre sei in ira, puoi effettuare un TS Costituzione CD 10 per scendere invece a 1 PF. Ogni uso successivo aumenta la CD di 5. Si azzera con un riposo breve o lungo.',
 
   // Bardo
@@ -1870,7 +1816,7 @@ const SPIEG_RISORSE = {
   'Portento': 'Al termine di ogni riposo lungo tiri due d20 (tre dal 14° livello) e ne annoti i risultati: puoi sostituire qualsiasi tiro per colpire, TS o prova con uno di questi dadi.',
 
   // Guerriero
-  'Recuperare Energie': 'Azione bonus: attingi alla tua riserva di resistenza per recuperare 1d10 + il tuo livello da Guerriero in Punti Ferita. Si ricarica con un riposo breve (o lungo). Nella 2024 ottieni più utilizzi scalabili con il livello.',
+  'Recuperare Energie': 'Azione bonus: attingi alla tua riserva di resistenza per recuperare 1d10 + il tuo livello da Guerriero in Punti Ferita. Nella 2014 ha 1 uso e si ricarica con un riposo breve o lungo. Nella 2024 ottieni più utilizzi (2/3/4 con il livello): il riposo breve ne restituisce uno, il lungo tutti.',
   'Azione Impetuosa': 'Nel tuo turno compi un’azione aggiuntiva oltre alla tua azione normale e alla possibile azione bonus. 1 uso (2 dal 17° livello); si ricarica con un riposo breve o lungo.',
   'Indomito': 'Puoi ritirare un tiro salvezza fallito (+ livello da Guerriero nella versione 2024). Usi: 1 al 9°, 2 al 13°, 3 al 17°; si ricarica con un riposo lungo.',
 
@@ -1879,7 +1825,7 @@ const SPIEG_RISORSE = {
   'Ausilio dalla Terra': 'Come azione spendi una Forma Selvatica per evocare fiori curativi per gli alleati o spine che feriscono i nemici nell’area.',
 
   // Chierico
-  'Incanalare Divinità': 'Incanali l’energia divina della tua divinità per alimentare effetti sacri: Scacciare Non Morti e il potere unico del tuo Dominio Divino (Preservare Vita, Radiosità dell’Alba, Furia della Tempesta…). Usi limitati per livello; si recuperano con un riposo breve o lungo.',
+  'Incanalare Divinità': 'Incanali l’energia divina della tua divinità per alimentare effetti sacri: Scacciare Non Morti e il potere unico del tuo Dominio Divino (Preservare Vita, Radiosità dell’Alba, Furia della Tempesta…). Usi limitati per livello. Nella 2014 si recuperano tutti con un riposo breve o lungo; nella 2024 il riposo breve ne restituisce uno e il lungo tutti.',
   'Intervento Divino': 'Come azione implori l’aiuto della tua divinità tirando 1d100: se ottieni un numero pari o inferiore al tuo livello da Chierico (automatico al 20°), la divinità interviene compiendo un miracolo o replicando un incantesimo. Si ricarica con un riposo lungo.',
 
   // Paladino
@@ -1957,7 +1903,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.63.0';
+const APP_VERSION = '4.64.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -4153,17 +4099,7 @@ export default function App() {
     const presetDati = PRESET_COLORI.find((p) => p.id === presetColori) || PRESET_COLORI[0];
     const t = { ...BASE_TEMA[modo], ...presetDati[modo] };
     const acc = coloreClasse(classeAttiva);
-    if (acc) {
-      const colore = acc[modo];
-      t.title = colore;
-      t.gold = colore;
-      t.goldDark = colore;
-      if (scuroEff) {
-        t.bg = mescola(t.bg, colore, 0.07);
-        t.panelLight = mescola(t.panelLight, colore, 0.1);
-      }
-      t.border = mescola(t.border, colore, 0.2);
-    }
+    if (acc) applicaTintaClasse(t, acc[modo], scuroEff);
     const hexRgba = (hex, a) => {
       const m = /^#?([0-9a-fA-F]{6})$/.exec(hex || '');
       if (!m) return `rgba(0,0,0,${a})`;
@@ -4172,8 +4108,8 @@ export default function App() {
     };
     const tintaClasse = acc ? acc[modo] : t.gold;
     const coloreGlow = mescola(t.bg, tintaClasse, scuroEff ? 0.22 : 0.12);
-    const glowClasse = `radial-gradient(150% 110% at 50% -18%, ${hexRgba(coloreGlow, scuroEff ? 0.15 : 0.08)}, transparent 75%)`;
-    const auraClasseSotto = `radial-gradient(120% 90% at 50% 110%, ${hexRgba(tintaClasse, scuroEff ? 0.13 : 0.05)}, transparent 80%)`;
+    const glowClasse = `radial-gradient(150% 110% at 50% -18%, ${hexRgba(coloreGlow, (scuroEff ? 0.15 : 0.08) * INTENSITA_CLASSE)}, transparent 75%)`;
+    const auraClasseSotto = `radial-gradient(120% 90% at 50% 110%, ${hexRgba(tintaClasse, (scuroEff ? 0.13 : 0.05) * INTENSITA_CLASSE)}, transparent 80%)`;
     const ambra = scuroEff ? '' : `radial-gradient(75% 50% at 50% -2%, rgba(224,162,74,0.04), transparent 70%)`;
     const vignetta = `radial-gradient(120% 120% at 50% 42%, transparent 56%, ${mescola(t.bg, '#000000', scuroEff ? 0.45 : 0.11)} 100%)`;
     const sfondoAmbiente = presetDati.sfondo || '';
@@ -4204,17 +4140,7 @@ export default function App() {
     const presetDati = PRESET_COLORI.find((p) => p.id === presetColori) || PRESET_COLORI[0];
     const t = { ...BASE_TEMA[modo], ...presetDati[modo] };
     const acc = coloreClasse(classeAttiva);
-    if (acc) {
-      const colore = acc[modo];
-      t.title = colore;
-      t.gold = colore;
-      t.goldDark = colore;
-      if (scuroEff) {
-        t.bg = mescola(t.bg, colore, 0.07);
-        t.panelLight = mescola(t.panelLight, colore, 0.1);
-      }
-      t.border = mescola(t.border, colore, 0.2);
-    }
+    if (acc) applicaTintaClasse(t, acc[modo], scuroEff);
     const root = document.documentElement;
     root.dataset.tema = modo;
     root.dataset.preset = presetColori;
@@ -4240,14 +4166,14 @@ export default function App() {
       const n = parseInt(m[1], 16);
       return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
     };
-    const aura1 = hexRgba(tintaClasse, scuroEff ? 0.20 : 0.09);
-    const aura2 = hexRgba(tintaClasse, scuroEff ? 0.14 : 0.05);
-    const auraPulse1 = hexRgba(tintaClasse, scuroEff ? 0.36 : 0.18);
-    const auraPulse2 = hexRgba(tintaClasse, scuroEff ? 0.24 : 0.10);
-    const auraGlowMin = hexRgba(tintaClasse, scuroEff ? 0.14 : 0.06);
-    const auraGlowMax = hexRgba(tintaClasse, scuroEff ? 0.38 : 0.20);
-    const borderGlowMin = hexRgba(tintaClasse, scuroEff ? 0.45 : 0.30);
-    const borderGlowMax = hexRgba(tintaClasse, scuroEff ? 0.85 : 0.65);
+    const aura1 = hexRgba(tintaClasse, (scuroEff ? 0.20 : 0.09) * INTENSITA_CLASSE);
+    const aura2 = hexRgba(tintaClasse, (scuroEff ? 0.14 : 0.05) * INTENSITA_CLASSE);
+    const auraPulse1 = hexRgba(tintaClasse, (scuroEff ? 0.36 : 0.18) * INTENSITA_CLASSE);
+    const auraPulse2 = hexRgba(tintaClasse, (scuroEff ? 0.24 : 0.10) * INTENSITA_CLASSE);
+    const auraGlowMin = hexRgba(tintaClasse, (scuroEff ? 0.14 : 0.06) * INTENSITA_CLASSE);
+    const auraGlowMax = hexRgba(tintaClasse, (scuroEff ? 0.38 : 0.20) * INTENSITA_CLASSE);
+    const borderGlowMin = hexRgba(tintaClasse, (scuroEff ? 0.45 : 0.30) * INTENSITA_CLASSE);
+    const borderGlowMax = hexRgba(tintaClasse, (scuroEff ? 0.85 : 0.65) * INTENSITA_CLASSE);
     const auraOmbra = `0 6px 28px -4px ${aura1}, 0 16px 48px -8px ${aura2}, 0 1px 3px rgba(0,0,0,${scuroEff ? 0.35 : 0.05})`;
 
     set('--c-aura-color', tintaClasse);
@@ -12649,7 +12575,7 @@ export default function App() {
                         borderRadius: 14, overflow: 'hidden',
                         background: isTrasformato
                           ? '#1b4332'
-                          : ((!scheda.ritratto || scheda.ritratto.startsWith('data:image/svg')) ? (coloreClasse(scheda.classe)?.chiaro || C.panel) : C.panel),
+                          : ((!scheda.ritratto || scheda.ritratto.startsWith('data:image/svg')) ? (coloreClasse(scheda.classe) ? `color-mix(in srgb, ${coloreClasse(scheda.classe).chiaro} ${Math.round(100 * INTENSITA_CLASSE * 0.5)}%, var(--c-panel))` : C.panel) : C.panel),
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         boxShadow: isTrasformato ? '0 0 16px rgba(46,125,50,0.6)' : 'inset 0 0 8px rgba(0,0,0,0.2)',
                         border: isTrasformato ? '2.5px solid #52b788' : `2px solid ${coloreClasse(scheda.classe) ? C.gold : C.border}`,

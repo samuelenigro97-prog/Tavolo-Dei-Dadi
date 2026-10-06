@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.64.0',
+    voci: {
+      it: [
+        'Il colore della classe è più discreto: sfondi, bordi e aloni meno intensi, titoli più morbidi.',
+        'Regole 2024: il riposo breve restituisce un solo uso di Ira, Recuperare Energie e Incanalare Divinità (il riposo lungo tutti).',
+      ],
+      en: [
+        'The class colour is more subtle: softer backgrounds, borders and glows, gentler headings.',
+        '2024 rules: a short rest restores a single use of Rage, Second Wind and Channel Divinity (a long rest restores all).',
+      ],
+    },
+  },
+  {
     versione: '4.63.0',
     voci: {
       it: ['Araldi del Segreto ora ha lo stesso formato della Panoramica dei privilegi: righe per livello, usi con le perle e livelli futuri sbiaditi.', 'Segreti e Debito accettano qualsiasi numero senza dover impostare un totale.'],

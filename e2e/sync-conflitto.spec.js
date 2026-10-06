@@ -175,7 +175,7 @@ async function preparaPreferenze({ page, prefOnline, prefLocali }) {
     attacchi: [{ id: 'att-1', nome: 'Spada lunga', categoria: 'Azione', bonus: 5, danno: '1d8+3', tipoDanno: 'Tagliente', note: '' }],
     privilegi: 'Stile di combattimento\nRecuperare energie (azione bonus)\nMaestria nelle armi\nAzione impetuosa\nMente tattica\nAttacco extra\nSpostamento tattico',
     risorse: [
-      { id: 'auto-guerriero-recuperare-energie', nome: 'Recuperare Energie', max: 3, attuali: 3, reset: 'breve' },
+      { id: 'auto-guerriero-recuperare-energie', nome: 'Recuperare Energie', max: 3, attuali: 3, reset: 'breve-uno' },
       { id: 'auto-guerriero-azione-impetuosa', nome: 'Azione Impetuosa', max: 1, attuali: 1, reset: 'breve' },
     ],
     addestramento: { armature: { leggera: true, media: true, pesante: true, scudi: true }, armi: 'Armi semplici e da guerra', strumenti: '' },

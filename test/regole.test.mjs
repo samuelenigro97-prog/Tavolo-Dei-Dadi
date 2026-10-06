@@ -1316,3 +1316,36 @@ test('dannoTrucchettoScalato: stessi valori per lista Trucchetti e Combattimento
   assert.equal(dannoTrucchettoScalato('Randello Incantato', '1d8', opz(17, '2024', 3)), '2d6+3');
   assert.equal(dannoTrucchettoScalato('Randello Incantato', '1d8', opz(3, '2024', 0)), '1d8');
 });
+
+// --- Risorse di classe automatiche per edizione (PHB 2014 e PHB 2024) ---
+test('risorseAutoClasse: i recuperi dei riposi seguono l\'edizione', async () => {
+  const { risorseAutoClasse, risorseDopoRiposo } = await import('../src/rules/regole.js');
+  const car = { carisma: 14 };
+  const trova = (classe, liv, ver, nome) => risorseAutoClasse(classe, liv, car, ver).find((r) => r.nome === nome);
+
+  // 2024: breve = un uso, lungo = tutti.
+  for (const [classe, nome, liv] of [['Barbaro', 'Ira', 5], ['Guerriero', 'Recuperare Energie', 5], ['Chierico', 'Incanalare Divinità', 5], ['Paladino', 'Incanalare Divinità', 5], ['Druido', 'Forma Selvatica', 5]]) {
+    assert.equal(trova(classe, liv, '2024', nome)?.reset, 'breve-uno', `${classe} ${nome} 2024`);
+  }
+  // 2014: Ira solo a riposo lungo; gli altri tornano interi con breve o lungo.
+  assert.equal(trova('Barbaro', 5, '2014', 'Ira').reset, 'lungo');
+  for (const [classe, nome] of [['Guerriero', 'Recuperare Energie'], ['Chierico', 'Incanalare Divinità'], ['Paladino', 'Incanalare Divinità'], ['Druido', 'Forma Selvatica']]) {
+    assert.equal(trova(classe, 5, '2014', nome).reset, 'breve', `${classe} ${nome} 2014`);
+  }
+  // Invariati: tornano interi con il riposo breve in entrambe le edizioni.
+  assert.equal(trova('Guerriero', 5, '2024', 'Azione Impetuosa').reset, 'breve');
+  assert.equal(trova('Monaco', 5, '2024', 'Punti Focus').reset, 'breve');
+  assert.equal(trova('Ladro', 20, '2024', 'Colpo di Fortuna').reset, 'breve');
+
+  // Usi: Incanalare Divinità del Chierico 2024 = 2/3/4 (livelli 2, 6, 18); Paladino 2014 = sempre 1.
+  assert.deepEqual([2, 6, 18].map((l) => trova('Chierico', l, '2024', 'Incanalare Divinità').max), [2, 3, 4]);
+  assert.deepEqual([2, 6, 18].map((l) => trova('Chierico', l, '2014', 'Incanalare Divinità').max), [1, 2, 3]);
+  assert.deepEqual([3, 11, 18].map((l) => trova('Paladino', l, '2024', 'Incanalare Divinità').max), [2, 3, 3]);
+  assert.deepEqual([3, 11, 18].map((l) => trova('Paladino', l, '2014', 'Incanalare Divinità').max), [1, 1, 1]);
+
+  // Effetto del riposo breve sul Barbaro 2024: un uso, non tutti.
+  const ira = trova('Barbaro', 6, '2024', 'Ira');
+  const spesa = [{ ...ira, attuali: 0 }];
+  assert.equal(risorseDopoRiposo(spesa, 'breve')[0].attuali, 1);
+  assert.equal(risorseDopoRiposo(spesa, 'lungo')[0].attuali, ira.max);
+});

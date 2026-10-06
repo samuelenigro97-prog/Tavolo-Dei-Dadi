@@ -2376,5 +2376,75 @@ export function calcolaIspirazioneBardica(scheda = {}) {
   };
 }
 
-
-
+/** Risorse di classe generate automaticamente da classe e livello (valori 5e
+ *  indicativi). Restituisce voci { id, nome, attuali, max, reset }. */
+export function risorseAutoClasse(classe, livello, caratteristiche, versione = '2024') {
+  const L = Math.max(1, Number(livello) || 1);
+  const v24 = String(versione) !== '2014';
+  const modCar = (v) => Math.floor(((Number(v) || 10) - 10) / 2);
+  const k = chiaveClasse(classe) || 'cls';
+  const mk = (nome, max, reset) => ({
+    id: `auto-${k}-${nome.toLowerCase().replace(/\s+/g, '-')}`,
+    nome,
+    attuali: Math.max(0, max),
+    max: Math.max(0, max),
+    reset,
+  });
+  switch (k) {
+    case 'barbaro':
+      // Stessa progressione nelle due edizioni. Nella 5.5 il riposo breve restituisce UN uso
+      // (il lungo tutti), nella 5.0 si recupera tutto solo con il riposo lungo.
+      return [mk('Ira', L >= 17 ? 6 : L >= 12 ? 5 : L >= 6 ? 4 : L >= 3 ? 3 : 2, v24 ? 'breve-uno' : 'lungo')];
+    case 'bardo':
+      return [mk('Ispirazione Bardica', Math.max(1, modCar(caratteristiche?.carisma)), L >= 5 ? 'breve' : 'lungo')];
+    case 'monaco':
+      // 5.0: Punti Ki. 5.5: Punti Focus (stesso numero, nome diverso).
+      return L >= 2 ? [mk(v24 ? 'Punti Focus' : 'Punti Ki', L, 'breve')] : [];
+    case 'stregone':
+      return [
+        ...(v24 ? [mk('Stregoneria Innata', 2, 'lungo')] : []),
+        ...(L >= 2 ? [mk('Punti Stregoneria', L, 'lungo')] : []),
+      ];
+    case 'mago':
+      // Recupero Arcano: un uso per riposo lungo, si spende durante un riposo breve.
+      return [mk('Recupero Arcano', 1, 'lungo')];
+    case 'guerriero':
+      // Recuperare Energie: 1 uso nella 5.0, 2/3/4 nella 5.5.
+      return [
+        // 5.0: un uso, tutto con riposo breve o lungo. 5.5: il breve ne restituisce uno, il lungo tutti.
+        mk('Recuperare Energie', v24 ? (L >= 10 ? 4 : L >= 4 ? 3 : 2) : 1, v24 ? 'breve-uno' : 'breve'),
+        ...(L >= 2 ? [mk('Azione Impetuosa', L >= 17 ? 2 : 1, 'breve')] : []),
+        ...(L >= 9 ? [mk('Indomito', L >= 17 ? 3 : L >= 13 ? 2 : 1, 'lungo')] : []),
+      ];
+    case 'druido':
+      // Forma Selvatica: 2 usi nella 5.0, 2/3/4 nella 5.5.
+      // Riposo breve: nella 5.0 restituisce tutti gli usi, nella 5.5 solo uno (il lungo tutti).
+      return L >= 2 ? [mk('Forma Selvatica', v24 ? (L >= 17 ? 4 : L >= 6 ? 3 : 2) : 2, v24 ? 'breve-uno' : 'breve')] : [];
+    case 'chierico':
+      // Incanalare Divinità: 1/2/3 nella 5.0 (liv. 2/6/18, riposo breve o lungo),
+      // 2/3/4 nella 5.5 (liv. 2/6/18; il riposo breve ne restituisce uno, il lungo tutti).
+      return L >= 2
+        ? [mk('Incanalare Divinità', v24 ? (L >= 18 ? 4 : L >= 6 ? 3 : 2) : (L >= 18 ? 3 : L >= 6 ? 2 : 1), v24 ? 'breve-uno' : 'breve')]
+        : [];
+    case 'paladino':
+      // Incanalare Divinità: 5.0 = 1 uso, torna con riposo breve o lungo; 5.5 = 2 usi (3 dall'11°),
+      // il riposo breve ne restituisce uno e il lungo tutti.
+      return [
+        mk('Imposizione delle Mani', L * 5, 'lungo'),
+        ...(L >= 3 ? [mk('Incanalare Divinità', v24 ? (L >= 11 ? 3 : 2) : 1, v24 ? 'breve-uno' : 'breve')] : []),
+      ];
+    case 'ranger':
+      // 2024: Marchio del Cacciatore (Hunter's Mark) senza slot.
+      // 2014: Consapevolezza Primordiale (Sensi Primordiali) NON ha usi propri: costa uno slot
+      // incantesimo, quindi nessun contatore automatico (quelli già salvati non vengono toccati).
+      return v24
+        ? [mk('Marchio del Cacciatore', L >= 17 ? 6 : L >= 13 ? 5 : L >= 9 ? 4 : L >= 5 ? 3 : 2, 'lungo')]
+        : [];
+    case 'ladro':
+      return L >= 20 ? [mk('Colpo di Fortuna', 1, 'breve')] : [];
+    case 'warlock':
+      return L >= 20 ? [mk('Contatto Mistico', 1, 'lungo')] : [];
+    default:
+      return [];
+  }
+}
