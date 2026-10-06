@@ -23,9 +23,12 @@ ALLOW_ORIGIN = "https://samuelenigro97-prog.github.io"
 binding = "SCHEDE"
 id = "92ac397f93124d5d98491554205be764"
 
-# Rate limiter nativo consigliato per /room (Wrangler >= 4.36). Scegli un
+# Rate limiter nativo consigliato per /room, /sync e le scritture di /pg (Wrangler >= 4.36;
+# ogni rotta ha il proprio contatore per IP, quindi il limite vale per ciascuna). Scegli un
 # namespace_id numerico non usato da altri limiter nello stesso account.
-# Se omesso, il Worker applica comunque un limite best-effort tramite SCHEDE.
+# Se omesso, il Worker applica comunque un limite best-effort tramite SCHEDE
+# (10 richieste/min per /room e /sync, 30 per le scritture di /pg), ma ogni richiesta
+# costa una scrittura KV: con il binding nativo non si consuma la quota.
 # [[ratelimits]]
 # name = "ROOM_RATE_LIMITER"
 # namespace_id = "1001"

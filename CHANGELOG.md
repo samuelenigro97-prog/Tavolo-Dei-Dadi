@@ -2,6 +2,22 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.67.0] – 2026-10-06
+
+### Sicurezza (Worker + app)
+- **Archivio del Master: limite di richieste sulle scritture aperte** (`POST /pg`
+  e la cancellazione della propria copia): 30 al minuto per IP senza il binding
+  nativo (best-effort sul KV), il limite configurato con `ROOM_RATE_LIMITER`
+  con il binding. Prima chiunque conoscesse l'indirizzo poteva riempire il KV
+  e consumare la quota di scritture giornaliera (1000 sul piano gratuito).
+- **La chiave DM viaggia nell'header** `x-dm-key` e non più nell'indirizzo
+  (`?key=…` finiva nei log del server e nella cronologia). Il Worker accetta
+  ancora l'indirizzo per le app già installate. Confronto della chiave a tempo
+  costante.
+- Test del Worker per archivio, limite e chiavi (`archivio-worker.test.mjs`).
+- **Da fare a mano su Cloudflare**: ripubblicare il Worker (`wrangler deploy`)
+  per attivare il limite; vedi `worker/LEGGIMI.md`. L'app funziona anche prima.
+
 ## [4.66.0] – 2026-10-06
 
 ### Cambiato

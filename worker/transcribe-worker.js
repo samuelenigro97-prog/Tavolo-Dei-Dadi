@@ -188,20 +188,33 @@ async function hashBreve(testo) {
   return [...new Uint8Array(digest).slice(0, 8)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-async function superaRateLimit(request, env) {
+/**
+ * Limite di richieste per IP. `bucket` separa i contatori (stanze, archivio...):
+ * con il binding ROOM_RATE_LIMITER (consigliato: atomico e distribuito) il limite
+ * è quello configurato in wrangler.toml; senza, ripiega sul KV con `massimo`
+ * richieste al minuto (best-effort: ogni richiesta costa una scrittura KV).
+ */
+async function superaRateLimit(request, env, { bucket = 'room', massimo = 10 } = {}) {
   const ip = request.headers.get('cf-connecting-ip') || 'sconosciuto';
   if (env.ROOM_RATE_LIMITER?.limit) {
-    const esito = await env.ROOM_RATE_LIMITER.limit({ key: ip });
+    const esito = await env.ROOM_RATE_LIMITER.limit({ key: `${bucket}:${ip}` });
     return esito?.success !== false;
   }
-  // Fallback best-effort sul KV esistente; il binding Cloudflare nativo resta
-  // consigliato in produzione perché è atomico e distribuito.
   const finestra = Math.floor(Date.now() / 60000);
-  const key = `rate:room:${finestra}:${await hashBreve(ip)}`;
+  const key = `rate:${bucket}:${finestra}:${await hashBreve(ip)}`;
   const usi = Number(await env.SCHEDE.get(key)) || 0;
-  if (usi >= 10) return false;
+  if (usi >= massimo) return false;
   await env.SCHEDE.put(key, String(usi + 1), { expirationTtl: 120 });
   return true;
+}
+
+/** Confronto di stringhe a tempo costante (la chiave DM non deve trapelare dai tempi di risposta). */
+function stessaChiave(a, b) {
+  const x = new TextEncoder().encode(String(a));
+  const y = new TextEncoder().encode(String(b));
+  let diff = x.length ^ y.length;
+  for (let i = 0; i < Math.max(x.length, y.length); i++) diff |= (x[i] || 0) ^ (y[i] || 0);
+  return diff === 0;
 }
 
 /** Snapshot pubblico temporaneo. Nessuna operazione di aggiornamento o delete. */
@@ -344,6 +357,14 @@ async function gestisciArchivio(request, env, headers, percorso) {
   const url = new URL(request.url);
   const id = percorso.startsWith('/pg/') ? decodeURIComponent(percorso.slice(4)) : '';
 
+  // Le scritture dell'archivio sono aperte (l'app deposita da sola): per non farle
+  // diventare un modo di esaurire la quota di scritture KV, hanno un limite per IP.
+  // Un'app legittima ne fa poche al minuto (una ~45 s dopo ogni modifica).
+  const scritturaAperta = request.method === 'POST' || (request.method === 'DELETE' && !id);
+  if (scritturaAperta && !(await superaRateLimit(request, env, { bucket: 'pg', massimo: 30 }))) {
+    return new Response(JSON.stringify({ error: 'Troppe richieste' }), { status: 429, headers: { ...headers, 'Retry-After': '60' } });
+  }
+
   if (request.method === 'POST') {
     let corpo;
     try { corpo = await request.json(); } catch { corpo = null; }
@@ -398,8 +419,9 @@ async function gestisciArchivio(request, env, headers, percorso) {
     return new Response(JSON.stringify({ ok: true }), { headers });
   }
 
-  const chiaveDm = url.searchParams.get('key') || request.headers.get('x-dm-key') || '';
-  if (!env.DM_KEY || chiaveDm !== env.DM_KEY) {
+  // Meglio nell'header x-dm-key (l'indirizzo finisce nei log); ?key= resta accettato per le vecchie app.
+  const chiaveDm = request.headers.get('x-dm-key') || url.searchParams.get('key') || '';
+  if (!env.DM_KEY || !stessaChiave(chiaveDm, env.DM_KEY)) {
     return new Response(JSON.stringify({ error: 'Chiave DM non valida' }), { status: 401, headers });
   }
 

@@ -1903,7 +1903,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.66.0';
+const APP_VERSION = '4.67.0';
 
 /**
  * Archivio schede del DM (Cloudflare Worker + KV, vedi worker/LEGGIMI.md).
@@ -2762,7 +2762,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
     if (!base) { setStato(tr('Archivio non configurato in questa build.', 'Archive not configured in this build.')); return; }
     setStato('carico');
     try {
-      const r = await fetch(`${base}/pg?key=${encodeURIComponent(k)}`);
+      const r = await fetch(`${base}/pg`, { headers: { 'x-dm-key': k } });
       const d = await r.json();
       if (!r.ok) { setStato(d.error || tr(`Errore ${r.status}`, `Error ${r.status}`)); return; }
       setElenco(d.schede || []);
@@ -2780,7 +2780,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
       setAprendoId(id);
       setStato('carico');
       try {
-        const r = await fetch(`${base}/pg/${encodeURIComponent(id)}?key=${encodeURIComponent(chiave)}`);
+        const r = await fetch(`${base}/pg/${encodeURIComponent(id)}`, { headers: { 'x-dm-key': chiave } });
         if (!r.ok) {
           let errTxt = tr(`Errore ${r.status}`, `Error ${r.status}`);
           try { const d = await r.json(); if (d?.error) errTxt = d.error; } catch {}
@@ -2823,7 +2823,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
       setAprendoId(id);
       setStato('');
       try {
-        const r = await fetch(`${base}/pg/${encodeURIComponent(id)}?key=${encodeURIComponent(chiave)}`);
+        const r = await fetch(`${base}/pg/${encodeURIComponent(id)}`, { headers: { 'x-dm-key': chiave } });
         if (!r.ok) {
           let errTxt = tr(`Errore ${r.status}`, `Error ${r.status}`);
           try { const d = await r.json(); if (d?.error) errTxt = d.error; } catch {}
@@ -2862,7 +2862,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
     }
     setDettagliAperti((d) => ({ ...d, [id]: 'carico' }));
     try {
-      const r = await fetch(`${base}/pg/${encodeURIComponent(id)}?key=${encodeURIComponent(chiave)}`);
+      const r = await fetch(`${base}/pg/${encodeURIComponent(id)}`, { headers: { 'x-dm-key': chiave } });
       if (!r.ok) {
         let errTxt = tr(`Errore ${r.status}`, `Error ${r.status}`);
         try { const d = await r.json(); if (d?.error) errTxt = d.error; } catch {}
@@ -2882,7 +2882,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
     if (!raw || raw === 'carico' || raw.errore) {
       setStato('carico');
       try {
-        const r = await fetch(`${base}/pg/${encodeURIComponent(s.id)}?key=${encodeURIComponent(chiave)}`);
+        const r = await fetch(`${base}/pg/${encodeURIComponent(s.id)}`, { headers: { 'x-dm-key': chiave } });
         if (!r.ok) {
           let err = tr(`Errore ${r.status}`, `Error ${r.status}`);
           try { const j = await r.json(); if (j?.error) err = j.error; } catch {}
@@ -2929,8 +2929,9 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
     if (!window.confirm(tr(`Eliminare "${nomeFmt}" (${quando(s.aggiornato)}) dall'Archivio del Master? L'operazione non può essere annullata.`, `Delete "${nomeFmt}" (${quando(s.aggiornato)}) from the DM Archive? This cannot be undone.`))) return;
     setStato('carico');
     try {
-      const r = await fetch(`${base}/pg/${encodeURIComponent(s.id)}?key=${encodeURIComponent(chiave)}`, {
+      const r = await fetch(`${base}/pg/${encodeURIComponent(s.id)}`, {
         method: 'DELETE',
+        headers: { 'x-dm-key': chiave },
       });
       if (!r.ok) {
         const d = await r.json().catch(() => ({}));
