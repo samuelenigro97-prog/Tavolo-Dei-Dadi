@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.87.0',
+    voci: {
+      it: ['Myrdhal è una creatura evocabile (Evoca / Aggiungi Compagno → Evocazioni) con il suo blocco completo. Fa parte del manuale Araldi del Segreto: compare solo con il manuale attivo.'],
+      en: ['Myrdhal is now a summonable creature (Summon / Add Companion → Summons) with its full stat block. It belongs to the Heralds of the Secret handbook: it only shows up while the handbook is on.'],
+    },
+  },
+  {
     versione: '4.86.0',
     voci: {
       it: ['Manuale Araldi del Segreto aggiornato alla versione Player 1.1: Veglia con "Vista Pura", nuova spesa di Segreti "Myrdhal" (10 Segreti, anche di gruppo) con pulsanti nel pannello Araldi. I poteri già sulla scheda si aggiornano da soli.'],

@@ -120,3 +120,50 @@ test('con il solo Debito (6/100) il ripristino rimette gli Araldi e tiene il Deb
   expect(stato.debito).toEqual([6]);
   expect(stato.araldi).toBe(true);
 });
+
+test('Myrdhal (Araldi del Segreto): si evoca dal catalogo solo con il manuale attivo, si "stacca" spegnendolo (v4.87.0)', async ({ page }) => {
+  await apriScheda(page);
+  const apriCatalogo = async () => {
+    await page.getByRole('button', { name: /Evoca \/ Aggiungi Compagno/ }).first().click();
+    await page.getByRole('button', { name: 'Evocazioni', exact: true }).click();
+  };
+  const chiudi = async () => { await page.keyboard.press('Escape'); await page.mouse.click(5, 300); };
+  const manuale = async (acceso) => {
+    await page.evaluate((v) => {
+      const m = JSON.parse(localStorage.getItem('scheda-interattiva:manuali') || '{}');
+      localStorage.setItem('scheda-interattiva:manuali', JSON.stringify({ ...m, araldi: v }));
+    }, acceso);
+    await apriScheda(page);
+  };
+  // Manuale spento di base: niente Myrdhal.
+  await apriCatalogo();
+  await expect(page.getByText('Elementale del Fuoco').first()).toBeVisible();
+  await expect(page.getByText('Myrdhal', { exact: true })).toHaveCount(0);
+  await chiudi();
+  // Manuale acceso: Myrdhal compare e si evoca con i suoi 210 PF.
+  await manuale(true);
+  await apriCatalogo();
+  await expect(page.getByTestId('creatura-manuale-araldi')).toContainText('Araldi del Segreto');
+  await page.getByText('Myrdhal', { exact: true }).locator('xpath=ancestor::div[2]').getByRole('button', { name: 'Evoca / Aggiungi' }).click();
+  const leggiAlleato = () => page.evaluate(() => {
+    const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+    return (r.personaggi[r.attivo].alleati || []).find((a) => a.nome === 'Myrdhal') || null;
+  });
+  await expect.poll(leggiAlleato).not.toBeNull();
+  const alleato = await leggiAlleato();
+  // 210 PF + 2 per dado vita (20) dell'Evocatore Possente del Circolo del Pastore di Vaelion.
+  expect(alleato.pfMax).toBe(250);
+  expect(alleato.ca).toBe(20);
+  expect(alleato.azioni.map((a) => a.nome)).toEqual(expect.arrayContaining(['Lama del Vuoto', 'Dardo di Terrore', 'Passo d\'Ombra (azione bonus)']));
+  // Manuale spento di nuovo: sparisce dal catalogo, ma quello già evocato resta sulla scheda.
+  await manuale(false);
+  await apriCatalogo();
+  await expect(page.getByText('Elementale del Fuoco').first()).toBeVisible();
+  await expect(page.getByTestId('creatura-manuale-araldi')).toHaveCount(0);
+  await chiudi();
+  const resta = await page.evaluate(() => {
+    const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+    return (r.personaggi[r.attivo].alleati || []).some((a) => a.nome === 'Myrdhal');
+  });
+  expect(resta).toBe(true);
+});

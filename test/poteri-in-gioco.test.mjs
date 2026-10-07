@@ -63,3 +63,20 @@ test('manuale Araldi 1.1: testi aggiornati (Vista Pura, Myrdhal) sui poteri già
   // Idempotente: niente da aggiornare = stesso array.
   assert.equal(aggiornaTestiAraldi(nuovi), nuovi);
 });
+
+test('Myrdhal: creatura del manuale Araldi, con il blocco del PDF 1.1 (v4.87.0)', async () => {
+  const { EVOCAZIONI_ARALDI, EVOCAZIONI } = await import('../src/data/bestiario.js');
+  const { parseAzioniCompagno, calcolaPfCompagno } = await import('../src/rules/regole.js');
+  const m = EVOCAZIONI_ARALDI.find((c) => c.nome === 'Myrdhal');
+  assert.equal(m.manuale, 'araldi');
+  assert.ok(!EVOCAZIONI.some((c) => c.nome === 'Myrdhal'), 'non nel catalogo base: arriva solo col manuale');
+  assert.equal(calcolaPfCompagno(m, { livello: 5 }), 210);
+  assert.equal(m.ca, 20);
+  assert.deepEqual(m.car, { forza: 20, destrezza: 22, costituzione: 20, intelligenza: 14, saggezza: 18, carisma: 22 });
+  const azioni = parseAzioniCompagno(m.azioni);
+  const lama = azioni.find((a) => a.nome === 'Lama del Vuoto');
+  assert.equal(lama.bonusAttacco, 13);
+  const dardo = azioni.find((a) => a.nome === 'Dardo di Terrore');
+  assert.equal(dardo.bonusAttacco, 12);
+  assert.equal(dardo.danno, '5d8');
+});

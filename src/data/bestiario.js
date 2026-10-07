@@ -1519,6 +1519,44 @@ export function limitiMetamorfosi(livello) {
   return { gsMax: Math.max(0, Number(livello) || 1) };
 }
 
+/**
+ * Creature del manuale di campagna "Araldi del Segreto" (Player 1.1): compaiono
+ * nel catalogo Compagni/Evocazioni solo con quel manuale attivo (Manuali e
+ * fonti), così si "attaccano e staccano" col manuale. Quelle già evocate
+ * restano sulla scheda anche se il manuale si spegne.
+ * Distanze in metri come nel resto del bestiario (il blocco originale ha
+ * qualche "ft" rimasto dal modello, ma il testo dice 36 m, 9 m, 18 m).
+ */
+export const EVOCAZIONI_ARALDI = [
+  {
+    nome: 'Myrdhal', nomeEn: 'Myrdhal', tipo: 'Non morto (Araldi del Segreto)', manuale: 'araldi',
+    taglia: 'Grande', ca: 20, pf: 210, pfFormula: '20d10 + 100',
+    velocita: { terra: 12 },
+    gs: '17', gsNum: 17,
+    car: { forza: 20, destrezza: 22, costituzione: 20, intelligenza: 14, saggezza: 18, carisma: 22 },
+    abilita: 'TS Des +12, Cos +11, Sag +10, Car +12 · Intimidire +12, Percezione +10, Furtività +12',
+    sensi: 'Vista cieca 36 m · Percezione passiva 20 · Telepatia 36 m',
+    tratti: [
+      'Resistenze: freddo; contundente, perforante e tagliente da attacchi non magici. Immunità ai danni: necrotico, veleno, psichico. Immunità alle condizioni: affascinato, sfinimento, spaventato, avvelenato.',
+      'Servitore Evocato: obbedisce all\'evocatore e agisce nella sua iniziativa. A 0 PF si dissolve nell\'ombra. Non può essere evocato alla luce del sole; se viene esposto ad essa ha svantaggio a ogni tiro, danni dimezzati e perde metà dei PF massimi.',
+      'Mantello d\'Ombra: in luce fioca o buio può Nascondersi come azione bonus e ha vantaggio a Furtività. Immune a cecità e oscurità magica. Il mantello non è mai mosso dal vento.',
+      'Presenza del Terrore: ogni creatura a scelta entro 36 m che lo vede la prima volta in un combattimento deve superare un TS Saggezza CD 20 o è spaventata per 1 minuto. Ripete il TS a fine turno, con svantaggio se lo vede. Se riesce è immune a questa Presenza per 24 ore.',
+      'Nutrito dal Terrore: una creatura spaventata dal Myrdhal che inizia il turno entro 9 m da lui subisce 7 (2d6) danni psichici. La prima volta per turno che danneggia una creatura spaventata dal Myrdhal recupera 11 (2d10) PF.',
+      'Azioni leggendarie (3 per round, una alla volta e solo alla fine del turno di un\'altra creatura; si recuperano all\'inizio del suo turno): Colpo Rapido (un attacco con Lama del Vuoto o Dardo di Terrore); Scivolare (si muove fino a metà della sua velocità senza provocare attacchi di opportunità); Mormorio del Vuoto (costa 2: un bersaglio entro 18 m, TS Saggezza CD 20 o spaventato fino alla fine del suo turno successivo).',
+      'Resistenza Leggendaria (3/giorno): se fallisce un TS può scegliere di superarlo.',
+    ],
+    azioni: [
+      'Multiattacco: tre attacchi, Lama del Vuoto oppure Dardo di Terrore o una combinazione fra i due.',
+      'Lama del Vuoto: +13 al tiro per colpire, portata 3 m (lama lunga), 17 (2d10 + 6) danni taglienti più 11 (2d10) necrotici.',
+      'Dardo di Terrore: +12 al tiro per colpire, gittata 36 m (incantesimo), 22 (5d8) danni psichici.',
+      'Sguardo Atterrente (Ricarica 5-6): una o più creature a scelta entro 9 m in grado di vedere il Myrdhal: TS Saggezza CD 20 o spaventate per 1 minuto; se falliscono di 5 o più sono anche paralizzate fino alla fine del loro turno successivo. Ripetono il TS a fine turno. Chi supera è immune 24 ore.',
+      'Incantesimi innati (Carisma, CD 20, attacco +12): a volontà tocco gelido (4d8), oscurità, nemici in abbondanza; 3/giorno ciascuno paura, allucinazione mortale, sguardo penetrante; 1/giorno ciascuno oscurità della follia, fatale.',
+      'Passo d\'Ombra (azione bonus): teletrasporto fino a 18 m tra due spazi in luce fioca o buio.',
+    ],
+    note: 'Si evoca con 10 Segreti, anche di gruppo, per 1d6 turni (manuale Araldi del Segreto, Player 1.1). GS 17.',
+  },
+];
+
 /** Bestie assumibili con la Metamorfosi al livello indicato, in ordine alfabetico. */
 export function creatureDisponibiliMetamorfosi(livello, bestie = BESTIE) {
   const limiti = limitiMetamorfosi(livello);

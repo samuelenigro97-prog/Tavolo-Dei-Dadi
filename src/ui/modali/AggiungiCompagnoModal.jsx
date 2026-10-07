@@ -1,10 +1,11 @@
 // Estratto da App.jsx (finestra "AggiungiCompagnoModal"): riceve dall'App lo stato che usa, tutto il resto è importato.
 import { C } from '../tema.js';
 import { styles } from '../stili.js';
-import { BESTIE, FAMIGLI, EVOCAZIONI, raggruppaPerGS } from '../../data/bestiario.js';
+import { BESTIE, FAMIGLI, EVOCAZIONI, EVOCAZIONI_ARALDI, raggruppaPerGS } from '../../data/bestiario.js';
+import { manualeAttivo } from '../../data/dati5e.js';
 import { calcolaPfCompagno, parseAzioniCompagno } from '../../rules/regole.js';
 
-export function AggiungiCompagnoModal({ aggiorna, cercaCompagnoText, filtroCompagnoCat, lingua, registra, scheda, setBestiaDettaglio, setCercaCompagnoText, setFiltroCompagnoCat, setMostraModalAggiungiCompagno }) {
+export function AggiungiCompagnoModal({ aggiorna, cercaCompagnoText, filtroCompagnoCat, lingua, manualiAttivi, registra, scheda, setBestiaDettaglio, setCercaCompagnoText, setFiltroCompagnoCat, setMostraModalAggiungiCompagno }) {
   return (
     <div
       style={{
@@ -122,11 +123,14 @@ export function AggiungiCompagnoModal({ aggiorna, cercaCompagnoText, filtroCompa
             (() => {
               const q = cercaCompagnoText.trim().toLowerCase();
               let elenco = [];
+              // Creature dei manuali di campagna: solo con il manuale attivo.
+              const evocazioniAraldi = manualeAttivo(manualiAttivi, 'araldi') ? EVOCAZIONI_ARALDI : [];
+              const tutteEvocazioni = [...EVOCAZIONI, ...evocazioniAraldi];
               if (filtroCompagnoCat === 'famigli') elenco = FAMIGLI;
               else if (filtroCompagnoCat === 'compagni') elenco = FAMIGLI.filter((c) => /compagno|artificiere|difensore/i.test(c.nome || c.tipo || ''));
-              else if (filtroCompagnoCat === 'evocazioni') elenco = EVOCAZIONI;
+              else if (filtroCompagnoCat === 'evocazioni') elenco = tutteEvocazioni;
               else if (filtroCompagnoCat === 'bestie') elenco = BESTIE;
-              else elenco = [...FAMIGLI, ...EVOCAZIONI, ...BESTIE];
+              else elenco = [...FAMIGLI, ...tutteEvocazioni, ...BESTIE];
 
               if (q) {
                 elenco = elenco.filter((c) => (c.nome || '').toLowerCase().includes(q) || (c.nomeEn || '').toLowerCase().includes(q) || (c.tipo || '').toLowerCase().includes(q));
@@ -164,7 +168,7 @@ export function AggiungiCompagnoModal({ aggiorna, cercaCompagnoText, filtroCompa
                         CA {c.ca} · {pfCalc} PF {c.pfFormula ? `(${c.pfFormula})` : ''} · {typeof c.velocita === 'object' ? Object.entries(c.velocita).map(([k, v]) => `${k} ${v}m`).join(', ') : c.velocita}
                       </div>
                       {c.tipo && (
-                        <div style={{ fontSize: 11, color: C.goldDark, marginTop: 1 }}>
+                        <div style={{ fontSize: 11, color: C.goldDark, marginTop: 1 }} data-testid={c.manuale ? `creatura-manuale-${c.manuale}` : undefined}>
                           {c.tipo}
                         </div>
                       )}

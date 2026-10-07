@@ -2,6 +2,17 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.87.0] – 2026-10-07
+
+### Aggiunto
+- **Myrdhal come creatura evocabile** (`EVOCAZIONI_ARALDI` in
+  `src/data/bestiario.js`): blocco completo dal manuale Araldi del Segreto 1.1
+  (CA 20, 210 PF, caratteristiche, tratti, Lama del Vuoto, Dardo di Terrore,
+  Sguardo Atterrente, incantesimi innati, Passo d'Ombra, azioni leggendarie).
+  Compare in "Evoca / Aggiungi Compagno" (Tutti ed Evocazioni) **solo con il
+  manuale Araldi del Segreto attivo**: spegnendo il manuale sparisce dal
+  catalogo, mentre quello già evocato resta sulla scheda.
+
 ## [4.86.0] – 2026-10-07
 
 ### Cambiato
