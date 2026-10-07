@@ -80,3 +80,22 @@ test('Myrdhal: creatura del manuale Araldi, con il blocco del PDF 1.1 (v4.87.0)'
   assert.equal(dardo.bonusAttacco, 12);
   assert.equal(dardo.danno, '5d8');
 });
+
+test('lista ampliata Araldi: incantesimi dei cerchi sbloccati, senza doppioni, fuori dai limiti di classe (v4.88.0)', async () => {
+  const { incantesimiAraldiMancanti, INCANTESIMI_ARALDI } = await import('../src/data/incantesimiAraldi.js');
+  const { datiIncantesimo } = await import('../src/data/incantesimi.js');
+  for (const [nome] of INCANTESIMI_ARALDI) assert.ok(datiIncantesimo(nome), `${nome} è nel catalogo`);
+  assert.equal(datiIncantesimo('Charme su persone').nome, 'Ammaliare Persone');
+  const slot = (max) => Object.fromEntries(Array.from({ length: 9 }, (_, i) => [i + 1, { totale: i + 1 <= max ? 2 : 0, spesi: 0 }]));
+  const druido10 = { slotIncantesimo: slot(5), incantesimiLista: [{ nome: 'Ammaliare Persone', livello: 1 }] };
+  const nuovi = incantesimiAraldiMancanti(druido10);
+  assert.equal(nuovi.length, 9, '10 incantesimi meno quello già presente');
+  assert.ok(nuovi.every((s) => s.bonus === true && s.preparato === true), 'non contano nei limiti di classe');
+  assert.deepEqual([...new Set(nuovi.map((s) => s.livello))].sort(), [1, 2, 3, 4, 5]);
+  // Solo i cerchi già sbloccati.
+  assert.deepEqual([...new Set(incantesimiAraldiMancanti({ slotIncantesimo: slot(2), incantesimiLista: [] }).map((s) => s.livello))].sort(), [1, 2]);
+  assert.equal(incantesimiAraldiMancanti({ slotIncantesimo: slot(0), incantesimiLista: [] }).length, 0);
+  // Idempotente.
+  const dopo = { ...druido10, incantesimiLista: [...druido10.incantesimiLista, ...nuovi] };
+  assert.equal(incantesimiAraldiMancanti(dopo).length, 0);
+});

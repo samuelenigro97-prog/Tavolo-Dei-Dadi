@@ -1344,6 +1344,7 @@ import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modif
 import { PoteriRisorse } from './ui/PoteriRisorse.jsx';
 import { unisciPoteriCampagna, poteriCampagnaIncompleti } from './data/poteriCampagna.js';
 import { aggiornaTestiAraldi } from './data/modelliPoteri.js';
+import { incantesimiAraldiMancanti } from './data/incantesimiAraldi.js';
 import { DadiModal } from './ui/modali/DadiModal.jsx';
 import { DiarioModal } from './ui/modali/DiarioModal.jsx';
 import { IspirazioneBgModal } from './ui/modali/IspirazioneBgModal.jsx';
@@ -2017,7 +2018,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.87.0';
+const APP_VERSION = '4.88.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4625,6 +4626,31 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scheda?.poteri]);
 
+  // Chi usa gli Araldi del Segreto (ha i poteri del loro modello):
+  // una volta sola il manuale di campagna si accende e gli incantesimi della sua
+  // lista ampliata entrano fra i conosciuti (cerchi già sbloccati). Dopo, ogni
+  // scelta (spegnere il manuale, togliere un incantesimo) resta com'è.
+  useEffect(() => {
+    if (!scheda || isSolaLettura || !Array.isArray(scheda.poteri)) return;
+    const usaAraldi = scheda.poteri.some((p) => p?.modello === 'araldi-del-segreto');
+    if (!usaAraldi) return;
+    try {
+      if (!localStorage.getItem('scheda-interattiva:araldi-manuale-auto')) {
+        localStorage.setItem('scheda-interattiva:araldi-manuale-auto', '1');
+        if (manualiAttivi?.araldi !== true) setManualiAttivi((m) => ({ ...m, araldi: true }));
+      }
+      const chiave = `scheda-interattiva:araldi-incantesimi:${roster.attivo}`;
+      if (!localStorage.getItem(chiave)) {
+        const nuovi = incantesimiAraldiMancanti(scheda);
+        if (nuovi.length) {
+          localStorage.setItem(chiave, '1');
+          aggiorna({ incantesimiLista: [...(scheda.incantesimiLista || []), ...nuovi] });
+        }
+      }
+    } catch { /* niente */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scheda?.poteri, scheda?.slotIncantesimo, roster.attivo]);
+
   // Corregge definitivamente anche le schede create/importate prima
   // dell'automatismo, senza ritardare i calcoli del render corrente.
   useEffect(() => {
@@ -6872,6 +6898,8 @@ export default function App() {
         const decisione = decidiSync({ base: leggiBaseCanale('codice'), remoto, locale: rosterLocale, politica: POLITICA_SYNC, tsLocale: leggiUltimaModificaLocale() });
         if (await gestisciDecisione('codice', decisione, remoto, silenzioso, setSyncCodiceStatus, rosterLocale)) return;
         if (soloLettura) return;
+      } else if (remoto?.roster) {
+        salvaSnapshot(remoto.roster, 'online-sostituita');
       }
       const rosterCloud = await caricaImmaginiRoster(rosterLocale).catch(() => rosterLocale);
       const rosterDaInviare = rosterRemotoGrezzo ? preservaImmaginiSeMancanti(rosterCloud, rosterRemotoGrezzo) : rosterCloud;
@@ -7197,6 +7225,16 @@ export default function App() {
     conflittoPausaRef.current[c.canale] = false;
     setConflittoSync(null);
     setStatoCanale(c.canale, { text: t('conflitto.caricata_online'), type: 'success' });
+  }
+  /** "Questa è la versione giusta": sostituisce la copia online con quella di questo
+   *  dispositivo, senza confronti. La copia online sostituita va prima in Cronologia versioni. */
+  function sostituisciOnlineConQuesta() {
+    setConferma({
+      titolo: tr('Questa è la versione giusta?', 'Is this the right version?'),
+      testo: tr('La copia online verrà sostituita con quella di questo dispositivo (personaggi, immagini, Poteri, PF...). La copia online di adesso viene salvata in Cronologia versioni, così puoi tornare indietro. Gli altri dispositivi la riceveranno da soli.', 'The online copy will be replaced with this device\'s (characters, images, Powers, HP...). The current online copy is saved in Version history so you can go back. Your other devices will receive it by themselves.'),
+      etichettaConferma: tr('Sì, sostituisci', 'Yes, replace'),
+      onConferma: () => { conflittoPausaRef.current.codice = false; setConflittoSync(null); salvaSuCodiceSync(false, { forza: true }); },
+    });
   }
   function conflittoMantieniMia() {
     const c = conflittoSync;
@@ -7595,7 +7633,7 @@ export default function App() {
             <div style={{ fontSize: 14, lineHeight: 1.45, color: C.ink, marginBottom: 16 }}>{conferma.testo}</div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button style={{ ...styles.button, flex: 1 }} onClick={() => setConferma(null)}>{t('modal.annulla')}</button>
-              <button style={{ ...styles.buttonDanger, flex: 1 }} onClick={() => { const f = conferma.onConferma; setConferma(null); if (f) f(); }}>🗑 {t('modal.elimina')}</button>
+              <button style={{ ...(conferma.etichettaConferma ? styles.buttonPrimary : styles.buttonDanger), flex: 1 }} onClick={() => { const f = conferma.onConferma; setConferma(null); if (f) f(); }}>{conferma.etichettaConferma || `🗑 ${t('modal.elimina')}`}</button>
             </div>
           </div>
         </div>
@@ -7901,6 +7939,7 @@ export default function App() {
       )}
 
       {mostraCloud && <CloudModal
+           sostituisciOnlineConQuesta={sostituisciOnlineConQuesta}
            autoSyncCodice={autoSyncCodice}
            codiceSync={codiceSync}
            codiceSyncInput={codiceSyncInput}

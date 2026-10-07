@@ -4,7 +4,7 @@ import { C } from '../tema.js';
 import { styles } from '../stili.js';
 import { normalizzaCodiceSync, formattaCodiceSync } from '../../utils/sync.js';
 
-export function CloudModal({ autoSyncCodice, codiceSync, codiceSyncInput, conflittoSync, disattivaSyncCodice, esportaBackupCompleto, isCloudAttivo, isCloudConfigurato, lingua, ripristinaArchivioLocale, ripristinaArchivioRef, roster, setCodiceSyncInput, setConflittoSync, setMostraCloud, setSyncCodiceStatus, setTabBackup, sincronizzando, statoBgCloud, statoColoreCloud, statoGlowCloud, syncCodiceStatus, tabBackup, ultimoSyncCodice, usaCodiceSyncEsistente, creaCodiceSync, riattivaCodiceSync }) {
+export function CloudModal({ sostituisciOnlineConQuesta, autoSyncCodice, codiceSync, codiceSyncInput, conflittoSync, disattivaSyncCodice, esportaBackupCompleto, isCloudAttivo, isCloudConfigurato, lingua, ripristinaArchivioLocale, ripristinaArchivioRef, roster, setCodiceSyncInput, setConflittoSync, setMostraCloud, setSyncCodiceStatus, setTabBackup, sincronizzando, statoBgCloud, statoColoreCloud, statoGlowCloud, syncCodiceStatus, tabBackup, ultimoSyncCodice, usaCodiceSyncEsistente, creaCodiceSync, riattivaCodiceSync }) {
   return (
     <div
       style={{
@@ -139,6 +139,16 @@ export function CloudModal({ autoSyncCodice, codiceSync, codiceSyncInput, confli
                   <button style={styles.buttonMini} onClick={() => navigator.clipboard?.writeText(formattaCodiceSync(codiceSync))}>📋</button>
                 </div>
                 {ultimoSyncCodice && <div style={{ ...styles.detail, fontSize: 11, marginBottom: 8 }}>{lingua === 'en' ? 'Last sync:' : 'Ultimo salvataggio:'} {ultimoSyncCodice}</div>}
+                <button
+                  type="button"
+                  data-testid="versione-giusta-sync"
+                  style={{ ...styles.button, width: '100%', marginBottom: 8, fontWeight: 700, color: C.goldDark, borderColor: C.goldDark }}
+                  disabled={sincronizzando}
+                  onClick={sostituisciOnlineConQuesta}
+                  title={tr('Usa questo dispositivo come versione giusta: sostituisce la copia online', 'Use this device as the right version: replaces the online copy')}
+                >
+                  {tr('Questa è la versione giusta: sostituisci quella online', 'This is the right version: replace the online one')}
+                </button>
                 <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                   <button style={{ ...styles.button, flex: 1 }} onClick={disattivaSyncCodice}>{t('cloud.disattiva')}</button>
                 </div>

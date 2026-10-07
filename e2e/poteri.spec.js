@@ -123,6 +123,35 @@ test.describe('Poteri', () => {
     await expect(pannello.getByTestId('soglia-70')).toContainText('Vista Pura 9 m');
   });
 
+  test('pannello Araldi: "Aggiungi gli incantesimi del manuale" mette la lista ampliata fra i conosciuti, senza contare nei limiti (v4.88.0)', async ({ page }) => {
+    await attivaManuale(page);
+    await page.getByRole('button', { name: 'Da modello' }).click();
+    await page.getByTestId('modelli-poteri').getByRole('button', { name: /Aggiungi \d+ poteri/ }).click();
+    const lista = () => page.evaluate(() => {
+      const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+      return (r.personaggi[r.attivo].incantesimiLista || []).filter((s) => /Lista ampliata Araldi/.test(s.note || '')).map((s) => `${s.livello} ${s.nome}`);
+    });
+    const pannello = page.getByTestId('araldi-pannello');
+    const bottone = pannello.getByTestId('aggiungi-incantesimi-araldi');
+    // La comparsa automatica ha già aggiunto quelli dei cerchi sbloccati; se qualcuno manca, il pulsante lo rimette.
+    await expect.poll(async () => (await lista()).length, { timeout: 8000 }).toBeGreaterThan(0);
+    const presenti = await lista();
+    expect(presenti).toEqual(expect.arrayContaining(['1 Camuffarsi', '5 Storia Leggendaria']));
+    await expect(bottone).toHaveCount(0);
+    // Tolto un incantesimo, il pulsante lo ripropone.
+    await page.evaluate(() => {
+      const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+      const pg = r.personaggi[r.attivo];
+      pg.incantesimiLista = pg.incantesimiLista.filter((s) => s.nome !== 'Occhio Arcano');
+      localStorage.setItem('scheda-interattiva:v1', JSON.stringify(r));
+    });
+    await apriScheda(page);
+    await expect(bottone).toContainText('(1)');
+    await bottone.click();
+    await expect.poll(lista).toEqual(expect.arrayContaining(['4 Occhio Arcano']));
+    await expect(bottone).toHaveCount(0);
+  });
+
   test('pannello Araldi: perle degli usi, Debito che sale, soglie e +1 CA automatico a Debito 15', async ({ page }) => {
     await attivaManuale(page);
     await page.getByRole('button', { name: 'Da modello' }).click();

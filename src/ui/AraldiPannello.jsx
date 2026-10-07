@@ -24,6 +24,7 @@ import {
   AZIONI_PRIVILEGI_ARALDI,
   SEGRETI_MYRDHAL_ARALDI,
 } from '../data/modelliPoteri.js';
+import { incantesimiAraldiMancanti } from '../data/incantesimiAraldi.js';
 
 const NOMI_BASE = ['Segreti', 'Debito'];
 
@@ -87,6 +88,13 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
   const valSegreti = segreti.attuali;
   const valDebito = debito.attuali;
   const prossima = SOGLIE_DEBITO_ARALDI.find((s) => valDebito < s.soglia);
+
+  const mancantiIncanti = incantesimiAraldiMancanti(scheda);
+  const aggiungiIncanti = () => {
+    if (!mancantiIncanti.length) return;
+    aggiorna({ incantesimiLista: [...(scheda.incantesimiLista || []), ...mancantiIncanti] });
+    if (registra) registra({ etichetta: en ? 'Handbook spells added' : 'Incantesimi del manuale aggiunti', tipo: 'privilegio', dettaglio: mancantiIncanti.map((x) => x.nome).join(', ') });
+  };
 
   const spesa = (costo, titolo, dettaglio, extra = []) => (
     <button
@@ -213,6 +221,19 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
             {en ? 'Cast' : 'Lancia'} <span style={{ color: C.inkDim }}>(−{cerchioScelto}, +1 {en ? 'Debt' : 'Debito'})</span>
           </button>
         </div>
+        {mancantiIncanti.length > 0 && (
+          <div style={{ marginTop: 8 }}>
+            <button
+              type="button"
+              data-testid="aggiungi-incantesimi-araldi"
+              style={{ ...styles.buttonMini, fontWeight: 700, color: C.goldDark, borderColor: C.goldDark }}
+              onClick={aggiungiIncanti}
+              title={en ? 'Adds the handbook\'s expanded spell list (levels 1-5) to the known spells.' : 'Aggiunge agli incantesimi conosciuti la lista ampliata del manuale (cerchi 1-5).'}
+            >
+              {en ? `Add the handbook spells to known spells (${mancantiIncanti.length})` : `Aggiungi gli incantesimi del manuale ai conosciuti (${mancantiIncanti.length})`}
+            </button>
+          </div>
+        )}
         {valSegreti === 0 && (
           <p style={{ ...styles.detail, fontSize: 11, margin: '8px 0 0' }}>
             {en

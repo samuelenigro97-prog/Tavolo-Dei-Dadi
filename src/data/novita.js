@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.88.0',
+    voci: {
+      it: [
+        'Sincronizzazione: nuovo pulsante "Questa è la versione giusta" per sostituire la copia online con quella del dispositivo che hai in mano (la copia online va in Cronologia versioni).',
+        'Gli incantesimi della lista ampliata degli Araldi del Segreto entrano fra i conosciuti (cerchi già sbloccati), senza contare nei limiti di classe. Il manuale si accende da solo dove lo usi.',
+      ],
+      en: [
+        'Sync: new "This is the right version" button to replace the online copy with the one on the device in your hands (the online copy goes to Version history).',
+        'The Heralds of the Secret expanded spell list is added to known spells (unlocked circles only), without counting against class limits. The handbook turns itself on where you use it.',
+      ],
+    },
+  },
+  {
     versione: '4.87.0',
     voci: {
       it: ['Myrdhal è una creatura evocabile (Evoca / Aggiungi Compagno → Evocazioni) con il suo blocco completo. Fa parte del manuale Araldi del Segreto: compare solo con il manuale attivo.'],

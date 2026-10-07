@@ -2,6 +2,27 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.88.0] – 2026-10-07
+
+### Aggiunto
+- **"Questa è la versione giusta: sostituisci quella online"** (Sincronizzazione):
+  carica su codice la copia di questo dispositivo senza confronti, anche se
+  online c'è una copia che sembra più recente. La copia online sostituita va
+  prima in Cronologia versioni; gli altri dispositivi la ricevono da soli. Serve
+  per riallineare tutto partendo dal dispositivo che ha i dati giusti.
+- **Lista ampliata del manuale Araldi fra gli incantesimi conosciuti**
+  (`src/data/incantesimiAraldi.js`): i 10 incantesimi dei cerchi 1-5 entrano
+  nella scheda, solo per i cerchi già sbloccati, segnati "bonus" (non contano nei
+  limiti di classe) con la nota su Segreti e Debito. Si aggiungono da soli una
+  volta per personaggio che usa gli Araldi; il pannello Araldi ha il pulsante
+  "Aggiungi gli incantesimi del manuale ai conosciuti" per rimettere quelli
+  mancanti.
+- Il manuale Araldi del Segreto si accende da solo una volta sui dispositivi
+  dove un personaggio ha i poteri degli Araldi, anche con "Ripristina i Poteri della campagna" (poi si può spegnere).
+- Nuovi incantesimi nel catalogo: Chiaroveggenza, Occhio Arcano, Localizza
+  Creatura, Storia Leggendaria; alias "Charme su persone" e "Camuffare sé stessi".
+- La finestra di conferma può avere un'etichetta propria per il pulsante.
+
 ## [4.87.0] – 2026-10-07
 
 ### Aggiunto

@@ -139,3 +139,23 @@ test('dopo una modifica il tasto della sincronizzazione resta arancione finché 
   expect(memoria[codice].roster.personaggi['pg-v'].pfAttuali).toBe(63);
   await ctx.close();
 });
+
+test('"Questa è la versione giusta" sostituisce la copia online anche se quella online sembra più recente (v4.88.0)', async ({ browser }) => {
+  const memoria = {};
+  const ctx = await browser.newContext();
+  await simulaWorker(ctx, memoria);
+  const page = await apri(ctx, dispositivoGiusto);
+  await page.getByRole('button', { name: 'Sincronizzazione', exact: true }).first().click();
+  await page.getByTestId('crea-codice-sync').click();
+  await expect(page.getByText(/Sincronizzato ·/)).toBeVisible();
+  const codice = Object.keys(memoria)[0];
+  // Online arriva una copia "vecchia" di un altro dispositivo, con data più recente.
+  memoria[codice] = { roster: dispositivoVecchio, updatedAt: Date.now() + 60000 };
+  await page.getByTestId('versione-giusta-sync').click();
+  await page.getByRole('button', { name: 'Sì, sostituisci' }).click();
+  await expect.poll(() => memoria[codice].roster.personaggi['pg-v'].nome, { timeout: 15000 }).toBe('Vaelion Giusto');
+  // La copia sostituita è in Cronologia versioni.
+  const snaps = await page.evaluate(() => JSON.parse(localStorage.getItem('scheda-interattiva:snapshots') || '[]'));
+  expect(snaps.some((x) => x.motivo === 'online-sostituita' && x.roster.personaggi['pg-v'].nome === 'Vaelion Vecchio')).toBe(true);
+  await ctx.close();
+});
