@@ -68,3 +68,30 @@ test.describe('Risorse, Poteri e Compagni', () => {
     await expect(page.getByText('Compagni, famigli ed evocazioni', { exact: true })).toHaveCount(0);
   });
 });
+
+test('senza Poteri, un tocco rimette quelli della campagna (Patrono + Araldi) e attiva il manuale', async ({ page }) => {
+  await apriScheda(page);
+  await page.evaluate(() => {
+    const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+    const pg = r.personaggi[r.attivo];
+    pg.poteri = [];
+    pg.risorse = (pg.risorse || []).filter((x) => !String(x.id || '').startsWith('potere-'));
+    localStorage.setItem('scheda-interattiva:v1', JSON.stringify(r));
+    localStorage.removeItem('scheda-interattiva:snapshots');
+  });
+  await apriScheda(page);
+  await page.getByTestId('ripristina-poteri-campagna').click();
+  const box = page.getByTestId('poteri-risorse');
+  await expect(box.getByRole('button', { name: 'Debito +1' })).toBeVisible();
+  await expect(box.getByText('Segreti', { exact: true })).toBeVisible();
+  await expect(page.getByTestId('araldi-pannello')).toBeVisible();
+  const stato = await page.evaluate(() => {
+    const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+    const pg = r.personaggi[r.attivo];
+    return { nomi: pg.poteri.map((p) => p.nome), debiti: pg.risorse.filter((x) => x.nome === 'Debito').length, manuale: JSON.parse(localStorage.getItem('scheda-interattiva:manuali') || '{}').araldi };
+  });
+  expect(stato.nomi).toContain('Potere del Patrono');
+  expect(stato.nomi).toContain('Inquisire (6° livello)');
+  expect(stato.debiti).toBe(1);
+  expect(stato.manuale).toBe(true);
+});

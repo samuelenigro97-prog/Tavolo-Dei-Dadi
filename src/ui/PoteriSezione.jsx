@@ -389,7 +389,7 @@ function PotereModal({ potere, scheda, indice, totale, onChiudi, onAggiorna, onE
  * Sezione "Poteri": elenco di schede + pulsante per aggiungerne una nuova.
  * `scheda`/`aggiorna` sono le stesse props usate in tutto il resto della UI.
  */
-export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi = {}, registra, mostraInfo }) {
+export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi = {}, registra, mostraInfo, ripristinoCampagna }) {
   const [potereApertoId, setPotereApertoId] = useState(null);
   const [mostraModelli, setMostraModelli] = useState(false);
   // Sezione comprimibile: la scelta resta su questo dispositivo.
@@ -600,8 +600,13 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
       )}
 
       {chiusa ? null : poteriInLista.length === 0 && !pannelloAraldi ? (
-        <div style={{ ...styles.detail, fontSize: 12, textAlign: 'center', padding: '10px 0' }}>
+        <div style={{ ...styles.detail, fontSize: 12, textAlign: 'center', padding: '10px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
           {lingua === 'en' ? 'No custom powers yet.' : 'Nessun potere personalizzato per ora.'}
+          {ripristinoCampagna && (
+            <button type="button" data-testid="ripristina-poteri-campagna-sezione" style={{ ...styles.buttonMini, fontWeight: 700, color: C.goldDark, borderColor: C.goldDark }} onClick={ripristinoCampagna}>
+              {lingua === 'en' ? 'Restore the campaign powers (Heralds of the Secret)' : 'Ripristina i Poteri della campagna (Araldi del Segreto)'}
+            </button>
+          )}
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

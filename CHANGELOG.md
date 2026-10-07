@@ -2,6 +2,18 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.83.0] – 2026-10-07
+
+### Aggiunto
+- **Ripristino dei Poteri della campagna** (`src/data/poteriCampagna.js`): se il
+  personaggio non ha Poteri, il riquadro Poteri (sotto Risorse di classe) e la
+  sezione Poteri mostrano "Ripristina i Poteri della campagna". Rimette il
+  Potere del Patrono (contatore Debito, Velocità +3 m dalla Maschera) e tutti i
+  poteri del modello Araldi del Segreto (Segreti, soglie, Occhio Risvegliato,
+  Veglia, Affabilità, Inquisire, Trasferire Empatico, Braccare!) con un solo
+  Debito condiviso, e attiva il manuale di campagna se era spento. Resta anche
+  il recupero dalla Cronologia versioni quando ne esiste una copia.
+
 ## [4.82.0] – 2026-10-07
 
 ### Corretto

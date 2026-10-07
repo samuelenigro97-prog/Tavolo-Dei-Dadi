@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.83.0',
+    voci: {
+      it: ['Poteri spariti? Nel riquadro Poteri e nella sezione Poteri c\'è "Ripristina i Poteri della campagna": rimette il Potere del Patrono (Debito, Maschera +3 m) e tutti i privilegi degli Araldi del Segreto, e attiva il manuale.'],
+      en: ['Powers gone? The Powers box and section now have "Restore the campaign powers": it brings back the Patron\'s Power (Debt, Mask +3 m) and all the Heralds of the Secret features, and turns the sourcebook on.'],
+    },
+  },
+  {
     versione: '4.81.0',
     voci: {
       it: [

@@ -1341,6 +1341,7 @@ import { modificatore, conSegno, tiraDado, parseEspressioneDado, facceDadoVita, 
 import { risorseAutoClasse, trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from "./rules/regole.js";
 import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda, contatoriInGioco } from './rules/poteri.js';
 import { PoteriRisorse } from './ui/PoteriRisorse.jsx';
+import { costruisciPoteriCampagna } from './data/poteriCampagna.js';
 import { DadiModal } from './ui/modali/DadiModal.jsx';
 import { DiarioModal } from './ui/modali/DiarioModal.jsx';
 import { IspirazioneBgModal } from './ui/modali/IspirazioneBgModal.jsx';
@@ -2014,7 +2015,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.82.0';
+const APP_VERSION = '4.83.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -6103,6 +6104,14 @@ export default function App() {
       }
     }
     return null;
+  }
+  /** Rimette i Poteri della campagna (Potere del Patrono + Araldi del Segreto) e
+   *  attiva il manuale degli Araldi se era spento. */
+  function ripristinaPoteriCampagna() {
+    const poteri = costruisciPoteriCampagna();
+    aggiorna({ poteri, risorse: sincronizzaRisorsePoteri(poteri, scheda.risorse, livelloTotaleScheda(scheda), scheda.bonusCompetenza) });
+    if (manualiAttivi?.araldi !== true) setManualiAttivi((m) => ({ ...m, araldi: true }));
+    registra({ etichetta: tr('Poteri della campagna ripristinati', 'Campaign powers restored'), tipo: 'privilegio', dettaglio: tr('Potere del Patrono e Araldi del Segreto', "Patron's Power and Heralds of the Secret") });
   }
   function leggiSnapshots() {
     try { return JSON.parse(localStorage.getItem('scheda-interattiva:snapshots')) || []; } catch { return []; }
@@ -10525,6 +10534,7 @@ export default function App() {
                     registra={registra}
                     mostraInfo={setInfo}
                     recupero={!isSolaLettura && contatoriInGioco(scheda).length === 0 ? recuperoPoteriDaCronologia() : null}
+                    ripristinoCampagna={!isSolaLettura && !(scheda.poteri || []).length ? ripristinaPoteriCampagna : null}
                   />
                 </Sezione>
               </div>
@@ -14814,7 +14824,7 @@ export default function App() {
                   </div>
 
                   {/* Riga 3: Poteri personalizzati (regole homebrew del tavolo) */}
-                  <SezionePoteri scheda={scheda} aggiorna={aggiorna} lingua={lingua} manualiAttivi={manualiAttivi} registra={registra} mostraInfo={setInfo} />
+                  <SezionePoteri scheda={scheda} aggiorna={aggiorna} lingua={lingua} manualiAttivi={manualiAttivi} registra={registra} mostraInfo={setInfo} ripristinoCampagna={!isSolaLettura && !(scheda.poteri || []).length ? ripristinaPoteriCampagna : null} />
                 </div>
               </Sezione>
 

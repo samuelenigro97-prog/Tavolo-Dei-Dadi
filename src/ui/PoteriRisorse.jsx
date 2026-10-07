@@ -22,7 +22,7 @@ function etichettaRicarica(ricarica, en) {
  * di questo personaggio con dei Poteri (es. persi collegando un altro dispositivo),
  * il pulsante per recuperarli: `recupero` = { quando, applica }.
  */
-export function PoteriRisorse({ scheda, aggiorna, lingua = 'it', registra, mostraInfo, recupero }) {
+export function PoteriRisorse({ scheda, aggiorna, lingua = 'it', registra, mostraInfo, recupero, ripristinoCampagna }) {
   const en = lingua === 'en';
   const voci = contatoriInGioco(scheda);
   if (!voci.length) {
@@ -41,6 +41,17 @@ export function PoteriRisorse({ scheda, aggiorna, lingua = 'it', registra, mostr
             onClick={recupero.applica}
           >
             {en ? `Restore powers from history (${recupero.quando})` : `Recupera i Poteri dalla cronologia (${recupero.quando})`}
+          </button>
+        )}
+        {ripristinoCampagna && (
+          <button
+            type="button"
+            data-testid="ripristina-poteri-campagna"
+            style={{ ...styles.buttonMini, width: '100%', padding: '5px 8px', fontWeight: 700, marginTop: recupero ? 6 : 0, color: C.goldDark, borderColor: C.goldDark }}
+            onClick={ripristinoCampagna}
+            title={en ? 'Patron\'s Power (Debt, Mask +3 m) and all the Heralds of the Secret features' : 'Potere del Patrono (Debito, Maschera +3 m) e tutti i privilegi degli Araldi del Segreto'}
+          >
+            {en ? 'Restore the campaign powers (Heralds of the Secret)' : 'Ripristina i Poteri della campagna (Araldi del Segreto)'}
           </button>
         )}
       </div>
