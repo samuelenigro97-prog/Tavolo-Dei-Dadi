@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.86.0',
+    voci: {
+      it: ['Manuale Araldi del Segreto aggiornato alla versione Player 1.1: Veglia con "Vista Pura", nuova spesa di Segreti "Myrdhal" (10 Segreti, anche di gruppo) con pulsanti nel pannello Araldi. I poteri già sulla scheda si aggiornano da soli.'],
+      en: ['Heralds of the Secret handbook updated to Player 1.1: Vigil with "True Sight", new Secrets expense "Myrdhal" (10 Secrets, pooled by the group) with buttons in the Heralds panel. Powers already on your sheet update on their own.'],
+    },
+  },
+  {
     versione: '4.85.0',
     voci: {
       it: ['Il tasto della sincronizzazione diventa arancione appena modifichi la scheda e torna verde quando le modifiche sono online (dopo una decina di secondi).'],

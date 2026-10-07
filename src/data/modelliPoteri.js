@@ -8,7 +8,7 @@ export const SOGLIE_DEBITO_ARALDI = [
   { soglia: 5, nome: 'Voce nell\'Ombra', nomeEn: 'Voice in the Shadows', effetto: 'Messaggio a volontà come azione bonus e vantaggio alle prove di Intuizione.', effettoEn: 'Message at will as a bonus action and advantage on Insight checks.' },
   { soglia: 15, nome: 'Occhio Risvegliato', nomeEn: 'Awakened Eye', effetto: 'Vantaggio a Percezione e Indagare; +1 CA (applicato in automatico).', effettoEn: 'Advantage on Perception and Investigation; +1 AC (applied automatically).' },
   { soglia: 35, nome: 'Coraggio', nomeEn: 'Courage', effetto: 'Vantaggio ai TS contro spaventato.', effettoEn: 'Advantage on saves against being frightened.' },
-  { soglia: 70, nome: 'Veglia', nomeEn: 'Vigil', effetto: 'Truesight 9 m per 1 ora al giorno; +1 ai tiri per colpire.', effettoEn: 'Truesight 30 ft for 1 hour a day; +1 to attack rolls.' },
+  { soglia: 70, nome: 'Veglia', nomeEn: 'Vigil', effetto: 'Vista Pura 9 m per 1 ora al giorno; +1 ai tiri per colpire.', effettoEn: 'True Sight 30 ft for 1 hour a day; +1 to attack rolls.' },
   { soglia: 150, nome: 'Non questa volta', nomeEn: 'Not This Time', effetto: 'Una volta nella vita, a 0 PF resti a 1 PF; puoi riutilizzare il privilegio solo chiedendolo a Tim.', effettoEn: 'Once in your life, at 0 HP you stay at 1 HP; you can reuse it only by asking Tim.' },
 ];
 
@@ -17,6 +17,9 @@ export const ID_MODELLO_ARALDI = 'araldi-del-segreto';
 
 /** Debito guadagnato a ogni uso di un privilegio degli Araldi (dal manuale). */
 export const DEBITO_PER_USO_ARALDI = { 'Inquisire': 1, 'Trasferire Empatico': 2, 'Braccare!': 1 };
+
+/** Segreti per evocare Myrdhal (manuale 1.1): si possono mettere in comune fra i giocatori. */
+export const SEGRETI_MYRDHAL_ARALDI = 10;
 
 /** Segreti da spendere per recuperare un uso di un privilegio (dal manuale). */
 export const RECUPERO_CON_SEGRETI_ARALDI = { 'Affabilità': 1, 'Trasferire Empatico': 2 };
@@ -65,7 +68,8 @@ export const MODELLI_POTERI = [
           '• Aprire (1 Segreto): rompi il sigillo e leggi l\'informazione; il DM garantisce che sia vera e utile.',
           '• Leva (1 Segreto): usi il Segreto contro la sua fonte, o contro chi ne è coinvolto, in un\'interazione sociale: una prova di Carisma contro di lei ha successo automatico (CD massima 20).',
           '• Incantare con i segreti (1 Segreto per livello dell\'incantesimo): lanci un incantesimo della lista ampliata senza spendere slot e guadagni 1 Debito.',
-          '• Mercato (in gioco): i Segreti sono moneta; venderne uno lo consuma.',
+          '• Mercato (in gioco): i Segreti sono moneta: informatori, culti e nobili pagano in favori, accessi o oro un biglietto che non possono ancora leggere. Venderlo lo consuma.',
+          '• Myrdhal (10 Segreti, anche di gruppo): evocate Myrdhal per 1d6 turni.',
           '',
           'Lista ampliata (si sblocca col relativo cerchio):',
           '1°: charme su persone, camuffare sé stessi',
@@ -85,10 +89,10 @@ export const MODELLI_POTERI = [
         nome: 'Araldi del Segreto · Soglie del Debito',
         livelloMin: 1,
         descrizione: [
-          '5: Voce nell\'Ombra: messaggio a volontà come azione bonus e vantaggio alle prove di Intuizione.',
+          '5: Voce nell\'Ombra: Messaggio a volontà come azione bonus e vantaggio alle prove di Intuizione.',
           '15: Occhio Risvegliato: vantaggio a Percezione e Indagare; +1 CA (vedi il potere dedicato, da attivare al raggiungimento).',
           '35: Coraggio: vantaggio ai TS contro spaventato.',
-          '70: Veglia: Truesight 9 m per 1 ora al giorno; +1 ai tiri per colpire.',
+          '70: Veglia: Vista Pura 9 m per 1 ora al giorno; +1 ai tiri per colpire.',
           '150: Non questa volta: 1 volta nella vita a 0 PF resti a 1 PF; puoi riutilizzare questo privilegio solo chiedendolo a Tim.',
         ].join('\n'),
         attivo: true,
@@ -105,7 +109,7 @@ export const MODELLI_POTERI = [
       },
       {
         nome: 'Debito 70 · Veglia (+1 colpire)',
-        descrizione: 'Scatta da solo quando il Debito arriva a 70: Truesight 9 m per 1 ora al giorno e +1 ai tiri per colpire.',
+        descrizione: 'Scatta da solo quando il Debito arriva a 70: Vista Pura 9 m per 1 ora al giorno e +1 ai tiri per colpire.',
         attivo: true,
         condizione: { contatore: 'Debito', minimo: 70 },
         contatori: [],
@@ -169,3 +173,27 @@ export const MODELLI_POTERI = [
     ],
   },
 ];
+
+/**
+ * Porta al manuale 1.1 i testi dei poteri degli Araldi già presenti sulle
+ * schede (Veglia → "Vista Pura", nuova voce Myrdhal fra le spese di Segreti).
+ * Tocca solo i testi che portano ancora le vecchie diciture, così una
+ * descrizione modificata a mano resta com'è. Restituisce lo stesso array se
+ * non c'è niente da aggiornare.
+ */
+export function aggiornaTestiAraldi(poteri) {
+  if (!Array.isArray(poteri)) return poteri;
+  const modello = MODELLI_POTERI.find((m) => m.id === ID_MODELLO_ARALDI);
+  let cambiato = false;
+  const nuovi = poteri.map((p) => {
+    if (!p || p.modello !== ID_MODELLO_ARALDI || typeof p.descrizione !== 'string') return p;
+    const m = (modello?.poteri || []).find((x) => x.nome === p.nome);
+    if (!m || m.descrizione === p.descrizione) return p;
+    const vecchia = /Truesight 9 m/.test(p.descrizione)
+      || (/Mercato \(in gioco\)/.test(p.descrizione) && !/Myrdhal/.test(p.descrizione));
+    if (!vecchia) return p;
+    cambiato = true;
+    return { ...p, descrizione: m.descrizione };
+  });
+  return cambiato ? nuovi : poteri;
+}

@@ -39,3 +39,27 @@ test('Poteri della campagna: incompleti con il solo Debito, uniti tenendo il val
   assert.ok(uniti.some((p) => p.nome === 'Benedizione del mare'), 'gli altri poteri restano');
   assert.ok(!uniti.some((p) => p.id === 'x'), 'il Debito generico viene sostituito da quello del Patrono');
 });
+
+test('manuale Araldi 1.1: testi aggiornati (Vista Pura, Myrdhal) sui poteri già presenti, senza toccare quelli modificati a mano (v4.86.0)', async () => {
+  const { aggiornaTestiAraldi, MODELLI_POTERI, ID_MODELLO_ARALDI, SOGLIE_DEBITO_ARALDI, SEGRETI_MYRDHAL_ARALDI } = await import('../src/data/modelliPoteri.js');
+  const modello = MODELLI_POTERI.find((m) => m.id === ID_MODELLO_ARALDI);
+  const tutti = modello.poteri.map((p) => p.descrizione).join('\n');
+  assert.ok(!/Truesight/.test(tutti), 'niente più Truesight nei testi italiani');
+  assert.ok(/Vista Pura 9 m/.test(tutti));
+  assert.equal(SOGLIE_DEBITO_ARALDI.find((s) => s.soglia === 70).effetto, 'Vista Pura 9 m per 1 ora al giorno; +1 ai tiri per colpire.');
+  assert.equal(SEGRETI_MYRDHAL_ARALDI, 10);
+  const segreti = modello.poteri.find((p) => p.nome.endsWith('Segreti e Debito'));
+  assert.ok(/Myrdhal \(10 Segreti, anche di gruppo\)/.test(segreti.descrizione));
+  // Una scheda con i testi vecchi viene aggiornata.
+  const vecchi = [
+    { id: 'a', nome: segreti.nome, modello: ID_MODELLO_ARALDI, descrizione: '• Mercato (in gioco): i Segreti sono moneta; venderne uno lo consuma.' },
+    { id: 'b', nome: 'Araldi del Segreto · Soglie del Debito', modello: ID_MODELLO_ARALDI, descrizione: '70: Veglia: Truesight 9 m per 1 ora al giorno' },
+    { id: 'c', nome: 'Affabilità (1° livello)', modello: ID_MODELLO_ARALDI, descrizione: 'Testo scritto a mano' },
+  ];
+  const nuovi = aggiornaTestiAraldi(vecchi);
+  assert.equal(nuovi[0].descrizione, segreti.descrizione);
+  assert.ok(/Vista Pura/.test(nuovi[1].descrizione));
+  assert.equal(nuovi[2].descrizione, 'Testo scritto a mano', 'modificata a mano: resta');
+  // Idempotente: niente da aggiornare = stesso array.
+  assert.equal(aggiornaTestiAraldi(nuovi), nuovi);
+});

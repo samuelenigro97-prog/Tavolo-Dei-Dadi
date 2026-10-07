@@ -95,6 +95,34 @@ test.describe('Poteri', () => {
     await expect(page.getByTestId('modelli-poteri').getByRole('button', { name: 'Già aggiunto' })).toBeDisabled();
   });
 
+  test('manuale 1.1: Myrdhal fra le spese di Segreti, Veglia con "Vista Pura", testi vecchi aggiornati da soli (v4.86.0)', async ({ page }) => {
+    await attivaManuale(page);
+    // Una scheda con i testi della versione precedente del manuale.
+    await page.getByRole('button', { name: 'Da modello' }).click();
+    await page.getByTestId('modelli-poteri').getByRole('button', { name: /Aggiungi \d+ poteri/ }).click();
+    await page.evaluate(() => {
+      const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+      const pg = r.personaggi[r.attivo];
+      for (const p of pg.poteri) {
+        if (p.nome.endsWith('Soglie del Debito')) p.descrizione = p.descrizione.replace('Vista Pura', 'Truesight');
+        if (p.nome.endsWith('Segreti e Debito')) p.descrizione = p.descrizione.split('\n').filter((l) => !/Myrdhal/.test(l)).join('\n');
+      }
+      localStorage.setItem('scheda-interattiva:v1', JSON.stringify(r));
+    });
+    await apriScheda(page);
+    const testi = await page.evaluate(() => {
+      const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+      return r.personaggi[r.attivo].poteri.filter((p) => p.modello === 'araldi-del-segreto').map((p) => p.descrizione).join('\n');
+    });
+    expect(testi).toContain('Vista Pura 9 m');
+    expect(testi).not.toContain('Truesight');
+    expect(testi).toContain('Myrdhal (10 Segreti, anche di gruppo)');
+    const pannello = page.getByTestId('araldi-pannello');
+    await expect(pannello.getByRole('button', { name: /^Myrdhal/ })).toBeDisabled();
+    await expect(pannello.getByTestId('myrdhal-gruppo')).toContainText('10 Segreti');
+    await expect(pannello.getByTestId('soglia-70')).toContainText('Vista Pura 9 m');
+  });
+
   test('pannello Araldi: perle degli usi, Debito che sale, soglie e +1 CA automatico a Debito 15', async ({ page }) => {
     await attivaManuale(page);
     await page.getByRole('button', { name: 'Da modello' }).click();

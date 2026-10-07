@@ -2,6 +2,22 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.86.0] – 2026-10-07
+
+### Cambiato
+- **Manuale Araldi del Segreto aggiornato alla versione Player 1.1**
+  (`src/data/modelliPoteri.js`): la Veglia (Debito 70) ora dà "Vista Pura 9 m"
+  al posto di "Truesight 9 m"; "Messaggio" con la maiuscola; il Mercato ha il
+  testo completo del manuale; nuova spesa di Segreti **Myrdhal** (10 Segreti,
+  anche di gruppo: "Evocate Myrdhal per 1d6 turni").
+- Nel pannello Araldi, fra "Spendere i Segreti": pulsante **Myrdhal (−10)**,
+  attivo con almeno 10 Segreti, e **Segreto per Myrdhal (−1)** per mettere un
+  Segreto nel fondo comune del gruppo.
+- I poteri degli Araldi già sulle schede si aggiornano da soli ai testi nuovi
+  (`aggiornaTestiAraldi`): solo se portano ancora le vecchie diciture, le
+  descrizioni modificate a mano non si toccano.
+- Manuali e fonti: l'elenco indica "Player 1.1".
+
 ## [4.85.0] – 2026-10-07
 
 ### Corretto

@@ -22,6 +22,7 @@ import {
   DEBITO_PER_USO_ARALDI as DEBITO_PER_USO,
   RECUPERO_CON_SEGRETI_ARALDI as RECUPERO_CON_SEGRETI,
   AZIONI_PRIVILEGI_ARALDI,
+  SEGRETI_MYRDHAL_ARALDI,
 } from '../data/modelliPoteri.js';
 
 const NOMI_BASE = ['Segreti', 'Debito'];
@@ -184,6 +185,11 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
           {spesa(1, en ? 'Open' : 'Aprire', en ? 'Open a seal: the DM guarantees the information is true and useful.' : 'Rompi il sigillo: il DM garantisce che l\'informazione sia vera e utile.')}
           {spesa(1, en ? 'Lever' : 'Leva', en ? 'Use the Secret against its source: an automatic Charisma success (max DC 20).' : 'Usi il Segreto contro la sua fonte: prova di Carisma con successo automatico (CD massima 20).')}
           {spesa(1, en ? 'Market' : 'Mercato', en ? 'Sell a Secret: it is consumed.' : 'Vendi un Segreto: viene consumato.')}
+          {spesa(SEGRETI_MYRDHAL_ARALDI, 'Myrdhal', en ? 'Summon Myrdhal for 1d6 turns (10 Secrets, the group can pool them).' : 'Evocate Myrdhal per 1d6 turni (10 Segreti, anche di gruppo).')}
+          {spesa(1, en ? 'Secret for Myrdhal' : 'Segreto per Myrdhal', en ? 'Put 1 Secret into the group pool to summon Myrdhal (10 in total).' : 'Metti 1 Segreto nel fondo comune del gruppo per evocare Myrdhal (10 in tutto).')}
+          <span style={{ ...styles.detail, fontSize: 11 }} data-testid="myrdhal-gruppo">
+            {en ? 'Myrdhal costs 10 Secrets: the group can pool them.' : 'Myrdhal costa 10 Segreti: si possono mettere in comune nel gruppo.'}
+          </span>
         </div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginTop: 8 }}>
           <span style={{ fontSize: 12, fontWeight: 700 }}>{en ? 'Enchant with secrets' : 'Incantare con i segreti'}</span>

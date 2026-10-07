@@ -2445,8 +2445,8 @@ export const MANUALI_INFO = {
   },
   araldi: {
     id: 'araldi',
-    nome: 'Araldi del Segreto (manuale di campagna)',
-    nomeEn: 'Heralds of the Secret (campaign handbook)',
+    nome: 'Araldi del Segreto (manuale di campagna, Player 1.1)',
+    nomeEn: 'Heralds of the Secret (campaign handbook, Player 1.1)',
     codice: 'Campagna',
     icona: '🗝️',
     colore: '#6366f1',

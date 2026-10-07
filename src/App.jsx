@@ -1343,6 +1343,7 @@ import { risorseAutoClasse, trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer
 import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda, contatoriInGioco, valoreContatore } from './rules/poteri.js';
 import { PoteriRisorse } from './ui/PoteriRisorse.jsx';
 import { unisciPoteriCampagna, poteriCampagnaIncompleti } from './data/poteriCampagna.js';
+import { aggiornaTestiAraldi } from './data/modelliPoteri.js';
 import { DadiModal } from './ui/modali/DadiModal.jsx';
 import { DiarioModal } from './ui/modali/DiarioModal.jsx';
 import { IspirazioneBgModal } from './ui/modali/IspirazioneBgModal.jsx';
@@ -2016,7 +2017,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.85.0';
+const APP_VERSION = '4.86.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4614,6 +4615,15 @@ export default function App() {
     const next = typeof updater === 'function' ? updater(prev) : updater;
     aggiorna({ livelliIncChiusi: next });
   };
+
+  // Manuale Araldi del Segreto 1.1: porta ai testi nuovi (Vista Pura, Myrdhal)
+  // i poteri degli Araldi già presenti sulla scheda.
+  useEffect(() => {
+    if (!scheda || isSolaLettura || !Array.isArray(scheda.poteri)) return;
+    const aggiornati = aggiornaTestiAraldi(scheda.poteri);
+    if (aggiornati !== scheda.poteri) aggiorna({ poteri: aggiornati });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scheda?.poteri]);
 
   // Corregge definitivamente anche le schede create/importate prima
   // dell'automatismo, senza ritardare i calcoli del render corrente.
