@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.89.0',
+    voci: {
+      it: ['Myrdhal ha sempre il suo blocco (210 PF): l\'Evocatore Possente e gli altri bonus di classe dell\'evocatore non lo modificano. Le altre evocazioni li ricevono come prima.'],
+      en: ['Myrdhal always keeps its own stat block (210 HP): Mighty Summoner and other summoner class bonuses do not change it. Other summons get them as before.'],
+    },
+  },
+  {
     versione: '4.88.0',
     voci: {
       it: [

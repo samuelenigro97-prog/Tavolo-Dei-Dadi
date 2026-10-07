@@ -1337,6 +1337,9 @@ export function riepilogoCondizioni(condizioni, versione = '2024') {
  */
 export function calcolaPfCompagno(creatura, scheda) {
   if (!creatura) return 10;
+  // Creature dei manuali di campagna (es. Myrdhal): blocco fisso, i bonus di classe
+  // dell'evocatore (Evocatore Possente...) non lo toccano.
+  if (creatura.manuale) return Number(creatura.pf) || 10;
   const formula = String(creatura.pfFormula || '').trim();
   const liv = Math.max(1, Math.floor(scheda?.livello) || 1);
   const modInt = modificatore(scheda?.caratteristiche?.intelligenza || 10);

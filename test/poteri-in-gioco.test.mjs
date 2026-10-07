@@ -99,3 +99,14 @@ test('lista ampliata Araldi: incantesimi dei cerchi sbloccati, senza doppioni, f
   const dopo = { ...druido10, incantesimiLista: [...druido10.incantesimiLista, ...nuovi] };
   assert.equal(incantesimiAraldiMancanti(dopo).length, 0);
 });
+
+test('Myrdhal: i bonus di classe dell\'evocatore non lo toccano, le altre evocazioni sì (v4.89.0)', async () => {
+  const { EVOCAZIONI_ARALDI, EVOCAZIONI } = await import('../src/data/bestiario.js');
+  const { calcolaPfCompagno } = await import('../src/rules/regole.js');
+  const pastore = { livello: 10, classe: 'Druido', sottoclasse: 'Circolo del Pastore', privilegiSottoclasse: 'Evocatore Possente' };
+  const myrdhal = EVOCAZIONI_ARALDI.find((c) => c.nome === 'Myrdhal');
+  assert.equal(calcolaPfCompagno(myrdhal, pastore), 210, 'niente +2 PF per dado vita');
+  const elementale = EVOCAZIONI.find((c) => /^\d+d\d+/.test(c.pfFormula || ''));
+  const dadi = Number(elementale.pfFormula.match(/^(\d+)d/)[1]);
+  assert.equal(calcolaPfCompagno(elementale, pastore), elementale.pf + 2 * dadi, 'un\'evocazione normale prende l\'Evocatore Possente');
+});

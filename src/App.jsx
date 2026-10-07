@@ -2018,7 +2018,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.88.0';
+const APP_VERSION = '4.89.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4625,6 +4625,16 @@ export default function App() {
     if (aggiornati !== scheda.poteri) aggiorna({ poteri: aggiornati });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scheda?.poteri]);
+
+  // Myrdhal evocato con la 4.87 aveva 250 PF (210 + Evocatore Possente di Vaelion):
+  // il suo blocco è fisso, torna a 210.
+  useEffect(() => {
+    if (!scheda || isSolaLettura || !Array.isArray(scheda.alleati)) return;
+    if (!scheda.alleati.some((a) => a?.nomeOriginale === 'Myrdhal' && a.pfMax === 250)) return;
+    aggiorna({ alleati: scheda.alleati.map((a) => (a?.nomeOriginale === 'Myrdhal' && a.pfMax === 250
+      ? { ...a, pfMax: 210, pfAttuali: Math.min(Number(a.pfAttuali) || 0, 210) } : a)) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scheda?.alleati]);
 
   // Chi usa gli Araldi del Segreto (ha i poteri del loro modello):
   // una volta sola il manuale di campagna si accende e gli incantesimi della sua

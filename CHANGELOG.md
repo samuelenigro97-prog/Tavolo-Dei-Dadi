@@ -2,6 +2,15 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.89.0] – 2026-10-07
+
+### Corretto
+- **Myrdhal non prende i bonus di classe dell'evocatore**: l'Evocatore Possente
+  di Vaelion (+2 PF per dado vita) lo portava a 250 PF. Le creature dei manuali di
+  campagna (`manuale` nel catalogo) hanno ora un blocco fisso, in
+  `calcolaPfCompagno`: 210 PF. Un Myrdhal già evocato con 250 PF torna a 210.
+  Le altre evocazioni continuano a ricevere l'Evocatore Possente.
+
 ## [4.88.0] – 2026-10-07
 
 ### Aggiunto

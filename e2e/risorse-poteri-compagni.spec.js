@@ -151,8 +151,8 @@ test('Myrdhal (Araldi del Segreto): si evoca dal catalogo solo con il manuale at
   });
   await expect.poll(leggiAlleato).not.toBeNull();
   const alleato = await leggiAlleato();
-  // 210 PF + 2 per dado vita (20) dell'Evocatore Possente del Circolo del Pastore di Vaelion.
-  expect(alleato.pfMax).toBe(250);
+  // Blocco fisso: l'Evocatore Possente di Vaelion (+2 PF per dado vita) non lo tocca.
+  expect(alleato.pfMax).toBe(210);
   expect(alleato.ca).toBe(20);
   expect(alleato.azioni.map((a) => a.nome)).toEqual(expect.arrayContaining(['Lama del Vuoto', 'Dardo di Terrore', 'Passo d\'Ombra (azione bonus)']));
   // Manuale spento di nuovo: sparisce dal catalogo, ma quello già evocato resta sulla scheda.
@@ -166,4 +166,20 @@ test('Myrdhal (Araldi del Segreto): si evoca dal catalogo solo con il manuale at
     return (r.personaggi[r.attivo].alleati || []).some((a) => a.nome === 'Myrdhal');
   });
   expect(resta).toBe(true);
+});
+
+test('Myrdhal già evocato con 250 PF (bug 4.87) torna a 210 (v4.89.0)', async ({ page }) => {
+  await apriScheda(page);
+  await page.evaluate(() => {
+    const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+    const pg = r.personaggi[r.attivo];
+    pg.alleati = [{ id: 'a1', nome: 'Myrdhal', nomeOriginale: 'Myrdhal', pfMax: 250, pfAttuali: 250, ca: 20, azioni: [] }];
+    localStorage.setItem('scheda-interattiva:v1', JSON.stringify(r));
+  });
+  await apriScheda(page);
+  await expect.poll(() => page.evaluate(() => {
+    const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+    const a = r.personaggi[r.attivo].alleati[0];
+    return [a.pfMax, a.pfAttuali];
+  })).toEqual([210, 210]);
 });
