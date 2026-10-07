@@ -57,3 +57,12 @@ test('/pg: la lettura (con chiave) non consuma il limite delle scritture', async
     assert.equal(res.status, 200);
   }
 });
+
+test('il limite di richieste non consuma scritture KV (piano gratuito: 1.000 al giorno)', async () => {
+  const kv = new KvFinto();
+  const env = { SCHEDE: kv, DM_KEY: 'segreto' };
+  await worker.fetch(req('/sync/23456ABCDE'), env);
+  await worker.fetch(req('/sync/23456ABCDE'), env);
+  assert.equal(kv.puts.filter((p) => String(p.k).startsWith('rate:')).length, 0);
+  assert.equal(kv.puts.length, 0, 'una lettura della sincronizzazione non scrive nulla');
+});

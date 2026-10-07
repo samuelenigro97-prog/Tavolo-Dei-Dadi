@@ -2,6 +2,27 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.82.0] – 2026-10-07
+
+### Corretto
+- **Limite giornaliero di Cloudflare KV**: il piano gratuito ammette 1.000
+  scritture al giorno. Il limite di richieste del Worker (senza il binding
+  `ROOM_RATE_LIMITER`) teneva il contatore su KV, quindi OGNI richiesta, anche
+  una semplice lettura della sincronizzazione, costava una scrittura; con il
+  controllo ogni 45 s introdotto nella 4.77.0 due dispositivi aperti
+  arrivavano al 50% in poche ore.
+  - Worker: contatore del limite in memoria dell'istanza (nessuna operazione KV);
+    il PUT di `/sync` legge il valore esistente una volta sola invece di due.
+    **Richiede di ripubblicare il Worker** (`cd worker && npx wrangler deploy`).
+  - App: controllo periodico della copia online ogni 10 minuti (non 45 s) e al
+    ritorno sull'app al massimo una volta al minuto; salvataggio automatico a
+    codice 10 s dopo l'ultima modifica (una raffica di clic = un salvataggio);
+    deposito nell'Archivio DM 3 minuti dopo l'ultima modifica (prima 45 s).
+  - Se all'avvio il caricamento della copia online coincide con una modifica
+    automatica della scheda, si riprova dopo 1,5 s (massimo 3 volte al minuto)
+    invece di aspettare il salvataggio successivo.
+- Test: il limite di richieste del Worker non scrive su KV.
+
 ## [4.81.0] – 2026-10-06
 
 ### Aggiunto

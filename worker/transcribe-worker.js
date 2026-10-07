@@ -200,13 +200,25 @@ async function superaRateLimit(request, env, { bucket = 'room', massimo = 10 } =
     const esito = await env.ROOM_RATE_LIMITER.limit({ key: `${bucket}:${ip}` });
     return esito?.success !== false;
   }
+  // Senza il binding: contatore in memoria dell'istanza del Worker (finestra di
+  // 1 minuto). Prima era su KV, ma così ogni richiesta (anche una semplice
+  // lettura della sincronizzazione) costava una SCRITTURA KV: il piano gratuito
+  // ne ha 1.000 al giorno e i controlli periodici dell'app le esaurivano.
+  // In memoria è approssimato (ogni istanza conta per sé) ma non costa nulla.
   const finestra = Math.floor(Date.now() / 60000);
-  const key = `rate:${bucket}:${finestra}:${await hashBreve(ip)}`;
-  const usi = Number(await env.SCHEDE.get(key)) || 0;
+  const key = `${bucket}:${await hashBreve(ip)}`;
+  const voce = CONTATORI_RATE.get(key);
+  const usi = voce && voce.finestra === finestra ? voce.usi : 0;
   if (usi >= massimo) return false;
-  await env.SCHEDE.put(key, String(usi + 1), { expirationTtl: 120 });
+  CONTATORI_RATE.set(key, { finestra, usi: usi + 1 });
+  if (CONTATORI_RATE.size > 5000) {
+    for (const [k, v] of CONTATORI_RATE) if (v.finestra !== finestra) CONTATORI_RATE.delete(k);
+  }
   return true;
 }
+
+/** Contatori del limite di richieste (vedi superaRateLimit): in memoria, niente KV. */
+const CONTATORI_RATE = new Map();
 
 /** Confronto di stringhe a tempo costante (la chiave DM non deve trapelare dai tempi di risposta). */
 function stessaChiave(a, b) {
@@ -308,9 +320,12 @@ export async function gestisciSync(request, env, headers, percorso) {
     // frattempo un altro dispositivo ha salvato, rispondiamo 409 invece di
     // sovrascrivere: sarà l'utente a decidere quale versione tenere.
     const baseUpdatedAt = corpo?.baseUpdatedAt;
+    // Una sola lettura del valore esistente, usata da entrambi i controlli.
+    let esistenteLetto = null;
+    try { esistenteLetto = await env.SCHEDE.get(chiave); } catch { esistenteLetto = null; }
     if (baseUpdatedAt !== undefined && baseUpdatedAt !== null) {
       try {
-        const esistente = await env.SCHEDE.get(chiave);
+        const esistente = esistenteLetto;
         if (esistente) {
           const tsEsistente = Number(JSON.parse(esistente)?.updatedAt) || 0;
           if (tsEsistente !== (Number(baseUpdatedAt) || 0)) {
@@ -321,7 +336,7 @@ export async function gestisciSync(request, env, headers, percorso) {
     }
     // Safety: non sovrascrivere un roster più grande con uno più piccolo se il timestamp non è più recente (evita cancellazioni accidentali)
     try {
-      const esistente = await env.SCHEDE.get(chiave);
+      const esistente = esistenteLetto;
       if (esistente) {
         const esistenteDati = JSON.parse(esistente);
         const countEsistente = Object.keys(esistenteDati?.roster?.personaggi || {}).length;

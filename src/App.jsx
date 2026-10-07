@@ -2014,7 +2014,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.81.0';
+const APP_VERSION = '4.82.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4661,7 +4661,7 @@ export default function App() {
     scheda?.alleati,
   ]);
 
-  // Archivio DM: deposita una copia della scheda attiva ~45 secondi dopo l'ultima
+  // Archivio DM: deposita una copia della scheda attiva ~3 minuti dopo l'ultima
   // modifica effettiva (per non sprecare scritture su Cloudflare KV), e solo se la
   // scheda ha un nome vero e i dati sono davvero cambiati.
   const ultimoInvioDmRef = useRef('');
@@ -4682,7 +4682,7 @@ export default function App() {
       }).then((res) => {
         if (res.ok) ultimoInvioDmRef.current = payloadStr;
       }).catch(() => { /* offline o archivio spento: si riproverà alla prossima modifica */ });
-    }, 45000);
+    }, 180000);
     return () => clearTimeout(timer);
   }, [scheda, roster.attivo, idDispositivo]);
 
@@ -6409,6 +6409,7 @@ export default function App() {
   }
   /** Applica la decisione presa da decidiSync() quando NON si deve inviare.
    *  Restituisce true se l'invio va annullato. */
+  const riproveRapideRef = useRef([]);
   async function gestisciDecisione(canale, decisione, remoto, silenzioso, setStato, rosterValutato) {
     if (decisione.azione === 'invia') return false;
     if (decisione.azione === 'niente') {
@@ -6442,9 +6443,20 @@ export default function App() {
     }
     if (decisione.azione === 'carica') {
       if (!(await applicaRosterRemoto(canale, remoto, rosterValutato))) {
-        // Modificato qualcosa proprio adesso: con la politica "online" si riprova
-        // al prossimo controllo (parte da solo con la modifica), senza chiedere.
-        if (POLITICA_SYNC === 'online') return true;
+        // Il roster è cambiato proprio adesso (es. immagini caricate all'avvio):
+        // con la politica "online" si riprova fra un attimo, senza chiedere.
+        if (POLITICA_SYNC === 'online') {
+          // Al massimo 3 riprove rapide al minuto: ogni giro è una richiesta al servizio online.
+          const ora = Date.now();
+          riproveRapideRef.current = riproveRapideRef.current.filter((t) => ora - t < 60000);
+          if (riproveRapideRef.current.length >= 3) return true;
+          riproveRapideRef.current.push(ora);
+          setTimeout(() => {
+            if (canale === 'codice') salvaSuCodiceSync(true, { soloLettura: !autoSyncCodiceRef.current });
+            else salvaSuCloud(true, { soloLettura: !autoSyncRef.current });
+          }, 1500);
+          return true;
+        }
         apriConflitto(canale, remoto);
         setStato({ text: t('conflitto.in_pausa'), type: 'error' });
         return true;
@@ -6990,7 +7002,8 @@ export default function App() {
   useEffect(() => {
     if (primoRenderSyncCodice.current) { primoRenderSyncCodice.current = false; return; }
     if (!autoSyncCodice || !codiceSync) return;
-    const t = setTimeout(() => { salvaSuCodiceSync(true); }, 2500);
+    // 10 s dopo l'ultima modifica: una raffica di clic (PF, slot...) diventa un solo salvataggio.
+    const t = setTimeout(() => { salvaSuCodiceSync(true); }, 10000);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rosterSincronizzato, autoSyncCodice, codiceSync]);
@@ -7031,7 +7044,7 @@ export default function App() {
   // Ritorno sull'app (scheda di nuovo visibile, finestra a fuoco, connessione
   // tornata): ricontrolla la copia online. È il caso tipico del dispositivo
   // rimasto aperto per ore: vede subito le modifiche fatte altrove invece di
-  // sovrascriverle alla prima modifica. Al massimo un controllo ogni 10 s, più uno ogni 45 s a app aperta.
+  // sovrascriverle alla prima modifica. Al massimo un controllo al minuto, più uno ogni 10 minuti a app aperta.
   const verificaRitornoRef = useRef(null);
   verificaRitornoRef.current = () => {
     if (tokenSyncRef.current && gistSyncRef.current) salvaSuCloud(true, { soloLettura: !autoSyncRef.current });
@@ -7041,13 +7054,14 @@ export default function App() {
     let ultimo = Date.now();
     const verifica = (e) => {
       if (document.visibilityState === 'hidden') return;
-      if (e?.type !== 'online' && Date.now() - ultimo < 10000) return;
+      if (e?.type !== 'online' && Date.now() - ultimo < 60000) return;
       ultimo = Date.now();
       verificaRitornoRef.current?.();
     };
-    // Anche con l'app aperta e ferma: ogni 45 s (solo se in primo piano) si guarda
-    // se un altro dispositivo ha salvato, così le sue modifiche compaiono da sole.
-    const periodico = setInterval(() => verifica({ type: 'intervallo' }), 45000);
+    // Anche con l'app aperta e ferma: ogni 10 minuti (solo se in primo piano) si guarda
+    // se un altro dispositivo ha salvato. Non più spesso: ogni controllo è una
+    // richiesta al servizio online, che ha un limite giornaliero gratuito.
+    const periodico = setInterval(() => verifica({ type: 'intervallo' }), 10 * 60 * 1000);
     document.addEventListener('visibilitychange', verifica);
     window.addEventListener('focus', verifica);
     window.addEventListener('online', verifica);

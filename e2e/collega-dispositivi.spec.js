@@ -98,7 +98,7 @@ test('un ritratto nuovo caricato su un dispositivo arriva anche sull’altro', a
   const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGP8z8DAwMDAxMDAwMDAAAANHQEDasKb6QAAAABJRU5ErkJggg==', 'base64');
   // Il secondo campo immagine della pagina è quello del ritratto (il primo è la mappa).
   await a.locator('input[type="file"][accept="image/*"]').nth(1).setInputFiles({ name: 'vaelion.png', mimeType: 'image/png', buffer: png });
-  await expect.poll(() => memoria[codice]?.roster?.personaggi?.['pg-v']?.ritratto?.slice(0, 15) || '', { timeout: 15000 }).toBe('data:image/jpeg');
+  await expect.poll(() => memoria[codice]?.roster?.personaggi?.['pg-v']?.ritratto?.slice(0, 15) || '', { timeout: 30000 }).toBe('data:image/jpeg');
   const ritrattoNuovo = memoria[codice].roster.personaggi['pg-v'].ritratto;
 
   // Il dispositivo B torna sull'app: ricontrolla online e prende il ritratto nuovo.
