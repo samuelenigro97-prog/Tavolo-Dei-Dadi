@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.93.0',
+    voci: {
+      it: ['La versione accanto al titolo poggia ora sulla stessa linea della scritta "Tavolo dei Dadi".'],
+      en: ['The version next to the title now rests on the same line as "Tavolo dei Dadi".'],
+    },
+  },
+  {
     versione: '4.92.0',
     voci: {
       it: [

@@ -1699,7 +1699,7 @@ tbody tr:hover {
   /* Cifre allineate sulla stessa riga (Georgia le ha "a onde"), subito dopo il titolo e un po' più in basso. */
   color: var(--c-ink-dim); font: 600 11px/1 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   font-variant-numeric: lining-nums tabular-nums; letter-spacing: .2px;
-  position: relative; top: 2px;
+  position: relative; top: 0;
 }
 /* Simboli di sfondo ed emoji opachi nei riquadri vitali e caratteristiche */
 .sfondo-vit-emoji {

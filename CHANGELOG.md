@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.93.0] – 2026-10-07
+
+### Cambiato
+- **Versione nell'intestazione** un po' più in alto: ora poggia sulla stessa linea di
+  base di "Tavolo dei Dadi" (prima era abbassata di 2 px).
+
 ## [4.92.0] – 2026-10-07
 
 ### Cambiato
