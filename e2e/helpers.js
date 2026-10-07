@@ -16,6 +16,17 @@ export async function apriScheda(page) {
   await page.locator('[role="dialog"]:visible').first().waitFor({ state: 'detached', timeout: 1000 }).catch(() => {});
 }
 
+/**
+ * Dopo un `page.reload()`: l'app riapre il menu iniziale (selettore dei personaggi)
+ * a ogni avvio, quindi va chiuso prima di toccare la scheda.
+ */
+export async function chiudiMenuIniziale(page) {
+  await page.getByText(/Tavolo dei Dadi/i).first().waitFor();
+  for (let i = 0; i < 3; i++) await page.keyboard.press('Escape');
+  await page.mouse.click(20, 300);
+  await page.locator('[role="dialog"]:visible').first().waitFor({ state: 'detached', timeout: 1000 }).catch(() => {});
+}
+
 /** Scrolla l'elemento che contiene `testo` (case-insensitive) fino al centro dello schermo. */
 export async function scrollaA(page, selettore, testo) {
   await page.evaluate(({ selettore, testo }) => {

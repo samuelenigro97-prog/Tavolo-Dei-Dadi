@@ -2,6 +2,22 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.92.0] – 2026-10-07
+
+### Cambiato
+- **Incantesimi: tornano i chip colorati** come prima della 4.79.0 e come nelle
+  Azioni (stessi colori e stesso ordine): tempo di lancio, distanza, area,
+  Concentrazione, Rituale, nota e **scuola di magia** (chip a parte). Il testo
+  semplice della 4.91.0 è tolto; il dettaglio resta nella nuvoletta del nome.
+- **Avvio**: di base all'apertura si mostra il menu iniziale con il selettore dei
+  personaggi, invece di caricare l'ultima scheda (utile aprendo da più dispositivi,
+  dove "l'ultima" può essere rimasta indietro). Nel menu c'è la casella "All'avvio
+  apri subito l'ultima scheda" per chi preferisce il comportamento di prima
+  (`CHIAVE_AVVIO_DIRETTO`, `src/utils/avvio.js`).
+- **Versione nell'intestazione**: cifre allineate sulla stessa riga (niente numeri
+  "a onde" del Georgia), sulla linea di base del titolo, un po' più in basso e
+  attaccata alla scritta "Tavolo dei Dadi".
+
 ## [4.91.0] – 2026-10-07
 
 ### Cambiato

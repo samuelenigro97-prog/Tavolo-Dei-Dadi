@@ -5,6 +5,21 @@
 
 export const NOVITA = [
   {
+    versione: '4.92.0',
+    voci: {
+      it: [
+        'Incantesimi: tornano i chip colorati (tempo, distanza, area, Concentrazione, Rituale) e la scuola di magia, come nelle Azioni.',
+        'All\'apertura si mostra il menu col selettore dei personaggi invece dell\'ultima scheda (si può cambiare nel menu).',
+        'La versione accanto al titolo ha le cifre allineate ed è più vicina alla scritta.',
+      ],
+      en: [
+        'Spells: the colored chips (time, range, area, Concentration, Ritual) and the school of magic are back, like in Actions.',
+        'On opening, the menu with the character picker shows instead of the last sheet (changeable in the menu).',
+        'The version next to the title has aligned digits and sits closer to the name.',
+      ],
+    },
+  },
+  {
     versione: '4.91.0',
     voci: {
       it: [

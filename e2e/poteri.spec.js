@@ -1,7 +1,7 @@
 // Sezione Poteri (dentro Privilegi, Tratti & Talenti): chiarimento "regole
 // homebrew" nel titolo, bersaglio libero per i modificatori.
 import { test, expect } from '@playwright/test';
-import { apriScheda } from './helpers.js';
+import { apriScheda, chiudiMenuIniziale } from './helpers.js';
 
 // Attiva il manuale di campagna "Araldi del Segreto" dal pannello Manuali e fonti.
 async function attivaManuale(page) {
@@ -59,7 +59,7 @@ test.describe('Poteri', () => {
     await page.getByTestId('poteri-titolo').click();
     await expect(page.getByText('Potere del Patrono')).toHaveCount(0);
     await page.reload();
-    await page.waitForTimeout(800);
+    await chiudiMenuIniziale(page);
     await expect(page.getByText('Potere del Patrono')).toHaveCount(0);
     await page.getByTestId('poteri-titolo').click();
     await expect(page.getByText('Potere del Patrono').first()).toBeVisible();

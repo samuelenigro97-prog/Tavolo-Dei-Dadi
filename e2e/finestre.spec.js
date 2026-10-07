@@ -2,7 +2,7 @@
 // il suo contenuto e non genera errori JavaScript. Protegge dalle dimenticanze
 // tipiche di uno spostamento di codice (una proprietà non passata, un import mancante).
 import { test, expect } from '@playwright/test';
-import { apriScheda } from './helpers.js';
+import { apriScheda, chiudiMenuIniziale } from './helpers.js';
 
 test.describe('Finestre estratte', () => {
   let errori;
@@ -116,6 +116,7 @@ test.describe('Finestre estratte', () => {
       // la cronologia compare solo se esiste almeno un salvataggio automatico
       await page.evaluate(() => localStorage.setItem('scheda-interattiva:snapshots', JSON.stringify([{ ts: Date.now(), n: 1, roster: { personaggi: {} } }])));
       await page.reload();
+      await chiudiMenuIniziale(page);
       await page.getByRole('button', { name: /^Menu: nuovo personaggio/ }).first().click();
       await page.getByRole('button', { name: pulsante }).first().click();
       await expect(page.getByText(titolo, { exact: true })).toBeVisible();

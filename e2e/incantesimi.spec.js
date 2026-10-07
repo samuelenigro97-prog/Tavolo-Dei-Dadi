@@ -1,7 +1,7 @@
 // Sezione Incantesimi: slot leggibili accanto al livello, "Preparati" sceso
 // nell'intestazione del 1° Livello, niente più bottone "Scegli in Level Up".
 import { test, expect } from '@playwright/test';
-import { apriScheda } from './helpers.js';
+import { apriScheda, chiudiMenuIniziale } from './helpers.js';
 
 test.describe('Incantesimi', () => {
   test.beforeEach(async ({ page }) => {
@@ -48,7 +48,7 @@ test.describe('Incantesimi', () => {
       localStorage.setItem('scheda-interattiva:v1', JSON.stringify(r));
     });
     await page.reload();
-    await page.waitForTimeout(600);
+    await chiudiMenuIniziale(page);
     const riga = page.locator('.spell-row').filter({ has: page.getByRole('button', { name: 'Metamorfosi', exact: true }) });
     if (await riga.count() === 0) test.skip(true, 'Il PG di esempio non ha Metamorfosi in lista');
     // La nota salvata è davvero "Conc." (il ricaricamento non l'ha sovrascritta).
@@ -57,7 +57,9 @@ test.describe('Incantesimi', () => {
       return (r.personaggi[r.attivo].incantesimiLista || []).find((x) => x.nome === 'Metamorfosi')?.note;
     });
     expect(notaSalvata).toBe('Conc.');
-    // La riga non ha più chip: Concentrazione compare una sola volta, nella nuvoletta del nome.
+    // Concentrazione compare una sola volta (chip dedicato) e la nota "Conc." non diventa un secondo chip.
+    await expect(riga.locator('.chip-concentrazione')).toHaveCount(1);
+    await expect(riga.locator('.chip-nota')).toHaveCount(0);
     await expect(riga.getByText('Conc.', { exact: true })).toHaveCount(0);
     await riga.getByRole('button', { name: 'Metamorfosi', exact: true }).click();
     const nuvola = page.getByText(/Tempo di lancio:/).last();

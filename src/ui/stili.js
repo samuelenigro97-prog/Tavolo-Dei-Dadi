@@ -1691,12 +1691,15 @@ tbody tr:hover {
   text-shadow: 0 1px 0 color-mix(in srgb, var(--c-panel) 70%, transparent);
 }
 .app-version {
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: 0 4px;
+  display: inline-block;
+  padding: 0 0 0 3px;
   border: none !important;
   border-radius: 0 !important;
   background: transparent !important;
-  color: var(--c-ink-dim); font: 600 12px/1 Georgia, serif; letter-spacing: .35px;
+  /* Cifre allineate sulla stessa riga (Georgia le ha "a onde"), subito dopo il titolo e un po' più in basso. */
+  color: var(--c-ink-dim); font: 600 11px/1 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-variant-numeric: lining-nums tabular-nums; letter-spacing: .2px;
+  position: relative; top: 2px;
 }
 /* Simboli di sfondo ed emoji opachi nei riquadri vitali e caratteristiche */
 .sfondo-vit-emoji {

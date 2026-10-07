@@ -1,8 +1,10 @@
 // Estratto da App.jsx (finestra "MenuPersonaggiModal"): riceve dall'App lo stato che usa, tutto il resto è importato.
+import { useState } from 'react';
 import { styles } from '../stili.js';
 import { C } from '../tema.js';
 import { t } from '../../i18n';
 import { URL_ARCHIVIO_PG } from '../../utils/ambiente.js';
+import { CHIAVE_AVVIO_DIRETTO } from '../../utils/avvio.js';
 
 export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, esportaBackupCompleto, generaPgCasuale, idDispositivo, isCloudAttivo, jsonRef, leggiSnapshots, lingua, manualiAttivi, mostraListaCarica, novitaNonLette, roster, scheda, setBozzaCrea, setCloudStatus, setConferma, setLingua, setMostraArchivioDm, setMostraCloud, setMostraCrea, setMostraDonazioni, setMostraListaCarica, setMostraMenu, setMostraMenuEsporta, setMostraModalManuali, setMostraNoteLegali, setMostraRipristino, setPosEsporta, setRoster, setSchedaSolaLettura, setTemaCornici, statoBgCloud, statoColoreCloud, statoGlowCloud, temaCornici }) {
   return (
@@ -198,6 +200,8 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
           </div>
         </div>
     
+        <OpzioneAvvio lingua={lingua} />
+
         <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${C.border}` }}>
           <div style={{ ...styles.detail, marginBottom: 8, fontWeight: 700 }}>{t('menu.sezione_info')}</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
@@ -240,5 +244,23 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
         {erroreImport && <div style={{ color: C.red, marginTop: 10 }}>{erroreImport}</div>}
       </div>
     </div>
+  );
+}
+
+/** Scelta di avvio: di base si apre questo menu (per scegliere il personaggio); in alternativa l'ultima scheda. */
+function OpzioneAvvio({ lingua }) {
+  const [diretto, setDiretto] = useState(() => {
+    try { return localStorage.getItem(CHIAVE_AVVIO_DIRETTO) === '1'; } catch { return false; }
+  });
+  const cambia = (e) => {
+    const v = e.target.checked;
+    setDiretto(v);
+    try { if (v) localStorage.setItem(CHIAVE_AVVIO_DIRETTO, '1'); else localStorage.removeItem(CHIAVE_AVVIO_DIRETTO); } catch { /* niente */ }
+  };
+  return (
+    <label data-testid="avvio-diretto" style={{ ...styles.detail, display: 'flex', alignItems: 'center', gap: 8, marginTop: 12, cursor: 'pointer' }}>
+      <input type="checkbox" checked={diretto} onChange={cambia} />
+      <span>{lingua === 'en' ? 'Open the last character straight away at start-up (otherwise this menu opens, to pick the character)' : 'All\'avvio apri subito l\'ultima scheda (altrimenti si apre questo menu, per scegliere il personaggio)'}</span>
+    </label>
   );
 }

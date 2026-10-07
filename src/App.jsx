@@ -22,6 +22,7 @@ import { posizionePopover, stilePopover } from './utils/popover.js';
 import { normalizzaPreferenze } from './utils/preferenze.js';
 import { improntaRoster, contenutoBase, decidiSync, riepilogoConflitto, leggiBaseSync, salvaBaseSync, revisioneGist } from './utils/conflittiSync.js';
 import { potaSnapshot } from './utils/cronologia.js';
+import { CHIAVE_AVVIO_DIRETTO } from './utils/avvio.js';
 import { trovaBackdropInCima, eCampoModificabile, deveAttivareDaTastiera } from './utils/accessibilita.js';
 import { salvaJsonLiberandoSpazio, deveRicordareBackup, rosterSenzaImmagini, riagganciaImmagini, salvaImmaginiRoster, caricaImmaginiRoster, rimuoviImmaginePersonaggio, preservaImmaginiSeMancanti } from './utils/persistenza.js';
 import { datiTabelleBackground } from './data/tabelleBackground.js';
@@ -2018,7 +2019,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.91.0';
+const APP_VERSION = '4.92.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -3732,11 +3733,14 @@ export default function App() {
     return ordinato;
   });
   const [sezTrascinata, setSezTrascinata] = useState(null);
-  // Menu iniziale: si mostra solo al primo avvio. Una volta chiuso (o se ci
+  // Menu iniziale: a ogni avvio (vedi CHIAVE_AVVIO_DIRETTO per saltarlo). Una volta chiuso (o se ci
   // sono già PG reali) resta un flag, così una scheda vuota non lo fa
   // ricomparire a ogni apertura dell'app: si riapre dal Menu Hub.
   const [mostraMenu, setMostraMenu] = useState(() => {
     try {
+      // Di base il menu si apre a ogni avvio (selettore dei personaggi); chi preferisce
+      // l'ultima scheda lo dice nel menu stesso.
+      if (localStorage.getItem(CHIAVE_AVVIO_DIRETTO) !== '1') return true;
       if (localStorage.getItem(CHIAVE_MENU_INIZIALE_VISTO)) return false;
       const r = JSON.parse(localStorage.getItem(STORAGE_KEY));
       const s = r?.personaggi?.[r?.attivo];
@@ -9631,9 +9635,9 @@ export default function App() {
                 >
                   {/* Sinistra su Desktop: Home standalone, non dentro la barra laterale */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, userSelect: 'none', flexShrink: 0, alignSelf: 'center' }}>
-                    <span style={{ fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", fontSize: 16, fontWeight: 800, color: 'var(--c-title)', letterSpacing: 0.5, whiteSpace: 'nowrap', transition: 'color 0.2s ease', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+                    <span style={{ fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", fontSize: 16, fontWeight: 800, color: 'var(--c-title)', letterSpacing: 0.5, whiteSpace: 'nowrap', transition: 'color 0.2s ease', display: 'inline-flex', alignItems: 'baseline', gap: 0 }}>
                       Tavolo dei Dadi
-                      <span className="app-version" style={{ fontSize: 11, color: C.inkDim, fontWeight: 600, fontVariantNumeric: 'tabular-nums', letterSpacing: 0.3, whiteSpace: 'nowrap', lineHeight: 1, transform: 'translateY(1px)' }}>
+                      <span className="app-version" style={{ whiteSpace: 'nowrap' }}>
                         v{APP_VERSION}
                       </span>
                     </span>
@@ -9881,9 +9885,9 @@ export default function App() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, userSelect: 'none', flexShrink: 0 }}>
-                    <span style={{ fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", fontSize: 15, fontWeight: 800, color: 'var(--c-title)', letterSpacing: 0.4, whiteSpace: 'nowrap', transition: 'color 0.2s ease', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+                    <span style={{ fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", fontSize: 15, fontWeight: 800, color: 'var(--c-title)', letterSpacing: 0.4, whiteSpace: 'nowrap', transition: 'color 0.2s ease', display: 'inline-flex', alignItems: 'baseline', gap: 0 }}>
                       Tavolo dei Dadi
-                      <span className="app-version" style={{ fontSize: 11, color: C.inkDim, fontWeight: 600, fontVariantNumeric: 'tabular-nums', letterSpacing: 0.2, whiteSpace: 'nowrap', lineHeight: 1, transform: 'translateY(1px)' }}>
+                      <span className="app-version" style={{ whiteSpace: 'nowrap' }}>
                         v{APP_VERSION}
                       </span>
                     </span>
@@ -14007,6 +14011,20 @@ export default function App() {
                             ];
                             const testoModal = testoNuvoletta(righeInfo, spieg);
 
+                            const chipIncantesimo = (icona, label, val, colore, classe) => val ? (
+                              <span
+                                key={label}
+                                className={classe}
+                                style={colore
+                                  ? { fontSize: 11, background: `${colore}1f`, border: `1px solid ${colore}`, borderRadius: 4, padding: '1px 5px', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 3, color: colore, fontWeight: 700 }
+                                  : { fontSize: 11, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: '1px 5px', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 3 }}
+                                title={`${label}: ${val}`}
+                              >
+                                {icona && <span aria-hidden="true">{icona}</span>}
+                                <span style={colore ? undefined : { color: C.inkDim }}>{val}</span>
+                              </span>
+                            ) : null;
+
                             const isUltimoCritInc = ultimoAttaccoCritico && (ultimoAttaccoCritico.id === s.id || ultimoAttaccoCritico.nome === s.nome);
 
                             return (
@@ -14159,27 +14177,41 @@ export default function App() {
                                       onClick={() => aggiorna({ incantesimiLista: scheda.incantesimiLista.map((x) => (x.id === s.id ? { ...x, bonus: false } : x)) })}
                                     >✦ {t('spell.bonus_badge')}</span>
                                   )}
-                                  {/* Riepilogo a testo semplice (senza riquadri): tempo, distanza, area, durata, Conc./Rit.; il resto nella nuvoletta del nome. */}
-                                  {(() => {
-                                    const meta = [
-                                      tempoLabel,
-                                      gittata && traduciDato(gittata),
-                                      area && traduciDato(area),
-                                      durataInc && traduciDato(durataInc),
-                                      (isConcRow || /concentrazione/i.test(spieg)) && (en ? 'Conc.' : 'Conc.'),
-                                      isRitualeRow && (en ? 'Rit.' : 'Rit.'),
-                                    ].filter(Boolean);
-                                    if (!meta.length) return null;
-                                    return (
-                                      <span
-                                        className="spell-meta"
-                                        data-testid="spell-meta"
-                                        title={righeInfo.filter(Boolean).slice(0, 6).join('\n')}
-                                        style={{ fontSize: 11.5, color: C.inkDim, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '0 1 auto', marginLeft: 4 }}
-                                      >{meta.join(' · ')}</span>
-                                    );
-                                  })()}
-                                  <div style={{ flex: '1 1 auto', minWidth: 0 }} />
+                                  {/* Chip colorati come nelle Azioni (tempo, distanza, area, concentrazione, rituale, scuola); il resto nella nuvoletta del nome. */}
+                                  <div className="spell-chips" tabIndex={0} role="group" aria-label={tr('Dettagli dell\'incantesimo', 'Spell details')} style={{ display: 'flex', flexWrap: 'nowrap', gap: 4, alignItems: 'center', overflowX: 'auto', flex: '1 1 auto', minWidth: 0 }}>
+                                    {chipIncantesimo('', t('spell.chip_tempo'), tempoLabel, coloreCategoria('tempo', notteAttiva), 'chip-tempo')}
+                                    {chipIncantesimo('', t('spell.chip_gittata'), traduciDato(gittata), coloreCategoria('gittata', notteAttiva), 'chip-gittata')}
+                                    {area && chipIncantesimo('', 'Area', traduciDato(area), coloreCategoria('gittata', notteAttiva), 'chip-area')}
+                                    {isConcRow && chipIncantesimo('', en ? 'Concentration' : 'Concentrazione', en ? 'Concentration' : 'Concentrazione', coloreCategoria('concentrazione', notteAttiva), 'chip-concentrazione')}
+                                    {isRitualeRow && chipIncantesimo('', en ? 'Ritual' : 'Rituale', en ? 'Ritual' : 'Rituale', coloreCategoria('rituale', notteAttiva), 'chip-rituale')}
+                                    {(danno || tipoDanno) && !parseEspressioneDado(danno) && (
+                                      chipIncantesimo(iconaTipoDanno(tipoDanno), 'Danno', [danno, tipoDanno].filter(Boolean).join(' '), coloreCategoria(tipoDanno === 'Guarigione' ? 'guarigione' : 'danno', notteAttiva))
+                                    )}
+                                    {note && chipIncantesimo('', t('spell.chip_note'), note, undefined, 'chip-nota')}
+                                  </div>
+                                  {scuola && (
+                                    <span
+                                      className="chip-scuola"
+                                      style={{
+                                        fontSize: 11,
+                                        fontWeight: 700,
+                                        color: coloreCategoria('scuola', notteAttiva),
+                                        border: `1px solid ${coloreCategoria('scuola', notteAttiva)}`,
+                                        background: `${coloreCategoria('scuola', notteAttiva)}1f`,
+                                        borderRadius: 4,
+                                        padding: '1px 5px',
+                                        lineHeight: '13px',
+                                        whiteSpace: 'nowrap',
+                                        flexShrink: 0,
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: 3,
+                                      }}
+                                      title={`${en ? 'School' : 'Scuola'}: ${traduciDato(scuola)}`}
+                                    >
+                                      {traduciDato(scuola)}
+                                    </span>
+                                  )}
                                   {parseEspressioneDado(danno) && (
                                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
                                       {modIncantatore !== null && isTSInc && (
