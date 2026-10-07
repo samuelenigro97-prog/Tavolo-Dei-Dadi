@@ -2016,7 +2016,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.84.0';
+const APP_VERSION = '4.85.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -3376,6 +3376,9 @@ export default function App() {
   // Dichiarato prima del rilevatore PWA: un aggiornamento aspetta che il
   // salvataggio cloud corrente sia terminato prima di ricaricare la pagina.
   const [sincronizzando, setSincronizzando] = useState(false);
+  // Modifiche fatte qui e non ancora inviate online: il tasto della
+  // sincronizzazione resta arancione finché non arrivano (poi torna verde).
+  const [inAttesaSync, setInAttesaSync] = useState(false);
   // aggiornamenti PWA: mostra un banner quando è pronta una nuova versione
   const {
     needRefresh: [needRefresh, setNeedRefresh],
@@ -4140,21 +4143,22 @@ export default function App() {
   useEffect(() => {
     try { navigator.storage?.persist?.().catch(() => {}); } catch { /* niente */ }
   }, []);
-  const statoColoreCloud = sincronizzando
+  const arancioneSync = (sincronizzando || inAttesaSync) && isCloudAttivo;
+  const statoColoreCloud = arancioneSync
     ? '#f59e0b'
     : isCloudAttivo
       ? C.green
       : isCloudConfigurato
         ? '#f59e0b'
         : C.red;
-  const statoBgCloud = sincronizzando
+  const statoBgCloud = arancioneSync
     ? 'rgba(245, 158, 11, 0.14)'
     : isCloudAttivo
       ? 'rgba(46, 157, 77, 0.14)'
       : isCloudConfigurato
         ? 'rgba(245, 158, 11, 0.09)'
         : 'rgba(239, 68, 68, 0.09)';
-  const statoGlowCloud = sincronizzando
+  const statoGlowCloud = arancioneSync
     ? '0 0 8px rgba(245, 158, 11, 0.45)'
     : isCloudAttivo
       ? '0 0 8px rgba(46, 157, 77, 0.45)'
@@ -6427,6 +6431,17 @@ export default function App() {
     gist: { base: 'scheda-interattiva:sync-base', ts: 'scheda-interattiva:sync-ts' },
     codice: { base: 'scheda-interattiva:sync-codice-base', ts: 'scheda-interattiva:sync-codice-ts' },
   };
+  /** C'è qualcosa di questo dispositivo che non è ancora online (sui canali attivi)? */
+  function aggiornaAttesaSync() {
+    try {
+      const canali = [];
+      if (autoSyncCodiceRef.current && codiceSyncRef.current) canali.push('codice');
+      if (autoSyncRef.current && gistSyncRef.current && tokenSyncRef.current) canali.push('gist');
+      if (!canali.length) { setInAttesaSync(false); return; }
+      const impronta = improntaRoster(rosterSyncRef.current);
+      setInAttesaSync(canali.some((c) => leggiBaseCanale(c)?.hash !== impronta));
+    } catch { setInAttesaSync(false); }
+  }
   function leggiBaseCanale(canale) {
     return leggiBaseSync(localStorage, CANALI_SYNC[canale].base, CANALI_SYNC[canale].ts);
   }
@@ -6680,6 +6695,7 @@ export default function App() {
         setTimeout(() => salvaSuCloud(true, { soloLettura: !autoSyncRef.current }), 0);
       } else {
         setSincronizzando(false);
+        aggiornaAttesaSync();
       }
     }
   }
@@ -6757,6 +6773,7 @@ export default function App() {
   useEffect(() => {
     if (primoRenderSync.current) { primoRenderSync.current = false; return; }
     if (!autoSync || !githubToken || !gistId) return;
+    aggiornaAttesaSync();
     const t = setTimeout(() => { salvaSuCloud(true); }, 2500);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -6880,6 +6897,7 @@ export default function App() {
     } finally {
       setSincronizzando(false);
       syncCodiceInCorsoRef.current = false;
+      aggiornaAttesaSync();
       if (syncCodicePendenteRef.current) {
         syncCodicePendenteRef.current = false;
         setTimeout(() => salvaSuCodiceSync(true, { soloLettura: !autoSyncCodiceRef.current }), 0);
@@ -7073,6 +7091,7 @@ export default function App() {
   useEffect(() => {
     if (primoRenderSyncCodice.current) { primoRenderSyncCodice.current = false; return; }
     if (!autoSyncCodice || !codiceSync) return;
+    aggiornaAttesaSync();
     // 10 s dopo l'ultima modifica: una raffica di clic (PF, slot...) diventa un solo salvataggio.
     const t = setTimeout(() => { salvaSuCodiceSync(true); }, 10000);
     return () => clearTimeout(t);
@@ -9702,11 +9721,15 @@ export default function App() {
                           padding: '4px 7px',
                           transition: 'all 0.25s ease',
                         }}
+                        data-testid="cloud-header"
+                        data-in-attesa={isCloudAttivo && inAttesaSync ? 'si' : 'no'}
                         title={
                           sincronizzando
                             ? (lingua === 'en' ? 'Sync in progress…' : 'Sincronizzazione in corso…')
                             : conflittoSync
                               ? t('conflitto.banner')
+                            : isCloudAttivo && inAttesaSync
+                              ? (lingua === 'en' ? 'Changes saved on this device, being sent online in a few seconds' : 'Modifiche salvate su questo dispositivo, inviate online fra pochi secondi')
                             : isCloudAttivo
                               ? (lingua === 'en' ? `Sync is on · last sync: ${ultimoSyncCodice || ultimoSync || 'recent'}` : `Sincronizzazione attiva · ultima: ${ultimoSyncCodice || ultimoSync || 'recente'}`)
                               : isCloudConfigurato
@@ -9814,7 +9837,10 @@ export default function App() {
                       data-testid="cloud-mobile"
                       style={{ ...btnAzione, width: 28, height: 28, minWidth: 28, maxWidth: 28, minHeight: 28, maxHeight: 28, fontSize: 13, color: statoColoreCloud, borderColor: statoColoreCloud, background: statoBgCloud, boxShadow: statoGlowCloud }}
                       onClick={() => { setCloudStatus({ text: '', type: '' }); setSyncCodiceStatus({ text: '', type: '' }); setTabBackup('online'); setMostraCloud(true); }}
-                      title={isCloudAttivo
+                      data-in-attesa={isCloudAttivo && inAttesaSync ? 'si' : 'no'}
+                      title={isCloudAttivo && inAttesaSync
+                        ? (lingua === 'en' ? 'Changes saved on this device, being sent online in a few seconds' : 'Modifiche salvate su questo dispositivo, inviate online fra pochi secondi')
+                        : isCloudAttivo
                         ? (lingua === 'en' ? 'Sync is on' : 'Sincronizzazione attiva')
                         : conflittoSync
                           ? t('conflitto.banner')

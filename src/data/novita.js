@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.85.0',
+    voci: {
+      it: ['Il tasto della sincronizzazione diventa arancione appena modifichi la scheda e torna verde quando le modifiche sono online (dopo una decina di secondi).'],
+      en: ['The sync button turns orange as soon as you change the sheet and goes back to green once the changes are online (after about ten seconds).'],
+    },
+  },
+  {
     versione: '4.84.0',
     voci: {
       it: [

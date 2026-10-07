@@ -119,3 +119,23 @@ test('su telefono la nuvola nella barra in alto mostra la sincronizzazione e apr
   await page.getByTestId('cloud-mobile').click();
   await expect(page.getByTestId('crea-codice-sync')).toBeVisible();
 });
+
+test('dopo una modifica il tasto della sincronizzazione resta arancione finché non è online, poi torna verde (v4.85.0)', async ({ browser }) => {
+  const memoria = {};
+  const ctx = await browser.newContext();
+  await simulaWorker(ctx, memoria);
+  const page = await apri(ctx, { attivo: 'pg-v', personaggi: { 'pg-v': { ...dispositivoGiusto.personaggi['pg-v'], pfMax: 64, pfAttuali: 64 } } });
+  await page.getByRole('button', { name: 'Sincronizzazione', exact: true }).first().click();
+  await page.getByTestId('crea-codice-sync').click();
+  await expect(page.getByText(/Sincronizzato ·/)).toBeVisible();
+  await page.keyboard.press('Escape');
+  const tasto = page.getByTestId('cloud-header');
+  await expect(tasto).toHaveAttribute('data-in-attesa', 'no');
+  await page.getByRole('button', { name: '-1', exact: true }).first().click();
+  await expect(tasto).toHaveAttribute('data-in-attesa', 'si');
+  // Il salvataggio automatico parte 10 s dopo l'ultima modifica.
+  await expect(tasto).toHaveAttribute('data-in-attesa', 'no', { timeout: 20000 });
+  const codice = Object.keys(memoria)[0];
+  expect(memoria[codice].roster.personaggi['pg-v'].pfAttuali).toBe(63);
+  await ctx.close();
+});

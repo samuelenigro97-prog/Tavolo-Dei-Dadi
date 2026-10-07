@@ -2,6 +2,16 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.85.0] – 2026-10-07
+
+### Corretto
+- **Tasto della sincronizzazione**: diventa arancione appena modifichi la scheda
+  e resta arancione finché le modifiche non sono online (il salvataggio
+  automatico parte 10 secondi dopo l'ultima modifica), poi torna verde. Prima
+  diventava arancione solo per l'istante dell'invio e non si notava. Stato
+  `inAttesaSync` (impronta del roster diversa dalla base dei canali attivi),
+  attributo `data-in-attesa` sui tasti della barra.
+
 ## [4.84.0] – 2026-10-07
 
 ### Corretto
