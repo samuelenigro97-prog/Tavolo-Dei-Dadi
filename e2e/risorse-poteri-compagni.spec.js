@@ -183,3 +183,17 @@ test('Myrdhal già evocato con 250 PF (bug 4.87) torna a 210 (v4.89.0)', async (
     return [a.pfMax, a.pfAttuali];
   })).toEqual([210, 210]);
 });
+
+test('catalogo rapido nella sezione Compagni: Myrdhal compare per primo solo con il manuale Araldi attivo (v4.90.0)', async ({ page }) => {
+  await apriScheda(page);
+  const catalogo = page.getByText('Catalogo di bestie ed evocazioni').locator('xpath=ancestor::div[2]');
+  await expect(catalogo.getByText('Elementale del Fuoco').first()).toBeVisible();
+  await expect(catalogo.getByText('Myrdhal', { exact: true })).toHaveCount(0);
+  await page.evaluate(() => {
+    const m = JSON.parse(localStorage.getItem('scheda-interattiva:manuali') || '{}');
+    localStorage.setItem('scheda-interattiva:manuali', JSON.stringify({ ...m, araldi: true }));
+  });
+  await apriScheda(page);
+  await expect(catalogo.getByText('Myrdhal', { exact: true })).toBeVisible();
+  await expect(catalogo).toContainText('CA 20 · 210 PF');
+});

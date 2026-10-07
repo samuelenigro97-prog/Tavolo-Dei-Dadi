@@ -5,6 +5,26 @@
 
 export const NOVITA = [
   {
+    versione: '4.91.0',
+    voci: {
+      it: [
+        'Tolti i bordi gialli da nome, ritratto, PF, Riposo Lungo e bonus ai tiri salvezza.',
+        'Incantesimi: tornano tempo, distanza, durata e Conc./Rit. accanto al nome, come testo semplice senza riquadri.',
+      ],
+      en: [
+        'Removed the yellow borders from name, portrait, HP, Long Rest and saving throw bonuses.',
+        'Spells: casting time, range, duration and Conc./Rit. are back next to the name, as plain text without boxes.',
+      ],
+    },
+  },
+  {
+    versione: '4.90.0',
+    voci: {
+      it: ['Myrdhal compare anche nel catalogo rapido della sezione Compagni, per primo, quando il manuale Araldi del Segreto è attivo.'],
+      en: ['Myrdhal also shows in the quick catalog of the Companions section, first in the list, when the Heralds of the Secret handbook is on.'],
+    },
+  },
+  {
     versione: '4.89.0',
     voci: {
       it: ['Myrdhal ha sempre il suo blocco (210 PF): l\'Evocatore Possente e gli altri bonus di classe dell\'evocatore non lo modificano. Le altre evocazioni li ricevono come prima.'],

@@ -2,6 +2,24 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.91.0] – 2026-10-07
+
+### Cambiato
+- **Via i bordi gialli** da nome del personaggio, ritratto, barra dei PF, pulsante
+  Riposo Lungo e pulsanti "✨ +n" dei bonus ai tiri salvezza; in Risorse di classe
+  il nome di Forma Selvatica è neutro come gli altri. Restano i bordi neutri del tema.
+- **Righe degli incantesimi**: tornano le informazioni a colpo d'occhio, come testo
+  semplice e piccolo accanto al nome (tempo di lancio · distanza · area · durata ·
+  Conc. · Rit.), senza riquadri colorati; il dettaglio resta nella nuvoletta del nome.
+  Nella 4.79.0 erano finite solo nella nuvoletta.
+
+## [4.90.0] – 2026-10-07
+
+### Corretto
+- **Myrdhal nel catalogo rapido** di "Compagni, famigli ed evocazioni": con il
+  manuale Araldi del Segreto attivo compare per primo (prima il catalogo mostrava
+  solo 16 creature senza di lui, e il conteggio non lo includeva).
+
 ## [4.89.0] – 2026-10-07
 
 ### Corretto

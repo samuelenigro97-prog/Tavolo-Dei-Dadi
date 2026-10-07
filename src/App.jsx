@@ -13,7 +13,7 @@ import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } fr
 import { fixEquipaggiamentoVaelion, migrazioneRegoleVaelion, autoIdratazionePersonaggioPredefinito } from './data/migrazioniPersonaggi.js';
 import { CARATTERISTICHE, ABILITA } from './data/caratteristiche.js';
 import { effettiCondizione } from './data/condizioni.js';
-import { BESTIE, FAMIGLI, EVOCAZIONI, MOSTRI_5E, TUTTE_LE_CREATURE, bestieDisponibili, limitiFormaSelvatica, creatureDisponibiliMetamorfosi, limitiMetamorfosi, raggruppaPerGS } from './data/bestiario.js';
+import { BESTIE, FAMIGLI, EVOCAZIONI, EVOCAZIONI_ARALDI, MOSTRI_5E, TUTTE_LE_CREATURE, bestieDisponibili, limitiFormaSelvatica, creatureDisponibiliMetamorfosi, limitiMetamorfosi, raggruppaPerGS } from './data/bestiario.js';
 import { ultimaVersioneNovita } from './data/novita.js';
 import { codificaScheda, decodificaScheda, preparaPerCondivisione, costruisciLink, payloadDaUrl, LIMITE_PAYLOAD } from './utils/condivisione.js';
 import { creaStanza, apriStanza, normalizzaCodiceStanza, formattaCodiceStanza, DURATA_STANZA_ORE } from './utils/stanze.js';
@@ -1337,7 +1337,7 @@ import { caricaSpiegazioniEn, spiegaPrivilegio, spiegaIncantesimo, spiegaTratto,
 import { INCANTESIMI_DB, ALIAS_INCANTESIMI, datiIncantesimo, valoreIncantesimoPerEdizione } from './data/incantesimi.js';
 
 const INCANTESIMI_NOMI = Array.from(new Set([...NOMI_SPIEG_INC, ...Object.keys(INCANTESIMI_DB)])).sort((a, b) => a.localeCompare(b, 'it'));
-import { NOMI_CLASSI, BACKGROUND_5E, TAGLIE_5E, ALLINEAMENTI_5E, SESSO_5E, SOTTOCLASSI_5E, INCANTESIMI_CLASSE, DANNI_5E, SENSI_5E, CONDIZIONI_5E, NOMI_OGGETTI, LINGUE_5E, ARMI_5E, STRUMENTI_5E, REAZIONI_5E, AZIONI_BONUS_5E, GRUPPI_ARMI_5E, GRUPPI_STRUMENTI_5E, GRUPPI_LINGUE_5E, DEFAULT_MANUALI, SOTTOCLASSI_FONTI, talentiPerManuali, PE_PER_LIVELLO, BACKGROUND_COMPETENZE, BACKGROUND_TALENTO_ORIGINE_2024, SPECIE_5E, tabellaPrivilegiSottoclasse, CARATT_INCANTATORE, PRIORITA_CARATT, DADO_VITA_CLASSE, BACKGROUND_CARATT, TS_CLASSE, ADDESTRAMENTO_CLASSE, COMPETENZE_CLASSE, PRIVILEGI_CLASSE_L1, PRIVILEGI_CLASSE_L1_2014, ASI_LIV, SOTTOCLASSE_LIV, COMPETENZE_SPECIE, NOMI_SPECIE, NOMI_SPECIE_GENERE, COGNOMI_SPECIE, NOMI_GENERICI, SPECIE_DATI, SPECIE_DATI_2014, BONUS_CARATT_SPECIE_2014, SFINIMENTO_2014, BASE_ARMATURA_DEFAULT, ESEMPI_ARMATURA } from "./data/dati5e.js";
+import { NOMI_CLASSI, BACKGROUND_5E, TAGLIE_5E, ALLINEAMENTI_5E, SESSO_5E, SOTTOCLASSI_5E, INCANTESIMI_CLASSE, DANNI_5E, SENSI_5E, CONDIZIONI_5E, NOMI_OGGETTI, LINGUE_5E, ARMI_5E, STRUMENTI_5E, REAZIONI_5E, AZIONI_BONUS_5E, GRUPPI_ARMI_5E, GRUPPI_STRUMENTI_5E, GRUPPI_LINGUE_5E, DEFAULT_MANUALI, manualeAttivo, SOTTOCLASSI_FONTI, talentiPerManuali, PE_PER_LIVELLO, BACKGROUND_COMPETENZE, BACKGROUND_TALENTO_ORIGINE_2024, SPECIE_5E, tabellaPrivilegiSottoclasse, CARATT_INCANTATORE, PRIORITA_CARATT, DADO_VITA_CLASSE, BACKGROUND_CARATT, TS_CLASSE, ADDESTRAMENTO_CLASSE, COMPETENZE_CLASSE, PRIVILEGI_CLASSE_L1, PRIVILEGI_CLASSE_L1_2014, ASI_LIV, SOTTOCLASSE_LIV, COMPETENZE_SPECIE, NOMI_SPECIE, NOMI_SPECIE_GENERE, COGNOMI_SPECIE, NOMI_GENERICI, SPECIE_DATI, SPECIE_DATI_2014, BONUS_CARATT_SPECIE_2014, SFINIMENTO_2014, BASE_ARMATURA_DEFAULT, ESEMPI_ARMATURA } from "./data/dati5e.js";
 import { modificatore, conSegno, tiraDado, parseEspressioneDado, facceDadoVita, esprDadiVita, gruppiDadoVita, bonusCompetenzaDaLivello, tiraDanni, tiraD20, capacitaCarico, modalitaEffettiva } from "./rules/dadi.js";
 import { risorseAutoClasse, trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from "./rules/regole.js";
 import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda, contatoriInGioco, valoreContatore } from './rules/poteri.js';
@@ -2018,7 +2018,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.89.0';
+const APP_VERSION = '4.91.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -10344,7 +10344,7 @@ export default function App() {
                           : C.panel,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         boxShadow: isTrasformato ? '0 0 16px rgba(46,125,50,0.6)' : 'inset 0 0 8px rgba(0,0,0,0.2)',
-                        border: isTrasformato ? '2.5px solid #52b788' : `2px solid ${coloreClasse(scheda.classe) ? C.gold : C.border}`,
+                        border: isTrasformato ? '2.5px solid #52b788' : `2px solid ${C.border}`,
                         cursor: 'pointer', position: 'relative',
                       }}
                       title={isTrasformato ? tr(`${formaAttiva.dati.nome}: clicca per cambiare illustrazione o caricare un'immagine`, `${formaAttiva.dati.nome}: click to change the art or upload an image`) : (scheda.ritratto ? tr('Clic: cambia immagine', 'Click: change image') : tr('Clic: carica l’immagine del personaggio', 'Click: upload the character image'))}
@@ -10610,7 +10610,7 @@ export default function App() {
                               type="button"
                               title={lingua === 'en' ? 'Open the Wild Shape catalog (choose the beast to become)' : 'Apri il catalogo Forma Selvatica (scegli la bestia da assumere)'}
                               onClick={() => setTabTrasformazione('animale')}
-                              style={{ padding: 0, border: 0, background: 'transparent', color: C.goldDark, font: 'inherit', fontWeight: 600, textAlign: 'left', cursor: 'pointer', textDecoration: 'none', marginRight: 'auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}
+                              style={{ padding: 0, border: 0, background: 'transparent', color: C.ink, font: 'inherit', fontWeight: 600, textAlign: 'left', cursor: 'pointer', textDecoration: 'underline dotted', textUnderlineOffset: 3, textDecorationColor: C.inkDim, marginRight: 'auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}
                             >{nomeVisualizzato}</button>
                           ) : (
                             <button
@@ -10696,7 +10696,7 @@ export default function App() {
                 {/* Nome PG & Selettore Personaggio con versione D&D nello sfondo */}
                 <div className="profilo-nome-box" style={{ position: 'relative', width: '100%', marginBottom: 6 }}>
                   {isSolaLettura ? (
-                    <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center', borderRadius: 8, border: `1.5px solid ${C.goldDark}`, height: 38, background: 'rgba(0,0,0,0.03)', padding: '4px 60px 4px 12px', boxSizing: 'border-box' }}>
+                    <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center', borderRadius: 8, border: `1.5px solid ${C.border}`, height: 38, background: 'rgba(0,0,0,0.03)', padding: '4px 60px 4px 12px', boxSizing: 'border-box' }}>
                       <span style={{ fontSize: 16, fontWeight: 'bold', color: 'var(--c-title)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         🔒 {formattaNomePg(scheda.nome) || t('menu.senza_nome')}
                       </span>
@@ -10704,7 +10704,7 @@ export default function App() {
                   ) : rinominando ? (
                     <input
                       autoFocus
-                      style={{ ...styles.inlineInput, width: '100%', fontSize: 16, fontWeight: 'bold', fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", color: 'var(--c-title)', height: 38, padding: '4px 60px 4px 12px', border: `1.5px solid ${C.goldDark}`, borderRadius: 8, boxSizing: 'border-box' }}
+                      style={{ ...styles.inlineInput, width: '100%', fontSize: 16, fontWeight: 'bold', fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", color: 'var(--c-title)', height: 38, padding: '4px 60px 4px 12px', border: `1.5px solid ${C.border}`, borderRadius: 8, boxSizing: 'border-box' }}
                       value={scheda.nome}
                       onChange={(e) => aggiorna({ nome: e.target.value })}
                       onBlur={() => {
@@ -10724,7 +10724,7 @@ export default function App() {
                     />
                   ) : (
                     <div
-                      style={{ position: 'relative', width: '100%', display: 'flex', overflow: 'hidden', borderRadius: 8, border: `1.5px solid ${C.goldDark}`, height: 38, background: 'rgba(0,0,0,0.03)', boxSizing: 'border-box', cursor: isSolaLettura ? 'default' : 'pointer' }}
+                      style={{ position: 'relative', width: '100%', display: 'flex', overflow: 'hidden', borderRadius: 8, border: `1.5px solid ${C.border}`, height: 38, background: 'rgba(0,0,0,0.03)', boxSizing: 'border-box', cursor: isSolaLettura ? 'default' : 'pointer' }}
                       onDoubleClick={() => { if (!isSolaLettura) setRinominando(true); }}
                       title={t('nome.tooltip_selettore') + (!isSolaLettura ? (lingua === 'en' ? ' · Double click to rename' : ' · Doppio clic per rinominare') : '')}
                     >
@@ -11091,7 +11091,7 @@ export default function App() {
                       const isCritico = att > 0 && (att / Math.max(1, maxPfEffettivo)) <= 0.25;
                       const glowColore = (att / Math.max(1, maxPfEffettivo)) > 0.5 ? 'rgba(76,175,80,0.45)' : (att / Math.max(1, maxPfEffettivo)) > 0.25 ? 'rgba(255,179,0,0.45)' : 'rgba(229,57,53,0.55)';
                       return (
-                        <div className={`profilo-barra-vita ${isCritico ? 'pf-barra-critica' : ''}`} style={{ position: 'relative', width: '100%', height: 26, borderRadius: 13, background: 'rgba(10,8,6,0.85)', border: `2px solid ${isTrasformato ? '#52b788' : C.goldDark}`, boxShadow: 'inset 0 3px 6px rgba(0,0,0,0.85), 0 2px 8px rgba(0,0,0,0.35), 0 0 1px rgba(255,255,255,0.2)', overflow: 'hidden', margin: '2px 0', display: 'flex' }} title={`${att} / ${maxPfEffettivo} PF${temp ? ` (+ ${temp} temp)` : ''}`}>
+                        <div className={`profilo-barra-vita ${isCritico ? 'pf-barra-critica' : ''}`} style={{ position: 'relative', width: '100%', height: 26, borderRadius: 13, background: 'rgba(10,8,6,0.85)', border: `2px solid ${isTrasformato ? '#52b788' : C.border}`, boxShadow: 'inset 0 3px 6px rgba(0,0,0,0.85), 0 2px 8px rgba(0,0,0,0.35), 0 0 1px rgba(255,255,255,0.2)', overflow: 'hidden', margin: '2px 0', display: 'flex' }} title={`${att} / ${maxPfEffettivo} PF${temp ? ` (+ ${temp} temp)` : ''}`}>
                           <div style={{ width: `${percNormale}%`, height: '100%', background: coloreNormale, transition: 'width 0.35s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: `0 0 12px ${glowColore}`, position: 'relative' }}>
                             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '48%', background: 'linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.08) 70%, rgba(255,255,255,0) 100%)' }} />
                           </div>
@@ -11494,7 +11494,7 @@ export default function App() {
               <div style={styles.vitalLabel}>{t("vital.riposo")}</div>
               <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
                 <button style={{ ...styles.buttonMini, fontSize: 14, fontWeight: 700, padding: '8px 18px', width: '100%', maxWidth: 220 }} onClick={() => riposoBreve()} title={t('vital.riposo_breve_tip')}>{t("vital.breve")}</button>
-                <button style={{ ...styles.buttonMini, fontSize: 14, fontWeight: 700, padding: '8px 18px', width: '100%', maxWidth: 220, borderColor: C.goldDark, color: C.goldDark }} onClick={() => riposoLungo()} title={t('vital.riposo_lungo_tip')}>{t("vital.lungo")}</button>
+                <button style={{ ...styles.buttonMini, fontSize: 14, fontWeight: 700, padding: '8px 18px', width: '100%', maxWidth: 220 }} onClick={() => riposoLungo()} title={t('vital.riposo_lungo_tip')}>{t("vital.lungo")}</button>
               </div>
             </div>
             <div className="vital-box" style={{ ...styles.vitalBox }}>
@@ -11903,7 +11903,7 @@ export default function App() {
                                   setFontePopover((v) => (v && v.tipo === 'ts' && v.key === key ? null : { tipo: 'ts', key, ...posizionePopover(r, window) }));
                                 }}
                                 title={t('inv.fonte_bonus_tip')}
-                                style={{ ...styles.buttonMini, fontSize: 11, padding: '0 5px', height: 18, lineHeight: '16px', color: C.goldDark, borderColor: C.goldDark, background: 'rgba(201,162,39,0.12)' }}
+                                style={{ ...styles.buttonMini, fontSize: 11, padding: '0 5px', height: 18, lineHeight: '16px' }}
                               >✨ +{bonusOggettiTS}</button>
                               {fontePopover?.tipo === 'ts' && fontePopover.key === key && createPortal(
                                 <div
@@ -14159,7 +14159,26 @@ export default function App() {
                                       onClick={() => aggiorna({ incantesimiLista: scheda.incantesimiLista.map((x) => (x.id === s.id ? { ...x, bonus: false } : x)) })}
                                     >✦ {t('spell.bonus_badge')}</span>
                                   )}
-                                  {/* Tempo, distanza, area, durata, concentrazione, scuola e note: nella nuvoletta del nome. */}
+                                  {/* Riepilogo a testo semplice (senza riquadri): tempo, distanza, area, durata, Conc./Rit.; il resto nella nuvoletta del nome. */}
+                                  {(() => {
+                                    const meta = [
+                                      tempoLabel,
+                                      gittata && traduciDato(gittata),
+                                      area && traduciDato(area),
+                                      durataInc && traduciDato(durataInc),
+                                      (isConcRow || /concentrazione/i.test(spieg)) && (en ? 'Conc.' : 'Conc.'),
+                                      isRitualeRow && (en ? 'Rit.' : 'Rit.'),
+                                    ].filter(Boolean);
+                                    if (!meta.length) return null;
+                                    return (
+                                      <span
+                                        className="spell-meta"
+                                        data-testid="spell-meta"
+                                        title={righeInfo.filter(Boolean).slice(0, 6).join('\n')}
+                                        style={{ fontSize: 11.5, color: C.inkDim, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '0 1 auto', marginLeft: 4 }}
+                                      >{meta.join(' · ')}</span>
+                                    );
+                                  })()}
                                   <div style={{ flex: '1 1 auto', minWidth: 0 }} />
                                   {parseEspressioneDado(danno) && (
                                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
@@ -15439,10 +15458,10 @@ export default function App() {
                     <div style={{ marginTop: 4 }}>
                       <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, marginBottom: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span>{lingua === 'en' ? 'Bestiary and summons catalog' : 'Catalogo di bestie ed evocazioni'}</span>
-                        <span style={{ fontSize: 11, color: C.inkDim, fontWeight: 400 }}>{FAMIGLI.length + EVOCAZIONI.length} creature</span>
+                        <span style={{ fontSize: 11, color: C.inkDim, fontWeight: 400 }}>{FAMIGLI.length + EVOCAZIONI.length + (manualeAttivo(manualiAttivi, 'araldi') ? EVOCAZIONI_ARALDI.length : 0)} creature</span>
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))', gap: 6 }}>
-                        {[...FAMIGLI, ...EVOCAZIONI].slice(0, 16).map((c) => (
+                        {[...(manualeAttivo(manualiAttivi, 'araldi') ? EVOCAZIONI_ARALDI : []), ...FAMIGLI, ...EVOCAZIONI].slice(0, 16).map((c) => (
                           <div role="button" tabIndex={0}
                             key={c.nome}
                             onClick={() => setBestiaDettaglio(c)}
