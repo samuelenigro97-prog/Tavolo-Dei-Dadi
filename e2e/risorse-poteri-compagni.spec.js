@@ -95,3 +95,28 @@ test('senza Poteri, un tocco rimette quelli della campagna (Patrono + Araldi) e 
   expect(stato.debiti).toBe(1);
   expect(stato.manuale).toBe(true);
 });
+
+test('con il solo Debito (6/100) il ripristino rimette gli Araldi e tiene il Debito a 6 (v4.84.0)', async ({ page }) => {
+  await apriScheda(page);
+  await page.evaluate(() => {
+    const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+    const pg = r.personaggi[r.attivo];
+    pg.poteri = [{ id: 'deb', nome: 'Debito', attivo: true, contatori: [{ nome: 'Debito', attuali: 6, max: 100 }], modificatori: [] }];
+    pg.risorse = (pg.risorse || []).filter((x) => !String(x.id || '').startsWith('potere-'));
+    localStorage.setItem('scheda-interattiva:v1', JSON.stringify(r));
+    localStorage.removeItem('scheda-interattiva:snapshots');
+  });
+  await apriScheda(page);
+  const box = page.getByTestId('poteri-risorse');
+  await expect(box.getByText('Debito', { exact: true })).toBeVisible();
+  await box.getByTestId('ripristina-poteri-campagna').click();
+  await expect(box.getByText('Segreti', { exact: true })).toBeVisible();
+  await expect(box.getByTestId('ripristina-poteri-campagna')).toHaveCount(0);
+  const stato = await page.evaluate(() => {
+    const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+    const pg = r.personaggi[r.attivo];
+    return { debito: pg.risorse.filter((x) => x.nome === 'Debito').map((x) => x.attuali), araldi: pg.poteri.some((p) => p.modello === 'araldi-del-segreto') };
+  });
+  expect(stato.debito).toEqual([6]);
+  expect(stato.araldi).toBe(true);
+});

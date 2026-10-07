@@ -17,10 +17,11 @@ import { BESTIE, FAMIGLI, EVOCAZIONI, MOSTRI_5E, TUTTE_LE_CREATURE, bestieDispon
 import { ultimaVersioneNovita } from './data/novita.js';
 import { codificaScheda, decodificaScheda, preparaPerCondivisione, costruisciLink, payloadDaUrl, LIMITE_PAYLOAD } from './utils/condivisione.js';
 import { creaStanza, apriStanza, normalizzaCodiceStanza, formattaCodiceStanza, DURATA_STANZA_ORE } from './utils/stanze.js';
-import { generaCodiceSync, normalizzaCodiceSync, salvaSync, caricaSync, messaggioErroreSync } from './utils/sync.js';
+import { generaCodiceSync, normalizzaCodiceSync, salvaSync, caricaSync, caricaStoriaSync, messaggioErroreSync } from './utils/sync.js';
 import { posizionePopover, stilePopover } from './utils/popover.js';
 import { normalizzaPreferenze } from './utils/preferenze.js';
 import { improntaRoster, contenutoBase, decidiSync, riepilogoConflitto, leggiBaseSync, salvaBaseSync, revisioneGist } from './utils/conflittiSync.js';
+import { potaSnapshot } from './utils/cronologia.js';
 import { trovaBackdropInCima, eCampoModificabile, deveAttivareDaTastiera } from './utils/accessibilita.js';
 import { salvaJsonLiberandoSpazio, deveRicordareBackup, rosterSenzaImmagini, riagganciaImmagini, salvaImmaginiRoster, caricaImmaginiRoster, rimuoviImmaginePersonaggio, preservaImmaginiSeMancanti } from './utils/persistenza.js';
 import { datiTabelleBackground } from './data/tabelleBackground.js';
@@ -1339,9 +1340,9 @@ const INCANTESIMI_NOMI = Array.from(new Set([...NOMI_SPIEG_INC, ...Object.keys(I
 import { NOMI_CLASSI, BACKGROUND_5E, TAGLIE_5E, ALLINEAMENTI_5E, SESSO_5E, SOTTOCLASSI_5E, INCANTESIMI_CLASSE, DANNI_5E, SENSI_5E, CONDIZIONI_5E, NOMI_OGGETTI, LINGUE_5E, ARMI_5E, STRUMENTI_5E, REAZIONI_5E, AZIONI_BONUS_5E, GRUPPI_ARMI_5E, GRUPPI_STRUMENTI_5E, GRUPPI_LINGUE_5E, DEFAULT_MANUALI, SOTTOCLASSI_FONTI, talentiPerManuali, PE_PER_LIVELLO, BACKGROUND_COMPETENZE, BACKGROUND_TALENTO_ORIGINE_2024, SPECIE_5E, tabellaPrivilegiSottoclasse, CARATT_INCANTATORE, PRIORITA_CARATT, DADO_VITA_CLASSE, BACKGROUND_CARATT, TS_CLASSE, ADDESTRAMENTO_CLASSE, COMPETENZE_CLASSE, PRIVILEGI_CLASSE_L1, PRIVILEGI_CLASSE_L1_2014, ASI_LIV, SOTTOCLASSE_LIV, COMPETENZE_SPECIE, NOMI_SPECIE, NOMI_SPECIE_GENERE, COGNOMI_SPECIE, NOMI_GENERICI, SPECIE_DATI, SPECIE_DATI_2014, BONUS_CARATT_SPECIE_2014, SFINIMENTO_2014, BASE_ARMATURA_DEFAULT, ESEMPI_ARMATURA } from "./data/dati5e.js";
 import { modificatore, conSegno, tiraDado, parseEspressioneDado, facceDadoVita, esprDadiVita, gruppiDadoVita, bonusCompetenzaDaLivello, tiraDanni, tiraD20, capacitaCarico, modalitaEffettiva } from "./rules/dadi.js";
 import { risorseAutoClasse, trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from "./rules/regole.js";
-import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda, contatoriInGioco } from './rules/poteri.js';
+import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda, contatoriInGioco, valoreContatore } from './rules/poteri.js';
 import { PoteriRisorse } from './ui/PoteriRisorse.jsx';
-import { costruisciPoteriCampagna } from './data/poteriCampagna.js';
+import { unisciPoteriCampagna, poteriCampagnaIncompleti } from './data/poteriCampagna.js';
 import { DadiModal } from './ui/modali/DadiModal.jsx';
 import { DiarioModal } from './ui/modali/DiarioModal.jsx';
 import { IspirazioneBgModal } from './ui/modali/IspirazioneBgModal.jsx';
@@ -2015,7 +2016,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.83.0';
+const APP_VERSION = '4.84.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -3296,11 +3297,17 @@ function leggiTentativiAggiornamento(build) {
 }
 
 /**
- * Nei conflitti di sincronizzazione vince sempre l'ultima versione salvata
- * online, senza chiedere: la copia di questo dispositivo finisce prima in
- * Cronologia versioni, e le sue modifiche a parti diverse della scheda restano.
+ * Nei conflitti di sincronizzazione vince la modifica fatta per ultima, senza
+ * chiedere: se qui l'utente ha cambiato la scheda dopo l'ultimo salvataggio
+ * online, vince questa copia; altrimenti la versione online. La copia che perde
+ * finisce prima in Cronologia versioni, e le modifiche a parti diverse della
+ * scheda restano comunque da entrambe le parti.
  */
-const POLITICA_SYNC = 'online';
+const POLITICA_SYNC = 'recente';
+const CHIAVE_ULTIMA_MODIFICA = 'scheda-interattiva:ultima-modifica';
+function leggiUltimaModificaLocale() {
+  try { return Number(localStorage.getItem(CHIAVE_ULTIMA_MODIFICA)) || 0; } catch { return 0; }
+}
 
 /**
  * Nuvoletta unica dei dettagli (Combattimento, Incantesimi...): prima le
@@ -3967,6 +3974,30 @@ export default function App() {
     const tmr = setTimeout(() => salvaSnapshot(roster), 2500);
     return () => clearTimeout(tmr);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roster]);
+
+  // Ora dell'ultima modifica fatta A MANO su questo dispositivo: nei conflitti di
+  // sincronizzazione vince la modifica più recente (POLITICA_SYNC 'recente').
+  // Conta solo un cambio del roster subito dopo un tocco o un tasto: i caricamenti
+  // dall'online e gli automatismi all'avvio non rendono "nuova" una copia vecchia.
+  const ultimaInterazioneRef = useRef(0);
+  const rosterDaRemotoRef = useRef(null);
+  const rosterVistoRef = useRef(roster);
+  useEffect(() => {
+    const segna = () => { ultimaInterazioneRef.current = Date.now(); };
+    window.addEventListener('pointerdown', segna, true);
+    window.addEventListener('keydown', segna, true);
+    return () => {
+      window.removeEventListener('pointerdown', segna, true);
+      window.removeEventListener('keydown', segna, true);
+    };
+  }, []);
+  useEffect(() => {
+    const prima = rosterVistoRef.current;
+    rosterVistoRef.current = roster;
+    if (prima === roster || roster === rosterDaRemotoRef.current) return;
+    if (Date.now() - ultimaInterazioneRef.current > 5000) return;
+    try { localStorage.setItem(CHIAVE_ULTIMA_MODIFICA, String(Date.now())); } catch { /* niente */ }
   }, [roster]);
 
   // Cloud Sync
@@ -6082,13 +6113,16 @@ export default function App() {
    * Serve quando un caricamento online li ha tolti (es. collegando un dispositivo).
    */
   function recuperoPoteriDaCronologia() {
-    if (!scheda || (Array.isArray(scheda.poteri) && scheda.poteri.length)) return null;
+    if (!scheda) return null;
+    // Si propone la copia più recente che ha PIÙ poteri di quelli attuali
+    // (es. una sincronizzazione ha riportato una versione con il solo Debito).
+    const quantiOra = Array.isArray(scheda.poteri) ? scheda.poteri.length : 0;
     const idAttivo = roster?.attivo;
     const nome = String(scheda.nome || '').trim().toLowerCase();
     for (const snap of [...leggiSnapshots()].sort((a, b) => (b.ts || 0) - (a.ts || 0))) {
       const pgs = snap?.roster?.personaggi || {};
       const pg = pgs[idAttivo] || Object.values(pgs).find((x) => String(x?.nome || '').trim().toLowerCase() === nome);
-      if (Array.isArray(pg?.poteri) && pg.poteri.length) {
+      if (Array.isArray(pg?.poteri) && pg.poteri.length > quantiOra) {
         const quando = new Date(snap.ts || Date.now()).toLocaleString(lingua === 'en' ? 'en-GB' : 'it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
         return {
           quando,
@@ -6108,24 +6142,31 @@ export default function App() {
   /** Rimette i Poteri della campagna (Potere del Patrono + Araldi del Segreto) e
    *  attiva il manuale degli Araldi se era spento. */
   function ripristinaPoteriCampagna() {
-    const poteri = costruisciPoteriCampagna();
-    aggiorna({ poteri, risorse: sincronizzaRisorsePoteri(poteri, scheda.risorse, livelloTotaleScheda(scheda), scheda.bonusCompetenza) });
+    // I contatori già presenti (es. Debito) tengono il valore attuale.
+    const poteri = unisciPoteriCampagna(scheda.poteri, (p, i, c) => valoreContatore(scheda, p.id, i, c).attuali);
+    const base = (scheda.risorse || []).filter((r) => !String(r?.id || '').startsWith('potere-'));
+    aggiorna({ poteri, risorse: sincronizzaRisorsePoteri(poteri, base, livelloTotaleScheda(scheda), scheda.bonusCompetenza) });
     if (manualiAttivi?.araldi !== true) setManualiAttivi((m) => ({ ...m, araldi: true }));
     registra({ etichetta: tr('Poteri della campagna ripristinati', 'Campaign powers restored'), tipo: 'privilegio', dettaglio: tr('Potere del Patrono e Araldi del Segreto', "Patron's Power and Heralds of the Secret") });
   }
   function leggiSnapshots() {
     try { return JSON.parse(localStorage.getItem('scheda-interattiva:snapshots')) || []; } catch { return []; }
   }
-  function salvaSnapshot(r) {
+  function salvaSnapshot(r, motivo) {
     try {
       const ids = Object.keys(r?.personaggi || {});
       if (!ids.length) return;
       const { preferenze: _pref, ...leggero } = rosterSenzaImmagini(r);
       const serial = JSON.stringify(leggero.personaggi);
       const snaps = leggiSnapshots();
-      if (snaps[0] && JSON.stringify(snaps[0].roster.personaggi) === serial) return; // no doppioni
-      snaps.unshift({ ts: Date.now(), n: ids.length, roster: leggero });
-      let taglio = snaps.slice(0, 12);
+      if (snaps[0] && JSON.stringify(snaps[0].roster.personaggi) === serial) {
+        // Stessa versione appena salvata: al massimo le si dà il motivo (per tenerla più a lungo).
+        if (!motivo || snaps[0].motivo) return;
+        snaps[0] = { ...snaps[0], motivo };
+      } else {
+        snaps.unshift({ ts: Date.now(), n: ids.length, roster: leggero, ...(motivo ? { motivo } : {}) });
+      }
+      let taglio = potaSnapshot(snaps);
       // se lo spazio non basta, riduci progressivamente il numero di snapshot
       for (;;) {
         try { localStorage.setItem('scheda-interattiva:snapshots', JSON.stringify(taglio)); break; }
@@ -6133,9 +6174,17 @@ export default function App() {
       }
     } catch { /* niente */ }
   }
+  /** Copie online precedenti del codice di sincronizzazione, pronte da ripristinare. */
+  async function caricaStoriaOnline() {
+    const versioni = await caricaStoriaSync(URL_STANZE, codiceSyncRef.current);
+    return versioni.map((v) => {
+      const { preferenze: _p, ...roster } = normalizzaRosterRemoto(v.roster);
+      return { ts: v.updatedAt, n: Object.keys(roster.personaggi).length, roster };
+    });
+  }
   /** Ripristina un roster da uno snapshot (salvando prima lo stato attuale, per poter tornare indietro). */
   function ripristinaSnapshot(snap) {
-    salvaSnapshot(roster);
+    salvaSnapshot(roster, 'ripristino');
     setRoster(riagganciaImmagini(snap.roster, roster));
     setMostraRipristino(false);
     setMostraMenu(false);
@@ -6398,7 +6447,7 @@ export default function App() {
   /** Sostituisce il roster locale con la versione online e ne fa la nuova base.
    *  Prima salva una copia locale in Cronologia versioni, per sicurezza. */
   async function applicaRosterRemoto(canale, remoto, atteso = null) {
-    salvaSnapshot(rosterSyncRef.current);
+    salvaSnapshot(rosterSyncRef.current, 'prima-sync');
     const conImmaginiLocali = await caricaImmaginiRoster(remoto.roster).catch(() => remoto.roster);
     // Caricamento automatico: se nel frattempo l'utente ha modificato qualcosa
     // non si sostituisce nulla (lo gestirà il prossimo controllo come conflitto).
@@ -6408,6 +6457,7 @@ export default function App() {
     // il roster risulta modificato e l'immagine viene inviata al prossimo salvataggio.
     salvaBaseCanale(canale, { rev: remoto.rev, ts: remoto.ts, hash: improntaRoster(remoto.roster), contenuto: contenutoBase(remoto.roster) });
     rosterSyncRef.current = finale;
+    rosterDaRemotoRef.current = finale;
     setRoster(finale);
     applicaPreferenzeRemote(remoto.roster?.preferenze);
     return true;
@@ -6420,7 +6470,12 @@ export default function App() {
    *  Restituisce true se l'invio va annullato. */
   const riproveRapideRef = useRef([]);
   async function gestisciDecisione(canale, decisione, remoto, silenzioso, setStato, rosterValutato) {
-    if (decisione.azione === 'invia') return false;
+    if (decisione.azione === 'invia') {
+      // Qui c'è la modifica più recente e si sovrascrive la copia online: quella
+      // finisce prima in Cronologia versioni, così non va persa.
+      if (decisione.motivo === 'conflitto-vince-locale' && remoto?.roster) salvaSnapshot(remoto.roster, 'online-sostituita');
+      return false;
+    }
     if (decisione.azione === 'niente') {
       if (!silenzioso) setStato({ text: t('conflitto.gia_allineato'), type: 'success' });
       return true;
@@ -6433,17 +6488,21 @@ export default function App() {
     if (decisione.azione === 'unisci') {
       // Modifiche nel frattempo: le gestirà il prossimo controllo (parte da solo).
       if (rosterSyncRef.current !== rosterValutato) return true;
-      salvaSnapshot(rosterSyncRef.current);
+      salvaSnapshot(rosterSyncRef.current, 'prima-sync');
+      if (decisione.motivo === 'conflitto-vince-locale') salvaSnapshot(remoto.roster, 'online-sostituita');
       const finale = preservaImmaginiSeMancanti(decisione.roster, rosterSyncRef.current);
       // Nuova base = la copia online: il roster unito risulta "modificato" e si invia
       // col prossimo salvataggio automatico, così l'altro dispositivo riceve tutto.
       salvaBaseCanale(canale, { rev: remoto.rev, ts: remoto.ts, hash: improntaRoster(remoto.roster), contenuto: contenutoBase(remoto.roster) });
       rosterSyncRef.current = finale;
+      rosterDaRemotoRef.current = finale;
       setRoster(finale);
       const tsPrefRemote = Number(remoto.roster?.preferenze?.ts) || 0;
       if (tsPrefRemote > (Number(rosterValutato?.preferenze?.ts) || 0)) applicaPreferenzeRemote(remoto.roster?.preferenze);
       setStato({
-        text: decisione.motivo === 'conflitto-vince-online'
+        text: decisione.motivo === 'conflitto-vince-locale'
+          ? tr('Tenute le modifiche più recenti di questo dispositivo, unite al resto della versione online. La copia online è in Cronologia versioni.', 'Kept the newer changes from this device, merged with the rest of the online version. The online copy is in Version history.')
+          : decisione.motivo === 'conflitto-vince-online'
           ? tr('Caricata l’ultima versione online; le altre modifiche di questo dispositivo sono state tenute. La copia precedente è in Cronologia versioni.', 'Loaded the latest online version; the other changes from this device were kept. The previous copy is in Version history.')
           : tr('Unite le modifiche di questo dispositivo con quelle dell’altro.', 'Merged the changes from this device with those from the other one.'),
         type: 'success',
@@ -6453,8 +6512,8 @@ export default function App() {
     if (decisione.azione === 'carica') {
       if (!(await applicaRosterRemoto(canale, remoto, rosterValutato))) {
         // Il roster è cambiato proprio adesso (es. immagini caricate all'avvio):
-        // con la politica "online" si riprova fra un attimo, senza chiedere.
-        if (POLITICA_SYNC === 'online') {
+        // con la politica automatica si riprova fra un attimo, senza chiedere.
+        if (POLITICA_SYNC !== 'chiedi') {
           // Al massimo 3 riprove rapide al minuto: ogni giro è una richiesta al servizio online.
           const ora = Date.now();
           riproveRapideRef.current = riproveRapideRef.current.filter((t) => ora - t < 60000);
@@ -6471,7 +6530,9 @@ export default function App() {
         return true;
       }
       setStato({
-        text: decisione.motivo === 'conflitto-vince-online'
+        text: decisione.motivo === 'conflitto-vince-locale'
+          ? tr('Tenute le modifiche più recenti di questo dispositivo, unite al resto della versione online. La copia online è in Cronologia versioni.', 'Kept the newer changes from this device, merged with the rest of the online version. The online copy is in Version history.')
+          : decisione.motivo === 'conflitto-vince-online'
           ? tr('Caricata l’ultima versione online. La copia di questo dispositivo è in Cronologia versioni.', 'Loaded the latest online version. This device’s copy is in Version history.')
           : t('conflitto.caricata_recente'),
         type: 'success',
@@ -6565,7 +6626,7 @@ export default function App() {
         }
       }
       if (!forza) {
-        const decisione = decidiSync({ base: leggiBaseCanale('gist'), remoto, locale: rosterLocale, politica: POLITICA_SYNC });
+        const decisione = decidiSync({ base: leggiBaseCanale('gist'), remoto, locale: rosterLocale, politica: POLITICA_SYNC, tsLocale: leggiUltimaModificaLocale() });
         if (await gestisciDecisione('gist', decisione, remoto, silenzioso, setCloudStatus, rosterLocale)) return;
         if (soloLettura) return;
       }
@@ -6781,7 +6842,7 @@ export default function App() {
         }
       }
       if (!forza) {
-        const decisione = decidiSync({ base: leggiBaseCanale('codice'), remoto, locale: rosterLocale, politica: POLITICA_SYNC });
+        const decisione = decidiSync({ base: leggiBaseCanale('codice'), remoto, locale: rosterLocale, politica: POLITICA_SYNC, tsLocale: leggiUltimaModificaLocale() });
         if (await gestisciDecisione('codice', decisione, remoto, silenzioso, setSyncCodiceStatus, rosterLocale)) return;
         if (soloLettura) return;
       }
@@ -6793,7 +6854,7 @@ export default function App() {
         if (errScrittura.message === 'SYNC_CONFLICT') {
           // Un altro dispositivo ha salvato proprio adesso. Con la politica "online"
           // si ripete il giro (rilettura + unione) fra un attimo, senza chiedere.
-          if (POLITICA_SYNC === 'online' && riprovaConflittoRef.current < 3) {
+          if (POLITICA_SYNC !== 'chiedi' && riprovaConflittoRef.current < 3) {
             riprovaConflittoRef.current += 1;
             syncCodicePendenteRef.current = true;
             return;
@@ -6929,8 +6990,9 @@ export default function App() {
     // presenti solo qui, il roster risulta "modificato" e verrà inviato.
     conflittoPausaRef.current.codice = false;
     setConflittoSync((c) => (c?.canale === 'codice' ? null : c));
-    salvaSnapshot(rosterSyncRef.current);
+    salvaSnapshot(rosterSyncRef.current, 'prima-sync');
     salvaBaseCanale('codice', { rev: String(updatedAt || ''), ts: updatedAt, hash: improntaRoster(caricato), contenuto: contenutoBase(caricato) });
+    rosterDaRemotoRef.current = merged;
     setRoster(merged);
     return updatedAt;
   }
@@ -9319,7 +9381,7 @@ export default function App() {
         </div>
       )}
 
-      {mostraRipristino && <RipristinoModal leggiSnapshots={leggiSnapshots} ripristinaSnapshot={ripristinaSnapshot} setConferma={setConferma} setMostraRipristino={setMostraRipristino} />}
+      {mostraRipristino && <RipristinoModal leggiSnapshots={leggiSnapshots} ripristinaSnapshot={ripristinaSnapshot} setConferma={setConferma} setMostraRipristino={setMostraRipristino} caricaStoriaOnline={codiceSync && URL_STANZE ? caricaStoriaOnline : null} />}
 
       {/* Note Legali & Licenza Creative Commons SRD 5.1 */}
       {mostraNoteLegali && <NoteLegaliModal setMostraNoteLegali={setMostraNoteLegali} />}
@@ -10533,8 +10595,8 @@ export default function App() {
                     lingua={lingua}
                     registra={registra}
                     mostraInfo={setInfo}
-                    recupero={!isSolaLettura && contatoriInGioco(scheda).length === 0 ? recuperoPoteriDaCronologia() : null}
-                    ripristinoCampagna={!isSolaLettura && !(scheda.poteri || []).length ? ripristinaPoteriCampagna : null}
+                    recupero={!isSolaLettura ? recuperoPoteriDaCronologia() : null}
+                    ripristinoCampagna={!isSolaLettura && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null}
                   />
                 </Sezione>
               </div>
@@ -14824,7 +14886,7 @@ export default function App() {
                   </div>
 
                   {/* Riga 3: Poteri personalizzati (regole homebrew del tavolo) */}
-                  <SezionePoteri scheda={scheda} aggiorna={aggiorna} lingua={lingua} manualiAttivi={manualiAttivi} registra={registra} mostraInfo={setInfo} ripristinoCampagna={!isSolaLettura && !(scheda.poteri || []).length ? ripristinaPoteriCampagna : null} />
+                  <SezionePoteri scheda={scheda} aggiorna={aggiorna} lingua={lingua} manualiAttivi={manualiAttivi} registra={registra} mostraInfo={setInfo} ripristinoCampagna={!isSolaLettura && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null} />
                 </div>
               </Sezione>
 

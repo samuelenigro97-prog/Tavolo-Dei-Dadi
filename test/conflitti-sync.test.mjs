@@ -269,10 +269,10 @@ test('worker sync: baseUpdatedAt diverso dal salvato → 409 SYNC_CONFLICT, dato
   assert.equal((await put(env, { roster: rosterMattino, updatedAt: T_1606, baseUpdatedAt: T_1549 })).status, 200);
 });
 
-test('worker sync: senza baseUpdatedAt (app vecchie) il comportamento resta quello di prima', async () => {
+test('worker sync: senza baseUpdatedAt (app vecchie) si crea la prima copia ma non si sovrascrive quella esistente (v4.84.0)', async () => {
   const env = envFinto();
   assert.equal((await put(env, { roster: rosterCorretto(), updatedAt: T_1549 })).status, 200);
-  assert.equal((await put(env, { roster: rosterCorretto(), updatedAt: T_1606 })).status, 200);
+  assert.equal((await put(env, { roster: rosterCorretto(), updatedAt: T_1606 })).status, 409);
 });
 
 test('salvaSync invia baseUpdatedAt e traduce il 409 in SYNC_CONFLICT', async () => {
@@ -336,4 +336,27 @@ test('politica "online": nei conflitti veri vince la copia online, il resto dell
   assert.deepEqual([d2.azione, d2.motivo], ['carica', 'conflitto-vince-online']);
   // Con la politica predefinita ("chiedi") resta il conflitto.
   assert.equal(decidiSync({ base: b, remoto: { rev: 'r2', ts: 2, roster: online }, locale: qui }).azione, 'conflitto');
+});
+
+test('politica "recente": vince la modifica fatta per ultima, una copia online più vecchia non cancella quella di qui (v4.84.0)', async () => {
+  const { contenutoBase } = await import('../src/utils/conflittiSync.js');
+  const base = { attivo: 'p', personaggi: { p: { nome: 'V', pf: 30, slot: 4, note: 'a' } } };
+  // Qui (oggi pomeriggio): PF scesi e slot spesi. Online: un dispositivo rimasto indietro ha cambiato PF e note.
+  const qui = { attivo: 'p', personaggi: { p: { nome: 'V', pf: 10, slot: 1, note: 'a' } } };
+  const online = { attivo: 'p', personaggi: { p: { nome: 'V', pf: 15, slot: 4, note: 'c' } } };
+  const b = { rev: 'r1', ts: 1000, hash: improntaRoster(base), contenuto: contenutoBase(base) };
+  const remoto = { rev: 'r2', ts: 2000, roster: online };
+  const d = decidiSync({ base: b, remoto, locale: qui, politica: 'recente', tsLocale: 3000 });
+  assert.deepEqual([d.azione, d.motivo], ['unisci', 'conflitto-vince-locale']);
+  assert.deepEqual(d.roster.personaggi.p, { nome: 'V', pf: 10, slot: 1, note: 'c' }, 'pf: vince qui (più recente); slot: solo qui; note: solo online');
+  // Se la modifica online è più recente vince quella, come prima.
+  const d2 = decidiSync({ base: b, remoto, locale: qui, politica: 'recente', tsLocale: 1500 });
+  assert.deepEqual([d2.azione, d2.motivo], ['unisci', 'conflitto-vince-online']);
+  assert.equal(d2.roster.personaggi.p.pf, 15);
+  // Ora dell'ultima modifica sconosciuta: vince online.
+  assert.equal(decidiSync({ base: b, remoto, locale: qui, politica: 'recente' }).motivo, 'conflitto-vince-online');
+  // Senza contenuto della base: la copia più recente vince per intero.
+  const senza = { rev: 'r1', ts: 1000, hash: 'vecchia' };
+  assert.deepEqual(Object.values(decidiSync({ base: senza, remoto, locale: qui, politica: 'recente', tsLocale: 3000 })).slice(0, 2), ['invia', 'conflitto-vince-locale']);
+  assert.equal(decidiSync({ base: senza, remoto, locale: qui, politica: 'recente', tsLocale: 1500 }).azione, 'carica');
 });

@@ -282,8 +282,46 @@ export async function gestisciStanze(request, env, headers, percorso) {
 }
 
 function codiceSyncValido(percorso) {
-  const codice = percorso.startsWith('/sync/') ? decodeURIComponent(percorso.slice(6)).toUpperCase() : '';
+  const codice = percorso.startsWith('/sync/') ? decodeURIComponent(percorso.slice(6)).replace(/\/storia$/, '').toUpperCase() : '';
   return /^[2-9A-HJ-NP-Z]{10}$/.test(codice) ? codice : '';
+}
+
+// Storico delle copie online di un codice: se un dispositivo rimasto indietro
+// sovrascrive i dati più recenti, si può tornare alla versione di qualche ora o
+// giorno prima. Una copia (senza immagini) al massimo ogni 15 minuti, in una
+// chiave a parte: una scrittura KV in più ogni 15 minuti di gioco, non per salvataggio.
+const STORIA_OGNI_MS = 15 * 60 * 1000;
+const STORIA_MASSIMO = 16;
+
+function senzaImmaginiSync(valore) {
+  if (typeof valore === 'string') return valore.startsWith('data:') && valore.length > 2000 ? '' : valore;
+  if (Array.isArray(valore)) return valore.map(senzaImmaginiSync);
+  if (valore && typeof valore === 'object') {
+    const out = {};
+    for (const [k, v] of Object.entries(valore)) out[k] = senzaImmaginiSync(v);
+    return out;
+  }
+  return valore;
+}
+
+/** Tiene le copie più utili: ogni 15 min per 3 ore, ogni 3 ore per 2 giorni, una al giorno per 14 giorni. */
+export function potaStoriaSync(voci, ora = Date.now()) {
+  const ordinate = [...voci].filter((v) => v && v.roster).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+  const fasce = new Set();
+  const tenute = [];
+  for (const v of ordinate) {
+    const ts = Number(v.updatedAt) || 0;
+    const eta = ora - ts;
+    let fascia;
+    if (eta < 3 * 3600e3) fascia = `q${Math.floor(ts / STORIA_OGNI_MS)}`;
+    else if (eta < 48 * 3600e3) fascia = `t${Math.floor(ts / (3 * 3600e3))}`;
+    else if (eta < 14 * 86400e3) fascia = `g${Math.floor(ts / 86400e3)}`;
+    else continue;
+    if (fasce.has(fascia)) continue;
+    fasce.add(fascia);
+    tenute.push(v);
+  }
+  return tenute.slice(0, STORIA_MASSIMO);
 }
 
 /** Sincronizzazione roster tra dispositivi senza account né token: il codice
@@ -302,6 +340,14 @@ export async function gestisciSync(request, env, headers, percorso) {
     return new Response(JSON.stringify({ error: 'SYNC_INVALID_CODE' }), { status: 400, headers });
   }
   const chiave = `sync:${codice}`;
+  const chiaveStoria = `sync-storia:${codice}`;
+
+  if (percorso.endsWith('/storia')) {
+    if (request.method !== 'GET') return new Response(JSON.stringify({ error: 'SYNC_METHOD_NOT_ALLOWED' }), { status: 405, headers });
+    let voci = [];
+    try { voci = JSON.parse((await env.SCHEDE.get(chiaveStoria)) || '[]'); } catch { voci = []; }
+    return new Response(JSON.stringify({ versioni: Array.isArray(voci) ? voci : [] }), { status: 200, headers });
+  }
 
   if (request.method === 'PUT') {
     let corpo;
@@ -323,6 +369,13 @@ export async function gestisciSync(request, env, headers, percorso) {
     // Una sola lettura del valore esistente, usata da entrambi i controlli.
     let esistenteLetto = null;
     try { esistenteLetto = await env.SCHEDE.get(chiave); } catch { esistenteLetto = null; }
+    // Chi non dichiara da quale versione parte (app vecchie, rimaste aperte da
+    // giorni) non può sovrascrivere alla cieca una copia online già esistente.
+    if (esistenteLetto && (baseUpdatedAt === undefined || baseUpdatedAt === null)) {
+      let tsEsistente = 0;
+      try { tsEsistente = Number(JSON.parse(esistenteLetto)?.updatedAt) || 0; } catch { /* niente */ }
+      return new Response(JSON.stringify({ error: 'SYNC_CONFLICT', updatedAt: tsEsistente }), { status: 409, headers });
+    }
     if (baseUpdatedAt !== undefined && baseUpdatedAt !== null) {
       try {
         const esistente = esistenteLetto;
@@ -347,7 +400,24 @@ export async function gestisciSync(request, env, headers, percorso) {
         }
       }
     } catch {}
-    await env.SCHEDE.put(chiave, testo, { expirationTtl: DURATA_SYNC_SEC });
+    // Storico: la copia che sta per essere sostituita entra nello storico se
+    // l'ultima registrata ha almeno 15 minuti.
+    let storiaTs = 0;
+    let testoFinale = testo;
+    try {
+      const esistenteDati = esistenteLetto ? JSON.parse(esistenteLetto) : null;
+      storiaTs = Number(esistenteDati?.storiaTs) || 0;
+      if (esistenteDati?.roster && Date.now() - storiaTs >= STORIA_OGNI_MS) {
+        let voci = [];
+        try { voci = JSON.parse((await env.SCHEDE.get(chiaveStoria)) || '[]'); } catch { voci = []; }
+        if (!Array.isArray(voci)) voci = [];
+        voci.unshift({ updatedAt: Number(esistenteDati.updatedAt) || 0, roster: senzaImmaginiSync(esistenteDati.roster) });
+        await env.SCHEDE.put(chiaveStoria, JSON.stringify(potaStoriaSync(voci)), { expirationTtl: DURATA_SYNC_SEC });
+        storiaTs = Date.now();
+      }
+      if (storiaTs) testoFinale = JSON.stringify({ roster, updatedAt, storiaTs });
+    } catch { /* lo storico è un di più: il salvataggio prosegue comunque */ }
+    await env.SCHEDE.put(chiave, testoFinale, { expirationTtl: DURATA_SYNC_SEC });
     return new Response(JSON.stringify({ ok: true, updatedAt }), { status: 200, headers });
   }
 

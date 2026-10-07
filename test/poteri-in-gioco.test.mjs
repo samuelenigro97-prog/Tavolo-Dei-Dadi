@@ -21,3 +21,21 @@ test('contatoriInGioco: un contatore per nome, solo poteri attivi e sbloccati, v
   assert.equal(voci[1].attuali, 4, 'il valore della risorsa collegata vince');
   assert.equal(voci[1].max, 6);
 });
+
+test('Poteri della campagna: incompleti con il solo Debito, uniti tenendo il valore del Debito (v4.84.0)', async () => {
+  const { poteriCampagnaIncompleti, unisciPoteriCampagna } = await import('../src/data/poteriCampagna.js');
+  const { ID_MODELLO_ARALDI } = await import('../src/data/modelliPoteri.js');
+  const soloDebito = [{ id: 'x', nome: 'Debito', attivo: true, contatori: [{ nome: 'Debito', attuali: 6, max: 100 }] }];
+  const altro = { id: 'y', nome: 'Benedizione del mare', attivo: true, contatori: [{ nome: 'Onde', attuali: 2, max: 3 }] };
+  assert.equal(poteriCampagnaIncompleti({ poteri: [] }), true);
+  assert.equal(poteriCampagnaIncompleti({ poteri: soloDebito }), true);
+  assert.equal(poteriCampagnaIncompleti({ poteri: [altro] }), false, 'altri personaggi con poteri propri: nessun pulsante');
+  const uniti = unisciPoteriCampagna([...soloDebito, altro]);
+  assert.equal(poteriCampagnaIncompleti({ poteri: uniti }), false);
+  assert.ok(uniti.some((p) => p.modello === ID_MODELLO_ARALDI), 'tornano gli Araldi del Segreto');
+  const debiti = uniti.flatMap((p) => p.contatori).filter((c) => c.nome === 'Debito');
+  assert.equal(debiti.length, 1, 'un solo Debito');
+  assert.equal(debiti[0].attuali, 6, 'il Debito tiene il valore attuale');
+  assert.ok(uniti.some((p) => p.nome === 'Benedizione del mare'), 'gli altri poteri restano');
+  assert.ok(!uniti.some((p) => p.id === 'x'), 'il Debito generico viene sostituito da quello del Patrono');
+});

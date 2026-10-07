@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import worker, { gestisciSync } from '../worker/transcribe-worker.js';
-import { salvaSync, caricaSync, normalizzaCodiceSync, generaCodiceSync, messaggioErroreSync } from '../src/utils/sync.js';
+import { salvaSync, caricaSync, caricaStoriaSync, normalizzaCodiceSync, generaCodiceSync, messaggioErroreSync } from '../src/utils/sync.js';
 
 class KvFinto {
   constructor() { this.dati = new Map(); this.puts = []; }
@@ -96,4 +96,31 @@ test('sync client: messaggi di errore coprono tutti i codici usati dal worker', 
     assert.equal(typeof messaggioErroreSync(codiceErrore), 'string');
     assert.ok(messaggioErroreSync(codiceErrore).length > 0);
   }
+});
+
+test('sync worker: chi non dichiara la versione di partenza non sovrascrive una copia esistente (v4.84.0)', async () => {
+  const env = { SCHEDE: new KvFinto() };
+  const c = '23456ABCDF';
+  assert.equal((await worker.fetch(req(`/sync/${c}`, { method: 'PUT', body: JSON.stringify({ roster, updatedAt: 100 }) }), env)).status, 200, 'la prima copia si crea');
+  const vecchia = await worker.fetch(req(`/sync/${c}`, { method: 'PUT', body: JSON.stringify({ roster: { ...roster, attivo: 'x' }, updatedAt: 200 }) }), env);
+  assert.equal(vecchia.status, 409);
+  assert.equal(JSON.parse(await (await worker.fetch(req(`/sync/${c}`), env)).text()).updatedAt, 100);
+  assert.equal((await worker.fetch(req(`/sync/${c}`, { method: 'PUT', body: JSON.stringify({ roster, updatedAt: 300, baseUpdatedAt: 100 }) }), env)).status, 200);
+});
+
+test('sync worker: la copia sostituita entra nello storico (senza immagini), al massimo una ogni 15 minuti (v4.84.0)', async () => {
+  const env = { SCHEDE: new KvFinto() };
+  const c = '23456ABCDG';
+  const t0 = Date.now() - 3600e3;
+  const conRitratto = { attivo: 'pg-1', personaggi: { 'pg-1': { nome: 'Vaelion', pfAttuali: 40, ritratto: `data:image/png;base64,${'A'.repeat(5000)}` } } };
+  await worker.fetch(req(`/sync/${c}`, { method: 'PUT', body: JSON.stringify({ roster: conRitratto, updatedAt: t0 }) }), env);
+  const dopo = { attivo: 'pg-1', personaggi: { 'pg-1': { nome: 'Vaelion', pfAttuali: 20 } } };
+  await worker.fetch(req(`/sync/${c}`, { method: 'PUT', body: JSON.stringify({ roster: dopo, updatedAt: Date.now(), baseUpdatedAt: t0 }) }), env);
+  const attuale = JSON.parse(env.SCHEDE.dati.get(`sync:${c}`));
+  await worker.fetch(req(`/sync/${c}`, { method: 'PUT', body: JSON.stringify({ roster: { ...dopo, attivo: 'pg-1' }, updatedAt: attuale.updatedAt + 1, baseUpdatedAt: attuale.updatedAt }) }), env);
+  const storia = await caricaStoriaSync('https://worker.example', c, (url, init) => worker.fetch(new Request(url, { ...init, headers: { 'cf-connecting-ip': '203.0.113.9' } }), env));
+  assert.equal(storia.length, 1, 'il secondo salvataggio ravvicinato non aggiunge copie');
+  assert.equal(storia[0].updatedAt, t0);
+  assert.equal(storia[0].roster.personaggi['pg-1'].pfAttuali, 40);
+  assert.equal(storia[0].roster.personaggi['pg-1'].ritratto, '', 'niente immagini nello storico');
 });

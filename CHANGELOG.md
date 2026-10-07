@@ -2,6 +2,35 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.84.0] – 2026-10-07
+
+### Corretto
+- **Una copia online vecchia non cancella più le modifiche recenti**
+  (`decidiSync`, politica `recente`): nei conflitti di sincronizzazione vince la
+  modifica fatta per ultima. Ogni dispositivo ricorda l'ora dell'ultima modifica
+  fatta a mano (solo cambi subito dopo un tocco o un tasto: caricamenti e
+  automatismi all'avvio non contano); se è più recente della copia online
+  vincono i campi di qui, altrimenti quelli online. La copia che perde va in
+  Cronologia versioni. Prima vinceva sempre l'online: un dispositivo rimasto
+  indietro poteva riportare PF, slot e risorse di giorni prima.
+- **Worker**: un salvataggio senza `baseUpdatedAt` (app vecchie rimaste aperte)
+  non sovrascrive più una copia esistente (409).
+
+### Aggiunto
+- **Storico online** (Worker, `sync-storia:<codice>`): la copia sostituita entra
+  nello storico (senza immagini) al massimo ogni 15 minuti; si tengono una copia
+  ogni 15 minuti per 3 ore, ogni 3 ore per 2 giorni, una al giorno per 2
+  settimane. `GET /sync/<codice>/storia`; in app: Cronologia versioni → "Mostra
+  le copie online". Serve il redeploy del Worker.
+- **Cronologia versioni più lunga** (`src/utils/cronologia.js`): le ultime 10,
+  poi una all'ora per 2 giorni e una al giorno per 2 settimane; le copie salvate
+  prima di una sincronizzazione restano 30 giorni. Ogni voce mostra PF e slot
+  rimasti dei personaggi e il motivo.
+- **Poteri della campagna incompleti**: "Ripristina i Poteri della campagna"
+  compare anche quando c'è solo il Debito; unisce i poteri tenendo il valore
+  attuale dei contatori. "Recupera i Poteri dalla cronologia" compare quando una
+  copia salvata ha più poteri di quelli attuali.
+
 ## [4.83.0] – 2026-10-07
 
 ### Aggiunto

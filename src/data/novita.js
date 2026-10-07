@@ -5,6 +5,21 @@
 
 export const NOVITA = [
   {
+    versione: '4.84.0',
+    voci: {
+      it: [
+        'Sincronizzazione: ora vince la modifica più recente. Un dispositivo rimasto indietro non può più riportare PF, slot e risorse di giorni prima.',
+        'Cronologia versioni più lunga (fino a due settimane) con PF e slot di ogni versione, e le copie online precedenti salvate dal servizio.',
+        'Poteri con il solo Debito? "Ripristina i Poteri della campagna" rimette gli Araldi del Segreto tenendo il Debito attuale.',
+      ],
+      en: [
+        'Sync: the most recent change now wins. A device left behind can no longer bring back HP, slots and resources from days before.',
+        'Longer Version history (up to two weeks) showing HP and slots of each version, plus the previous online copies kept by the service.',
+        'Powers with only Debt? "Restore the campaign powers" brings back the Heralds of the Secret, keeping the current Debt.',
+      ],
+    },
+  },
+  {
     versione: '4.83.0',
     voci: {
       it: ['Poteri spariti? Nel riquadro Poteri e nella sezione Poteri c\'è "Ripristina i Poteri della campagna": rimette il Potere del Patrono (Debito, Maschera +3 m) e tutti i privilegi degli Araldi del Segreto, e attiva il manuale.'],

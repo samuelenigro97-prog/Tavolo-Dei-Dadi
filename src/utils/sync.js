@@ -62,6 +62,17 @@ export async function caricaSync(baseUrl, codice, fetchImpl = fetch) {
   return { roster: dati.roster, updatedAt: Number(dati.updatedAt) || 0 };
 }
 
+/** Copie online precedenti di quel codice (senza immagini), dalla più recente. */
+export async function caricaStoriaSync(baseUrl, codice, fetchImpl = fetch) {
+  const pulito = normalizzaCodiceStanza(codice);
+  if (pulito.length !== 10) throw new Error('SYNC_INVALID_CODE');
+  const res = await fetchImpl(endpoint(baseUrl, `/sync/${encodeURIComponent(pulito)}/storia`), { method: 'GET' });
+  const dati = await leggiRisposta(res);
+  return (Array.isArray(dati?.versioni) ? dati.versioni : [])
+    .filter((v) => v?.roster && typeof v.roster === 'object')
+    .map((v) => ({ updatedAt: Number(v.updatedAt) || 0, roster: v.roster }));
+}
+
 /** Messaggio utente in italiano per i codici di errore sopra. */
 export function messaggioErroreSync(codice) {
   const raw = String(codice || '');

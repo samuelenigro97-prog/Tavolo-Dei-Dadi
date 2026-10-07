@@ -599,6 +599,11 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
         <AraldiPannello scheda={scheda} aggiorna={aggiorna} lingua={lingua} registra={registra} onModifica={setPotereApertoId} onInfo={mostraInfo} />
       )}
 
+      {!chiusa && ripristinoCampagna && (poteriInLista.length > 0 || pannelloAraldi) && (
+        <button type="button" data-testid="ripristina-poteri-campagna-sezione" style={{ ...styles.buttonMini, fontWeight: 700, color: C.goldDark, borderColor: C.goldDark, alignSelf: 'center', marginBottom: 8 }} onClick={ripristinoCampagna}>
+          {lingua === 'en' ? 'Restore the missing campaign powers (Heralds of the Secret)' : 'Ripristina i Poteri della campagna mancanti (Araldi del Segreto)'}
+        </button>
+      )}
       {chiusa ? null : poteriInLista.length === 0 && !pannelloAraldi ? (
         <div style={{ ...styles.detail, fontSize: 12, textAlign: 'center', padding: '10px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
           {lingua === 'en' ? 'No custom powers yet.' : 'Nessun potere personalizzato per ora.'}
