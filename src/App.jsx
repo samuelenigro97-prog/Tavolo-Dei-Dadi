@@ -2019,7 +2019,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.94.1';
+const APP_VERSION = '4.95.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4367,7 +4367,7 @@ export default function App() {
     const modo = scuroEff ? 'scuro' : 'chiaro';
     setNotteAttiva(scuroEff); // notte = tema scuro: pilota sfondi notturni e audio più cupo
     // Il colore della classe è l'accento operativo della scheda: titoli, bordi e controlli
-    // principali lo usano, mentre fondi e testo restano leggibili e fedeli all'ambientazione.
+    // principali e superfici lo usano, mantenendo il testo leggibile.
     const t = { ...BASE_TEMA[modo] };
     const accTema = (temaCornici && temaCornici !== 'auto' && temaCornici !== 'disattivato') ? coloreClasse(temaCornici) : null;
     const accClasse = temaCornici === 'disattivato' ? null : (accTema || coloreClasse(classeAttiva));
@@ -4378,8 +4378,9 @@ export default function App() {
       t.gold = tintaClasse;
       t.goldDark = tintaClasse;
       t.title = tintaClasse;
-      t.border = mescola(t.border, tintaClasse, scuroEff ? 0.30 : 0.18);
-      t.panelLight = mescola(t.panelLight, tintaClasse, scuroEff ? 0.075 : 0.035);
+      t.border = mescola(t.border, tintaClasse, scuroEff ? 0.50 : 0.38);
+      t.panel = mescola(t.panel, tintaClasse, scuroEff ? 0.09 : 0.065);
+      t.panelLight = mescola(t.panelLight, tintaClasse, scuroEff ? 0.16 : 0.12);
     }
     garantisciContrastoTema(t);
     const root = document.documentElement;

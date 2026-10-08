@@ -50,7 +50,7 @@ export const styles = {
   panelTitle: {
     margin: '0 0 12px',
     fontSize: 15,
-    color: C.ink,
+    color: C.title,
     textAlign: 'center',
     fontWeight: 'bold',
     borderTop: 'none',
@@ -617,6 +617,7 @@ tbody tr:hover {
 .sezione-titolo-testo {
   justify-self: center;
   text-align: center;
+  color: var(--c-title);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
   letter-spacing: 1px;
   transition: text-shadow 0.3s ease;
@@ -654,8 +655,7 @@ tbody tr:hover {
 
 .sezione:hover .sezione-titolo-testo,
 .profilo-sezione:hover .sezione-titolo-testo {
-  /* Testo stabile senza cambio di colore o bagliori */
-  color: var(--c-ink);
+  color: var(--c-title);
 }
 
 /* .angolo-ornamento ora è fratello (successivo) di <details class="sezione">,
@@ -1167,6 +1167,7 @@ tbody tr:hover {
      escono dal riquadro;
    - bordo luminoso singolo (senza il doppio filetto delle sezioni grandi). */
 .vital-box > div:first-child {
+  color: var(--c-title) !important;
   min-height: 2.4em;
   display: flex !important;
   align-items: center;
