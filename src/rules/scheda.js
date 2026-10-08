@@ -495,11 +495,11 @@ const QUANDO = { chiaro: '#0c582b', scuro: '#4ade80' };
 // pannelli tinti dalla classe: sotto i 4,5:1 (WCAG AA) il testo piccolo non si legge
 // (misurato con axe-core: prima il tema chiaro ne mancava il 3,6:1 per il verde "quando").
 const CONCENTRAZIONE = { chiaro: '#84178f', scuro: '#f0abfc' };
-const RITUALE = { chiaro: '#6123c0', scuro: '#b49cfa' };
+const RITUALE = { chiaro: '#6123c0', scuro: '#c4b5fd' };
 
 /** Palette per tipo di informazione, condivisa da Combattimento e Incantesimi. */
 export const COLORE_CATEGORIA_INFO = {
-  gittata:      { chiaro: '#1942b7', scuro: '#6cacfa' }, // dove: gittata, portata, area
+  gittata:      { chiaro: '#1942b7', scuro: '#93c5fd' }, // dove: gittata, portata, area
   tempo:        QUANDO,                                   // quando: tempo di lancio
   durata:       QUANDO,                                   // quando: durata
   innesco:      QUANDO,                                   // quando: innesco di una reazione

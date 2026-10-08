@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.95.0] – 2026-10-08
+
+### Cambiato
+- **Colore della classe**: fondi e bordi dei riquadri hanno una tinta più riconoscibile sia di giorno sia di notte.
+- **Titoli e statistiche**: usano il colore della classe anche al passaggio del mouse, anziché tornare al testo neutro.
+
 ## [4.94.1] – 2026-10-08
 
 ### Cambiato

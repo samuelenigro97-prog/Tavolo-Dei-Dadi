@@ -50,7 +50,7 @@ export const styles = {
   panelTitle: {
     margin: '0 0 12px',
     fontSize: 15,
-    color: C.ink,
+    color: C.title,
     textAlign: 'center',
     fontWeight: 'bold',
     borderTop: 'none',
@@ -287,7 +287,7 @@ export const styles = {
   },
   vitalLabel: {
     fontSize: 12,
-    color: C.inkDim,
+    color: C.title,
     letterSpacing: 0.5,
     textTransform: 'uppercase',
     fontWeight: 700,
@@ -617,6 +617,7 @@ tbody tr:hover {
 .sezione-titolo-testo {
   justify-self: center;
   text-align: center;
+  color: var(--c-title);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
   letter-spacing: 1px;
   transition: text-shadow 0.3s ease;
@@ -654,8 +655,7 @@ tbody tr:hover {
 
 .sezione:hover .sezione-titolo-testo,
 .profilo-sezione:hover .sezione-titolo-testo {
-  /* Testo stabile senza cambio di colore o bagliori */
-  color: var(--c-ink);
+  color: var(--c-title);
 }
 
 /* .angolo-ornamento ora è fratello (successivo) di <details class="sezione">,
@@ -1167,6 +1167,7 @@ tbody tr:hover {
      escono dal riquadro;
    - bordo luminoso singolo (senza il doppio filetto delle sezioni grandi). */
 .vital-box > div:first-child {
+  color: var(--c-title) !important;
   min-height: 2.4em;
   display: flex !important;
   align-items: center;
@@ -1426,7 +1427,7 @@ tbody tr:hover {
 .risorse-tier-3 .sezione-titolo-testo,
 .profilo-competenze-box .sezione-titolo-testo,
 .profilo-risorse-box .sezione-titolo-testo {
-  color: var(--c-ink) !important;
+  color: var(--c-title) !important;
   text-shadow: none !important;
   transition: none !important;
   filter: none !important;
@@ -1436,7 +1437,7 @@ tbody tr:hover {
 .risorse-tier-3:hover .sezione-titolo-testo,
 .profilo-competenze-box:hover .sezione-titolo-testo,
 .profilo-risorse-box:hover .sezione-titolo-testo {
-  color: var(--c-ink) !important;
+  color: var(--c-title) !important;
   text-shadow: none !important;
   filter: none !important;
 }

@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.95.0',
+    voci: {
+      it: ['Il colore della classe è più visibile anche sui fondi dei riquadri, nei titoli delle sezioni e nelle statistiche, sia nel tema giorno sia nel tema notte.'],
+      en: ['The class color is more visible on panel backgrounds, section headings and stat labels in both day and night themes.'],
+    },
+  },
+  {
     versione: '4.94.1',
     voci: {
       it: ['Il colore della classe è ora più riconoscibile: guida titoli, controlli principali e cornici senza cambiare i fondi.', 'Nel menu iniziale, l\'ultimo personaggio usato compare subito in cima con ritratto, classe e livello.'],
