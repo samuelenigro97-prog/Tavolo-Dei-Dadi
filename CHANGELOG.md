@@ -2,6 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.94.0] – 2026-10-08
+
+### Cambiato
+- **Menu iniziale ben distinguibile dalla scheda**: sfondo più scuro e sfocato, pannello
+  più chiaro del fondo (miscela di `--c-panel-light` e inchiostro), bordo più marcato e
+  ombra profonda; i pulsanti restano a contrasto con il pannello sia in scuro sia in
+  chiaro. Prima il pannello (#0e0e11) si confondeva con la scheda scura dietro.
+
 ## [4.93.0] – 2026-10-07
 
 ### Cambiato

@@ -11,11 +11,20 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
     <div
       style={{
         position: 'fixed', inset: 0, zIndex: 1000, padding: 16,
-        background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)', display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}
       onClick={(e) => { if (e.target === e.currentTarget) setMostraMenu(false); }}
     >
-      <div style={{ ...styles.panel, maxWidth: 460, width: '100%', maxHeight: '85vh', overflowY: 'auto' }}>
+      {/* Il menu si stacca dalla scheda dietro: sfondo scurito e sfocato, pannello più chiaro (scuro) o più caldo (chiaro), bordo ben visibile. */}
+      <div
+        data-testid="menu-iniziale"
+        style={{
+          ...styles.panel, maxWidth: 460, width: '100%', maxHeight: '85vh', overflowY: 'auto',
+          background: 'color-mix(in srgb, var(--c-panel-light) 85%, var(--c-ink) 15%)',
+          border: '1.5px solid color-mix(in srgb, var(--c-ink) 38%, var(--c-border))',
+          boxShadow: '0 14px 44px rgba(0,0,0,0.75), 0 0 0 1px rgba(0,0,0,0.45)',
+        }}
+      >
         <h1 style={{ ...styles.title, textAlign: 'center', marginBottom: 12, fontSize: 24, fontWeight: 800, color: 'var(--c-title)' }}>
           Tavolo dei Dadi <span style={{ fontSize: 11, opacity: 0.65, fontWeight: 600, verticalAlign: 'middle', color: C.inkDim }}>v{APP_VERSION}</span>
         </h1>

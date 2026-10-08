@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.94.0',
+    voci: {
+      it: ['Il menu iniziale si distingue bene dalla scheda: pannello più chiaro, bordo marcato e sfondo scurito e sfocato.'],
+      en: ['The start menu now stands out clearly from the sheet: lighter panel, stronger border and a darkened, blurred backdrop.'],
+    },
+  },
+  {
     versione: '4.93.0',
     voci: {
       it: ['La versione accanto al titolo poggia ora sulla stessa linea della scritta "Tavolo dei Dadi".'],
