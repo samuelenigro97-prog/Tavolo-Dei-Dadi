@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.94.1',
+    voci: {
+      it: ['Il colore della classe è ora più riconoscibile: guida titoli, controlli principali e cornici senza cambiare i fondi.', 'Nel menu iniziale, l\'ultimo personaggio usato compare subito in cima con ritratto, classe e livello.'],
+      en: ['The class color is now easier to spot: it guides titles, primary controls, and frames without changing the backgrounds.', 'In the start menu, the last character used appears first with portrait, class, and level.'],
+    },
+  },
+  {
     versione: '4.94.0',
     voci: {
       it: ['Il menu iniziale si distingue bene dalla scheda: pannello più chiaro, bordo marcato e sfondo scurito e sfocato.'],

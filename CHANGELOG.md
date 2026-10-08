@@ -2,6 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.94.1] – 2026-10-08
+
+### Cambiato
+- **Colore della classe più presente**: diventa l'accento dei titoli, dei controlli
+  principali e delle cornici della scheda; i fondi rimangono sobri e leggibili.
+- **Menu iniziale**: in cima compare subito l'ultimo personaggio usato, con ritratto,
+  classe e livello, per riprendere rapidamente la scheda giusta.
+
 ## [4.94.0] – 2026-10-08
 
 ### Cambiato

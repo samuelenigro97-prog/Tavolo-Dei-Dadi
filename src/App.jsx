@@ -1209,8 +1209,8 @@ function mescola(a, b, t) {
   return `#${canale(x.r, y.r)}${canale(x.g, y.g)}${canale(x.b, y.b)}`;
 }
 
-/** Intensità del bagliore dorato attorno alle sezioni (1 = intensità storica). */
-const INTENSITA_CLASSE = 0.5;
+/** Intensità dell'aura del colore di classe attorno alle sezioni (1 = intensità storica). */
+const INTENSITA_CLASSE = 0.85;
 
 /** Luminanza relativa (WCAG) di un colore esadecimale. */
 function luminanzaRelativa(hex) {
@@ -2019,7 +2019,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.94.0';
+const APP_VERSION = '4.94.1';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4366,13 +4366,21 @@ export default function App() {
       tema === 'scuro' || (tema === 'auto' && (sistemaScuro || eNotte()));
     const modo = scuroEff ? 'scuro' : 'chiaro';
     setNotteAttiva(scuroEff); // notte = tema scuro: pilota sfondi notturni e audio più cupo
-    // Un tema generico (oro e neutri) per testi, bordi e pulsanti; il colore della classe
-    // compare solo a tocchi: titoli delle sezioni, nome del personaggio, angoli decorati
-    // e un alone leggero attorno alle sezioni. L'ambientazione cambia scena e audio.
+    // Il colore della classe è l'accento operativo della scheda: titoli, bordi e controlli
+    // principali lo usano, mentre fondi e testo restano leggibili e fedeli all'ambientazione.
     const t = { ...BASE_TEMA[modo] };
     const accTema = (temaCornici && temaCornici !== 'auto' && temaCornici !== 'disattivato') ? coloreClasse(temaCornici) : null;
     const accClasse = temaCornici === 'disattivato' ? null : (accTema || coloreClasse(classeAttiva));
-    if (accClasse) t.title = mescola(accClasse[modo], t.ink, 0.2);
+    if (accClasse) {
+      const tintaClasse = accClasse[modo];
+      // Prima la tinta era quasi invisibile: restava solo su titoli e bagliori. Portarla
+      // anche sugli accenti rende riconoscibile a colpo d'occhio la classe del PG.
+      t.gold = tintaClasse;
+      t.goldDark = tintaClasse;
+      t.title = tintaClasse;
+      t.border = mescola(t.border, tintaClasse, scuroEff ? 0.30 : 0.18);
+      t.panelLight = mescola(t.panelLight, tintaClasse, scuroEff ? 0.075 : 0.035);
+    }
     garantisciContrastoTema(t);
     const root = document.documentElement;
     root.dataset.tema = modo;
@@ -4390,8 +4398,8 @@ export default function App() {
     set('--c-gold', t.gold); set('--c-gold-dark', t.goldDark); set('--c-red', t.red);
     set('--c-green', t.green); set('--c-title', t.title);
     set('--c-on-gold', testoSu(t.goldDark));
-    // Colore della classe per i piccoli accenti (angoli delle sezioni): stesso tono dei titoli.
-    set('--c-classe', t.title);
+    // Colore della classe per angoli, bordi e controlli principali.
+    set('--c-classe', t.gold);
 
     const tintaClasse = accClasse ? accClasse[modo] : t.gold;
     const hexRgba = (hex, a) => {
