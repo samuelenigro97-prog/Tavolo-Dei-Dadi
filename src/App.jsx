@@ -4379,8 +4379,8 @@ export default function App() {
       t.goldDark = tintaClasse;
       t.title = tintaClasse;
       t.border = mescola(t.border, tintaClasse, scuroEff ? 0.50 : 0.38);
-      t.panel = mescola(t.panel, tintaClasse, scuroEff ? 0.09 : 0.065);
-      t.panelLight = mescola(t.panelLight, tintaClasse, scuroEff ? 0.16 : 0.12);
+      t.panel = mescola(t.panel, tintaClasse, 0.13);
+      t.panelLight = mescola(t.panelLight, tintaClasse, scuroEff ? 0.23 : 0.20);
     }
     garantisciContrastoTema(t);
     const root = document.documentElement;

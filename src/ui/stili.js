@@ -287,7 +287,7 @@ export const styles = {
   },
   vitalLabel: {
     fontSize: 12,
-    color: C.inkDim,
+    color: C.title,
     letterSpacing: 0.5,
     textTransform: 'uppercase',
     fontWeight: 700,
@@ -1427,7 +1427,7 @@ tbody tr:hover {
 .risorse-tier-3 .sezione-titolo-testo,
 .profilo-competenze-box .sezione-titolo-testo,
 .profilo-risorse-box .sezione-titolo-testo {
-  color: var(--c-ink) !important;
+  color: var(--c-title) !important;
   text-shadow: none !important;
   transition: none !important;
   filter: none !important;
@@ -1437,7 +1437,7 @@ tbody tr:hover {
 .risorse-tier-3:hover .sezione-titolo-testo,
 .profilo-competenze-box:hover .sezione-titolo-testo,
 .profilo-risorse-box:hover .sezione-titolo-testo {
-  color: var(--c-ink) !important;
+  color: var(--c-title) !important;
   text-shadow: none !important;
   filter: none !important;
 }
