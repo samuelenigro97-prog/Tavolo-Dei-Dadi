@@ -2,6 +2,13 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.94.2] – 2026-10-08
+
+### Corretto
+- **Araldi del Segreto Player 1.1**: usare Affabilità aggiunge 1 Debito; Inquisire specifica che il personaggio subisce i danni psichici se fallisce.
+- **Veglia**: il +1 ai tiri per colpire entra nei tiri dalla soglia di 70 Debito. Anche le schede già salvate aggiornano il vecchio modificatore descrittivo.
+- **Incantesimi del manuale**: non si possono lanciare spendendo Segreti prima di sbloccare il relativo cerchio.
+
 ## [4.94.1] – 2026-10-08
 
 ### Cambiato

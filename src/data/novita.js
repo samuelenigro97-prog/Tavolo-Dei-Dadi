@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.94.2',
+    voci: {
+      it: ['Araldi del Segreto: Affabilità aggiunge il Debito previsto; il +1 di Veglia entra nei tiri per colpire. Inquisire indica correttamente chi subisce i danni e gli incantesimi del manuale restano bloccati finché non sblocchi il cerchio.'],
+      en: ['Heralds of the Secret: Affability adds the required Debt; Vigil’s +1 applies to attack rolls. Inquire correctly identifies who takes damage, and handbook spells stay locked until you unlock their spell level.'],
+    },
+  },
+  {
     versione: '4.94.1',
     voci: {
       it: ['Il colore della classe è ora più riconoscibile: guida titoli, controlli principali e cornici senza cambiare i fondi.', 'Nel menu iniziale, l\'ultimo personaggio usato compare subito in cima con ritratto, classe e livello.'],

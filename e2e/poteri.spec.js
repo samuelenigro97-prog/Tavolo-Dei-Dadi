@@ -152,6 +152,23 @@ test.describe('Poteri', () => {
     await expect(bottone).toHaveCount(0);
   });
 
+  test('pannello Araldi: senza cerchi sbloccati non lancia incantesimi con i Segreti', async ({ page }) => {
+    await attivaManuale(page);
+    await page.getByRole('button', { name: 'Da modello' }).click();
+    await page.getByTestId('modelli-poteri').getByRole('button', { name: /Aggiungi \d+ poteri/ }).click();
+    await page.evaluate(() => {
+      const dati = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+      const pg = dati.personaggi[dati.attivo];
+      pg.classe = 'Guerriero';
+      pg.slotIncantesimo = {};
+      localStorage.setItem('scheda-interattiva:v1', JSON.stringify(dati));
+    });
+    await apriScheda(page);
+    const pannello = page.getByTestId('araldi-pannello');
+    await expect(pannello.getByRole('button', { name: /^Lancia/ })).toBeDisabled();
+    await expect(pannello.getByText('Sblocca un cerchio di incantesimi prima di lanciare quelli del manuale.')).toBeVisible();
+  });
+
   test('pannello Araldi: perle degli usi, Debito che sale, soglie e +1 CA automatico a Debito 15', async ({ page }) => {
     await attivaManuale(page);
     await page.getByRole('button', { name: 'Da modello' }).click();
@@ -168,17 +185,23 @@ test.describe('Poteri', () => {
     const debito0 = (await stato()).debito;
     expect(await page.evaluate(() => JSON.parse(localStorage.getItem('scheda-interattiva:v1')).personaggi['pg-vaelion'].risorse.filter((r) => r.nome === 'Debito').length)).toBe(1);
 
+    // Affabilità, come gli altri privilegi del manuale, aggiunge Debito.
+    await pannello.getByTestId('perla-Affabilità').first().click();
+    await expect.poll(async () => (await stato()).affabilita).toBe(0);
+    await expect.poll(async () => (await stato()).debito).toBe(debito0 + 1);
+    await pannello.getByTestId('perla-Affabilità').first().click();
+
     // Una perla di Inquisire = un uso: il Debito sale di 1.
     await pannello.getByTestId('perla-Inquisire').first().click();
     await expect.poll(async () => (await stato()).inquisire).toBe(2);
-    await expect.poll(async () => (await stato()).debito).toBe(debito0 + 1);
+    await expect.poll(async () => (await stato()).debito).toBe(debito0 + 2);
     // Cliccare una perla spenta ripristina l'uso (senza toccare il Debito).
     await pannello.getByTestId('perla-Inquisire').last().click();
     await expect.poll(async () => (await stato()).inquisire).toBe(3);
-    await expect.poll(async () => (await stato()).debito).toBe(debito0 + 1);
+    await expect.poll(async () => (await stato()).debito).toBe(debito0 + 2);
 
     // Debito a 15: il +1 CA di Occhio Risvegliato scatta da solo.
-    for (let i = debito0 + 1; i < 15; i++) await pannello.getByRole('button', { name: 'Debito +1' }).click();
+    for (let i = debito0 + 2; i < 15; i++) await pannello.getByRole('button', { name: 'Debito +1' }).click();
     await expect.poll(async () => (await stato()).debito).toBe(15);
     await expect(pannello.getByTestId('soglia-15')).toHaveAttribute('data-raggiunta', 'si');
     await expect(pannello.getByTestId('soglia-35')).toHaveAttribute('data-raggiunta', 'no');
