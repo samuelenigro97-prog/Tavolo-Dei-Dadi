@@ -5,6 +5,7 @@ import { join } from 'node:path';
 
 const app = readFileSync(join(process.cwd(), 'src/App.jsx'), 'utf8');
 const css = readFileSync(join(process.cwd(), 'src/ui/stili.js'), 'utf8');
+const menu = readFileSync(join(process.cwd(), 'src/ui/modali/MenuPersonaggiModal.jsx'), 'utf8');
 
 test('estetica: la versione è parte del titolo e non è posizionata assolutamente', () => {
   assert.match(app, /className="app-version"/);
@@ -25,4 +26,18 @@ test('magia mobile: la caratteristica da incantatore non invade il titolo', () =
   assert.match(app, /className="magia-caratteristica"/);
   assert.match(css, /\.sezione-magia > \.sezione-titolo\s*\{[\s\S]*?grid-template-rows:\s*auto auto/);
   assert.match(css, /\.sezione-magia \.sezione-titolo-azioni\s*\{[\s\S]*?grid-column:\s*1 \/ -1/);
+});
+
+test('menu iniziale: propone subito l’ultimo personaggio attivo', () => {
+  assert.match(menu, /data-testid="continua-ultimo-pg"/);
+  assert.match(menu, /roster\?\.personaggi\?\.\[roster\?\.attivo\]/);
+  assert.match(menu, /t\('menu\.ultimo_usato'\)/);
+  assert.match(menu, /t\('menu\.riprendi'\)/);
+});
+
+test('tema: il colore della classe guida gli accenti principali', () => {
+  assert.match(app, /const INTENSITA_CLASSE = 0\.85/);
+  assert.match(app, /t\.gold = tintaClasse/);
+  assert.match(app, /t\.goldDark = tintaClasse/);
+  assert.match(app, /set\('--c-classe', t\.gold\)/);
 });

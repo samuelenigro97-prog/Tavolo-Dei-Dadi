@@ -7,6 +7,15 @@ import { URL_ARCHIVIO_PG } from '../../utils/ambiente.js';
 import { CHIAVE_AVVIO_DIRETTO } from '../../utils/avvio.js';
 
 export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, esportaBackupCompleto, generaPgCasuale, idDispositivo, isCloudAttivo, jsonRef, leggiSnapshots, lingua, manualiAttivi, mostraListaCarica, novitaNonLette, roster, scheda, setBozzaCrea, setCloudStatus, setConferma, setLingua, setMostraArchivioDm, setMostraCloud, setMostraCrea, setMostraDonazioni, setMostraListaCarica, setMostraMenu, setMostraMenuEsporta, setMostraModalManuali, setMostraNoteLegali, setMostraRipristino, setPosEsporta, setRoster, setSchedaSolaLettura, setTemaCornici, statoBgCloud, statoColoreCloud, statoGlowCloud, temaCornici }) {
+  // `attivo` viene salvato nel roster: è quindi anche l'ultimo personaggio effettivamente usato.
+  const ultimoPersonaggio = roster?.personaggi?.[roster?.attivo] || scheda;
+  const apriUltimoPersonaggio = () => {
+    if (roster?.attivo && roster?.personaggi?.[roster.attivo]) {
+      setRoster((r) => ({ ...r, attivo: r.attivo }));
+    }
+    setSchedaSolaLettura(null);
+    setMostraMenu(false);
+  };
   return (
     <div
       style={{
@@ -28,7 +37,34 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
         <h1 style={{ ...styles.title, textAlign: 'center', marginBottom: 12, fontSize: 24, fontWeight: 800, color: 'var(--c-title)' }}>
           Tavolo dei Dadi <span style={{ fontSize: 11, opacity: 0.65, fontWeight: 600, verticalAlign: 'middle', color: C.inkDim }}>v{APP_VERSION}</span>
         </h1>
-    
+
+        {ultimoPersonaggio && (
+          <button
+            type="button"
+            data-testid="continua-ultimo-pg"
+            aria-label={t('menu.continua_ultimo', { nome: ultimoPersonaggio.nome || t('menu.senza_nome') })}
+            onClick={apriUltimoPersonaggio}
+            style={{
+              width: '100%', marginBottom: 10, padding: 10, borderRadius: 10, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left', fontFamily: 'inherit',
+              color: C.ink, background: 'color-mix(in srgb, var(--c-gold) 13%, var(--c-panel-light))',
+              border: '1.5px solid var(--c-gold)', boxShadow: '0 5px 16px color-mix(in srgb, var(--c-gold) 19%, transparent)',
+            }}
+          >
+            <span style={{ width: 44, height: 44, flexShrink: 0, overflow: 'hidden', display: 'grid', placeItems: 'center', borderRadius: 8, border: '1px solid var(--c-gold)', background: 'var(--c-panel)', color: 'var(--c-title)', fontSize: 21, fontWeight: 800 }}>
+              {typeof ultimoPersonaggio.ritratto === 'string' && ultimoPersonaggio.ritratto ? (
+                <img src={ultimoPersonaggio.ritratto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (ultimoPersonaggio.nome || '?').trim().slice(0, 1).toUpperCase()}
+            </span>
+            <span style={{ minWidth: 0, display: 'flex', flex: 1, flexDirection: 'column', gap: 2 }}>
+              <span style={{ fontSize: 11, lineHeight: 1.1, color: C.inkDim, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{t('menu.ultimo_usato')}</span>
+              <strong style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 16 }}>{ultimoPersonaggio.nome || t('menu.senza_nome')}</strong>
+              <span style={{ color: C.inkDim, fontSize: 13 }}>{ultimoPersonaggio.classe || '—'} · {t('profilo.livello')} {ultimoPersonaggio.livello || 1}</span>
+            </span>
+            <span style={{ color: 'var(--c-gold-dark)', fontSize: 13, fontWeight: 800, whiteSpace: 'nowrap' }}>{t('menu.riprendi')}</span>
+          </button>
+        )}
+
         <button
           style={{ ...styles.buttonPrimary, width: '100%', marginBottom: 10 }}
           onClick={() => { setBozzaCrea({ nome: '', sesso: '', classe: '', sottoclasse: '', specie: '', background: '', livello: 1, metodo: 'auto', pool: null, assegna: {}, competenzeClasse: [], competenzeSpecie: [], maestria: [], talentoOrigine: '', asiTalenti: {}, multiclasseClasse2: '', multiclasseLivello2: 1, sottoclasseMc2: '', multiclasseClasse3: '', multiclasseLivello3: 1, sottoclasseMc3: '', dotazione: 'pacchetto' }); setMostraCrea(true); }}
