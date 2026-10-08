@@ -70,11 +70,11 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
     if (g) g.lista.push(p); else gruppiPerLivello.push({ livelloMin: p.livelloMin, lista: [p] });
   }
 
-  // Cerchi sbloccati: quelli per cui il personaggio ha slot (se non ne ha, nessun limite).
+  // Cerchi sbloccati: quelli per cui il personaggio ha slot.
   const slot = scheda.slotIncantesimo || {};
   const maxCerchio = Math.max(0, ...Object.entries(slot).filter(([, v]) => (Number(v?.totale) || 0) > 0).map(([k]) => Number(k)));
-  const cerchiDisponibili = [1, 2, 3, 4, 5].filter((n) => !maxCerchio || n <= maxCerchio);
-  const cerchioScelto = cerchiDisponibili.includes(cerchio) ? cerchio : cerchiDisponibili[0] || 1;
+  const cerchiDisponibili = [1, 2, 3, 4, 5].filter((n) => n <= maxCerchio);
+  const cerchioScelto = cerchiDisponibili.includes(cerchio) ? cerchio : cerchiDisponibili[0];
   const incantiDelCerchio = LISTA_AMPLIATA_ARALDI[cerchioScelto] || [];
   const incantoScelto = incantiDelCerchio[incanto] ? incanto : 0;
 
@@ -201,16 +201,18 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
         </div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginTop: 8 }}>
           <span style={{ fontSize: 12, fontWeight: 700 }}>{en ? 'Enchant with secrets' : 'Incantare con i segreti'}</span>
-          <select value={cerchioScelto} onChange={(e) => { setCerchio(Number(e.target.value)); setIncanto(0); }} style={{ ...styles.inlineInput, fontSize: 12, padding: '3px 6px' }} aria-label={en ? 'Spell level' : 'Cerchio'}>
+          <select value={cerchioScelto || ''} disabled={!cerchiDisponibili.length} onChange={(e) => { setCerchio(Number(e.target.value)); setIncanto(0); }} style={{ ...styles.inlineInput, fontSize: 12, padding: '3px 6px' }} aria-label={en ? 'Spell level' : 'Cerchio'}>
+            {!cerchiDisponibili.length && <option value="">{en ? 'No spell level' : 'Nessun cerchio'}</option>}
             {cerchiDisponibili.map((n) => <option key={n} value={n}>{n}°</option>)}
           </select>
-          <select value={incantoScelto} onChange={(e) => setIncanto(Number(e.target.value))} style={{ ...styles.inlineInput, fontSize: 12, padding: '3px 6px' }} aria-label={en ? 'Spell' : 'Incantesimo'}>
+          <select value={cerchiDisponibili.length ? incantoScelto : ''} disabled={!cerchiDisponibili.length} onChange={(e) => setIncanto(Number(e.target.value))} style={{ ...styles.inlineInput, fontSize: 12, padding: '3px 6px' }} aria-label={en ? 'Spell' : 'Incantesimo'}>
+            {!cerchiDisponibili.length && <option value="">{en ? 'No spell unlocked' : 'Nessun incantesimo sbloccato'}</option>}
             {incantiDelCerchio.map((n, i) => <option key={n} value={i}>{n}</option>)}
           </select>
           <button
             type="button"
             style={styles.buttonMini}
-            disabled={valSegreti < cerchioScelto}
+            disabled={!cerchiDisponibili.length || valSegreti < cerchioScelto}
             onClick={() => applica(
               [{ nome: 'Segreti', delta: -cerchioScelto }, { nome: 'Debito', delta: 1 }],
               incantiDelCerchio[incantoScelto],
@@ -221,6 +223,7 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
             {en ? 'Cast' : 'Lancia'} <span style={{ color: C.inkDim }}>(−{cerchioScelto}, +1 {en ? 'Debt' : 'Debito'})</span>
           </button>
         </div>
+        {!cerchiDisponibili.length && <p style={{ ...styles.detail, fontSize: 11, margin: '8px 0 0' }}>{en ? 'Unlock a spell level before casting spells from the handbook.' : 'Sblocca un cerchio di incantesimi prima di lanciare quelli del manuale.'}</p>}
         {mancantiIncanti.length > 0 && (
           <div style={{ marginTop: 8 }}>
             <button

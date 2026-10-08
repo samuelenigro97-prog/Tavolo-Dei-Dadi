@@ -64,6 +64,36 @@ test('manuale Araldi 1.1: testi aggiornati (Vista Pura, Myrdhal) sui poteri già
   assert.equal(aggiornaTestiAraldi(nuovi), nuovi);
 });
 
+test('Araldi: Affabilità genera Debito, Inquisire ferisce il personaggio e Veglia modifica gli attacchi', async () => {
+  const { aggiornaTestiAraldi, DEBITO_PER_USO_ARALDI, MODELLI_POTERI, ID_MODELLO_ARALDI } = await import('../src/data/modelliPoteri.js');
+  const { bonusPotereBersaglio } = await import('../src/rules/poteri.js');
+  const modello = MODELLI_POTERI.find((m) => m.id === ID_MODELLO_ARALDI);
+  const affabilita = modello.poteri.find((p) => p.nome.startsWith('Affabilità'));
+  const inquisire = modello.poteri.find((p) => p.nome.startsWith('Inquisire'));
+  const veglia = modello.poteri.find((p) => p.nome.startsWith('Debito 70'));
+  assert.equal(DEBITO_PER_USO_ARALDI.Affabilità, 1);
+  assert.match(affabilita.descrizione, /Guadagni 1 Debito a ogni uso/);
+  assert.match(inquisire.descrizione, /Se fallisci: subisci 1d6 danni psichici/);
+  assert.deepEqual(veglia.modificatori.map((m) => m.bersaglio), ['attacco']);
+
+  const vecchi = [
+    { ...affabilita, modello: ID_MODELLO_ARALDI, descrizione: affabilita.descrizione.replace(' Guadagni 1 Debito a ogni uso.', '') },
+    { ...inquisire, modello: ID_MODELLO_ARALDI, descrizione: inquisire.descrizione.replace('Se fallisci: subisci', 'Se fallisce: subisce') },
+    { ...veglia, modello: ID_MODELLO_ARALDI, modificatori: [{ bersaglio: 'altro', bersaglioLibero: 'Tiri per colpire', valore: 1, fonte: 'Veglia' }] },
+  ];
+  const aggiornati = aggiornaTestiAraldi(vecchi);
+  assert.match(aggiornati[0].descrizione, /Guadagni 1 Debito a ogni uso/);
+  assert.match(aggiornati[1].descrizione, /Se fallisci: subisci/);
+  assert.equal(aggiornati[2].modificatori[0].bersaglio, 'attacco');
+  assert.equal(aggiornaTestiAraldi(aggiornati), aggiornati, 'migrazione idempotente');
+  const scheda = (debito) => ({ livello: 10, poteri: [
+    { id: 'base', attivo: true, contatori: [{ nome: 'Debito', attuali: debito, max: null }] },
+    { ...aggiornati[2], id: 'veglia', attivo: true, condizione: { contatore: 'Debito', minimo: 70 } },
+  ] });
+  assert.equal(bonusPotereBersaglio(scheda(69), 'attacco'), 0);
+  assert.equal(bonusPotereBersaglio(scheda(70), 'attacco'), 1);
+});
+
 test('Myrdhal: creatura del manuale Araldi, con il blocco del PDF 1.1 (v4.87.0)', async () => {
   const { EVOCAZIONI_ARALDI, EVOCAZIONI } = await import('../src/data/bestiario.js');
   const { parseAzioniCompagno, calcolaPfCompagno } = await import('../src/rules/regole.js');

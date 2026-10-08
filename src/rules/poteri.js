@@ -25,6 +25,7 @@ export const BERSAGLI_MODIFICATORE_POTERE = [
   { chiave: 'velocita', label: 'Velocità', labelEn: 'Speed', unita: 'm' },
   { chiave: 'ca', label: 'CA', labelEn: 'AC', unita: '' },
   { chiave: 'iniziativa', label: 'Iniziativa', labelEn: 'Initiative', unita: '' },
+  { chiave: 'attacco', label: 'Tiri per colpire', labelEn: 'Attack rolls', unita: '' },
   { chiave: 'pf_massimi', label: 'PF Massimi', labelEn: 'Max HP', unita: '' },
 ];
 

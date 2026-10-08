@@ -16,7 +16,7 @@ export const SOGLIE_DEBITO_ARALDI = [
 export const ID_MODELLO_ARALDI = 'araldi-del-segreto';
 
 /** Debito guadagnato a ogni uso di un privilegio degli Araldi (dal manuale). */
-export const DEBITO_PER_USO_ARALDI = { 'Inquisire': 1, 'Trasferire Empatico': 2, 'Braccare!': 1 };
+export const DEBITO_PER_USO_ARALDI = { 'Affabilità': 1, 'Inquisire': 1, 'Trasferire Empatico': 2, 'Braccare!': 1 };
 
 /** Segreti per evocare Myrdhal (manuale 1.1): si possono mettere in comune fra i giocatori. */
 export const SEGRETI_MYRDHAL_ARALDI = 10;
@@ -90,7 +90,7 @@ export const MODELLI_POTERI = [
         livelloMin: 1,
         descrizione: [
           '5: Voce nell\'Ombra: Messaggio a volontà come azione bonus e vantaggio alle prove di Intuizione.',
-          '15: Occhio Risvegliato: vantaggio a Percezione e Indagare; +1 CA (vedi il potere dedicato, da attivare al raggiungimento).',
+          '15: Occhio Risvegliato: vantaggio a Percezione e Indagare; +1 CA (applicato automaticamente).',
           '35: Coraggio: vantaggio ai TS contro spaventato.',
           '70: Veglia: Vista Pura 9 m per 1 ora al giorno; +1 ai tiri per colpire.',
           '150: Non questa volta: 1 volta nella vita a 0 PF resti a 1 PF; puoi riutilizzare questo privilegio solo chiedendolo a Tim.',
@@ -113,13 +113,13 @@ export const MODELLI_POTERI = [
         attivo: true,
         condizione: { contatore: 'Debito', minimo: 70 },
         contatori: [],
-        modificatori: [{ bersaglio: 'altro', bersaglioLibero: 'Tiri per colpire', valore: 1, fonte: 'Veglia' }],
+        modificatori: [{ bersaglio: 'attacco', bersaglioLibero: '', valore: 1, fonte: 'Veglia' }],
       },
       {
         nome: 'Affabilità (1° livello)',
         livelloMin: 1,
         descrizione: [
-          'Usi: una volta per riposo breve. Puoi recuperare l\'uso spendendo 1 Segreto.',
+          'Usi: una volta per riposo breve. Puoi recuperare l\'uso spendendo 1 Segreto. Guadagni 1 Debito a ogni uso.',
           'Ottieni successo automatico in una prova di Carisma (Inganno, Persuasione o Intimidire) quando la CD stabilita dal DM sarebbe 15 o meno. Contro CD più alte, tiri con vantaggio. Non funziona su una creatura ostile in combattimento, né per ottenere qualcosa contrario alla natura del bersaglio. La discrezione del DM ha l\'ultima parola.',
         ].join('\n'),
         attivo: true,
@@ -132,7 +132,7 @@ export const MODELLI_POTERI = [
         descrizione: [
           'Usi: un numero di volte pari al tuo bonus di competenza per riposo lungo (aggiorna il massimo quando sale). Guadagni 1 Debito a ogni uso.',
           'Con un\'azione bonus, scegli una creatura che vedi entro 18 metri e che abbia Intelligenza 4 o superiore. Effettua un TS su Carisma contro la CD del nemico.',
-          'Se fallisce: subisce 1d6 danni psichici ogni 2 livelli del personaggio.',
+          'Se fallisci: subisci 1d6 danni psichici ogni 2 livelli del personaggio.',
           'Se superi la prova scegli:',
           '• Occhi: hai vantaggio ai tiri per colpire contro di essa fino alla fine del tuo prossimo turno.',
           '• Cervello: prendi un ricordo della creatura; ottieni 1 Segreto conosciuto dalla creatura (massimo Segreti pari al doppio della competenza).',
@@ -177,23 +177,39 @@ export const MODELLI_POTERI = [
 /**
  * Porta al manuale 1.1 i testi dei poteri degli Araldi già presenti sulle
  * schede (Veglia → "Vista Pura", nuova voce Myrdhal fra le spese di Segreti).
- * Tocca solo i testi che portano ancora le vecchie diciture, così una
- * descrizione modificata a mano resta com'è. Restituisce lo stesso array se
- * non c'è niente da aggiornare.
+ * Aggiorna solo diciture riconoscibili e il vecchio bonus al colpire di Veglia.
+ * Le descrizioni personalizzate e gli altri modificatori restano intatti.
  */
 export function aggiornaTestiAraldi(poteri) {
   if (!Array.isArray(poteri)) return poteri;
   const modello = MODELLI_POTERI.find((m) => m.id === ID_MODELLO_ARALDI);
   let cambiato = false;
   const nuovi = poteri.map((p) => {
-    if (!p || p.modello !== ID_MODELLO_ARALDI || typeof p.descrizione !== 'string') return p;
+    if (!p || p.modello !== ID_MODELLO_ARALDI) return p;
     const m = (modello?.poteri || []).find((x) => x.nome === p.nome);
-    if (!m || m.descrizione === p.descrizione) return p;
-    const vecchia = /Truesight 9 m/.test(p.descrizione)
-      || (/Mercato \(in gioco\)/.test(p.descrizione) && !/Myrdhal/.test(p.descrizione));
-    if (!vecchia) return p;
+    if (!m) return p;
+    let descrizione = p.descrizione;
+    if (typeof descrizione === 'string') {
+      const vecchia = /Truesight 9 m/.test(descrizione)
+        || (/Mercato \(in gioco\)/.test(descrizione) && !/Myrdhal/.test(descrizione));
+      if (vecchia) descrizione = m.descrizione;
+      else {
+        if (p.nome === 'Affabilità (1° livello)' && descrizione.includes('Puoi recuperare l\'uso spendendo 1 Segreto.') && !descrizione.includes('Guadagni 1 Debito')) {
+          descrizione = descrizione.replace('Puoi recuperare l\'uso spendendo 1 Segreto.', 'Puoi recuperare l\'uso spendendo 1 Segreto. Guadagni 1 Debito a ogni uso.');
+        }
+        if (p.nome === 'Inquisire (6° livello)') {
+          descrizione = descrizione.replace('Se fallisce: subisce 1d6 danni psichici ogni 2 livelli del personaggio.', 'Se fallisci: subisci 1d6 danni psichici ogni 2 livelli del personaggio.');
+        }
+      }
+    }
+    const modificatori = p.nome === 'Debito 70 · Veglia (+1 colpire)' && Array.isArray(p.modificatori)
+      ? p.modificatori.map((mod) => mod.bersaglio === 'altro' && mod.bersaglioLibero === 'Tiri per colpire' && mod.valore === 1 && mod.fonte === 'Veglia'
+        ? { ...mod, bersaglio: 'attacco', bersaglioLibero: '' }
+        : mod)
+      : p.modificatori;
+    if (descrizione === p.descrizione && (modificatori === p.modificatori || modificatori.every((mod, i) => mod === p.modificatori[i]))) return p;
     cambiato = true;
-    return { ...p, descrizione: m.descrizione };
+    return { ...p, descrizione, modificatori };
   });
   return cambiato ? nuovi : poteri;
 }

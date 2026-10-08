@@ -150,9 +150,9 @@ test('risorseDopoRiposo: un riposo lungo continua a ricaricare le risorse normal
   assert.equal(dopo[1].attuali, 1, 'il riposo lungo copre anche il recupero di un riposo breve');
 });
 
-test('BERSAGLI_MODIFICATORE_POTERE copre almeno velocità, CA, iniziativa, PF massimi', () => {
+test('BERSAGLI_MODIFICATORE_POTERE copre velocità, CA, iniziativa, PF massimi e tiri per colpire', () => {
   const chiavi = BERSAGLI_MODIFICATORE_POTERE.map((b) => b.chiave);
-  for (const attesa of ['velocita', 'ca', 'iniziativa', 'pf_massimi']) {
+  for (const attesa of ['velocita', 'ca', 'iniziativa', 'pf_massimi', 'attacco']) {
     assert.ok(chiavi.includes(attesa), `manca il bersaglio ${attesa}`);
   }
 });
