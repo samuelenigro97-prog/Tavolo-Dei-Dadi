@@ -13004,7 +13004,7 @@ export default function App() {
 
                               return (
                                 <tr key={a.id} className="attacchi-riga">
-                                  <td style={styles.td} className="attacchi-nome">
+                                  <td style={{ ...styles.td, flexDirection: 'column', alignItems: 'flex-start', maxWidth: '100%' }} className="attacchi-nome">
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 4, width: '100%' }}>
                                       {a.isSpell || cat === 'Reazione' ? (
                                         <button
