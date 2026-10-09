@@ -63,6 +63,8 @@ test.describe('Combattimento', () => {
     for (const [nome, azione, distanza] of [['Inaridire', '1 Azione', '9m'], ['Randello Incantato', 'Azione Bonus', 'Tocco'], ['Morsa del Gelo', '1 Azione', '18m'], ['Parola di Guarigione', 'Azione Bonus', '18m']]) {
       const riga = page.locator('tr.attacchi-riga').filter({ hasText: nome });
       await expect(riga.locator('.chip-tempo, .chip-gittata')).toHaveCount(0);
+      await expect(riga.locator('.attacco-dettagli')).toContainText(`Distanza: ${distanza}`);
+      await expect(riga.locator('.attacco-dettagli')).toContainText(azione === '1 Azione' ? 'Azione' : azione);
       await riga.locator('.attacco-nome').click();
       const nuvola = page.getByText(new RegExp(`Azione: ${azione}`)).last();
       await expect(nuvola).toBeVisible();
@@ -72,6 +74,14 @@ test.describe('Combattimento', () => {
       expect(righe[1]).toBe(`Distanza: ${distanza}`);
       await page.keyboard.press('Escape');
     }
+  });
+
+  test('tipo e distanza restano visibili anche sul telefono', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const riga = page.locator('tr.attacchi-riga').filter({ hasText: 'Frusta di Spine' });
+    await expect(riga.locator('.attacco-dettagli')).toHaveText('Azione · Distanza: 9m');
+    const dimensioni = await page.evaluate(() => ({ viewport: innerWidth, contenuto: document.documentElement.scrollWidth }));
+    expect(dimensioni.contenuto).toBeLessThanOrEqual(dimensioni.viewport);
   });
 
   test('tiro per colpire e danni usano gli stessi badge di Trucchetti/Incantesimi', async ({ page }) => {
