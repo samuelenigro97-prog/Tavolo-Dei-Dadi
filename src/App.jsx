@@ -12979,7 +12979,7 @@ export default function App() {
                               const tipoAzione = cat === 'Azione' ? tr('Azione', 'Action') : cat === 'Bonus' ? tr('Azione Bonus', 'Bonus Action') : tr('Reazione', 'Reaction');
                               const distanza = gittataAttacco(a, spellInLista, armaDb)
                                 || (hasReach ? '3m' : '') || spSpell?.gittata
-                                || (!a.isSpell && (armaDb || a.tipo === 'tattica' || a.tipo === 'attacco') ? '1,5m' : '');
+                                || (!a.isSpell && (armaDb || a.tipo === 'tattica' || a.tipo === 'attacco') ? (lingua === 'en' ? '5 ft (melee reach)' : '1,5 m (portata in mischia)') : '');
 
                               // Nuvoletta essenziale (tocco sul nome o sull'icona): tipo di azione,
                               // distanza, innesco/effetto, tiro e danno, poi una descrizione breve.
