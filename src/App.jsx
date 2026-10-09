@@ -1238,6 +1238,7 @@ function testoSu(hex) {
  */
 function garantisciContrastoTema(t) {
   const sfondi = [t.bg, t.panel, t.panelLight];
+  if (luminanzaRelativa(t.panelLight) < 0.1) sfondi.push(mescola(t.panelLight, '#c9a227', 0.22));
   // Verde e rosso servono spesso su pulsanti con uno sfondo appena tinto dello stesso colore (che ne abbassa
   // il contrasto): per questo la soglia è più alta di quella del testo attenuato.
   // L'oro (titoli, etichette, accenti) va scritto su carta chiara come su pergamena scura: stessa regola.
@@ -2022,7 +2023,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.95.1';
+const APP_VERSION = '4.95.2';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4382,8 +4383,10 @@ export default function App() {
       t.goldDark = tintaClasse;
       t.title = tintaClasse;
       t.border = mescola(t.border, tintaClasse, scuroEff ? 0.50 : 0.38);
-      t.panel = mescola(t.panel, tintaClasse, 0.13);
-      t.panelLight = mescola(t.panelLight, tintaClasse, scuroEff ? 0.23 : 0.20);
+      if (!scuroEff) {
+        t.panel = mescola(t.panel, tintaClasse, 0.13);
+        t.panelLight = mescola(t.panelLight, tintaClasse, 0.20);
+      }
     }
     garantisciContrastoTema(t);
     const root = document.documentElement;

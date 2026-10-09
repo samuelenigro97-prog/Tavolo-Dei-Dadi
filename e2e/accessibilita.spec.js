@@ -36,6 +36,13 @@ for (const tema of ['scuro', 'chiaro']) {
   for (const preset of AMBIENTAZIONI) {
     test(`senza violazioni di contrasto/nomi: tema ${tema}, ambientazione ${preset}`, async ({ page }) => {
       await apri(page, { tema, preset });
+      if (tema === 'scuro') {
+        const superfici = await page.evaluate(() => {
+          const stile = getComputedStyle(document.documentElement);
+          return ['--c-panel', '--c-panel-light'].map((nome) => stile.getPropertyValue(nome).trim());
+        });
+        expect(superfici).toEqual(['#0e0e11', '#16161b']);
+      }
       expect(await violazioni(page)).toEqual([]);
     });
   }

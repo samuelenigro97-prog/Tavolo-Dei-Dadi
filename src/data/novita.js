@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.95.2',
+    voci: {
+      it: ['Nel tema scuro le sezioni tornano quasi nere. Il colore della classe resta su titoli, bordi e controlli; il tema chiaro non cambia.'],
+      en: ['Dark theme sections return to near-black backgrounds. Class color stays on headings, borders and controls; the light theme is unchanged.'],
+    },
+  },
+  {
     versione: '4.95.1',
     voci: {
       it: ['Nelle Azioni il tipo di azione e la distanza sono visibili sotto il nome, anche su mobile.', 'Forma Bestiale e Forma Selvatica usano un solo contatore del Druido, conservando gli utilizzi già spesi.'],
