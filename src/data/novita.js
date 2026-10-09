@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.95.1',
+    voci: {
+      it: ['Nelle Azioni il tipo di azione e la distanza sono visibili sotto il nome, anche su mobile.', 'Forma Bestiale e Forma Selvatica usano un solo contatore del Druido, conservando gli utilizzi già spesi.'],
+      en: ['Actions show the action type and range below the name, including on mobile.', 'Beast Form and Wild Shape share one Druid resource counter, preserving spent uses.'],
+    },
+  },
+  {
     versione: '4.95.0',
     voci: {
       it: ['Il colore della classe è più visibile anche sui fondi dei riquadri, nei titoli delle sezioni e nelle statistiche, sia nel tema giorno sia nel tema notte.'],

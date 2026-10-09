@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.95.1] – 2026-10-09
+
+### Corretto
+- Tipo di azione e distanza visibili direttamente nelle righe di Azioni, Azioni Bonus e Reazioni, anche su mobile.
+- Forma Bestiale e Forma Selvatica riconosciute come lo stesso contatore del Druido, conservando gli utilizzi spesi e il recupero corretto per edizione.
+
 ## [4.95.0] – 2026-10-08
 
 ### Cambiato

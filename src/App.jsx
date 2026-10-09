@@ -1809,6 +1809,7 @@ function sincronizzaRisorseClasse(scheda, versione = '2024') {
       if (typeof r.id === 'string' && r.id.startsWith('auto-') && r.nome?.toLowerCase() === auto.nome?.toLowerCase()) return true;
       const n = String(r.nome || '').toLocaleLowerCase('it').trim();
       const a = auto.nome.toLocaleLowerCase('it').trim();
+      if (a === 'forma selvatica' && /^(forma bestiale|wild shape)$/.test(n)) return true;
       return n === a;
     };
 
@@ -1825,12 +1826,14 @@ function sincronizzaRisorseClasse(scheda, versione = '2024') {
 
     const primoIndice = indici[0];
     const corrente = risultato[primoIndice];
-    const vecchioMax = Math.max(0, Number(corrente.max) || 0);
-    const vecchiAttuali = Math.max(0, Math.min(vecchioMax, Number(corrente.attuali) || 0));
-    const usati = Math.max(0, vecchioMax - vecchiAttuali);
+    // I doppioni sono lo stesso contatore: non sommare le spese né ricaricare quello più consumato.
+    const usati = Math.max(...indici.map((idx) => {
+      const max = Math.max(0, Number(risultato[idx].max) || 0);
+      return max - Math.max(0, Math.min(max, Number(risultato[idx].attuali) || 0));
+    }));
     const attuali = Math.max(0, auto.max - usati);
 
-    if (corrente.max !== auto.max || corrente.reset !== auto.reset || corrente.attuali !== attuali || corrente.id !== auto.id) {
+    if (corrente.nome !== auto.nome || corrente.max !== auto.max || corrente.reset !== auto.reset || corrente.attuali !== attuali || corrente.id !== auto.id) {
       risultato[primoIndice] = { ...corrente, ...auto, attuali };
       cambiate = true;
     }
@@ -2019,7 +2022,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.95.0';
+const APP_VERSION = '4.95.1';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -12973,6 +12976,10 @@ export default function App() {
                                 : a.tipo === 'manovra' ? '🎯'
                                 : a.tipo === 'specie' ? '🧬'
                                 : '⚡';
+                              const tipoAzione = cat === 'Azione' ? tr('Azione', 'Action') : cat === 'Bonus' ? tr('Azione Bonus', 'Bonus Action') : tr('Reazione', 'Reaction');
+                              const distanza = gittataAttacco(a, spellInLista, armaDb)
+                                || (hasReach ? '3m' : '') || spSpell?.gittata
+                                || (!a.isSpell && (armaDb || a.tipo === 'tattica' || a.tipo === 'attacco') ? (lingua === 'en' ? '5 ft (melee reach)' : '1,5 m (portata in mischia)') : '');
 
                               // Nuvoletta essenziale (tocco sul nome o sull'icona): tipo di azione,
                               // distanza, innesco/effetto, tiro e danno, poi una descrizione breve.
@@ -12980,8 +12987,6 @@ export default function App() {
                                 const en = lingua === 'en';
                                 const righe = [];
                                 righe.push(`${en ? 'Action' : 'Azione'}: ${cat === 'Azione' ? (en ? '1 Action' : '1 Azione') : cat === 'Bonus' ? (en ? 'Bonus Action' : 'Azione Bonus') : (en ? 'Reaction' : 'Reazione')}`);
-                                const distanza = gittataAttacco(a, spellInLista, armaDb) || (hasReach ? '3m' : '') || spSpell?.gittata
-                                  || (!a.isSpell && (a.tipo === 'tattica' || a.tipo === 'attacco') ? (en ? '5 ft (melee reach)' : '1,5 m (portata in mischia)') : '');
                                 if (distanza) righe.push(`${en ? 'Range' : 'Distanza'}: ${traduciDato(distanza)}`);
                                 if (spSpell?.durata) righe.push(`${en ? 'Duration' : 'Durata'}: ${traduciDato(spSpell.durata)}`);
                                 if (spSpell?.conc) righe.push(en ? 'Concentration' : 'Concentrazione');
@@ -12999,7 +13004,7 @@ export default function App() {
 
                               return (
                                 <tr key={a.id} className="attacchi-riga">
-                                  <td style={styles.td} className="attacchi-nome">
+                                  <td style={{ ...styles.td, flexDirection: 'column', alignItems: 'flex-start', maxWidth: '100%' }} className="attacchi-nome">
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 4, width: '100%' }}>
                                       {a.isSpell || cat === 'Reazione' ? (
                                         <button
@@ -13074,6 +13079,9 @@ export default function App() {
                                         title={castBloccato ? tr('Equipaggia un focus per lanciare questo incantesimo', 'Equip a focus to cast this spell') : undefined}
                                         style={{ background: 'transparent', border: 0, padding: 0, font: 'inherit', fontWeight: 700, color: C.ink, cursor: 'help', textAlign: 'left', textDecoration: 'underline dotted', textUnderlineOffset: 3, textDecorationColor: C.inkDim, minWidth: 0 }}
                                       >{traduciDato(cleanNome) || cleanNome}</button>
+                                    </div>
+                                    <div className="attacco-dettagli" style={{ fontSize: 11, color: C.inkDim, marginTop: 3, whiteSpace: 'normal', overflowWrap: 'anywhere' }}>
+                                      {tipoAzione}{distanza && ` · ${tr('Distanza', 'Range')}: ${traduciDato(distanza)}`}
                                     </div>
                                   </td>
                                   <td style={styles.td} className="attacchi-bonus" data-label={t('combat.col_bonus')}>
