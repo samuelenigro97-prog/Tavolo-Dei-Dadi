@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.95.2] – 2026-10-09
+
+### Cambiato
+- Ripristinati i fondi quasi neri delle sezioni nel tema scuro, mantenendo il colore della classe su titoli, bordi e controlli. Tema chiaro invariato.
+- Verificata la leggibilità degli accenti anche sui pulsanti con fondo ambrato.
+
 ## [4.95.1] – 2026-10-09
 
 ### Corretto
