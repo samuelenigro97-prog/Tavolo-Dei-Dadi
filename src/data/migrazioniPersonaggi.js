@@ -67,9 +67,29 @@ export function migrazioneRegoleVaelion(roster) {
       s.sottoclasse = 'Circolo del Pastore';
     }
     if (Array.isArray(s.risorse)) {
-      const idxForma = s.risorse.findIndex((r) => /forma selvatica/i.test(r.nome || ''));
-      if (idxForma !== -1 && (s.risorse[idxForma].nome || '').includes('GS 3')) {
-        s.risorse[idxForma].nome = 'Forma Selvatica (2/riposo breve, GS max 1, Nuotare/Volare)';
+      const isForma = (r) => /forma\s*(bestiale|selvatica)|wild\s*shape/i.test(r?.nome || '') || /forma-(bestiale|selvatica)/i.test(r?.id || '');
+      const indiciForma = [];
+      s.risorse.forEach((r, idx) => { if (isForma(r)) indiciForma.push(idx); });
+      if (indiciForma.length > 0) {
+        const usati = Math.max(...indiciForma.map((idx) => {
+          const max = Math.max(0, Number(s.risorse[idx].max) || 0);
+          return max - Math.max(0, Math.min(max, Number(s.risorse[idx].attuali) || 0));
+        }));
+        const maxUsi = 2; // Vaelion livello 10 Druido 2014
+        const attuali = Math.max(0, maxUsi - usati);
+        const primo = indiciForma[0];
+        s.risorse[primo] = {
+          ...s.risorse[primo],
+          id: 'auto-druido-forma-selvatica',
+          nome: 'Forma Selvatica',
+          max: maxUsi,
+          attuali,
+          reset: 'breve',
+        };
+        if (indiciForma.length > 1) {
+          const toRemove = new Set(indiciForma.slice(1));
+          s.risorse = s.risorse.filter((_, idx) => !toRemove.has(idx));
+        }
       }
       const hasTotem = s.risorse.some((r) => /totem spirituale/i.test(r.nome || ''));
       if (!hasTotem) {

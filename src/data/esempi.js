@@ -348,7 +348,7 @@ export const VAELION_JSON = {
     { id: "v-inv-13", nome: "Sonaglio di zucca essiccata con bacche di agrifoglio", qta: 1, peso: 0.2, equip: true, categoria: "Focus", descrizione: "Oggetto prezioso e focus druidico legato alla sua infanzia tra le Montagne Rauvin." }
   ],
   risorse: [
-    { id: "auto-forma-selvatica", nome: "Forma Selvatica", attuali: 2, max: 2, reset: "breve" },
+    { id: "auto-druido-forma-selvatica", nome: "Forma Selvatica", attuali: 2, max: 2, reset: "breve" },
     { id: "auto-totem-spirituale", nome: "Totem Spirituale (Aura)", attuali: 1, max: 1, reset: "breve" }
   ],
   // Potere personalizzato di prova (vedi src/rules/poteri.js): il contatore

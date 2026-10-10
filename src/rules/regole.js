@@ -2558,3 +2558,106 @@ export function risorseAutoClasse(classe, livello, caratteristiche, versione = '
       return [];
   }
 }
+
+/**
+ * Completa e aggiorna le risorse automatiche per la classe principale e per
+ * tutte le classi multiclasse, senza toccare quelle aggiunte a mano.
+ * Unifica e deduplica sempre Forma Bestiale e Forma Selvatica conservando gli utilizzi spesi.
+ */
+export function sincronizzaRisorseClasse(scheda, versione = '2024') {
+  if (!scheda) return [];
+  const correnti = Array.isArray(scheda.risorse) ? scheda.risorse : [];
+  const classiDaElaborare = [
+    { classe: scheda.classe, livello: scheda.livello },
+    ...(Array.isArray(scheda.multiclasse) ? scheda.multiclasse : [])
+  ].filter((c) => c && c.classe);
+
+  const automatiche = [];
+  for (const { classe, livello } of classiDaElaborare) {
+    automatiche.push(...risorseAutoClasse(classe, livello, scheda.caratteristiche, versione));
+  }
+  if (!automatiche.length) return correnti;
+
+  let cambiate = false;
+  let risultato = [...correnti];
+
+  for (const auto of automatiche) {
+    const matchAlias = (r) => {
+      if (!r) return false;
+      if (r.id === auto.id) return true;
+      if (typeof r.id === 'string' && r.id.startsWith('auto-') && r.nome?.toLowerCase() === auto.nome?.toLowerCase()) return true;
+      const n = String(r.nome || '').toLocaleLowerCase('it').trim();
+      const a = String(auto.nome || '').toLocaleLowerCase('it').trim();
+      if (a === 'forma selvatica') {
+        if (/^(forma\s*(bestiale|selvatica)|wild\s*shape)(\b|\s*\(|$)/i.test(n)) return true;
+        if (typeof r.id === 'string' && /forma-(selvatica|bestiale)/i.test(r.id)) return true;
+      }
+      return n === a;
+    };
+
+    const indici = [];
+    risultato.forEach((r, idx) => {
+      if (matchAlias(r)) indici.push(idx);
+    });
+
+    if (indici.length === 0) {
+      risultato.push(auto);
+      cambiate = true;
+      continue;
+    }
+
+    const primoIndice = indici[0];
+    const corrente = risultato[primoIndice];
+    // I doppioni sono lo stesso contatore: non sommare le spese né ricaricare quello più consumato.
+    const usati = Math.max(...indici.map((idx) => {
+      const max = Math.max(0, Number(risultato[idx].max) || 0);
+      return max - Math.max(0, Math.min(max, Number(risultato[idx].attuali) || 0));
+    }));
+    const attuali = Math.max(0, auto.max - usati);
+
+    if (corrente.nome !== auto.nome || corrente.max !== auto.max || corrente.reset !== auto.reset || corrente.attuali !== attuali || corrente.id !== auto.id) {
+      risultato[primoIndice] = { ...corrente, ...auto, attuali };
+      cambiate = true;
+    }
+
+    // Se erano presenti doppioni storici con lo stesso nome o alias, rimuovili
+    if (indici.length > 1) {
+      const daRimuovere = new Set(indici.slice(1));
+      risultato = risultato.filter((_, idx) => !daRimuovere.has(idx));
+      cambiate = true;
+    }
+  }
+
+  // Deduplicazione e pulizia finale di sicurezza per Forma Selvatica / Forma Bestiale
+  const isForma = (r) => /^(forma\s*(bestiale|selvatica)|wild\s*shape)(\b|\s*\(|$)/i.test(String(r?.nome || '').trim()) || (typeof r?.id === 'string' && /forma-(selvatica|bestiale)/i.test(r.id));
+  const indiciForma = [];
+  risultato.forEach((r, idx) => {
+    if (isForma(r)) indiciForma.push(idx);
+  });
+  if (indiciForma.length > 1) {
+    const primoIdx = indiciForma[0];
+    const usati = Math.max(...indiciForma.map((idx) => {
+      const max = Math.max(0, Number(risultato[idx].max) || 0);
+      return max - Math.max(0, Math.min(max, Number(risultato[idx].attuali) || 0));
+    }));
+    const maxVal = Number(risultato[primoIdx].max) || 2;
+    risultato[primoIdx] = {
+      ...risultato[primoIdx],
+      nome: 'Forma Selvatica',
+      attuali: Math.max(0, maxVal - usati),
+    };
+    const daRimuovere = new Set(indiciForma.slice(1));
+    risultato = risultato.filter((_, idx) => !daRimuovere.has(idx));
+    cambiate = true;
+  }
+
+  // Rinomina ovunque "Forma Bestiale" residuo in "Forma Selvatica"
+  for (let i = 0; i < risultato.length; i++) {
+    if (/^forma\s*bestiale$/i.test(String(risultato[i]?.nome || '').trim())) {
+      risultato[i] = { ...risultato[i], nome: 'Forma Selvatica' };
+      cambiate = true;
+    }
+  }
+
+  return cambiate ? risultato : correnti;
+}

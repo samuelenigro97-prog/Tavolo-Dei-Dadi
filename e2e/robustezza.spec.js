@@ -59,25 +59,13 @@ test.describe('Robustezza e accessibilità', () => {
     await expect(alert.getByRole('button', { name: 'Scarica backup' })).toBeVisible();
   });
 
-  test('all\'avvio si apre il menu coi personaggi; con "apri subito l\'ultima scheda" no, nemmeno con una scheda vuota', async ({ page }) => {
+  test('all\'avvio si apre il menu coi personaggi e l\'opzione "apri subito l\'ultima scheda" è rimossa', async ({ page }) => {
     await apriScheda(page);
     // Di base: dopo un riavvio il menu iniziale è aperto (selettore dei personaggi).
     await page.reload();
     await expect(page.getByRole('button', { name: 'Personaggio casuale' })).toBeVisible();
+    await expect(page.getByTestId('avvio-diretto')).toHaveCount(0);
     await chiudiMenuIniziale(page);
-    // Con la scelta "apri subito l'ultima scheda" il menu resta chiuso.
-    await page.getByRole('button', { name: /^Menu: / }).first().click();
-    await page.getByTestId('avvio-diretto').getByRole('checkbox').check();
-    await chiudiMenuIniziale(page);
-    await page.evaluate((KEY) => {
-      const r = JSON.parse(localStorage.getItem(KEY));
-      r.personaggi[r.attivo].nome = '';
-      r.personaggi[r.attivo].classe = '';
-      localStorage.setItem(KEY, JSON.stringify(r));
-    }, KEY);
-    await page.reload();
-    await page.waitForTimeout(500);
-    await expect(page.getByRole('button', { name: 'Personaggio casuale' })).toHaveCount(0);
   });
 
   test('un chip role="button" si attiva con Invio', async ({ page }) => {

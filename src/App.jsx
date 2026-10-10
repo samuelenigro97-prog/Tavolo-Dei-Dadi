@@ -1341,7 +1341,7 @@ import { INCANTESIMI_DB, ALIAS_INCANTESIMI, datiIncantesimo, valoreIncantesimoPe
 const INCANTESIMI_NOMI = Array.from(new Set([...NOMI_SPIEG_INC, ...Object.keys(INCANTESIMI_DB)])).sort((a, b) => a.localeCompare(b, 'it'));
 import { NOMI_CLASSI, BACKGROUND_5E, TAGLIE_5E, ALLINEAMENTI_5E, SESSO_5E, SOTTOCLASSI_5E, INCANTESIMI_CLASSE, DANNI_5E, SENSI_5E, CONDIZIONI_5E, NOMI_OGGETTI, LINGUE_5E, ARMI_5E, STRUMENTI_5E, REAZIONI_5E, AZIONI_BONUS_5E, GRUPPI_ARMI_5E, GRUPPI_STRUMENTI_5E, GRUPPI_LINGUE_5E, DEFAULT_MANUALI, manualeAttivo, SOTTOCLASSI_FONTI, talentiPerManuali, PE_PER_LIVELLO, BACKGROUND_COMPETENZE, BACKGROUND_TALENTO_ORIGINE_2024, SPECIE_5E, tabellaPrivilegiSottoclasse, CARATT_INCANTATORE, PRIORITA_CARATT, DADO_VITA_CLASSE, BACKGROUND_CARATT, TS_CLASSE, ADDESTRAMENTO_CLASSE, COMPETENZE_CLASSE, PRIVILEGI_CLASSE_L1, PRIVILEGI_CLASSE_L1_2014, ASI_LIV, SOTTOCLASSE_LIV, COMPETENZE_SPECIE, NOMI_SPECIE, NOMI_SPECIE_GENERE, COGNOMI_SPECIE, NOMI_GENERICI, SPECIE_DATI, SPECIE_DATI_2014, BONUS_CARATT_SPECIE_2014, SFINIMENTO_2014, BASE_ARMATURA_DEFAULT, ESEMPI_ARMATURA } from "./data/dati5e.js";
 import { modificatore, conSegno, tiraDado, parseEspressioneDado, facceDadoVita, esprDadiVita, gruppiDadoVita, bonusCompetenzaDaLivello, tiraDanni, tiraD20, capacitaCarico, modalitaEffettiva } from "./rules/dadi.js";
-import { risorseAutoClasse, trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from "./rules/regole.js";
+import { risorseAutoClasse, sincronizzaRisorseClasse, trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from "./rules/regole.js";
 import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda, contatoriInGioco, valoreContatore } from './rules/poteri.js';
 import { PoteriRisorse } from './ui/PoteriRisorse.jsx';
 import { unisciPoteriCampagna, poteriCampagnaIncompleti } from './data/poteriCampagna.js';
@@ -1782,72 +1782,7 @@ const ORO_INIZIALE = {
   mago: 55, monaco: 50, paladino: 150, ranger: 150, stregone: 50, warlock: 100,
 };
 
-/**
- * Completa e aggiorna le risorse automatiche per la classe principale e per
- * tutte le classi multiclasse, senza toccare quelle aggiunte a mano.
- */
-function sincronizzaRisorseClasse(scheda, versione = '2024') {
-  if (!scheda) return [];
-  const correnti = Array.isArray(scheda.risorse) ? scheda.risorse : [];
-  const classiDaElaborare = [
-    { classe: scheda.classe, livello: scheda.livello },
-    ...(Array.isArray(scheda.multiclasse) ? scheda.multiclasse : [])
-  ].filter((c) => c && c.classe);
 
-  const automatiche = [];
-  for (const { classe, livello } of classiDaElaborare) {
-    automatiche.push(...risorseAutoClasse(classe, livello, scheda.caratteristiche, versione));
-  }
-  if (!automatiche.length) return correnti;
-
-  let cambiate = false;
-  let risultato = [...correnti];
-
-  for (const auto of automatiche) {
-    const matchAlias = (r) => {
-      if (!r) return false;
-      if (r.id === auto.id) return true;
-      if (typeof r.id === 'string' && r.id.startsWith('auto-') && r.nome?.toLowerCase() === auto.nome?.toLowerCase()) return true;
-      const n = String(r.nome || '').toLocaleLowerCase('it').trim();
-      const a = auto.nome.toLocaleLowerCase('it').trim();
-      if (a === 'forma selvatica' && /^(forma bestiale|wild shape)$/.test(n)) return true;
-      return n === a;
-    };
-
-    const indici = [];
-    risultato.forEach((r, idx) => {
-      if (matchAlias(r)) indici.push(idx);
-    });
-
-    if (indici.length === 0) {
-      risultato.push(auto);
-      cambiate = true;
-      continue;
-    }
-
-    const primoIndice = indici[0];
-    const corrente = risultato[primoIndice];
-    // I doppioni sono lo stesso contatore: non sommare le spese né ricaricare quello più consumato.
-    const usati = Math.max(...indici.map((idx) => {
-      const max = Math.max(0, Number(risultato[idx].max) || 0);
-      return max - Math.max(0, Math.min(max, Number(risultato[idx].attuali) || 0));
-    }));
-    const attuali = Math.max(0, auto.max - usati);
-
-    if (corrente.nome !== auto.nome || corrente.max !== auto.max || corrente.reset !== auto.reset || corrente.attuali !== attuali || corrente.id !== auto.id) {
-      risultato[primoIndice] = { ...corrente, ...auto, attuali };
-      cambiate = true;
-    }
-
-    // Se erano presenti doppioni storici con lo stesso nome, rimuovili
-    if (indici.length > 1) {
-      const daRimuovere = new Set(indici.slice(1));
-      risultato = risultato.filter((_, idx) => !daRimuovere.has(idx));
-      cambiate = true;
-    }
-  }
-  return cambiate ? risultato : correnti;
-}
 // Spiegazioni delle risorse di classe (parole proprie, meccaniche 5e/5.5):
 // mostrate al passaggio del cursore sul nome, come per le altre sezioni.
 const SPIEG_RISORSE = {
@@ -2272,6 +2207,7 @@ function loadState() {
         // da codice stanza, senza aspettare la prima modifica dalla sezione Poteri.
         s.poteri = normalizzaPoteri(s.poteri);
         s.risorse = sincronizzaRisorsePoteri(s.poteri, s.risorse, livelloTotaleScheda(s), s.bonusCompetenza);
+        s.risorse = sincronizzaRisorseClasse(s, s.versione || '2024');
         // assegna un id agli incantesimi che ne fossero privi (schede legacy),
         // così ognuno è modificabile singolarmente nel sottomenu
         if (Array.isArray(s.incantesimiLista)) {
@@ -10103,7 +10039,7 @@ export default function App() {
                     type="button"
                     style={{ ...styles.buttonMini, background: C.panel, borderColor: '#52b788', color: '#1b4332', fontWeight: 700, fontSize: 12, padding: '5px 10px', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 4 }}
                     onClick={() => setMostraModalRitrattoBestia(true)}
-                    title={lingua === 'en' ? 'Change beast portrait artwork' : 'Cambia illustrazione o carica immagine per la forma bestiale'}
+                    title={lingua === 'en' ? 'Change beast portrait artwork' : 'Cambia illustrazione o carica immagine per la forma selvatica'}
                   >
                     <span>{lingua === 'en' ? 'Change Art' : 'Cambia Immagine'}</span>
                   </button>
@@ -10441,7 +10377,7 @@ export default function App() {
                               boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
                             }}
                             onClick={(e) => { e.stopPropagation(); setMostraModalRitrattoBestia(true); }}
-                            title={tr('Cambia immagine o illustrazione della forma bestiale', 'Change the image or art of the beast form')}
+                            title={tr('Cambia immagine o illustrazione della forma selvatica', 'Change the image or art of the wild shape')}
                           >
                             <span>{lingua === 'en' ? 'Art' : 'Arte'}</span>
                           </button>
@@ -10620,7 +10556,7 @@ export default function App() {
                     // La risorsa "Forma Selvatica" apre direttamente il catalogo delle creature
                     // (invece della sola descrizione): è qui che si "spende" un uso scegliendo
                     // la forma, non con un bottone Trasformazioni separato altrove nella scheda.
-                    const isFormaSelvatica = /forma selvatica|wild shape/i.test(r.nome || '');
+                    const isFormaSelvatica = /forma\s*(selvatica|bestiale)|wild\s*shape/i.test(r.nome || '');
                     return (
                       <div key={r.id} style={{ marginBottom: 8, fontSize: 12, paddingBottom: 8, borderBottom: `1px dotted ${C.border}` }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
@@ -10690,20 +10626,22 @@ export default function App() {
                 </Sezione>
               </div>
 
-              {/* Tier 3b: Poteri (Segreti, Debito, usi dei privilegi...) separati dalle risorse di classe */}
-              <div className="risorse-tier-3 profilo-risorse-box" style={{ marginTop: 10 }}>
-                <Sezione titolo={lingua === 'en' ? 'Powers' : 'Poteri'} senzaAngoli={true} {...apertoProps('poteriRisorse')}>
-                  <PoteriRisorse
-                    scheda={scheda}
-                    aggiorna={aggiorna}
-                    lingua={lingua}
-                    registra={registra}
-                    mostraInfo={setInfo}
-                    recupero={!isSolaLettura ? recuperoPoteriDaCronologia() : null}
-                    ripristinoCampagna={!isSolaLettura && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null}
-                  />
-                </Sezione>
-              </div>
+              {/* Tier 3b: Poteri (Segreti, Debito, usi dei privilegi...) separati dalle risorse di classe — solo con manuale Araldi del Segreto attivo */}
+              {manualeAttivo(scheda?.manuali || manualiAttivi, 'araldi') && (
+                <div className="risorse-tier-3 profilo-risorse-box" style={{ marginTop: 10 }}>
+                  <Sezione titolo={lingua === 'en' ? 'Powers' : 'Poteri'} senzaAngoli={true} {...apertoProps('poteriRisorse')}>
+                    <PoteriRisorse
+                      scheda={scheda}
+                      aggiorna={aggiorna}
+                      lingua={lingua}
+                      registra={registra}
+                      mostraInfo={setInfo}
+                      recupero={!isSolaLettura ? recuperoPoteriDaCronologia() : null}
+                      ripristinoCampagna={!isSolaLettura && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null}
+                    />
+                  </Sezione>
+                </div>
+              )}
             </div>
 
             {/* COLONNA CENTRALE: anagrafica + riquadri vitali */}
@@ -15138,8 +15076,10 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Riga 3: Poteri personalizzati (regole homebrew del tavolo) */}
-                  <SezionePoteri scheda={scheda} aggiorna={aggiorna} lingua={lingua} manualiAttivi={manualiAttivi} registra={registra} mostraInfo={setInfo} ripristinoCampagna={!isSolaLettura && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null} />
+                  {/* Riga 3: Poteri personalizzati (regole homebrew del tavolo) — solo con manuale Araldi del Segreto attivo */}
+                  {manualeAttivo(scheda?.manuali || manualiAttivi, 'araldi') && (
+                    <SezionePoteri scheda={scheda} aggiorna={aggiorna} lingua={lingua} manualiAttivi={manualiAttivi} registra={registra} mostraInfo={setInfo} ripristinoCampagna={!isSolaLettura && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null} />
+                  )}
                 </div>
               </Sezione>
 

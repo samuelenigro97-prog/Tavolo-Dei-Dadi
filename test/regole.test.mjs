@@ -1448,3 +1448,40 @@ test('risorseAutoClasse: privilegi a usi limitati che mancavano (v4.79.0)', asyn
   const sd = trova('Paladino', 1, '2014', 'Senso Divino');
   assert.equal(risorseDopoRiposo([{ ...sd, attuali: 0 }], 'breve')[0].attuali, 0);
 });
+
+test('sincronizzaRisorseClasse: unifica e deduplica Forma Bestiale e Forma Selvatica conservando gli usi spesi', async () => {
+  const { sincronizzaRisorseClasse } = await import('../src/rules/regole.js');
+
+  const schedaDruido = {
+    classe: 'Druido',
+    livello: 10,
+    caratteristiche: { saggezza: 20 },
+    risorse: [
+      { id: 'vecchia-fb', nome: 'Forma Bestiale', attuali: 4, max: 4, reset: 'breve' },
+      { id: 'totem-aura', nome: 'Totem Spirituale (Aura)', attuali: 1, max: 1, reset: 'breve' },
+      { id: 'auto-druido-forma-selvatica', nome: 'Forma Selvatica', attuali: 1, max: 2, reset: 'breve' },
+    ],
+  };
+
+  const res2014 = sincronizzaRisorseClasse(schedaDruido, '2014');
+  const forme = res2014.filter((r) => /forma/i.test(r.nome));
+  assert.equal(forme.length, 1, 'deve rimanere una sola risorsa per la forma del druido');
+  assert.equal(forme[0].nome, 'Forma Selvatica');
+  assert.equal(forme[0].max, 2);
+  assert.equal(forme[0].attuali, 1, 'conserva 1 uso speso da Forma Selvatica');
+
+  // Risorsa singola chiamata "Forma Bestiale" senza duplicati
+  const schedaSoloFB = {
+    classe: 'Druido',
+    livello: 10,
+    caratteristiche: { saggezza: 20 },
+    risorse: [
+      { id: 'manuale-fb', nome: 'Forma Bestiale', attuali: 3, max: 4, reset: 'breve' },
+    ],
+  };
+  const resSoloFB = sincronizzaRisorseClasse(schedaSoloFB, '2014');
+  assert.equal(resSoloFB.length, 1);
+  assert.equal(resSoloFB[0].nome, 'Forma Selvatica');
+  assert.equal(resSoloFB[0].max, 2);
+  assert.equal(resSoloFB[0].attuali, 1, '4 max - 3 attuali = 1 speso -> 2 max - 1 = 1');
+});

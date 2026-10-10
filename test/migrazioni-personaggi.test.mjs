@@ -80,6 +80,23 @@ test('migrazioneRegoleVaelion: rispetta una sottoclasse già diversa da Circolo 
   assert.equal(s.sottoclasse, 'Circolo del Pastore'); // non tocca una scelta già corretta
 });
 
+test('migrazioneRegoleVaelion: deduplica Forma Bestiale e Forma Selvatica conservando gli usi spesi', () => {
+  const s = personaggioBase({
+    risorse: [
+      { id: 'vecchia-fb', nome: 'Forma Bestiale', attuali: 4, max: 4, reset: 'breve' },
+      { id: 'vecchia-fs', nome: 'Forma Selvatica', attuali: 1, max: 2, reset: 'breve' },
+    ],
+  });
+  const roster = { personaggi: { pg1: s } };
+  migrazioneRegoleVaelion(roster);
+
+  const forme = s.risorse.filter((r) => /forma\s*(bestiale|selvatica)/i.test(r.nome));
+  assert.equal(forme.length, 1, 'deve esserci un unico contatore');
+  assert.equal(forme[0].nome, 'Forma Selvatica');
+  assert.equal(forme[0].max, 2);
+  assert.equal(forme[0].attuali, 1, 'conserva 1 uso speso da Forma Selvatica');
+});
+
 test('autoIdratazionePersonaggioPredefinito: riempie i campi mancanti di Vaelion dal seed', () => {
   const s = personaggioBase({ note: '', trattiCaratteriali: '', abilita: { natura: 1 } });
   autoIdratazionePersonaggioPredefinito(s, 'pg-vaelion');
