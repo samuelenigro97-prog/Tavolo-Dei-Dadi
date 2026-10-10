@@ -7,7 +7,7 @@ import { trovaReazioniDisponibili } from '../../rules/regole.js';
 import { idUnico } from '../../utils/idUnici.js';
 
 export function ReazioniModal({ aggiorna, lingua, registra, scheda, setInfo, setMostraModalReazioni, suoniEffOn, versione, volumeEffetti }) {
-  const reazioniDisponibili = trovaReazioniDisponibili(scheda);
+  const reazioniDisponibili = trovaReazioniDisponibili(scheda, versione);
   const reazioneUsata = Boolean(scheda.reazioneUsata);
 
   const eseguiReazione = (r) => {
@@ -28,10 +28,10 @@ export function ReazioniModal({ aggiorna, lingua, registra, scheda, setInfo, set
       id: idUnico('att'),
       nome: r.nome,
       categoria: 'Reazione',
-      bonus: 0,
-      danno: matchDb?.danno || '',
-      tipoDanno: matchDb?.tipoDanno || '',
-      note: lingua === 'en' ? `${r.innescoEn} • ${r.effettoEn}` : `${r.innescoIt} • ${r.effettoIt}`,
+      bonus: typeof r.bonus === 'number' ? r.bonus : 0,
+      danno: r.danno || matchDb?.danno || '',
+      tipoDanno: r.tipoDanno || matchDb?.tipoDanno || '',
+      note: r.note || (lingua === 'en' ? `${r.innescoEn} • ${r.effettoEn}` : `${r.innescoIt} • ${r.effettoIt}`),
     };
     aggiorna({ attacchi: [...(scheda.attacchi || []), nuovo] });
   };

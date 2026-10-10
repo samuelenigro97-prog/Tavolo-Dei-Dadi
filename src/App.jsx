@@ -12773,9 +12773,24 @@ export default function App() {
                   return [avvisoFocus, ...['Azione', 'Bonus', 'Reazione'].map((cat) => {
                     const arr = (() => {
                       if (cat === 'Reazione') {
-                        const reazDisponibili = trovaReazioniDisponibili(scheda);
+                        const reazDisponibili = trovaReazioniDisponibili(scheda, versione);
                         const salvatiReaz = attacchiSalvati.filter((a) => (a.categoria || 'Azione') === 'Reazione');
                         const nomiSalvati = new Set(salvatiReaz.map((a) => String(a.nome || '').replace(/^✨\s*/, '').trim().toLowerCase()));
+
+                        const oppAuto = reazDisponibili.find((r) => r.nome === 'Attacco di Opportunità');
+                        const salvatiReazAggiornati = salvatiReaz.map((a) => {
+                          const clean = String(a.nome || '').replace(/^✨\s*/, '').trim().toLowerCase();
+                          if ((clean === 'attacco di opportunità' || clean === 'opportunity attack') && oppAuto) {
+                            return {
+                              ...a,
+                              bonus: a.bonusManual ? a.bonus : oppAuto.bonus,
+                              danno: a.dannoManual ? a.danno : oppAuto.danno,
+                              tipoDanno: a.tipoDannoManual ? a.tipoDanno : (oppAuto.tipoDanno || a.tipoDanno),
+                              note: a.noteManual ? a.note : (oppAuto.note || a.note),
+                            };
+                          }
+                          return a;
+                        });
 
                         const autoReaz = reazDisponibili
                           .filter((r) => !nomiSalvati.has(String(r.nome || '').replace(/^✨\s*/, '').trim().toLowerCase()))
@@ -12797,10 +12812,11 @@ export default function App() {
                             effettoEn: r.effettoEn,
                             note: r.note || (lingua === 'en' ? (r.innescoEn || r.effettoEn) : (r.innescoIt || r.effettoIt)) || '',
                             hasReach: r.hasReach,
+                            gittata: r.gittata || '',
                             isAuto: true,
                           }));
 
-                        return [...salvatiReaz, ...autoReaz];
+                        return [...salvatiReazAggiornati, ...autoReaz];
                       }
                       return listaAttacchiCompleta.filter((a) => (a.categoria || 'Azione') === cat);
                     })();
@@ -12979,10 +12995,14 @@ export default function App() {
                                 : a.tipo === 'manovra' ? '🎯'
                                 : a.tipo === 'specie' ? '🧬'
                                 : '⚡';
-                              const tipoAzione = cat === 'Azione' ? tr('Azione', 'Action') : cat === 'Bonus' ? tr('Azione Bonus', 'Bonus Action') : tr('Reazione', 'Reaction');
+                              const tipoAzione = cat === 'Azione' ? tr('1 Azione', '1 Action') : cat === 'Bonus' ? tr('Azione Bonus', 'Bonus Action') : tr('Reazione', 'Reaction');
+                              const tempoLabel = tipoAzione;
                               const distanza = gittataAttacco(a, spellInLista, armaDb)
+                                || a.gittata
                                 || (hasReach ? '3m' : '') || spSpell?.gittata
-                                || (!a.isSpell && (armaDb || a.tipo === 'tattica' || a.tipo === 'attacco') ? (lingua === 'en' ? '5 ft (melee reach)' : '1,5 m (portata in mischia)') : '');
+                                || (!a.isSpell && (armaDb || a.tipo === 'tattica' || a.tipo === 'attacco') ? (lingua === 'en' ? '5 ft' : '1,5 m') : '');
+                              const isConc = !!(spSpell?.conc || (spellInLista && (spellInLista.conc || spellInLista.concentrazione)));
+                              const isRituale = !!(spSpell?.rituale || (spellInLista && spellInLista.rituale));
 
                               // Nuvoletta essenziale (tocco sul nome o sull'icona): tipo di azione,
                               // distanza, innesco/effetto, tiro e danno, poi una descrizione breve.
@@ -13007,8 +13027,8 @@ export default function App() {
 
                               return (
                                 <tr key={a.id} className="attacchi-riga">
-                                  <td style={{ ...styles.td, flexDirection: 'column', alignItems: 'flex-start', maxWidth: '100%' }} className="attacchi-nome">
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, width: '100%' }}>
+                                  <td style={styles.td} className="attacchi-nome">
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                                       {a.isSpell || cat === 'Reazione' ? (
                                         <button
                                           type="button"
@@ -13083,9 +13103,6 @@ export default function App() {
                                         style={{ background: 'transparent', border: 0, padding: 0, font: 'inherit', fontWeight: 700, color: C.ink, cursor: 'help', textAlign: 'left', textDecoration: 'underline dotted', textUnderlineOffset: 3, textDecorationColor: C.inkDim, minWidth: 0 }}
                                       >{traduciDato(cleanNome) || cleanNome}</button>
                                     </div>
-                                    <div className="attacco-dettagli" style={{ fontSize: 11, color: C.inkDim, marginTop: 3, whiteSpace: 'normal', overflowWrap: 'anywhere' }}>
-                                      {tipoAzione}{distanza && ` · ${tr('Distanza', 'Range')}: ${traduciDato(distanza)}`}
-                                    </div>
                                   </td>
                                   <td style={styles.td} className="attacchi-bonus" data-label={t('combat.col_bonus')}>
                                     {a.isTS ? (
@@ -13152,9 +13169,89 @@ export default function App() {
                                     ) : null}
                                   </td>
                                   <td style={styles.td} className="attacchi-note" data-label={t('combat.col_note')}>
-                                    {/* Tempo, distanza, proprietà e note stanno nella nuvoletta (tocco sul nome):
-                                        qui resta solo ciò che si usa in gioco, come le munizioni. */}
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+                                    <div className="attacchi-chips" tabIndex={0} role="group" aria-label={tr('Dettagli dell\'azione', 'Action details')} style={{ display: 'flex', flexWrap: 'nowrap', gap: 4, alignItems: 'center', overflowX: 'auto', minWidth: 0 }}>
+                                      <span
+                                        className="chip-tempo"
+                                        style={{
+                                          fontSize: 11,
+                                          background: `${coloreCategoria('tempo', notteAttiva)}1f`,
+                                          border: `1px solid ${coloreCategoria('tempo', notteAttiva)}`,
+                                          borderRadius: 4,
+                                          padding: '1px 5px',
+                                          whiteSpace: 'nowrap',
+                                          display: 'inline-flex',
+                                          alignItems: 'center',
+                                          gap: 3,
+                                          color: coloreCategoria('tempo', notteAttiva),
+                                          fontWeight: 700,
+                                        }}
+                                        title={t('spell.chip_tempo')}
+                                      >
+                                        {tempoLabel}
+                                      </span>
+                                      {distanza && (
+                                        <span
+                                          className="chip-gittata"
+                                          style={{
+                                            fontSize: 11,
+                                            background: `${coloreCategoria('gittata', notteAttiva)}1f`,
+                                            border: `1px solid ${coloreCategoria('gittata', notteAttiva)}`,
+                                            borderRadius: 4,
+                                            padding: '1px 5px',
+                                            whiteSpace: 'nowrap',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: 3,
+                                            color: coloreCategoria('gittata', notteAttiva),
+                                            fontWeight: 700,
+                                          }}
+                                          title={t('spell.chip_gittata')}
+                                        >
+                                          {traduciDato(distanza)}
+                                        </span>
+                                      )}
+                                      {isConc && (
+                                        <span
+                                          className="chip-concentrazione"
+                                          style={{
+                                            fontSize: 11,
+                                            background: `${coloreCategoria('concentrazione', notteAttiva)}1f`,
+                                            border: `1px solid ${coloreCategoria('concentrazione', notteAttiva)}`,
+                                            borderRadius: 4,
+                                            padding: '1px 5px',
+                                            whiteSpace: 'nowrap',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: 3,
+                                            color: coloreCategoria('concentrazione', notteAttiva),
+                                            fontWeight: 700,
+                                          }}
+                                          title={lingua === 'en' ? 'Concentration' : 'Concentrazione'}
+                                        >
+                                          {lingua === 'en' ? 'Concentration' : 'Concentrazione'}
+                                        </span>
+                                      )}
+                                      {isRituale && (
+                                        <span
+                                          className="chip-rituale"
+                                          style={{
+                                            fontSize: 11,
+                                            background: `${coloreCategoria('rituale', notteAttiva)}1f`,
+                                            border: `1px solid ${coloreCategoria('rituale', notteAttiva)}`,
+                                            borderRadius: 4,
+                                            padding: '1px 5px',
+                                            whiteSpace: 'nowrap',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: 3,
+                                            color: coloreCategoria('rituale', notteAttiva),
+                                            fontWeight: 700,
+                                          }}
+                                          title={lingua === 'en' ? 'Ritual' : 'Rituale'}
+                                        >
+                                          {lingua === 'en' ? 'Ritual' : 'Rituale'}
+                                        </span>
+                                      )}
                                       {infoMunizioni.usaMunizioni && (
                                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
                                           <span

@@ -586,6 +586,11 @@ export function isRandelloIncantato(nome) {
   return /randello incantato|shillelagh|bastone incantato/i.test(String(nome || ''));
 }
 
+/** Verifica se l'arma può essere incantata da Randello Incantato (randello o bastone ferrato). */
+export function isArmaPerRandello(nome) {
+  return /randello|bastone ferrato|bastone|club|quarterstaff/i.test(String(nome || ''));
+}
+
 /**
  * Danno di Randello Incantato (Shillelagh), UNICA fonte di verità usata sia
  * dalla lista Trucchetti sia da Combattimento/Azioni Bonus: il dado
@@ -1674,7 +1679,7 @@ export function calcolaMovimentoESalti(scheda) {
  * privilegi di classe (Schivata Prodigiosa, Deviare Proiettili, Flash di Genio, Parole Taglienti, ecc.),
  * stili di combattimento (Intercettare, Protezione) e talenti (Sentinella, Duellante Difensivo, Maestro d'Armi con Asta).
  */
-export function trovaReazioniDisponibili(scheda) {
+export function trovaReazioniDisponibili(scheda, versione = (scheda?.versione || '2024')) {
   const reazioni = [];
   const aggiunte = new Set();
 
@@ -1695,7 +1700,8 @@ export function trovaReazioniDisponibili(scheda) {
   const modCar = modificatore(punteggioCaratteristica(scheda, 'carisma'));
 
   // Calcolo incantatore (CD e Bonus attacco magico)
-  const carInc = scheda?.incantatore?.caratteristica || CARATT_INCANTATORE[chiaveClasse(scheda?.classe)] || 'intelligenza';
+  // Per Randello Incantato (Shillelagh, trucchetto druidico), se non diversamente specificato si usa Saggezza
+  const carInc = scheda?.incantatore?.caratteristica || CARATT_INCANTATORE[chiaveClasse(scheda?.classe)] || 'saggezza';
   const modInc = modificatore(punteggioCaratteristica(scheda, carInc));
   const cdIncantesimi = 8 + bonusComp + modInc;
   const bonusAttaccoMagico = bonusComp + modInc;
@@ -1703,12 +1709,29 @@ export function trovaReazioniDisponibili(scheda) {
   // Cerca arma da mischia equipaggiata o principale
   const inv = Array.isArray(scheda?.inventario) ? scheda.inventario : [];
   const attacchi = Array.isArray(scheda?.attacchi) ? scheda.attacchi : [];
+  const listaInc = Array.isArray(scheda?.incantesimiLista) ? scheda.incantesimiLista : [];
+
+  // Rileva se il trucchetto Randello Incantato (Shillelagh) è preparato/disponibile
+  const haRandelloIncantato = (
+    listaInc.some((s) => isRandelloIncantato(s?.nome) && s?.preparato !== false) ||
+    attacchi.some((a) => isRandelloIncantato(a?.nome)) ||
+    (Array.isArray(scheda?.trucchetti) && scheda.trucchetti.some((t) => isRandelloIncantato(t?.nome || t)))
+  );
+
+  const trovaArmaMischiaDb = (nome) => {
+    if (!nome) return null;
+    const n = String(nome).trim().toLowerCase();
+    const esatta = (ARMI_5E || []).find((w) => w.nome.toLowerCase() === n && !w.ranged);
+    if (esatta) return esatta;
+    const ordinata = [...(ARMI_5E || [])].filter((w) => !w.ranged).sort((a, b) => b.nome.length - a.nome.length);
+    return ordinata.find((w) => n.includes(w.nome.toLowerCase())) || null;
+  };
 
   let armaMischia = null;
   // 1. Cerca in inventario tra gli oggetti equipaggiati
   for (const o of inv) {
     if (o.equip) {
-      const match = (ARMI_5E || []).find((w) => w.nome.toLowerCase() === (o.nome || '').toLowerCase() && !w.ranged);
+      const match = trovaArmaMischiaDb(o.nome);
       if (match) {
         armaMischia = { ...match, customNome: o.nome };
         break;
@@ -1718,11 +1741,18 @@ export function trovaReazioniDisponibili(scheda) {
   // 2. Se non trovata in inventario equipaggiata, cerca tra gli attacchi salvati
   if (!armaMischia) {
     for (const a of attacchi) {
-      if (!a.isSpell && a.nome) {
-        const match = (ARMI_5E || []).find((w) => w.nome.toLowerCase() === a.nome.toLowerCase() && !w.ranged);
-        if (match) {
-          armaMischia = { ...match, customNome: a.nome, dannoCustom: a.danno, bonusCustom: a.bonus };
+      if (a.nome) {
+        if (isRandelloIncantato(a.nome)) {
+          const matchRandello = (ARMI_5E || []).find((w) => w.nome === 'Randello') || { nome: 'Randello', danno: '1d4', tipo: 'Contundente' };
+          armaMischia = { ...matchRandello, customNome: a.nome, dannoCustom: a.danno, bonusCustom: a.bonus };
           break;
+        }
+        if (!a.isSpell) {
+          const match = trovaArmaMischiaDb(a.nome);
+          if (match) {
+            armaMischia = { ...match, customNome: a.nome, dannoCustom: a.danno, bonusCustom: a.bonus };
+            break;
+          }
         }
       }
     }
@@ -1730,7 +1760,7 @@ export function trovaReazioniDisponibili(scheda) {
   // 3. Se non trovata, cerca qualsiasi arma da mischia in inventario
   if (!armaMischia) {
     for (const o of inv) {
-      const match = (ARMI_5E || []).find((w) => w.nome.toLowerCase() === (o.nome || '').toLowerCase() && !w.ranged);
+      const match = trovaArmaMischiaDb(o.nome);
       if (match) {
         armaMischia = { ...match, customNome: o.nome };
         break;
@@ -1738,14 +1768,50 @@ export function trovaReazioniDisponibili(scheda) {
     }
   }
 
+  // Verifica se l'arma equipaggiata/disponibile è compatibile con Randello Incantato (randello o bastone ferrato)
+  const armaSupportaRandello = Boolean(armaMischia && isArmaPerRandello(armaMischia.customNome || armaMischia.nome));
+  const randelloInInv = inv.some((o) => isArmaPerRandello(o.nome));
+  const usaRandelloIncantato = Boolean(
+    haRandelloIncantato && (
+      armaSupportaRandello ||
+      isRandelloIncantato(armaMischia?.customNome || armaMischia?.nome) ||
+      (!armaMischia && randelloInInv)
+    )
+  );
+
   // Calcolo statistiche dell'attacco in mischia per l'attacco di opportunità
-  let nomeArmaMischia = armaMischia ? (armaMischia.customNome || armaMischia.nome) : 'Colpo senz\'armi';
+  let nomeArmaMischia = armaMischia ? (armaMischia.customNome || armaMischia.nome) : (usaRandelloIncantato ? 'Randello Incantato' : 'Colpo senz\'armi');
+  if (usaRandelloIncantato) {
+    if (!armaMischia || isRandelloIncantato(nomeArmaMischia) || /^randello$/i.test(nomeArmaMischia.trim())) {
+      nomeArmaMischia = 'Randello Incantato';
+    } else if (/^bastone(\s+ferrato)?$/i.test(nomeArmaMischia.trim())) {
+      nomeArmaMischia = 'Bastone Ferrato (Randello Incantato)';
+    } else if (!nomeArmaMischia.toLowerCase().includes('incantato')) {
+      nomeArmaMischia = `${nomeArmaMischia} (Incantato)`;
+    }
+  }
+
   let bonusMischia = 0;
   let dannoMischia = '1';
   let tipoDannoMischia = 'Contundente';
   let hasReach = false;
 
-  if (armaMischia) {
+  if (usaRandelloIncantato) {
+    // Randello Incantato (Shillelagh): usa la caratteristica da incantatore (es. Saggezza per Druido)
+    // al posto della Forza per tiri per colpire e per i danni;
+    // il dado di danno scala: d8 (2014) oppure d8/d10/d12/2d6 in base al livello (2024).
+    const matchBonusMagico = String(nomeArmaMischia).match(/\+([123])/);
+    const bonusMagico = matchBonusMagico ? parseInt(matchBonusMagico[1], 10) : 0;
+    const modAttacco = Math.max(modFor, modInc);
+    const modTot = modAttacco + bonusMagico;
+    bonusMischia = armaMischia?.bonusCustom !== undefined
+      ? Math.max(armaMischia.bonusCustom, modTot + bonusComp)
+      : modTot + bonusComp;
+    const dadoShillelagh = dadoRandelloIncantato(liv, versione);
+    dannoMischia = dannoRandelloIncantato(dadoShillelagh, modTot);
+    tipoDannoMischia = versione === '2024' ? 'Contundente o Forza (Magico)' : 'Contundente (Magico)';
+    hasReach = false;
+  } else if (armaMischia) {
     let modArma = armaMischia.finesse ? Math.max(modFor, modDes) : modFor;
     const matchBonusMagico = String(nomeArmaMischia).match(/\+([123])/);
     const bonusMagico = matchBonusMagico ? parseInt(matchBonusMagico[1], 10) : 0;
@@ -1780,11 +1846,11 @@ export function trovaReazioniDisponibili(scheda) {
     innescoEn: 'When a hostile creature that you can see moves out of your melee reach.',
     effettoIt: `Compi un singolo attacco con arma da mischia (${nomeArmaMischia}${hasReach ? ' - Portata 3m' : ''}) contro la creatura che fugge.`,
     effettoEn: `Make one melee weapon attack (${nomeArmaMischia}${hasReach ? ' - Reach 10ft' : ''}) against the fleeing creature.`,
-    note: `Arma: ${nomeArmaMischia}${hasReach ? ' (Portata 3m)' : ''}`,
+    note: `Arma: ${nomeArmaMischia}${hasReach ? ' (Portata 3m)' : ''}${usaRandelloIncantato ? ` · Shillelagh (${(carInc || 'SAG').slice(0, 3).toUpperCase()})` : ''}`,
+    gittata: hasReach ? '3m' : '1,5 m',
   });
 
   // 2. Incantesimi di Reazione noti o preparati
-  const listaInc = Array.isArray(scheda?.incantesimiLista) ? scheda.incantesimiLista : [];
   for (const inc of listaInc) {
     const nomeInc = inc.nome || '';
     const sp = datiIncantesimo(nomeInc) || {};
@@ -1817,6 +1883,7 @@ export function trovaReazioniDisponibili(scheda) {
         effettoIt: inc.note || matchDb?.note || sp.desc || '',
         effettoEn: matchDb?.noteEn || sp.desc || '',
         note: inc.note || matchDb?.note || (sp.scuola ? `${sp.scuola} • ${sp.gittata || ''}` : ''),
+        gittata: sp.gittata || inc.gittata || '',
       });
     }
   }
@@ -1835,6 +1902,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: 'Dimezza il danno dell\'attacco contro di te.',
       effettoEn: 'Halve the damage that you take from this attack.',
       note: 'Dimezza danni subiti da attacco visibile',
+      gittata: 'Sé stesso',
     });
   }
 
@@ -1852,6 +1920,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: `Riduci il danno di 1d10 + DES (${conSegno(modDes)}) + Liv. Monaco (${livMonaco}). Se riduci a 0, puoi afferrare e rilanciare (1 Ki).`,
       effettoEn: `Reduce damage by 1d10 + DEX (${conSegno(modDes)}) + Monk level (${livMonaco}). If reduced to 0, catch and throw (1 Ki).`,
       note: `Riduci 1d10+${modDes + livMonaco} (DES+Liv)`,
+      gittata: 'Sé stesso',
     });
   }
 
@@ -1866,6 +1935,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: `Aggiungi il tuo modificatore di Intelligenza (${conSegno(modInt)}) al risultato del tiro.`,
       effettoEn: `Add your Intelligence modifier (${conSegno(modInt)}) to the roll result.`,
       note: `+${modInt} INT a prova o TS entro 9m`,
+      gittata: '9m',
     });
   }
 
@@ -1882,6 +1952,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: `Spendi 1 dado di Ispirazione Bardica (${dadoBardo}) e sottrai il risultato dal tiro del bersaglio.`,
       effettoEn: `Spend 1 Bardic Inspiration die (${dadoBardo}) and subtract the result from the target roll.`,
       note: `-${dadoBardo} dal tiro del nemico entro 18m`,
+      gittata: '18m',
     });
   }
 
@@ -1897,6 +1968,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: `Riduci il danno dell'attacco di 1d10 + Bonus Competenza (+${bonusComp}) mentre impugni uno scudo o un'arma.`,
       effettoEn: `Reduce the attack damage by 1d10 + Proficiency Bonus (+${bonusComp}) with shield or weapon.`,
       note: `Riduci 1d10+${bonusComp} danni a creatura entro 1,5m`,
+      gittata: '1,5 m',
     });
   }
 
@@ -1910,6 +1982,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: 'Imponi svantaggio al tiro per colpire dell\'attaccante (mentre impugni uno scudo).',
       effettoEn: 'Impose disadvantage on the attack roll (with shield).',
       note: 'Svantaggio all\'attacco nemico contro alleato (con scudo)',
+      gittata: '1,5 m',
     });
   }
 
@@ -1926,6 +1999,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: `Compi un attacco con arma da mischia (${nomeArmaMischia}). Se colpisci, la velocità del bersaglio diventa 0.`,
       effettoEn: `Make a melee weapon attack (${nomeArmaMischia}). On hit, target's speed becomes 0.`,
       note: 'Attacco di reazione; velocità 0 se colpisci',
+      gittata: hasReach ? '3m' : '1,5 m',
     });
   }
 
@@ -1940,6 +2014,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: `Aggiungi il tuo Bonus di Competenza (+${bonusComp}) alla tua CA contro quell'attacco.`,
       effettoEn: `Add your Proficiency Bonus (+${bonusComp}) to your AC against that attack.`,
       note: `+${bonusComp} CA contro attacco in mischia`,
+      gittata: 'Sé stesso',
     });
   }
 
@@ -1956,6 +2031,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: `Provochi un attacco di opportunità con ${nomeArmaMischia} quando il nemico ENTRA nella tua portata.`,
       effettoEn: `Provoke an opportunity attack with ${nomeArmaMischia} when the enemy ENTERS your reach.`,
       note: 'Attacco di opportunità all\'entrata nella portata',
+      gittata: '3m',
     });
   }
 
@@ -1969,6 +2045,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: 'Puoi lanciare un incantesimo con tempo di lancio di 1 azione (che bersaglia solo quella creatura) invece di un attacco con arma.',
       effettoEn: 'Cast a spell with a casting time of 1 action (targeting only that creature) instead of an opportunity attack.',
       note: 'Lancia un incantesimo da 1 azione come Attacco d\'Opportunità',
+      gittata: hasReach ? '3m' : '1,5 m',
     });
   }
 
@@ -1984,6 +2061,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: `Spendi 1 dado di superiorità: riduci il danno di 1d8 + DES (${conSegno(modDes)}).`,
       effettoEn: `Spend 1 superiority die: reduce damage by 1d8 + DEX (${conSegno(modDes)}).`,
       note: `Riduci 1d8+${modDes} danni in mischia`,
+      gittata: 'Sé stesso',
     });
   }
 
@@ -2000,6 +2078,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: `Spendi 1 dado di superiorità e compi un attacco in mischia con ${nomeArmaMischia}, sommando 1d8 ai danni se colpisci.`,
       effettoEn: `Spend 1 superiority die and make a melee attack with ${nomeArmaMischia}, adding 1d8 to damage on hit.`,
       note: 'Attacco in mischia + 1d8 se il nemico manca',
+      gittata: hasReach ? '3m' : '1,5 m',
     });
   }
 
@@ -2013,6 +2092,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: 'Imponi svantaggio al tiro per colpire dell\'attaccante prima che colpisca o manchi.',
       effettoEn: 'Impose disadvantage on the attack roll before it hits or misses.',
       note: 'Svantaggio all\'attaccante entro 9m',
+      gittata: '9m',
     });
   }
 
@@ -2030,6 +2110,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: `La creatura subisce 2d8 danni da fulmine o tuono (TS Destrezza CD ${cdIncantesimi} per dimezzare).`,
       effettoEn: `Target takes 2d8 lightning or thunder damage (Dex save DC ${cdIncantesimi} for half).`,
       note: `2d8 danni (TS Des CD ${cdIncantesimi})`,
+      gittata: '1,5 m',
     });
   }
 
@@ -2043,6 +2124,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: 'Annulli gli effetti del colpo critico trasformandolo in un colpo normale.',
       effettoEn: 'Cancel the critical hit, turning it into a normal hit.',
       note: 'Annulla critico nemico entro 9m',
+      gittata: '9m',
     });
   }
 
@@ -2056,6 +2138,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: 'Concedi resistenza a quel tipo di danno per quell\'attacco.',
       effettoEn: 'Grant resistance to that damage type for that attack.',
       note: 'Resistenza a elemento a te o alleato entro 9m',
+      gittata: '9m',
     });
   }
 
@@ -2072,6 +2155,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: `Compi un attacco con arma da mischia (${nomeArmaMischia}) contro l'attaccante.`,
       effettoEn: `Make a melee weapon attack (${nomeArmaMischia}) against the attacker.`,
       note: `Contrattacca chi ti colpisce con ${nomeArmaMischia}`,
+      gittata: hasReach ? '3m' : '1,5 m',
     });
   }
 
@@ -2089,6 +2173,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: `Riduci il danno subito dall'alleato di ${dadiSpiriti}.`,
       effettoEn: `Reduce the damage taken by the ally by ${dadiSpiriti}.`,
       note: `Riduci ${dadiSpiriti} danni subiti da alleato in ira`,
+      gittata: '9m',
     });
   }
 
@@ -2104,6 +2189,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: 'Spendi 2 punti stregoneria: tira 1d4 e aggiungi o sottrai il risultato dal tiro del bersaglio.',
       effettoEn: 'Spend 2 sorcery points: roll 1d4 and add or subtract it from the target roll.',
       note: '±1d4 a tiro altrui (2 Punti Stregoneria)',
+      gittata: '9m',
     });
   }
 
@@ -2118,6 +2204,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: '+2 CA contro quell\'attacco oppure +4 al tiro salvezza fallito.',
       effettoEn: '+2 AC against that attack or +4 to the failed saving throw.',
       note: '+2 CA contro attacco o +4 a TS',
+      gittata: 'Sé stesso',
     });
   }
 
@@ -2131,6 +2218,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: 'Diventi invisibile e ti teletrasporti fino a 18 m in uno spazio visibile non occupato.',
       effettoEn: 'Turn invisible and teleport up to 60 ft to an unoccupied space.',
       note: 'Invisibilità e teletrasporto 18m al danno',
+      gittata: '18m',
     });
   }
 
@@ -2146,6 +2234,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: `Riduci il danno subito di 1d12 + Costituzione (${conSegno(modCon)}).`,
       effettoEn: `Reduce the damage taken by 1d12 + Constitution (${conSegno(modCon)}).`,
       note: `Riduci 1d12+${modCon} danni (1/Riposo Breve)`,
+      gittata: 'Sé stesso',
     });
   }
 
@@ -2159,6 +2248,7 @@ export function trovaReazioniDisponibili(scheda) {
       effettoIt: 'Concedi Vantaggio a quel tiro per colpire.',
       effettoEn: 'Grant Advantage on that attack roll.',
       note: 'Vantaggio al tiro per colpire nell\'aura',
+      gittata: '9m',
     });
   }
 
@@ -2173,6 +2263,7 @@ export function trovaReazioniDisponibili(scheda) {
         bonus: a.bonus,
         danno: a.danno || '',
         tipoDanno: a.tipoDanno || '',
+        gittata: a.gittata || '',
         innescoIt: a.note || 'Reazione di combattimento preparata.',
         innescoEn: a.note || 'Prepared combat reaction.',
         effettoIt: a.note || (a.danno ? `${a.danno} ${a.tipoDanno || ''}` : ''),

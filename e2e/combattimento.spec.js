@@ -59,12 +59,11 @@ test.describe('Combattimento', () => {
     await expect(page.getByText(/Nessun attacco\/incantesimo ad azione bonus/)).toHaveCount(0);
   });
 
-  test('nuvoletta unica: prima il tipo di azione, subito dopo la distanza (anche per Inaridire)', async ({ page }) => {
+  test('chip tempo e gittata visibili nella riga, tocco apre la nuvoletta con i dettagli', async ({ page }) => {
     for (const [nome, azione, distanza] of [['Inaridire', '1 Azione', '9m'], ['Randello Incantato', 'Azione Bonus', 'Tocco'], ['Morsa del Gelo', '1 Azione', '18m'], ['Parola di Guarigione', 'Azione Bonus', '18m']]) {
       const riga = page.locator('tr.attacchi-riga').filter({ hasText: nome });
-      await expect(riga.locator('.chip-tempo, .chip-gittata')).toHaveCount(0);
-      await expect(riga.locator('.attacco-dettagli')).toContainText(`Distanza: ${distanza}`);
-      await expect(riga.locator('.attacco-dettagli')).toContainText(azione === '1 Azione' ? 'Azione' : azione);
+      await expect(riga.locator('.chip-tempo')).toHaveText(azione);
+      await expect(riga.locator('.chip-gittata')).toHaveText(distanza);
       await riga.locator('.attacco-nome').click();
       const nuvola = page.getByText(new RegExp(`Azione: ${azione}`)).last();
       await expect(nuvola).toBeVisible();
@@ -79,7 +78,8 @@ test.describe('Combattimento', () => {
   test('tipo e distanza restano visibili anche sul telefono', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     const riga = page.locator('tr.attacchi-riga').filter({ hasText: 'Frusta di Spine' });
-    await expect(riga.locator('.attacco-dettagli')).toHaveText('Azione · Distanza: 9m');
+    await expect(riga.locator('.chip-tempo')).toHaveText('1 Azione');
+    await expect(riga.locator('.chip-gittata')).toHaveText('9m');
     const dimensioni = await page.evaluate(() => ({ viewport: innerWidth, contenuto: document.documentElement.scrollWidth }));
     expect(dimensioni.contenuto).toBeLessThanOrEqual(dimensioni.viewport);
   });
@@ -200,10 +200,11 @@ test.describe('Combattimento', () => {
     await expect(rigaBonus.locator('.badge-tiro-danno')).toContainText('2d4+5');
   });
 
-  test('Reazioni: niente riquadri di innesco/effetto, nome non modificabile, il tocco apre la nuvoletta essenziale', async ({ page }) => {
+  test('Reazioni: niente riquadri di innesco/effetto, nome non modificabile, chip tempo e gittata presenti, il tocco apre la nuvoletta essenziale', async ({ page }) => {
     const riga = page.locator('tr.attacchi-riga').filter({ hasText: 'Attacco di Opportunità' });
     await expect(riga.locator('.chip-reazione-testo')).toHaveCount(0);
-    await expect(riga.locator('.chip-tempo')).toHaveCount(0);
+    await expect(riga.locator('.chip-tempo')).toHaveText('Reazione');
+    await expect(riga.locator('.chip-gittata')).toHaveText('1,5 m');
     // Nessun campo modificabile nella riga (il nome lo decide il sistema).
     await expect(riga.locator('input, [contenteditable="true"]')).toHaveCount(0);
     await riga.locator('.attacco-nome').click();

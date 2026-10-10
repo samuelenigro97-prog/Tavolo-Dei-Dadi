@@ -1046,7 +1046,81 @@ test('reazioni e inneschi di combattimento 5e (trovaReazioniDisponibili)', () =>
   const reazioniMonaco = trovaReazioniDisponibili(monaco);
   const deviare = reazioniMonaco.find((r) => r.nome === 'Deviare Proiettili');
   assert.ok(deviare);
-  assert.equal(deviare.danno, '1d10+7'); // 1d10 + DES (3) + Liv (4) = 1d10+7
+  assert.equal(deviare.danno, '1d10+7');
+  assert.equal(deviare.gittata, 'Sé stesso');
+
+  const attOppMonaco = reazioniMonaco.find((r) => r.nome === 'Attacco di Opportunità');
+  assert.ok(attOppMonaco);
+  assert.equal(attOppMonaco.gittata, '1,5 m');
+});
+
+test('Attacco di Opportunità con Randello Incantato (Shillelagh) scala automaticamente', () => {
+  // Druido livello 5 (2024), SAG 18 (+4), FOR 10 (+0), BC +3, Randello equipaggiato e Trucchetto preparato
+  const druido = {
+    classe: 'Druido',
+    livello: 5,
+    bonusCompetenza: 3,
+    caratteristiche: { forza: 10, destrezza: 12, saggezza: 18 },
+    inventario: [
+      { nome: 'Randello', equip: true, peso: 1, qta: 1 },
+    ],
+    incantesimiLista: [
+      { id: 'sh-0', nome: 'Randello Incantato', livello: 0, preparato: true },
+    ],
+  };
+
+  const reazioni = trovaReazioniDisponibili(druido, '2024');
+  const attOpp = reazioni.find((r) => r.nome === 'Attacco di Opportunità');
+  assert.ok(attOpp);
+  // Con Shillelagh: SAG (+4) + BC (+3) = 7 (anziché FOR 0 + BC 3 = 3)
+  assert.equal(attOpp.bonus, 7);
+  // Al 5° livello nel 2024: il dado scala da 1d8 a 1d10 + SAG (+4) = 1d10+4
+  assert.equal(attOpp.danno, '1d10+4');
+  assert.ok(attOpp.note.includes('Randello Incantato'));
+  assert.ok(attOpp.note.includes('Shillelagh'));
+
+  // Nella versione 2014 il dado resta 1d8 fisso
+  const reazioni2014 = trovaReazioniDisponibili(druido, '2014');
+  const attOpp2014 = reazioni2014.find((r) => r.nome === 'Attacco di Opportunità');
+  assert.equal(attOpp2014.danno, '1d8+4');
+
+  // Bastone ferrato con Maestro d'Armi con Asta: scala sia Opportunità sia Intercettazione
+  const druidoAsta = {
+    classe: 'Druido',
+    livello: 11,
+    bonusCompetenza: 4,
+    caratteristiche: { forza: 10, saggezza: 20 },
+    inventario: [
+      { nome: 'Bastone Ferrato', equip: true, peso: 2, qta: 1 },
+    ],
+    incantesimiLista: [
+      { id: 'sh-0', nome: 'Randello Incantato', livello: 0, preparato: true },
+    ],
+    talenti: "Maestro d'Armi con Asta",
+  };
+  const reazAsta = trovaReazioniDisponibili(druidoAsta, '2024');
+  const attOppAsta = reazAsta.find((r) => r.nome === 'Attacco di Opportunità');
+  // Al livello 11 nel 2024: dado 1d12 + SAG (+5) = 1d12+5, bonus 5 + 4 = 9
+  assert.equal(attOppAsta.bonus, 9);
+  assert.equal(attOppAsta.danno, '1d12+5');
+  assert.ok(attOppAsta.note.includes('Bastone Ferrato'));
+
+  const interc = reazAsta.find((r) => r.nome === 'Asta: Intercettazione in Entrata');
+  assert.ok(interc);
+  assert.equal(interc.bonus, 9);
+  assert.equal(interc.danno, '1d12+5');
+
+  // Se equipaggia una Spada (non compatibile con Shillelagh), non usa Shillelagh
+  const druidoSpada = {
+    ...druido,
+    inventario: [
+      { nome: 'Spada Lunga', equip: true, peso: 1.5, qta: 1 },
+    ],
+  };
+  const reazSpada = trovaReazioniDisponibili(druidoSpada, '2024');
+  const attOppSpada = reazSpada.find((r) => r.nome === 'Attacco di Opportunità');
+  assert.equal(attOppSpada.bonus, 3); // FOR 0 + BC 3 = 3
+  assert.equal(attOppSpada.danno, '1d8'); // 1d8 da spada, non Shillelagh
 });
 
 test('economia del turno e tattiche di combattimento 5e (calcolaTurnoCombattimento)', () => {
