@@ -10,49 +10,55 @@ async function attivaManuale(page) {
     localStorage.setItem('scheda-interattiva:manuali', JSON.stringify({ ...m, araldi: true }));
   });
   await page.reload();
-  await page.waitForTimeout(800);
-  for (let i = 0; i < 3; i++) await page.keyboard.press('Escape');
-  await page.mouse.click(20, 300);
+  await chiudiMenuIniziale(page);
 }
 
 test.describe('Poteri', () => {
-  test.beforeEach(async ({ page }) => {
-    await apriScheda(page);
-  });
-
-  test('il titolo della sezione specifica "regole homebrew"', async ({ page }) => {
-    await expect(page.locator('div, span, h3, h4').filter({ hasText: /^\s*[▾▸]?\s*Poteri\s*\(regole homebrew\)\s*$/ }).last()).toBeVisible();
-    await expect(page.getByText('(regole homebrew)')).toBeVisible();
-  });
-
-  test('l\'etichetta del bersaglio di un modificatore è visibile senza passare il mouse', async ({ page }) => {
-    // Il PG di esempio ha un potere "Potere del Patrono" con un modificatore su Velocità.
-    await expect(page.getByText(/Velocità \+\d+m/)).toBeVisible();
-  });
-
-  test('si può aggiungere un modificatore con bersaglio libero personalizzato', async ({ page }) => {
-    await page.getByText('Potere del Patrono').click();
-    const dialog = page.getByRole('dialog');
-    await dialog.getByRole('button', { name: /Aggiungi modificatore/ }).click();
-    await page.waitForTimeout(150);
-
-    const selectBersaglio = dialog.locator('select').last();
-    await selectBersaglio.selectOption({ label: 'Altro (personalizzato)…' });
-
-    const campoLibero = dialog.getByPlaceholder(/Su cosa agisce/);
-    await expect(campoLibero).toBeVisible();
-    await campoLibero.fill('Vantaggio ai TS Carisma');
-
-    // Chiudi il modal e verifica che il chip mostri l'etichetta scritta a mano.
-    await dialog.getByRole('button', { name: '✕' }).click();
-    await expect(page.getByText(/Vantaggio ai TS Carisma/)).toBeVisible();
-  });
-
   test('il manuale di campagna è spento di base: "Da modello" compare solo dopo averlo attivato', async ({ page }) => {
+    await apriScheda(page);
     await expect(page.getByRole('button', { name: 'Da modello' })).toHaveCount(0);
     await attivaManuale(page);
     await expect(page.getByRole('button', { name: 'Da modello' })).toBeVisible();
   });
+
+  test.describe('con manuale Araldi attivo', () => {
+    test.beforeEach(async ({ page }) => {
+      await page.addInitScript(() => {
+        try {
+          const m = JSON.parse(localStorage.getItem('scheda-interattiva:manuali') || '{}');
+          localStorage.setItem('scheda-interattiva:manuali', JSON.stringify({ ...m, araldi: true }));
+        } catch {}
+      });
+      await apriScheda(page);
+    });
+
+    test('il titolo della sezione specifica "regole homebrew"', async ({ page }) => {
+      await expect(page.locator('div, span, h3, h4').filter({ hasText: /^\s*[▾▸]?\s*Poteri\s*\(regole homebrew\)\s*$/ }).last()).toBeVisible();
+      await expect(page.getByText('(regole homebrew)')).toBeVisible();
+    });
+
+    test('l\'etichetta del bersaglio di un modificatore è visibile senza passare il mouse', async ({ page }) => {
+      // Il PG di esempio ha un potere "Potere del Patrono" con un modificatore su Velocità.
+      await expect(page.getByText(/Velocità \+\d+m/)).toBeVisible();
+    });
+
+    test('si può aggiungere un modificatore con bersaglio libero personalizzato', async ({ page }) => {
+      await page.getByText('Potere del Patrono').click();
+      const dialog = page.getByRole('dialog');
+      await dialog.getByRole('button', { name: /Aggiungi modificatore/ }).click();
+      await page.waitForTimeout(150);
+
+      const selectBersaglio = dialog.locator('select').last();
+      await selectBersaglio.selectOption({ label: 'Altro (personalizzato)…' });
+
+      const campoLibero = dialog.getByPlaceholder(/Su cosa agisce/);
+      await expect(campoLibero).toBeVisible();
+      await campoLibero.fill('Vantaggio ai TS Carisma');
+
+      // Chiudi il modal e verifica che il chip mostri l'etichetta scritta a mano.
+      await dialog.getByRole('button', { name: '✕' }).click();
+      await expect(page.getByText(/Vantaggio ai TS Carisma/)).toBeVisible();
+    });
 
   test('la sezione Poteri si può rimpicciolire e si ricorda la scelta', async ({ page }) => {
     await expect(page.getByText('Potere del Patrono').first()).toBeVisible();
@@ -66,7 +72,6 @@ test.describe('Poteri', () => {
   });
 
   test('"Da modello" aggiunge Araldi del Segreto: pannello dedicato, contatori collegati, niente doppioni', async ({ page }) => {
-    await attivaManuale(page);
     await page.getByRole('button', { name: 'Da modello' }).click();
     const elenco = page.getByTestId('modelli-poteri');
     await expect(elenco.getByText('Araldi del Segreto', { exact: true })).toBeVisible();
@@ -96,7 +101,6 @@ test.describe('Poteri', () => {
   });
 
   test('manuale 1.1: Myrdhal fra le spese di Segreti, Veglia con "Vista Pura", testi vecchi aggiornati da soli (v4.86.0)', async ({ page }) => {
-    await attivaManuale(page);
     // Una scheda con i testi della versione precedente del manuale.
     await page.getByRole('button', { name: 'Da modello' }).click();
     await page.getByTestId('modelli-poteri').getByRole('button', { name: /Aggiungi \d+ poteri/ }).click();
@@ -124,7 +128,6 @@ test.describe('Poteri', () => {
   });
 
   test('pannello Araldi: "Aggiungi gli incantesimi del manuale" mette la lista ampliata fra i conosciuti, senza contare nei limiti (v4.88.0)', async ({ page }) => {
-    await attivaManuale(page);
     await page.getByRole('button', { name: 'Da modello' }).click();
     await page.getByTestId('modelli-poteri').getByRole('button', { name: /Aggiungi \d+ poteri/ }).click();
     const lista = () => page.evaluate(() => {
@@ -153,7 +156,6 @@ test.describe('Poteri', () => {
   });
 
   test('pannello Araldi: perle degli usi, Debito che sale, soglie e +1 CA automatico a Debito 15', async ({ page }) => {
-    await attivaManuale(page);
     await page.getByRole('button', { name: 'Da modello' }).click();
     await page.getByTestId('modelli-poteri').getByRole('button', { name: /Aggiungi \d+ poteri/ }).click();
     const pannello = page.getByTestId('araldi-pannello');
@@ -223,7 +225,9 @@ test.describe('Poteri', () => {
     const debito = () => page.evaluate(() => { const st = JSON.parse(localStorage.getItem('scheda-interattiva:v1')); return st.personaggi[st.attivo].risorse.find((r) => r.nome === 'Debito').attuali; });
     const campo = page.locator('span', { hasText: /^Debito/ }).locator('span').filter({ hasText: /^5$/ }).first();
     await campo.click();
-    await page.keyboard.press('Control+A');
+    const selectAllKey = process.platform === 'darwin' ? 'Meta+A' : 'Control+A';
+    await page.keyboard.press(selectAllKey);
+    await page.keyboard.press('Backspace');
     await page.keyboard.type('1000');
     await page.keyboard.press('Enter');
     await expect.poll(debito).toBe(1000);
@@ -245,7 +249,6 @@ test.describe('Poteri', () => {
   });
 
   test('riquadro Poteri con gli Araldi: una perla di Inquisire spende un uso e aggiunge Debito', async ({ page }) => {
-    await attivaManuale(page);
     await page.getByRole('button', { name: 'Da modello' }).click();
     await page.getByTestId('modelli-poteri').getByRole('button', { name: /Aggiungi \d+ poteri/ }).click();
     const box = page.getByTestId('poteri-risorse');
@@ -261,5 +264,6 @@ test.describe('Poteri', () => {
     await expect.poll(async () => (await stato()).debito).toBe(prima.debito + 1);
     // Il pannello Araldi della sezione Poteri vede lo stesso valore.
     await expect(page.getByTestId('araldi-pannello').getByTestId('perla-Inquisire').nth(prima.inquisire - 1)).toHaveAttribute('aria-pressed', 'true');
+  });
   });
 });

@@ -96,7 +96,7 @@ test.describe('Finestre estratte', () => {
   });
 
   test('Benvenuto / tutorial (GuidaModal)', async ({ page }) => {
-    await page.getByRole('button', { name: 'Nuovo personaggio' }).first().click();
+    await page.getByRole('button', { name: 'Nuovo personaggio', exact: true }).first().click();
     await page.getByRole('button', { name: 'ℹ️' }).first().click();
     await expect(page.getByText('Benvenuto al Tavolo dei Dadi')).toBeVisible();
   });
