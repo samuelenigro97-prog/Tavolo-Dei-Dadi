@@ -128,14 +128,38 @@ export function maxContatore(contatore, bonusCompetenza) {
   return contatore?.max === null || contatore?.max === undefined ? null : Number(contatore.max);
 }
 
-/** Valore attuale di un contatore cercato per NOME fra tutti i poteri (0 se non esiste). */
+/** Valore attuale di un contatore cercato per NOME fra tutti i poteri o risorse (0 se non esiste). */
 export function valoreContatorePerNome(scheda, nome) {
   const cerca = String(nome || '').trim().toLowerCase();
   for (const p of normalizzaPoteri(scheda?.poteri)) {
     const i = p.contatori.findIndex((c) => String(c.nome || '').trim().toLowerCase() === cerca);
     if (i >= 0) return valoreContatore(scheda, p.id, i, p.contatori[i]).attuali;
   }
+  const ris = (Array.isArray(scheda?.risorse) ? scheda.risorse : []).find(
+    (r) => String(r?.nome || '').trim().toLowerCase() === cerca
+  );
+  if (ris) return Number(ris.attuali) || 0;
   return 0;
+}
+
+/**
+ * Restituisce lo stato delle 5 soglie del Debito (manuale Araldi del Segreto):
+ * 5: Voce nell'Ombra (Messaggio BA a volontà, Vantaggio Intuizione)
+ * 15: Occhio Risvegliato (+1 CA, Vantaggio Percezione & Indagare)
+ * 35: Coraggio (Vantaggio TS contro Spaventato)
+ * 70: Veglia (Vista Pura 9m 1h/giorno, +1 tiri per colpire)
+ * 150: Non questa volta (1 volta nella vita, a 0 PF resti a 1 PF)
+ */
+export function soglieDebitoAttive(scheda) {
+  const deb = valoreContatorePerNome(scheda, 'Debito');
+  return {
+    debito: deb,
+    voceOmbra: deb >= 5,
+    occhioRisvegliato: deb >= 15,
+    coraggio: deb >= 35,
+    veglia: deb >= 70,
+    nonQuestaVolta: deb >= 150,
+  };
 }
 
 /** Un potere produce i suoi effetti se è attivo, sbloccato e (se ha una condizione) il contatore l'ha raggiunta. */
@@ -155,9 +179,19 @@ export function modificatoriPoteriAttivi(scheda) {
 
 /** Somma dei modificatori attivi per un bersaglio (es. 'ca', 'velocita', 'iniziativa', 'pf_massimi'). */
 export function bonusPotereBersaglio(scheda, bersaglio) {
-  return modificatoriPoteriAttivi(scheda)
+  const modificatori = modificatoriPoteriAttivi(scheda);
+  let tot = modificatori
     .filter((m) => m.bersaglio === bersaglio)
-    .reduce((tot, m) => tot + (Number(m.valore) || 0), 0);
+    .reduce((acc, m) => acc + (Number(m.valore) || 0), 0);
+
+  // Calcolo automatico della soglia Debito 15 (Occhio Risvegliato: +1 CA) se non già esplicitato da un potere salvato
+  if (bersaglio === 'ca') {
+    const giaPresente = modificatori.some((m) => m.bersaglio === 'ca' && /occhio risvegliato/i.test(m.fonte || ''));
+    if (!giaPresente && soglieDebitoAttive(scheda).occhioRisvegliato) {
+      tot += 1;
+    }
+  }
+  return tot;
 }
 
 // iniziativaTotale e pfMassimiEffettivi vivono in scheda.js: usano

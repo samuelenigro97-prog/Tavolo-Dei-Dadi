@@ -8,7 +8,7 @@ import { CLASSI, CLASSI_FULL_CASTER, CLASSI_MEZZO_CASTER, SLOT_FULL_CASTER, SLOT
   MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, PE_PER_LIVELLO, REAZIONI_5E, ARMI_5E, ARMATURE_5E } from '../data/dati5e.js';
 import { modificatore, conSegno, bonusCompetenzaDaLivello } from './dadi.js';
 import { punteggioCaratteristica, effettiSfinimento, trasformazioneAttiva, estraiCategorieNota } from './scheda.js';
-import { bonusPotereBersaglio } from './poteri.js';
+import { bonusPotereBersaglio, soglieDebitoAttive } from './poteri.js';
 import { spiegaIncantesimo } from '../data/spiegazioni.js';
 import { INCANTESIMI_DB, datiIncantesimo, valoreIncantesimoPerEdizione } from '../data/incantesimi.js';
 import { ABILITA, CARATTERISTICHE } from '../data/caratteristiche.js';
@@ -2271,6 +2271,21 @@ export function trovaReazioniDisponibili(scheda, versione = (scheda?.versione ||
         note: a.note || '',
       });
     }
+  }
+
+  // Soglia Debito 150: Non questa volta (Araldi del Segreto)
+  const soglie = soglieDebitoAttive(scheda);
+  if (soglie.nonQuestaVolta) {
+    addReazione({
+      nome: 'Non questa volta',
+      tipo: 'araldi',
+      innescoIt: 'Quando scendi a 0 PF.',
+      innescoEn: 'When you drop to 0 HP.',
+      effettoIt: '1 volta nella vita resti a 1 PF invece di cadere a 0 PF; puoi riutilizzare il privilegio solo chiedendolo a Tim.',
+      effettoEn: 'Once in your life you stay at 1 HP instead of dropping to 0 HP; you can reuse this feature only by asking Tim.',
+      note: 'Privilegio Araldi del Segreto (Debito 150)',
+      gittata: 'Personale',
+    });
   }
 
   return reazioni;

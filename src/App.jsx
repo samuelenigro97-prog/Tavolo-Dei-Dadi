@@ -1342,7 +1342,7 @@ const INCANTESIMI_NOMI = Array.from(new Set([...NOMI_SPIEG_INC, ...Object.keys(I
 import { NOMI_CLASSI, BACKGROUND_5E, TAGLIE_5E, ALLINEAMENTI_5E, SESSO_5E, SOTTOCLASSI_5E, INCANTESIMI_CLASSE, DANNI_5E, SENSI_5E, CONDIZIONI_5E, NOMI_OGGETTI, LINGUE_5E, ARMI_5E, STRUMENTI_5E, REAZIONI_5E, AZIONI_BONUS_5E, GRUPPI_ARMI_5E, GRUPPI_STRUMENTI_5E, GRUPPI_LINGUE_5E, DEFAULT_MANUALI, manualeAttivo, SOTTOCLASSI_FONTI, talentiPerManuali, PE_PER_LIVELLO, BACKGROUND_COMPETENZE, BACKGROUND_TALENTO_ORIGINE_2024, SPECIE_5E, tabellaPrivilegiSottoclasse, CARATT_INCANTATORE, PRIORITA_CARATT, DADO_VITA_CLASSE, BACKGROUND_CARATT, TS_CLASSE, ADDESTRAMENTO_CLASSE, COMPETENZE_CLASSE, PRIVILEGI_CLASSE_L1, PRIVILEGI_CLASSE_L1_2014, ASI_LIV, SOTTOCLASSE_LIV, COMPETENZE_SPECIE, NOMI_SPECIE, NOMI_SPECIE_GENERE, COGNOMI_SPECIE, NOMI_GENERICI, SPECIE_DATI, SPECIE_DATI_2014, BONUS_CARATT_SPECIE_2014, SFINIMENTO_2014, BASE_ARMATURA_DEFAULT, ESEMPI_ARMATURA } from "./data/dati5e.js";
 import { modificatore, conSegno, tiraDado, parseEspressioneDado, facceDadoVita, esprDadiVita, gruppiDadoVita, bonusCompetenzaDaLivello, tiraDanni, tiraD20, capacitaCarico, modalitaEffettiva } from "./rules/dadi.js";
 import { risorseAutoClasse, sincronizzaRisorseClasse, trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from "./rules/regole.js";
-import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda, contatoriInGioco, valoreContatore } from './rules/poteri.js';
+import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda, contatoriInGioco, valoreContatore, soglieDebitoAttive } from './rules/poteri.js';
 import { PoteriRisorse } from './ui/PoteriRisorse.jsx';
 import { unisciPoteriCampagna, poteriCampagnaIncompleti } from './data/poteriCampagna.js';
 import { aggiornaTestiAraldi } from './data/modelliPoteri.js';
@@ -5412,7 +5412,8 @@ export default function App() {
       ((tipoTiro === 'attacco' || tipoTiro === 'salvezza') && sfin.svantaggioAttacchiSalvezza)
     );
     const bonusEff = bonus - penSfinimento;
-    const modalitaUsata = modalitaEffettiva(modalita, forzaSvantaggio);
+    const modalitaBase = restExtra.modalitaForzata || modalita;
+    const modalitaUsata = modalitaEffettiva(modalitaBase, forzaSvantaggio);
     const { naturale, dadi } = tiraD20(modalitaUsata);
     const sogliaCrit = (() => {
       const sottoclasse = String(scheda.sottoclasse || '').toLowerCase();
@@ -7230,9 +7231,10 @@ export default function App() {
   const critico = tiro?.naturale === 20;
   const fallimento = tiro?.naturale === 1;
   const dannoAttaccoValido = tiro?.attacco && parseEspressioneDado(tiro.attacco.danno || '');
-  const percezionePassiva = 10 + (scheda ? bonusAbilita(scheda, 'percezione') : 0);
-  const indagarePassivo = 10 + (scheda ? bonusAbilita(scheda, 'indagare') : 0);
-  const intuizionePassiva = 10 + (scheda ? bonusAbilita(scheda, 'intuizione') : 0);
+  const soglieDebito = scheda ? soglieDebitoAttive(scheda) : {};
+  const percezionePassiva = 10 + (scheda ? bonusAbilita(scheda, 'percezione') : 0) + (soglieDebito.occhioRisvegliato ? 5 : 0);
+  const indagarePassivo = 10 + (scheda ? bonusAbilita(scheda, 'indagare') : 0) + (soglieDebito.occhioRisvegliato ? 5 : 0);
+  const intuizionePassiva = 10 + (scheda ? bonusAbilita(scheda, 'intuizione') : 0) + (soglieDebito.voceOmbra ? 5 : 0);
   const modIncantatore = (scheda && caratteristicaIncantatore)
     ? modificatore(punteggioCaratteristica(scheda, caratteristicaIncantatore))
     : null;
@@ -11302,6 +11304,27 @@ export default function App() {
                     <div style={{ ...styles.vitalLabel, position: 'static', margin: 0, marginBottom: 6, fontSize: 13, fontWeight: 800, letterSpacing: 1 }}>
                       {lingua === 'en' ? 'Death saves' : 'TS contro morte'}
                     </div>
+                    {soglieDebito.nonQuestaVolta && (
+                      <div
+                        style={{
+                          background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))',
+                          border: '1px solid var(--c-araldi-border, #a45a2a)',
+                          color: 'var(--c-araldi, #a45a2a)',
+                          borderRadius: 6,
+                          padding: '2px 8px',
+                          fontSize: 11,
+                          fontWeight: 700,
+                          marginBottom: 6,
+                          textAlign: 'center',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                        }}
+                        title={lingua === 'en' ? 'Once in a lifetime, at 0 HP you stay at 1 HP; can reuse only by asking Tim (Debt 150)' : 'Una volta nella vita, a 0 PF resti a 1 PF; puoi riutilizzare il privilegio solo chiedendolo a Tim (Debito 150)'}
+                      >
+                        💀 {lingua === 'en' ? 'Not This Time: at 0 HP stay at 1 HP' : 'Non questa volta: a 0 PF resti a 1 PF'}
+                      </div>
+                    )}
 
                     {/* Griglia: etichetta | 3 caselle | azioni. Le due righe condividono le stesse colonne, quindi caselle e pulsanti restano sempre allineati. */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'auto repeat(3, 32px) auto', alignItems: 'center', justifyContent: 'center', columnGap: 12, rowGap: 10 }}>
@@ -11637,6 +11660,27 @@ export default function App() {
                       title={t('tip.sensi')}
                     />
                   )}
+                  {soglieDebito.veglia && (
+                    <div
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: 'var(--c-araldi, #a45a2a)',
+                        background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))',
+                        border: '1px solid var(--c-araldi-border, #a45a2a)',
+                        borderRadius: 4,
+                        padding: '1px 5px',
+                        marginTop: 4,
+                        textAlign: 'center',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 3,
+                      }}
+                      title={lingua === 'en' ? 'True Sight 30 ft (9 m) for 1 hour a day (Vigil · Debt 70)' : 'Vista Pura 9 m per 1 ora al giorno (Veglia · Debito 70)'}
+                    >
+                      👁️ {lingua === 'en' ? 'True Sight 30 ft (1h/d)' : 'Vista Pura 9 m (1h/g)'}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -11668,6 +11712,26 @@ export default function App() {
                 <div style={styles.vitalLabel}>{t("vital.condizioni")}</div>
                 <div style={{ flex: 1, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, flexWrap: 'wrap', minHeight: 22, width: '100%' }} title={t('tip.aggiungi_condizione')}>
+                    {soglieDebito.coraggio && (
+                      <span
+                        style={{
+                          background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))',
+                          border: '1px solid var(--c-araldi-border, #a45a2a)',
+                          borderRadius: 6,
+                          padding: '2px 7px',
+                          fontSize: 11,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          whiteSpace: 'nowrap',
+                          color: 'var(--c-araldi, #a45a2a)',
+                          fontWeight: 700,
+                        }}
+                        title={lingua === 'en' ? 'Advantage on saving throws against being frightened (Courage · Debt 35)' : 'Vantaggio ai TS contro spaventato (Coraggio · Debito 35)'}
+                      >
+                        🦁 {lingua === 'en' ? 'Adv. vs Frightened' : 'Vant. TS Spaventato'}
+                      </span>
+                    )}
                     {scheda.effettoTaglia && (
                       <span
                         style={{
@@ -11868,6 +11932,27 @@ export default function App() {
                         </span>
                         <strong style={{ width: 26, flexShrink: 0, textAlign: 'center' }}>{conSegno(bonusTS)}</strong>
                         <em className="skill-nome" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, flex: 1 }}>{t('attr.tiro_salvezza')}</em>
+                        {key === 'saggezza' && soglieDebito.coraggio && (
+                          <span
+                            style={{
+                              fontSize: 10,
+                              fontWeight: 700,
+                              padding: '0 4px',
+                              borderRadius: 4,
+                              background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))',
+                              color: 'var(--c-araldi, #a45a2a)',
+                              border: '1px solid var(--c-araldi-border, #a45a2a)',
+                              marginLeft: 4,
+                              whiteSpace: 'nowrap',
+                              lineHeight: '14px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                            }}
+                            title={lingua === 'en' ? 'Advantage on saving throws against being frightened (Courage · Debt 35)' : 'Vantaggio ai TS contro spaventato (Coraggio · Debito 35)'}
+                          >
+                            🦁 Vant. Spaventato
+                          </span>
+                        )}
                         {tsMancante && (
                           <span style={{ marginLeft: 'auto', fontSize: 11, color: C.red, fontWeight: 700 }}>Manca</span>
                         )}
@@ -11912,6 +11997,12 @@ export default function App() {
                     const bonus = bonusAbilita(scheda, a.key);
                     const liv = scheda.abilita[a.key] || 0;
                     const abMancante = controlliAttivi.find((c) => c.tipo === 'abilita' && c.targetKey === a.key);
+                    const soglieDeb = soglieDebitoAttive(scheda);
+                    const haVantaggioDebito = (a.key === 'intuizione' && soglieDeb.voceOmbra) ||
+                      ((a.key === 'percezione' || a.key === 'indagare') && soglieDeb.occhioRisvegliato);
+                    const labelVantaggioDebito = a.key === 'intuizione'
+                      ? (lingua === 'en' ? 'Voice in the Shadows (Debt 5)' : 'Voce nell’Ombra (Debito 5)')
+                      : (lingua === 'en' ? 'Awakened Eye (Debt 15)' : 'Occhio Risvegliato (Debito 15)');
                     return (
                       <Rollable
                         as="div"
@@ -11924,8 +12015,8 @@ export default function App() {
                           background: abMancante ? 'rgba(231,76,60,0.12)' : 'transparent',
                           padding: abMancante ? '2px 4px' : styles.skillRow(true).padding,
                         }}
-                        title={abMancante ? `${abMancante.testo} (clicca per tirare, clicca sul pallino per impostare)` : `Tieni premuto e rilascia: prova di ${t('skill.' + a.key)} · click sul pallino: niente → competenza (●) → competenza di classe/razza (★) → Maestria/Expertise, doppia competenza (✦)`}
-                        onRoll={() => lanciaD20(`${t('skill.' + a.key)}`, bonus, { tipoTiro: 'prova' })}
+                        title={abMancante ? `${abMancante.testo} (clicca per tirare, clicca sul pallino per impostare)` : `Tieni premuto e rilascia: prova di ${t('skill.' + a.key)}${haVantaggioDebito ? ` · Vantaggio da ${labelVantaggioDebito}` : ''} · click sul pallino: niente → competenza (●) → competenza di classe/razza (★) → Maestria/Expertise, doppia competenza (✦)`}
+                        onRoll={() => lanciaD20(`${t('skill.' + a.key)}`, bonus, { tipoTiro: 'prova', modalitaForzata: haVantaggioDebito ? 'vantaggio' : undefined })}
                       >
                         <span
                           style={styles.dot(liv)}
@@ -11948,6 +12039,27 @@ export default function App() {
                           }}
                           title={lingua === 'en' ? 'Click for 5e rules, reference DCs and tool synergies' : 'Clicca per regole 5e, CD di riferimento e sinergie con gli strumenti'}
                         >{t('skill.' + a.key)}</span>
+                        {haVantaggioDebito && (
+                          <span
+                            style={{
+                              fontSize: 10,
+                              fontWeight: 700,
+                              padding: '0 4px',
+                              borderRadius: 4,
+                              background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))',
+                              color: 'var(--c-araldi, #a45a2a)',
+                              border: '1px solid var(--c-araldi-border, #a45a2a)',
+                              marginLeft: 4,
+                              whiteSpace: 'nowrap',
+                              lineHeight: '14px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                            }}
+                            title={lingua === 'en' ? `Advantage from ${labelVantaggioDebito}` : `Vantaggio permanente grazie a ${labelVantaggioDebito}`}
+                          >
+                            ▲ Vant.
+                          </span>
+                        )}
                         {abMancante && (
                           <span style={{ marginLeft: 'auto', fontSize: 11, color: C.red, fontWeight: 700 }}>Manca</span>
                         )}
@@ -12723,7 +12835,14 @@ export default function App() {
                     }
                     return scheda.mostraArmiAttacco !== false;
                   });
-                  const listaAttacchiCompleta = [...attacchiVisibili, ...attacchiSpettro];
+                  const listaAttacchiBase = [...attacchiVisibili, ...attacchiSpettro];
+                  const listaAttacchiCompleta = soglieDebito.veglia
+                    ? listaAttacchiBase.map((a) => (typeof a.bonus === 'number' ? {
+                        ...a,
+                        bonus: a.bonus + 1,
+                        note: a.note ? `${a.note} · ${lingua === 'en' ? '+1 to hit (Vigil)' : '+1 tpc (Veglia)'}` : (lingua === 'en' ? '+1 to hit (Vigil)' : '+1 tpc (Veglia)')
+                      } : a))
+                    : listaAttacchiBase;
                   // Per lanciare incantesimi in combattimento serve un focus (o
                   // borsa da componenti / simbolo sacro) EQUIPAGGIATO nell'inventario.
                   const haFocus = (scheda.inventario || []).some((o) => o.equip && /focus|simbolo sacro|borsa (da )?componenti|bacchetta|cristallo|totem|bastone runico|feticcio|strumento musicale|liuto|flauto|arpa|tamburo|cornamusa|lira/i.test(o.nome || ''));
@@ -12782,7 +12901,52 @@ export default function App() {
 
                         return [...salvatiReazAggiornati, ...autoReaz];
                       }
-                      return listaAttacchiCompleta.filter((a) => (a.categoria || 'Azione') === cat);
+                      let arrCat = listaAttacchiCompleta.filter((a) => (a.categoria || 'Azione') === cat);
+                      if (cat === 'Bonus' && soglieDebito.voceOmbra) {
+                        const esisteVoce = arrCat.some((a) => /voce nell['’]ombra/i.test(a.nome || ''));
+                        if (!esisteVoce) {
+                          arrCat = [
+                            {
+                              id: 'araldi-auto-voce-ombra',
+                              nome: "Voce nell'Ombra",
+                              categoria: 'Bonus',
+                              tipo: 'potere',
+                              tipoFonte: 'araldi',
+                              gittata: '36 m',
+                              danno: '',
+                              tipoDanno: '',
+                              note: lingua === 'en'
+                                ? 'Message at will as a bonus action (mental whisper up to 120 ft / 36 m).'
+                                : 'Messaggio a volontà come azione bonus (sussurro mentale a due vie fino a 36 m).',
+                              isAuto: true,
+                            },
+                            ...arrCat,
+                          ];
+                        }
+                      }
+                      if (cat === 'Azione' && soglieDebito.veglia) {
+                        const esisteVeglia = arrCat.some((a) => /^veglia$/i.test(a.nome || ''));
+                        if (!esisteVeglia) {
+                          arrCat = [
+                            {
+                              id: 'araldi-auto-veglia',
+                              nome: 'Veglia',
+                              categoria: 'Azione',
+                              tipo: 'potere',
+                              tipoFonte: 'araldi',
+                              gittata: 'Personale (9 m)',
+                              danno: '',
+                              tipoDanno: '',
+                              note: lingua === 'en'
+                                ? 'True Sight 30 ft (9 m) for 1 hour a day; see through illusions, invisibility and shapechangers.'
+                                : 'Vista Pura 9 m per 1 ora al giorno; vedi creature invisibili, piano etereo, illusioni e mutaforma.',
+                              isAuto: true,
+                            },
+                            ...arrCat,
+                          ];
+                        }
+                      }
+                      return arrCat;
                     })();
 
                     return (
@@ -12952,7 +13116,8 @@ export default function App() {
                               // con "Maestria: …" su un PG 5.0 non diventa un chip.
                               const categorieNota = categorieNotaTutte.filter((c) => c.categoria !== 'gittata' && !(a.isTS && c.categoria === 'tiroSalvezza') && !(versione === '2014' && /^maestria\s*:/i.test(String(c.testo || ''))));
                               const isTrucchetto = (spellInLista && spellInLista.livello === 0) || (spSpell && spSpell.livello === 0) || a.livello === 0;
-                              const iconaReazione = a.isSpell ? (isTrucchetto ? '✨' : '📖')
+                              const iconaReazione = a.tipoFonte === 'araldi' ? '📜'
+                                : a.isSpell ? (isTrucchetto ? '✨' : '📖')
                                 : (a.tipo === 'tattica' || a.tipo === 'attacco') ? '⚔️'
                                 : a.tipo === 'stile' ? '🛡️'
                                 : a.tipo === 'talento' ? '⭐'
@@ -12993,7 +13158,7 @@ export default function App() {
                                 <tr key={a.id} className="attacchi-riga">
                                   <td style={styles.td} className="attacchi-nome">
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                      {a.isSpell || cat === 'Reazione' ? (
+                                      {a.isSpell || cat === 'Reazione' || a.tipoFonte === 'araldi' ? (
                                         <button
                                           type="button"
                                           style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 16, cursor: 'help', display: 'inline-block', width: 22, textAlign: 'center' }}
@@ -13064,8 +13229,26 @@ export default function App() {
                                         className="attacco-nome"
                                         onClick={apriInfoReazione}
                                         title={castBloccato ? tr('Equipaggia un focus per lanciare questo incantesimo', 'Equip a focus to cast this spell') : undefined}
-                                        style={{ background: 'transparent', border: 0, padding: 0, font: 'inherit', fontWeight: 700, color: C.ink, cursor: 'help', textAlign: 'left', textDecoration: 'underline dotted', textUnderlineOffset: 3, textDecorationColor: C.inkDim, minWidth: 0 }}
+                                        style={{ background: 'transparent', border: 0, padding: 0, font: 'inherit', fontWeight: 700, color: a.tipoFonte === 'araldi' ? 'var(--c-araldi, #a45a2a)' : C.ink, cursor: 'help', textAlign: 'left', textDecoration: 'underline dotted', textUnderlineOffset: 3, textDecorationColor: a.tipoFonte === 'araldi' ? 'var(--c-araldi, #a45a2a)' : C.inkDim, minWidth: 0 }}
                                       >{traduciDato(cleanNome) || cleanNome}</button>
+                                      {a.tipoFonte === 'araldi' && (
+                                        <span
+                                          style={{
+                                            fontSize: 10,
+                                            fontWeight: 700,
+                                            padding: '1px 5px',
+                                            borderRadius: 4,
+                                            background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))',
+                                            color: 'var(--c-araldi, #a45a2a)',
+                                            border: '1px solid var(--c-araldi-border, #a45a2a)',
+                                            marginLeft: 4,
+                                            whiteSpace: 'nowrap',
+                                          }}
+                                          title="Privilegio Araldi del Segreto"
+                                        >
+                                          Araldi
+                                        </span>
+                                      )}
                                     </div>
                                   </td>
                                   <td style={styles.td} className="attacchi-bonus" data-label={t('combat.col_bonus')}>

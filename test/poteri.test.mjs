@@ -223,3 +223,43 @@ test('contatori: massimo dalla competenza, ricarica con i riposi, condizione su 
   assert.equal(trovaContatore({ ...dopo, ...sotto }, 'Segreti').attuali, 0);
   assert.equal(patchVariaContatori(dopo, [{ nome: 'Inesistente', delta: 1 }]), null);
 });
+
+test('soglieDebitoAttive: calcolo progressivo delle 5 soglie e integrazione automatica CA / reazioni', async () => {
+  const { soglieDebitoAttive, bonusPotereBersaglio } = await import('../src/rules/poteri.js');
+  const { trovaReazioniDisponibili } = await import('../src/rules/regole.js');
+
+  const creaSchedaDebito = (d) => ({
+    poteri: [
+      { id: 'araldi', nome: 'Araldi', contatori: [{ nome: 'Debito', attuali: d }] }
+    ]
+  });
+
+  const s0 = soglieDebitoAttive(creaSchedaDebito(0));
+  assert.equal(s0.voceOmbra, false);
+  assert.equal(s0.occhioRisvegliato, false);
+  assert.equal(s0.coraggio, false);
+  assert.equal(s0.veglia, false);
+  assert.equal(s0.nonQuestaVolta, false);
+
+  const s5 = soglieDebitoAttive(creaSchedaDebito(5));
+  assert.equal(s5.voceOmbra, true);
+  assert.equal(s5.occhioRisvegliato, false);
+
+  const s15 = creaSchedaDebito(15);
+  assert.equal(soglieDebitoAttive(s15).occhioRisvegliato, true);
+  assert.equal(bonusPotereBersaglio(s15, 'ca'), 1, '+1 CA automatico a Debito 15');
+
+  const s35 = soglieDebitoAttive(creaSchedaDebito(35));
+  assert.equal(s35.coraggio, true);
+  assert.equal(s35.veglia, false);
+
+  const s70 = soglieDebitoAttive(creaSchedaDebito(70));
+  assert.equal(s70.veglia, true);
+  assert.equal(s70.nonQuestaVolta, false);
+
+  const s150 = creaSchedaDebito(150);
+  assert.equal(soglieDebitoAttive(s150).nonQuestaVolta, true);
+  const reazioni = trovaReazioniDisponibili(s150);
+  assert.ok(reazioni.some((r) => r.nome === 'Non questa volta'), 'reazione automatica a 0 PF presente');
+});
+

@@ -167,12 +167,17 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
           {SOGLIE_DEBITO_ARALDI.map((s) => {
             const raggiunta = valDebito >= s.soglia;
             const eProssima = prossima && prossima.soglia === s.soglia;
+            const badgeSezione = s.soglia === 5 ? (en ? 'Bonus Action & Insight' : 'Azione Bonus e Intuizione')
+              : s.soglia === 15 ? (en ? '+1 AC, Perception & Investigation' : '+1 CA, Percezione e Indagare')
+              : s.soglia === 35 ? (en ? 'Save vs Frightened' : 'TS contro Spaventato')
+              : s.soglia === 70 ? (en ? 'Action, True Sight & +1 to Hit' : 'Azione, Vista Pura e +1 Colpire')
+              : (en ? 'Reaction at 0 HP' : 'Reazione a 0 PF');
             return (
               <div
                 key={s.soglia}
                 data-testid={`soglia-${s.soglia}`}
                 data-raggiunta={raggiunta ? 'si' : 'no'}
-                style={{ display: 'flex', gap: 8, alignItems: 'baseline', fontSize: 12, opacity: raggiunta || eProssima ? 1 : 0.55 }}
+                style={{ display: 'flex', gap: 8, alignItems: 'baseline', fontSize: 12, opacity: raggiunta || eProssima ? 1 : 0.55, flexWrap: 'wrap' }}
               >
                 <span style={{
                   flexShrink: 0, minWidth: 42, textAlign: 'center', fontWeight: 800, padding: '1px 6px', borderRadius: 4,
@@ -180,9 +185,27 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
                   color: raggiunta ? 'var(--c-araldi, #a45a2a)' : C.inkDim,
                   background: raggiunta ? 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))' : 'transparent',
                 }}>{raggiunta ? '✓ ' : ''}{s.soglia}</span>
-                <span style={{ minWidth: 0 }}>
+                <span style={{ minWidth: 0, flex: 1 }}>
                   <strong style={{ color: raggiunta ? C.ink : C.inkDim }}>{en ? s.nomeEn : s.nome}</strong>
                   <span style={{ color: C.inkDim }}> — {en ? s.effettoEn : s.effetto}</span>
+                  {raggiunta && (
+                    <span style={{
+                      marginLeft: 6,
+                      fontSize: 10,
+                      fontWeight: 700,
+                      padding: '1px 6px',
+                      borderRadius: 4,
+                      background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.16))',
+                      color: 'var(--c-araldi, #a45a2a)',
+                      border: '1px solid var(--c-araldi-border, #a45a2a)',
+                      whiteSpace: 'nowrap',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 3,
+                    }}>
+                      ✓ {badgeSezione}
+                    </span>
+                  )}
                 </span>
               </div>
             );
