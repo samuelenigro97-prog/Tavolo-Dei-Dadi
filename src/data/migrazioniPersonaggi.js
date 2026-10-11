@@ -99,6 +99,11 @@ export function migrazioneRegoleVaelion(roster) {
     if (Array.isArray(s.incantesimiLista)) {
       // Rimuovi 'Folata' se presente nei trucchetti di Vaelion (i 4 canonici sono Randello Incantato, Frusta di Spine, Guida, Morsa del Gelo)
       s.incantesimiLista = s.incantesimiLista.filter((inc) => !(inc.livello === 0 && /^folata$/i.test(String(inc.nome || '').trim())));
+      for (const inc of s.incantesimiLista) {
+        if (typeof inc.note === 'string' && /lista ampliata araldi/i.test(inc.note)) {
+          inc.note = 'Lista ampliata Araldi: 1 Segreto/liv (+1 Debito)';
+        }
+      }
     }
     if (s.maxTrucchetti === 5) s.maxTrucchetti = 0;
     if (s.velocita === 10.5) s.velocita = 9;

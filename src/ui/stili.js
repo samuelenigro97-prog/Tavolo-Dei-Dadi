@@ -1607,10 +1607,9 @@ tbody tr:hover {
 /* consente ai riquadri di stringersi sotto la larghezza del contenuto (niente overflow) */
 .vitali > *, .vitali-sezioni-4 > * { min-width: 0; }
 .vitali > * > *, .vitali-sezioni-4 > * > * { min-width: 0; }
-/* Fascia dettagli incantesimo: scorre in orizzontale su una riga; scrollbar sottile. */
-.spell-chips { scrollbar-width: thin; }
-.spell-chips::-webkit-scrollbar { height: 5px; }
-.spell-chips::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 3px; }
+/* Fascia dettagli incantesimo: scorre in orizzontale su una riga senza barre visibili. */
+.spell-chips { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+.spell-chips::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
 /* i campi anagrafica (con le tendine): font uniforme, padding compatto, allineati in basso */
 .campi-anagrafica > * { min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; }
 .campi-anagrafica select { max-width: 100%; font-size: 12px !important; font-family: inherit !important; font-weight: 600 !important; color: var(--c-ink) !important; padding: 1px 13px 1px 1px !important; height: 100% !important; line-height: 1.2; background-position: right 1px center !important; background-size: 7px !important; }

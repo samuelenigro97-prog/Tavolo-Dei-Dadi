@@ -13,7 +13,7 @@ export const INCANTESIMI_ARALDI = [
   ['Dominare Persone', 5], ['Storia Leggendaria', 5],
 ];
 
-export const NOTA_INCANTESIMO_ARALDI = 'Lista ampliata Araldi del Segreto: si lancia senza slot spendendo 1 Segreto per livello (+1 Debito).';
+export const NOTA_INCANTESIMO_ARALDI = 'Lista ampliata Araldi: 1 Segreto/liv (+1 Debito)';
 
 /** Cerchio più alto per cui la scheda ha slot (0 se non ne ha). */
 function cerchioMassimo(scheda) {

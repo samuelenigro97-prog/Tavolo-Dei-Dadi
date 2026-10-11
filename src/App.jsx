@@ -2222,6 +2222,9 @@ function loadState() {
             if (base.nome === 'Bastone Incantato' || base.nome === 'Bastone ferrato incantato' || base.nome === 'Shillelagh' || base.nome === 'bastone incantato') {
               base.nome = 'Randello Incantato';
             }
+            if (typeof base.note === 'string' && /lista ampliata araldi del segreto/i.test(base.note)) {
+              base.note = 'Lista ampliata Araldi: 1 Segreto/liv (+1 Debito)';
+            }
             // Auto-completa i dettagli mancanti (gittata/tempo/note vuoti) per
             // gli incantesimi noti: le righe importate o riaggiunte a mano non
             // restano più "vuote" (es. Dardo Incantato → gittata 36m).
@@ -14088,14 +14091,14 @@ export default function App() {
                             ];
                             const testoModal = testoNuvoletta(righeInfo, spieg);
 
-                            const chipIncantesimo = (icona, label, val, colore, classe) => val ? (
+                            const chipIncantesimo = (icona, label, val, colore, classe, testoPieno) => val ? (
                               <span
                                 key={label}
                                 className={classe}
                                 style={colore
                                   ? { fontSize: 11, background: `${colore}1f`, border: `1px solid ${colore}`, borderRadius: 4, padding: '1px 5px', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 3, color: colore, fontWeight: 700 }
                                   : { fontSize: 11, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 4, padding: '1px 5px', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 3 }}
-                                title={`${label}: ${val}`}
+                                title={testoPieno ? `${label}: ${testoPieno}` : `${label}: ${val}`}
                               >
                                 {icona && <span aria-hidden="true">{icona}</span>}
                                 <span style={colore ? undefined : { color: C.inkDim }}>{val}</span>
@@ -14255,7 +14258,7 @@ export default function App() {
                                     >✦ {t('spell.bonus_badge')}</span>
                                   )}
                                   {/* Chip colorati come nelle Azioni (tempo, distanza, area, concentrazione, rituale, scuola); il resto nella nuvoletta del nome. */}
-                                  <div className="spell-chips" tabIndex={0} role="group" aria-label={tr('Dettagli dell\'incantesimo', 'Spell details')} style={{ display: 'flex', flexWrap: 'nowrap', gap: 4, alignItems: 'center', overflowX: 'auto', flex: '1 1 auto', minWidth: 0 }}>
+                                  <div className="spell-chips" tabIndex={0} role="group" aria-label={tr('Dettagli dell\'incantesimo', 'Spell details')} style={{ display: 'flex', flexWrap: 'nowrap', gap: 4, alignItems: 'center', overflowX: 'auto', flex: '1 1 auto', minWidth: 0, scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                                     {chipIncantesimo('', t('spell.chip_tempo'), tempoLabel, coloreCategoria('tempo', notteAttiva), 'chip-tempo')}
                                     {chipIncantesimo('', t('spell.chip_gittata'), traduciDato(gittata), coloreCategoria('gittata', notteAttiva), 'chip-gittata')}
                                     {area && chipIncantesimo('', 'Area', traduciDato(area), coloreCategoria('gittata', notteAttiva), 'chip-area')}
@@ -14264,7 +14267,12 @@ export default function App() {
                                     {(danno || tipoDanno) && !parseEspressioneDado(danno) && (
                                       chipIncantesimo(iconaTipoDanno(tipoDanno), 'Danno', [danno, tipoDanno].filter(Boolean).join(' '), coloreCategoria(tipoDanno === 'Guarigione' ? 'guarigione' : 'danno', notteAttiva))
                                     )}
-                                    {note && chipIncantesimo('', t('spell.chip_note'), note, undefined, 'chip-nota')}
+                                    {note && (() => {
+                                      const notaBreve = (/araldi del segreto.*senza slot.*segreto.*debito/i.test(note) || /lista ampliata araldi/i.test(note))
+                                        ? (en ? 'Araldi: 1 Secret/lvl (+1 Debt)' : 'Araldi: 1 Segreto/liv (+1 Debito)')
+                                        : note;
+                                      return chipIncantesimo('', t('spell.chip_note'), notaBreve, undefined, 'chip-nota', note);
+                                    })()}
                                   </div>
                                   {scuola && (
                                     <span
