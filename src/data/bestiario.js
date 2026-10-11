@@ -1,5 +1,6 @@
 // Bestiario per la Forma Selvatica del Druido, Famigli ed Evocazioni (SRD 5.1 + Tasha).
 // Velocità convertite in metri (30 ft = 9 m, 5 ft = 1.5 m).
+import { manualeAttivo } from './dati5e.js';
 
 /** Velocità in metri. `terra` è sempre presente; le altre solo se la bestia ce l'ha. */
 export const BESTIE = [
@@ -1529,7 +1530,7 @@ export function limitiMetamorfosi(livello) {
  */
 export const EVOCAZIONI_ARALDI = [
   {
-    nome: 'Myrdhal', nomeEn: 'Myrdhal', tipo: 'Non morto (Araldi del Segreto)', manuale: 'araldi',
+    nome: 'Myrdhal', nomeEn: 'Myrdhal', tipo: 'Non morto (Evocazione Araldi del Segreto)', manuale: 'araldi',
     taglia: 'Grande', ca: 20, pf: 210, pfFormula: '20d10 + 100',
     velocita: { terra: 12 },
     gs: '17', gsNum: 17,
@@ -2053,3 +2054,87 @@ export const MOSTRI_5E = [
 ];
 
 export const TUTTE_LE_CREATURE = [...MOSTRI_5E, ...BESTIE];
+
+/**
+ * Seleziona le creature rapide da mostrare direttamente "a vista" nella sezione Compagni/Evocazioni.
+ * Include le preferite salvate dall'utente, Myrdhal (se il manuale Araldi è attivo per la scheda),
+ * e le creature in cui il personaggio si trasforma o che evoca più di frequente in base alla sua classe.
+ */
+export function ottieniCreatureRapide(scheda, manualiAttivi) {
+  const usaAraldi = manualeAttivo(scheda?.manuali || manualiAttivi, 'araldi') || Boolean(scheda?.poteri?.some((p) => p?.modello === 'araldi-del-segreto'));
+  const classe = String(scheda?.classe || '').toLowerCase();
+
+  const prefNomi = Array.isArray(scheda?.bestiePreferite) ? scheda.bestiePreferite : [];
+  const tutteLeCreature = [
+    ...(usaAraldi ? EVOCAZIONI_ARALDI : []),
+    ...EVOCAZIONI,
+    ...BESTIE,
+    ...FAMIGLI,
+  ];
+  const preferite = prefNomi.map((n) => tutteLeCreature.find((c) => c.nome === n)).filter(Boolean);
+
+  let selezionate = [];
+  if (classe.includes('druid')) {
+    // Druido: Myrdhal (se Araldi attivo), i 4 Elementali, top Metamorfosi (T-Rex, Gorilla gigante, Mammut, Triceratopo, Coccodrillo gigante)
+    // e top Forme Selvatiche / Bestie da combattimento ed evocazione (Orso bruno, Lupo crudele, Ragno gigante, Aquila gigante, Serpente costrittore gigante, Lupo)
+    const nomiDruido = [
+      'Myrdhal',
+      'Elementale del Fuoco',
+      'Elementale dell’Aria',
+      'Elementale della Terra',
+      'Elementale dell’Acqua',
+      'Tirannosauro rex',
+      'Gorilla gigante',
+      'Mammut',
+      'Triceratopo',
+      'Coccodrillo gigante',
+      'Orso bruno',
+      'Lupo crudele',
+      'Ragno gigante',
+      'Aquila gigante',
+      'Serpente costrittore gigante',
+      'Lupo',
+    ];
+    selezionate = nomiDruido
+      .map((n) => tutteLeCreature.find((c) => c.nome === n))
+      .filter((c) => Boolean(c) && (c.manuale !== 'araldi' || usaAraldi));
+  } else if (classe.includes('warlock')) {
+    const nomiWarlock = ['Myrdhal', 'Pseudodrago', 'Imp', 'Folletto Quasit', 'Sprite', 'Gazer', 'Spirito dell’Ombra (Tasha)', 'Spirito Non Morto (Tasha)'];
+    selezionate = nomiWarlock.map((n) => tutteLeCreature.find((c) => c.nome === n)).filter((c) => Boolean(c) && (c.manuale !== 'araldi' || usaAraldi));
+  } else if (classe.includes('artefic') || classe.includes('artific')) {
+    const nomiArtefice = ['Difensore d’Acciaio', 'Difensore d\'Acciaio', 'Servitore Omuncolo', 'Bestia della Terra (Compagno Artificiere)', 'Bestia del Cielo (Compagno Artificiere)'];
+    selezionate = nomiArtefice.map((n) => tutteLeCreature.find((c) => (c.nome || '').includes(n))).filter(Boolean);
+  } else if (classe.includes('paladin')) {
+    const nomiPala = ['Destriero Celestiale / Cavallo da Guerra', 'Pegaso (Destriero Superiore)', 'Grifone (Destriero Superiore)'];
+    selezionate = nomiPala.map((n) => tutteLeCreature.find((c) => c.nome === n)).filter(Boolean);
+  } else {
+    const nomiGen = [
+      'Myrdhal',
+      'Elementale del Fuoco',
+      'Elementale dell’Aria',
+      'Elementale della Terra',
+      'Elementale dell’Acqua',
+      'Tirannosauro rex',
+      'Gorilla gigante',
+      'Gufo',
+      'Gatto',
+      'Corvo',
+      'Orso bruno',
+      'Lupo crudele',
+    ];
+    selezionate = nomiGen
+      .map((n) => tutteLeCreature.find((c) => c.nome === n))
+      .filter((c) => Boolean(c) && (c.manuale !== 'araldi' || usaAraldi));
+  }
+
+  const uniche = [];
+  const visti = new Set();
+  for (const c of [...preferite, ...selezionate]) {
+    if (c && !visti.has(c.nome)) {
+      visti.add(c.nome);
+      uniche.push(c);
+    }
+  }
+  return uniche.slice(0, 16);
+}
+

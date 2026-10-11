@@ -123,17 +123,26 @@ export function AggiungiCompagnoModal({ aggiorna, cercaCompagnoText, filtroCompa
             (() => {
               const q = cercaCompagnoText.trim().toLowerCase();
               let elenco = [];
-              // Creature dei manuali di campagna: solo con il manuale attivo.
-              const evocazioniAraldi = manualeAttivo(manualiAttivi, 'araldi') ? EVOCAZIONI_ARALDI : [];
-              const tutteEvocazioni = [...EVOCAZIONI, ...evocazioniAraldi];
+              // Creature dei manuali di campagna: attive se il manuale o i poteri sono presenti.
+              const usaAraldi = manualeAttivo(scheda?.manuali || manualiAttivi, 'araldi') || Boolean(scheda?.poteri?.some((p) => p?.modello === 'araldi-del-segreto'));
+              const evocazioniAraldi = usaAraldi ? EVOCAZIONI_ARALDI : [];
+              const tutteEvocazioni = [...evocazioniAraldi, ...EVOCAZIONI];
               if (filtroCompagnoCat === 'famigli') elenco = FAMIGLI;
               else if (filtroCompagnoCat === 'compagni') elenco = FAMIGLI.filter((c) => /compagno|artificiere|difensore/i.test(c.nome || c.tipo || ''));
               else if (filtroCompagnoCat === 'evocazioni') elenco = tutteEvocazioni;
               else if (filtroCompagnoCat === 'bestie') elenco = BESTIE;
-              else elenco = [...FAMIGLI, ...tutteEvocazioni, ...BESTIE];
+              else elenco = [...evocazioniAraldi, ...EVOCAZIONI, ...FAMIGLI, ...BESTIE];
 
               if (q) {
-                elenco = elenco.filter((c) => (c.nome || '').toLowerCase().includes(q) || (c.nomeEn || '').toLowerCase().includes(q) || (c.tipo || '').toLowerCase().includes(q));
+                const qNorm = q.replace(/y/g, 'i').replace(/h/g, '');
+                elenco = elenco.filter((c) => {
+                  const it = (c.nome || '').toLowerCase();
+                  const en = (c.nomeEn || '').toLowerCase();
+                  const t = (c.tipo || '').toLowerCase();
+                  const itNorm = it.replace(/y/g, 'i').replace(/h/g, '');
+                  const enNorm = en.replace(/y/g, 'i').replace(/h/g, '');
+                  return it.includes(q) || en.includes(q) || t.includes(q) || itNorm.includes(qNorm) || enNorm.includes(qNorm);
+                });
               }
 
               if (elenco.length === 0) {

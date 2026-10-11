@@ -4,8 +4,9 @@ import { C } from '../tema.js';
 import { styles } from '../stili.js';
 import { parseAzioneBestia, coloreCategoria } from '../../rules/scheda.js';
 import { conSegno } from '../../rules/dadi.js';
+import { calcolaPfCompagno, parseAzioniCompagno } from '../../rules/regole.js';
 
-export function BestiaDettaglioModal({ aggiorna, bestiaDettaglio, lanciaD20, lanciaDanniDiretti, lingua, notteAttiva, scheda, setBestiaDettaglio }) {
+export function BestiaDettaglioModal({ aggiorna, bestiaDettaglio, lanciaD20, lanciaDanniDiretti, lingua, notteAttiva, registra, scheda, setBestiaDettaglio }) {
   return (
     <div
       style={{ position: 'fixed', inset: 0, zIndex: 3150, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)' }}
@@ -179,7 +180,46 @@ export function BestiaDettaglioModal({ aggiorna, bestiaDettaglio, lanciaD20, lan
           const formaSelvaticaEsaurita = risorsaFormaSelvatica && Number(risorsaFormaSelvatica.attuali) <= 0;
           const metamorfosiEsaurita = risorsaMetamorfosi && Number(risorsaMetamorfosi.attuali) <= 0;
           return (
-        <div style={{ marginTop: 14, display: 'flex', gap: 8 }}>
+        <div style={{ marginTop: 14, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            style={{
+              ...styles.button,
+              flex: 1,
+              minWidth: 120,
+              fontWeight: 700,
+              borderColor: C.goldDark,
+              color: C.goldDark,
+              background: 'rgba(201,162,39,0.08)',
+            }}
+            onClick={() => {
+              const pfCalc = calcolaPfCompagno(bestiaDettaglio, scheda);
+              const azioniParsed = parseAzioniCompagno(bestiaDettaglio.azioni || []);
+              const idNuovo = `all-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+              const nuovo = {
+                id: idNuovo,
+                nome: bestiaDettaglio.nome,
+                nomeOriginale: bestiaDettaglio.nome,
+                tipo: bestiaDettaglio.tipo || bestiaDettaglio.taglia || 'Evocazione',
+                taglia: bestiaDettaglio.taglia || 'Media',
+                ca: Number(bestiaDettaglio.ca) || 12,
+                pfMax: pfCalc,
+                pfAttuali: pfCalc,
+                velocita: bestiaDettaglio.velocita ? (typeof bestiaDettaglio.velocita === 'object' ? Object.entries(bestiaDettaglio.velocita).map(([k, v]) => `${k} ${v}m`).join(', ') : bestiaDettaglio.velocita) : '9m',
+                sensi: bestiaDettaglio.sensi || '',
+                abilita: bestiaDettaglio.abilita || '',
+                tratti: Array.isArray(bestiaDettaglio.tratti) ? bestiaDettaglio.tratti : [],
+                azioni: azioniParsed,
+                note: bestiaDettaglio.note || '',
+              };
+              aggiorna({ alleati: [...(scheda.alleati || []), nuovo] });
+              if (registra) registra({ etichetta: `${bestiaDettaglio.nome}`, tipo: 'evoca', dettaglio: `Evocato: ${bestiaDettaglio.nome} (${pfCalc} PF, CA ${bestiaDettaglio.ca})` });
+              setBestiaDettaglio(null);
+            }}
+            title={lingua === 'en' ? 'Summon / add as active ally to your sheet' : 'Evoca / aggiungi come alleato attivo sulla scheda'}
+          >
+            {lingua === 'en' ? 'Summon / Add' : 'Evoca / Aggiungi'}
+          </button>
           {bestiaDettaglio.gs != null && (
             <button
               disabled={formaSelvaticaEsaurita}

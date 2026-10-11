@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { BESTIE, bestieDisponibili, limitiFormaSelvatica, limitiMetamorfosi, creatureDisponibiliMetamorfosi, raggruppaPerGS } from '../src/data/bestiario.js';
+import { BESTIE, bestieDisponibili, limitiFormaSelvatica, limitiMetamorfosi, creatureDisponibiliMetamorfosi, raggruppaPerGS, ottieniCreatureRapide } from '../src/data/bestiario.js';
 
 test('BESTIE: nessun duplicato, ogni voce ha le sei caratteristiche e i campi base', () => {
   const nomi = new Set();
@@ -104,3 +104,28 @@ test('catalogo completo delle bestie SRD fino a GS 1/2: ci sono anche gli animal
   const liv8 = bestieDisponibili(8).map((b) => b.nomeEn);
   assert.ok(liv8.includes('Pteranodon') && liv8.includes('Giant Owl') && liv8.includes('Giant Sea Horse'));
 });
+
+test('ottieniCreatureRapide: restituisce creature utili per evocazioni/trasformazioni frequenti senza famigli generici', () => {
+  const base = ottieniCreatureRapide({});
+  const nomi = base.map((c) => c.nome);
+  assert.ok(nomi.includes('Elementale del Fuoco'));
+  assert.ok(nomi.some((n) => n.startsWith('Elementale dell') && n.includes('Aria')));
+  assert.ok(nomi.includes('Elementale della Terra'));
+  assert.ok(nomi.some((n) => n.startsWith('Elementale dell') && n.includes('Acqua')));
+  assert.ok(nomi.includes('Tirannosauro rex'));
+  assert.ok(nomi.includes('Gorilla gigante'));
+  assert.ok(nomi.includes('Orso bruno'));
+  assert.ok(nomi.includes('Lupo crudele'));
+  // Non contiene famigli come Imp o Quasit
+  assert.ok(!nomi.includes('Imp'));
+  assert.ok(!nomi.includes('Quasit'));
+
+  // Con preferiti, compaiono all'inizio
+  const conPref = ottieniCreatureRapide({ bestiePreferite: ['Lupo'] });
+  assert.equal(conPref[0].nome, 'Lupo');
+
+  // Con manuale araldi o potere araldi, Myrdhal è presente
+  const conAraldi = ottieniCreatureRapide({ poteri: [{ modello: 'araldi-del-segreto' }] });
+  assert.ok(conAraldi.some((c) => c.nome.includes('Myrdhal')));
+});
+

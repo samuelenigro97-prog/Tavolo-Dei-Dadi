@@ -13,7 +13,7 @@ import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } fr
 import { fixEquipaggiamentoVaelion, migrazioneRegoleVaelion, autoIdratazionePersonaggioPredefinito } from './data/migrazioniPersonaggi.js';
 import { CARATTERISTICHE, ABILITA } from './data/caratteristiche.js';
 import { effettiCondizione } from './data/condizioni.js';
-import { BESTIE, FAMIGLI, EVOCAZIONI, EVOCAZIONI_ARALDI, MOSTRI_5E, TUTTE_LE_CREATURE, bestieDisponibili, limitiFormaSelvatica, creatureDisponibiliMetamorfosi, limitiMetamorfosi, raggruppaPerGS } from './data/bestiario.js';
+import { BESTIE, FAMIGLI, EVOCAZIONI, EVOCAZIONI_ARALDI, MOSTRI_5E, TUTTE_LE_CREATURE, bestieDisponibili, limitiFormaSelvatica, creatureDisponibiliMetamorfosi, limitiMetamorfosi, raggruppaPerGS, ottieniCreatureRapide } from './data/bestiario.js';
 import { ultimaVersioneNovita } from './data/novita.js';
 import { codificaScheda, decodificaScheda, preparaPerCondivisione, costruisciLink, payloadDaUrl, LIMITE_PAYLOAD } from './utils/condivisione.js';
 import { creaStanza, apriStanza, normalizzaCodiceStanza, formattaCodiceStanza, DURATA_STANZA_ORE } from './utils/stanze.js';
@@ -7587,6 +7587,7 @@ export default function App() {
            lanciaDanniDiretti={lanciaDanniDiretti}
            lingua={lingua}
            notteAttiva={notteAttiva}
+           registra={registra}
            scheda={scheda}
            setBestiaDettaglio={setBestiaDettaglio}
          />}
@@ -15574,38 +15575,43 @@ export default function App() {
                     )}
 
                     {/* Catalogo Rapido Bestiario & Evocazioni per consultazione */}
-                    <div style={{ marginTop: 4 }}>
-                      <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, marginBottom: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span>{lingua === 'en' ? 'Bestiary and summons catalog' : 'Catalogo di bestie ed evocazioni'}</span>
-                        <span style={{ fontSize: 11, color: C.inkDim, fontWeight: 400 }}>{FAMIGLI.length + EVOCAZIONI.length + (manualeAttivo(manualiAttivi, 'araldi') ? EVOCAZIONI_ARALDI.length : 0)} creature</span>
-                      </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))', gap: 6 }}>
-                        {[...(manualeAttivo(manualiAttivi, 'araldi') ? EVOCAZIONI_ARALDI : []), ...FAMIGLI, ...EVOCAZIONI].slice(0, 16).map((c) => (
-                          <div role="button" tabIndex={0}
-                            key={c.nome}
-                            onClick={() => setBestiaDettaglio(c)}
-                            style={{
-                              background: C.panelLight,
-                              border: `1px solid ${C.border}`,
-                              borderRadius: 6,
-                              padding: '6px 8px',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              gap: 2,
-                              transition: 'border-color 0.15s ease',
-                            }}
-                          >
-                            <div style={{ fontWeight: 700, fontSize: 12, color: C.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {lingua === 'en' ? c.nomeEn : c.nome}
-                            </div>
-                            <div style={{ fontSize: 11, color: C.inkDim }}>
-                              CA {c.ca} · {c.pf} PF
-                            </div>
+                    {(() => {
+                      const creatureRapide = ottieniCreatureRapide(scheda, manualiAttivi);
+                      return (
+                        <div style={{ marginTop: 4 }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, marginBottom: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span>{lingua === 'en' ? 'Bestiary and summons catalog' : 'Catalogo di bestie ed evocazioni'}</span>
+                            <span style={{ fontSize: 11, color: C.inkDim, fontWeight: 400 }}>{creatureRapide.length} creature</span>
                           </div>
-                        ))}
-                      </div>
-                    </div>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))', gap: 6 }}>
+                            {creatureRapide.map((c) => (
+                              <div role="button" tabIndex={0}
+                                key={c.nome}
+                                onClick={() => setBestiaDettaglio(c)}
+                                style={{
+                                  background: C.panelLight,
+                                  border: `1px solid ${C.border}`,
+                                  borderRadius: 6,
+                                  padding: '6px 8px',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: 2,
+                                  transition: 'border-color 0.15s ease',
+                                }}
+                              >
+                                <div style={{ fontWeight: 700, fontSize: 12, color: C.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  {lingua === 'en' ? c.nomeEn : c.nome}
+                                </div>
+                                <div style={{ fontSize: 11, color: C.inkDim }}>
+                                  CA {c.ca} · {c.pf} PF
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 );
               })()}
@@ -15615,7 +15621,7 @@ export default function App() {
             {/* Modale Evoca / Aggiungi Compagno */}
             {mostraModalAggiungiCompagno && <AggiungiCompagnoModal
                  aggiorna={aggiorna}
-                 manualiAttivi={manualiAttivi}
+                 manualiAttivi={scheda?.manuali || manualiAttivi}
                  cercaCompagnoText={cercaCompagnoText}
                  filtroCompagnoCat={filtroCompagnoCat}
                  lingua={lingua}

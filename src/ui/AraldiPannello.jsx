@@ -25,6 +25,8 @@ import {
   SEGRETI_MYRDHAL_ARALDI,
 } from '../data/modelliPoteri.js';
 import { incantesimiAraldiMancanti } from '../data/incantesimiAraldi.js';
+import { EVOCAZIONI_ARALDI } from '../data/bestiario.js';
+import { parseAzioniCompagno } from '../rules/regole.js';
 
 const NOMI_BASE = ['Segreti', 'Debito'];
 
@@ -193,7 +195,43 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
           {spesa(1, en ? 'Open' : 'Aprire', en ? 'Open a seal: the DM guarantees the information is true and useful.' : 'Rompi il sigillo: il DM garantisce che l\'informazione sia vera e utile.')}
           {spesa(1, en ? 'Lever' : 'Leva', en ? 'Use the Secret against its source: an automatic Charisma success (max DC 20).' : 'Usi il Segreto contro la sua fonte: prova di Carisma con successo automatico (CD massima 20).')}
           {spesa(1, en ? 'Market' : 'Mercato', en ? 'Sell a Secret: it is consumed.' : 'Vendi un Segreto: viene consumato.')}
-          {spesa(SEGRETI_MYRDHAL_ARALDI, 'Myrdhal', en ? 'Summon Myrdhal for 1d6 turns (10 Secrets, the group can pool them).' : 'Evocate Myrdhal per 1d6 turni (10 Segreti, anche di gruppo).')}
+          <button
+            type="button"
+            style={styles.buttonMini}
+            disabled={valSegreti < SEGRETI_MYRDHAL_ARALDI}
+            onClick={() => {
+              const giaPresente = (scheda.alleati || []).some((a) => a.nome === 'Myrdhal' || a.nomeOriginale === 'Myrdhal');
+              let alleatiNuovi = scheda.alleati || [];
+              if (!giaPresente) {
+                const m = EVOCAZIONI_ARALDI.find((c) => c.nome === 'Myrdhal') || EVOCAZIONI_ARALDI[0];
+                if (m) {
+                  const nuovo = {
+                    id: `all-${Date.now()}-myrdhal`,
+                    nome: 'Myrdhal',
+                    nomeOriginale: 'Myrdhal',
+                    tipo: m.tipo || 'Non morto (Evocazione Araldi del Segreto)',
+                    taglia: m.taglia || 'Grande',
+                    ca: Number(m.ca) || 20,
+                    pfMax: 210,
+                    pfAttuali: 210,
+                    velocita: '12m',
+                    sensi: m.sensi || '',
+                    abilita: m.abilita || '',
+                    tratti: Array.isArray(m.tratti) ? m.tratti : [],
+                    azioni: parseAzioniCompagno(m.azioni || []),
+                    note: m.note || 'Evocato per 1d6 turni (10 Segreti).',
+                  };
+                  alleatiNuovi = [...alleatiNuovi, nuovo];
+                }
+              }
+              const patch = patchVariaContatori(scheda, [{ nome: 'Segreti', delta: -SEGRETI_MYRDHAL_ARALDI }]);
+              aggiorna({ ...(patch || {}), alleati: alleatiNuovi });
+              if (registra) registra({ etichetta: 'Myrdhal', tipo: 'evoca', dettaglio: en ? 'Summoned Myrdhal for 1d6 turns (−10 Secrets).' : 'Evocato Myrdhal per 1d6 turni (−10 Segreti).' });
+            }}
+            title={en ? 'Summon Myrdhal for 1d6 turns (10 Secrets, the group can pool them).' : 'Evocate Myrdhal per 1d6 turni (10 Segreti, anche di gruppo).'}
+          >
+            Myrdhal <span style={{ color: C.inkDim }}>(−{SEGRETI_MYRDHAL_ARALDI})</span>
+          </button>
           {spesa(1, en ? 'Secret for Myrdhal' : 'Segreto per Myrdhal', en ? 'Put 1 Secret into the group pool to summon Myrdhal (10 in total).' : 'Metti 1 Segreto nel fondo comune del gruppo per evocare Myrdhal (10 in tutto).')}
           <span style={{ ...styles.detail, fontSize: 11 }} data-testid="myrdhal-gruppo">
             {en ? 'Myrdhal costs 10 Secrets: the group can pool them.' : 'Myrdhal costa 10 Segreti: si possono mettere in comune nel gruppo.'}
