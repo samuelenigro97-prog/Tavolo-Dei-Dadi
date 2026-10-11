@@ -42,4 +42,33 @@ test.describe('Sezioni: angoli decorati', () => {
     expect(displays.length).toBe(4);
     expect(displays.every((d) => d !== 'none')).toBe(true);
   });
+
+  test('i campi dell\'anagrafica e le rispettive etichette sono perfettamente allineati a filo a sinistra (diff 0px)', async ({ page }) => {
+    const measurements = await page.evaluate(() => {
+      const rows = [];
+      document.querySelectorAll('.campi-anagrafica').forEach((row) => {
+        const cols = [];
+        row.querySelectorAll(':scope > div').forEach((col, colIdx) => {
+          const box = col.querySelector('.campo-modulo-box');
+          const label = col.querySelector('.campo-modulo-label');
+          const content = box ? (box.querySelector('select') || box.firstElementChild || box) : null;
+          const labelRect = label?.getBoundingClientRect();
+          const contentRect = content?.getBoundingClientRect();
+          cols.push({
+            colIdx,
+            diff: Math.abs((contentRect?.x ?? 0) - (labelRect?.x ?? 0)),
+          });
+        });
+        rows.push(cols);
+      });
+      return rows;
+    });
+
+    for (const cols of measurements) {
+      for (const col of cols) {
+        expect(col.diff).toBeLessThan(0.5);
+      }
+    }
+  });
 });
+

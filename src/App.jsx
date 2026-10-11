@@ -10679,7 +10679,7 @@ export default function App() {
                 {/* Nome PG & Selettore Personaggio con versione D&D nello sfondo */}
                 <div className="profilo-nome-box" style={{ position: 'relative', width: '100%', marginBottom: 6 }}>
                   {isSolaLettura ? (
-                    <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center', borderRadius: 8, border: 'none', height: 38, background: 'transparent', padding: '4px 60px 4px 1px', boxSizing: 'border-box' }}>
+                    <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center', borderRadius: 8, border: 'none', height: 38, background: 'transparent', padding: '4px 60px 4px 0', boxSizing: 'border-box' }}>
                       <span style={{ fontSize: 16, fontWeight: 'bold', color: 'var(--c-title)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         🔒 {formattaNomePg(scheda.nome) || t('menu.senza_nome')}
                       </span>
@@ -10687,7 +10687,7 @@ export default function App() {
                   ) : rinominando ? (
                     <input
                       autoFocus
-                      style={{ ...styles.inlineInput, width: '100%', fontSize: 16, fontWeight: 'bold', fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", color: 'var(--c-title)', height: 38, padding: '4px 60px 4px 1px', border: `1.5px solid ${C.goldDark || C.gold}`, borderRadius: 8, boxSizing: 'border-box', background: 'transparent' }}
+                      style={{ ...styles.inlineInput, width: '100%', fontSize: 16, fontWeight: 'bold', fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", color: 'var(--c-title)', height: 38, padding: '4px 60px 4px 0', border: `1.5px solid ${C.goldDark || C.gold}`, borderRadius: 8, boxSizing: 'border-box', background: 'transparent' }}
                       value={scheda.nome}
                       onChange={(e) => aggiorna({ nome: e.target.value })}
                       onBlur={() => {
@@ -10713,7 +10713,7 @@ export default function App() {
                     >
                       <select
                         aria-label={tr('Personaggio attivo', 'Active character')}
-                        style={{ ...styles.inlineInput, flex: 1, minWidth: 0, fontSize: 16, fontWeight: 'bold', fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", color: 'var(--c-title)', padding: '4px 74px 4px 1px', textOverflow: 'ellipsis', background: 'transparent', position: 'relative', zIndex: 2, border: 'none', height: '100%' }}
+                        style={{ ...styles.inlineInput, flex: 1, minWidth: 0, fontSize: 16, fontWeight: 'bold', fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", color: 'var(--c-title)', padding: '4px 74px 4px 0', textOverflow: 'ellipsis', background: 'transparent', position: 'relative', zIndex: 2, border: 'none', height: '100%' }}
                         value={roster.attivo}
                         onChange={(e) => { setSchedaSolaLettura(null); setRoster((r) => ({ ...r, attivo: e.target.value })); }}
                       >
@@ -10861,7 +10861,7 @@ export default function App() {
                           display: 'flex',
                           flexDirection: 'column',
                           gap: 2,
-                          padding: '2px 4px',
+                          padding: '2px 0',
                           background: 'transparent',
                           borderRadius: 4,
                           transition: 'background 0.15s ease',

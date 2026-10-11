@@ -724,7 +724,7 @@ export function CampoBloccato({ valore, title, style }) {
         fontWeight: 'inherit',
         fontFamily: 'inherit',
         color: 'inherit',
-        padding: '0 2px',
+        padding: 0,
         cursor: 'default',
         userSelect: 'none',
         whiteSpace: 'nowrap',
