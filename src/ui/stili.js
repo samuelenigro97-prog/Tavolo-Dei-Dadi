@@ -1141,18 +1141,15 @@ tbody tr:hover {
   background-image:
     repeating-linear-gradient(0deg, rgba(0,0,0,0.015) 0px, transparent 1px, transparent 2px, rgba(0,0,0,0.015) 3px),
     repeating-linear-gradient(90deg, rgba(0,0,0,0.012) 0px, transparent 1px, transparent 2px, rgba(0,0,0,0.012) 3px);
-  outline: 1px solid var(--c-border);
-  outline-offset: -4px;
+  outline: none;
 }
-/* Blocchi delle caratteristiche (Forza, Destrezza...): stessa cornice delle
-   sezioni — bordo verde luminoso, filetto interno e alone — invece del
-   bordo sottile grigio. !important perché il bordo base è inline (abilityBlock). */
+/* Blocchi delle caratteristiche (Forza, Destrezza...): bordo singolo con alone,
+   senza doppio filetto interno. */
 .blocco-car {
   border-color: var(--c-border-glow-min, var(--c-border)) !important;
   box-shadow: 0 3px 12px -2px var(--c-aura-glow-1, rgba(60,50,30,0.04)),
               0 1px 3px rgba(0, 0, 0, 0.25) !important;
-  outline: 1px solid var(--c-border);
-  outline-offset: -4px;
+  outline: none;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 .blocco-car:hover {
@@ -1617,7 +1614,7 @@ tbody tr:hover {
 /* i campi anagrafica (con le tendine): font uniforme, padding compatto, allineati in basso */
 .campi-anagrafica > * { min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; }
 .campi-anagrafica select { max-width: 100%; font-size: 12px !important; font-family: inherit !important; font-weight: 600 !important; color: var(--c-ink) !important; padding: 1px 13px 1px 1px !important; height: 100% !important; line-height: 1.2; background-position: right 1px center !important; background-size: 7px !important; }
-.campi-anagrafica .campo-modulo-box { padding: 0 1px !important; min-height: 26px !important; height: 26px; display: flex; align-items: center; overflow: hidden; font-size: 12px; font-weight: 600 !important; color: var(--c-ink) !important; font-family: inherit !important; }
+.campi-anagrafica .campo-modulo-box { padding: 0 1px !important; min-height: 26px !important; height: 26px; display: flex; align-items: center; overflow: hidden; font-size: 12px; font-weight: 600 !important; color: var(--c-ink) !important; font-family: inherit !important; border: none !important; background: transparent !important; box-shadow: none !important; }
 .campi-anagrafica .campo-modulo-box * { font-size: inherit; font-family: inherit; font-weight: 600; }
 .campi-anagrafica .campo-modulo-box.testo-compatto, .campi-anagrafica .campo-modulo-box.testo-compatto * { font-size: 11px !important; letter-spacing: -0.2px; }
 .campi-anagrafica .campo-modulo-label { font-size: 11px !important; margin-top: 2px; font-weight: 700 !important; letter-spacing: 0.25px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -2344,6 +2341,15 @@ tbody tr:hover {
 /* Elimina sulle righe (incantesimi): neutro, rosso solo al passaggio/focus */
 .btn-elimina-riga:hover, .btn-elimina-riga:focus-visible {
   color: var(--c-red) !important; border-color: var(--c-red) !important;
+}
+
+.btn-header-azione {
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+.btn-header-azione:hover {
+  border-color: var(--c-gold-dark);
 }
 
 /* Bersagli touch più grandi sui dispositivi touch (pulsanti piccoli e vicini

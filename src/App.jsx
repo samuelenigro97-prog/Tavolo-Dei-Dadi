@@ -9533,6 +9533,7 @@ export default function App() {
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
+              border: `1px solid ${C.border}`,
               borderRadius: 6,
               cursor: 'pointer',
               boxSizing: 'border-box',
@@ -9596,83 +9597,18 @@ export default function App() {
 
                   {/* Destra su Desktop: Scheda + Sistema + Sessione tutti uniti a destra */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                    {/* Gruppo 1: GESTIONE SCHEDA */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 2.5, flexShrink: 0 }}>
-                      <span style={stileEtichettaInline}>
-                        <span>{lingua === 'en' ? 'Sheet' : 'Scheda'}</span>
-                      </span>
-                      <button
-                        style={btnAzione}
-                        onClick={() => {
-                          setBozzaCrea({
-                            nome: '', sesso: '', classe: '', sottoclasse: '', specie: '', background: '',
-                            livello: 1, metodo: 'auto', pool: null, assegna: {}, competenzeClasse: [],
-                            competenzeSpecie: [], maestria: [], talentoOrigine: '', asiTalenti: {},
-                            multiclasseClasse2: '', multiclasseLivello2: 1, sottoclasseMc2: '',
-                            multiclasseClasse3: '', multiclasseLivello3: 1, sottoclasseMc3: '',
-                            dotazione: 'pacchetto'
-                          });
-                          setMostraCrea(true);
-                        }}
-                        title={t('tip.nuovo_pg')}
-                        aria-label={t('tip.nuovo_pg')}
-                      >
-                        ＋
-                      </button>
-                      <button
-                        style={btnAzione}
-                        title={t('tip.levelup')}
-                        aria-label={t('tip.levelup')}
-                        onClick={() => {
-                          const dvMatch = String(scheda.dadiVita || '').match(/d(\d+)/i);
-                          const facceDV = dvMatch ? parseInt(dvMatch[1]) : 8;
-                          const modCos = modificatore(punteggioCaratteristica(scheda, 'costituzione') || 10) || 0;
-                          const avgHpGain = Math.floor(facceDV / 2) + 1 + modCos;
-                          setLevelUpBozza({
-                            metodo: 'media', hpGainMedia: Math.max(1, avgHpGain), facceDV, modCos, tiroFatto: 0,
-                            asiMode: 'aumento', asiA: '', asiB: '', talento: '',
-                            sottoclasse: scheda.sottoclasse || '',
-                          });
-                          setMostraLevelUp(true);
-                        }}
-                      >
-                        🆙
-                      </button>
-                      <button
-                        style={btnAzione}
-                        onClick={eliminaPersonaggio}
-                        title={t('tip.elimina_pg')}
-                        aria-label={t('tip.elimina_pg')}
-                      >
-                        🗑
-                      </button>
-                      <button
-                        style={{ ...btnAzione, ...(mostraDadiModal ? { color: C.goldDark, borderColor: C.goldDark, background: 'rgba(201,162,39,0.15)' } : {}) }}
-                        onClick={() => setMostraDadiModal(true)}
-                        title={t('roll.tavolo_dadi')}
-                        aria-label={t('roll.tavolo_dadi')}
-                      >
-                        🎲
-                      </button>
-                      <button
-                        style={{ ...btnAzione, ...(mostraCompendio ? { color: C.goldDark, borderColor: C.goldDark, background: 'rgba(201,162,39,0.15)' } : {}) }}
-                        onClick={() => setMostraCompendio(true)}
-                        title={`${t('compendio.titolo')} (Cmd+K)`}
-                        aria-label={`${t('compendio.titolo')} (Cmd+K)`}
-                      >
-                        🔍
-                      </button>
-                    </div>
-
-                    {divisoreVerticale}
-                    {/* Gruppo 2: SISTEMA */}
+                    {/* Gruppo 1: SISTEMA */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2.5, flexShrink: 0 }}>
                       <span style={stileEtichettaInline}>
                         <span>{lingua === 'en' ? 'System' : 'Sistema'}</span>
                       </span>
                       <button
                         className="btn-header-azione"
-                        style={{ ...btnAzione, ...(mostraMenu ? { color: C.goldDark, borderColor: C.goldDark, background: 'rgba(201,162,39,0.15)' } : {}) }}
+                        style={{
+                          ...btnAzione,
+                          border: mostraMenu ? `1px solid ${C.goldDark}` : `1px solid ${C.border}`,
+                          ...(mostraMenu ? { color: C.goldDark, background: 'rgba(201,162,39,0.15)' } : {})
+                        }}
                         title={t('tip.menu_iniziale')}
                         aria-label={t('tip.menu_iniziale')}
                         onClick={() => setMostraMenu((v) => !v)}
@@ -9685,7 +9621,8 @@ export default function App() {
                         style={{
                           ...btnAzione,
                           position: 'relative',
-                          ...(daNotificare ? { color: C.goldDark, borderColor: C.goldDark } : {}),
+                          border: daNotificare ? `1px solid ${C.goldDark}` : `1px solid ${C.border}`,
+                          ...(daNotificare ? { color: C.goldDark } : {}),
                         }}
                         title={daNotificare ? (nuovaVersione ? (lingua === 'en' ? 'A new version is available' : 'È disponibile una nuova versione') : (controlliAttivi.length > 0 ? (lingua === 'en' ? `${controlliAttivi.length} sheet alerts` : `${controlliAttivi.length} avvisi sulla scheda`) : t('notifiche.novita_presenti'))) : t('notifiche.titolo')}
                         aria-label={t('notifiche.titolo')}
@@ -9705,7 +9642,11 @@ export default function App() {
                       <button
                         ref={esportaBtnRef}
                         className="btn-header-azione"
-                        style={{ ...btnAzione, ...(mostraMenuEsporta ? { borderColor: C.goldDark, color: C.goldDark } : {}) }}
+                        style={{
+                          ...btnAzione,
+                          border: mostraMenuEsporta ? `1px solid ${C.goldDark}` : `1px solid ${C.border}`,
+                          ...(mostraMenuEsporta ? { color: C.goldDark } : {})
+                        }}
                         title={t('import_export.tip')}
                         aria-label={t('import_export.tip')}
                         onClick={() => {
@@ -9754,6 +9695,89 @@ export default function App() {
                         onClick={() => { setCloudStatus({ text: '', type: '' }); setSyncCodiceStatus({ text: '', type: '' }); if (!isCloudConfigurato) setTabBackup('online'); setMostraCloud(true); }}
                       >
                         <span style={{ fontSize: 14 }}>☁️</span>
+                      </button>
+                    </div>
+
+                    {divisoreVerticale}
+
+                    {/* Gruppo 2: GESTIONE SCHEDA */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 2.5, flexShrink: 0 }}>
+                      <span style={stileEtichettaInline}>
+                        <span>{lingua === 'en' ? 'Sheet' : 'Scheda'}</span>
+                      </span>
+                      <button
+                        className="btn-header-azione"
+                        style={btnAzione}
+                        onClick={() => {
+                          setBozzaCrea({
+                            nome: '', sesso: '', classe: '', sottoclasse: '', specie: '', background: '',
+                            livello: 1, metodo: 'auto', pool: null, assegna: {}, competenzeClasse: [],
+                            competenzeSpecie: [], maestria: [], talentoOrigine: '', asiTalenti: {},
+                            multiclasseClasse2: '', multiclasseLivello2: 1, sottoclasseMc2: '',
+                            multiclasseClasse3: '', multiclasseLivello3: 1, sottoclasseMc3: '',
+                            dotazione: 'pacchetto'
+                          });
+                          setMostraCrea(true);
+                        }}
+                        title={t('tip.nuovo_pg')}
+                        aria-label={t('tip.nuovo_pg')}
+                      >
+                        ＋
+                      </button>
+                      <button
+                        className="btn-header-azione"
+                        style={btnAzione}
+                        title={t('tip.levelup')}
+                        aria-label={t('tip.levelup')}
+                        onClick={() => {
+                          const dvMatch = String(scheda.dadiVita || '').match(/d(\d+)/i);
+                          const facceDV = dvMatch ? parseInt(dvMatch[1]) : 8;
+                          const modCos = modificatore(punteggioCaratteristica(scheda, 'costituzione') || 10) || 0;
+                          const avgHpGain = Math.floor(facceDV / 2) + 1 + modCos;
+                          setLevelUpBozza({
+                            metodo: 'media', hpGainMedia: Math.max(1, avgHpGain), facceDV, modCos, tiroFatto: 0,
+                            asiMode: 'aumento', asiA: '', asiB: '', talento: '',
+                            sottoclasse: scheda.sottoclasse || '',
+                          });
+                          setMostraLevelUp(true);
+                        }}
+                      >
+                        🆙
+                      </button>
+                      <button
+                        className="btn-header-azione"
+                        style={btnAzione}
+                        onClick={eliminaPersonaggio}
+                        title={t('tip.elimina_pg')}
+                        aria-label={t('tip.elimina_pg')}
+                      >
+                        🗑
+                      </button>
+                      <button
+                        className="btn-header-azione"
+                        style={{
+                          ...btnAzione,
+                          border: mostraDadiModal ? `1px solid ${C.goldDark}` : `1px solid ${C.border}`,
+                          ...(mostraDadiModal ? { color: C.goldDark, background: 'rgba(201,162,39,0.15)' } : {})
+                        }}
+                        onClick={() => setMostraDadiModal(true)}
+                        title={t('roll.tavolo_dadi')}
+                        aria-label={t('roll.tavolo_dadi')}
+                      >
+                        🎲
+                      </button>
+                      <button
+                        className="btn-header-azione"
+                        style={{
+                          ...btnAzione,
+                          border: mostraCompendio ? `1px solid ${C.goldDark}` : `1px solid ${C.border}`,
+                          ...(mostraCompendio ? { color: C.goldDark, background: 'rgba(201,162,39,0.15)' } : {})
+                        }}
+                        onClick={() => setMostraCompendio(true)}
+                        title={`${t('compendio.titolo')} (Cmd+K)`}
+                        aria-label={`${t('compendio.titolo')} (Cmd+K)`}
+                      >
+                        🔍
                       </button>
                     </div>
 
@@ -10653,7 +10677,7 @@ export default function App() {
                 {/* Nome PG & Selettore Personaggio con versione D&D nello sfondo */}
                 <div className="profilo-nome-box" style={{ position: 'relative', width: '100%', marginBottom: 6 }}>
                   {isSolaLettura ? (
-                    <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center', borderRadius: 8, border: `1.5px solid ${C.border}`, height: 38, background: 'rgba(0,0,0,0.03)', padding: '4px 60px 4px 12px', boxSizing: 'border-box' }}>
+                    <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center', borderRadius: 8, border: 'none', height: 38, background: 'transparent', padding: '4px 60px 4px 12px', boxSizing: 'border-box' }}>
                       <span style={{ fontSize: 16, fontWeight: 'bold', color: 'var(--c-title)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         🔒 {formattaNomePg(scheda.nome) || t('menu.senza_nome')}
                       </span>
@@ -10661,7 +10685,7 @@ export default function App() {
                   ) : rinominando ? (
                     <input
                       autoFocus
-                      style={{ ...styles.inlineInput, width: '100%', fontSize: 16, fontWeight: 'bold', fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", color: 'var(--c-title)', height: 38, padding: '4px 60px 4px 12px', border: `1.5px solid ${C.border}`, borderRadius: 8, boxSizing: 'border-box' }}
+                      style={{ ...styles.inlineInput, width: '100%', fontSize: 16, fontWeight: 'bold', fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", color: 'var(--c-title)', height: 38, padding: '4px 60px 4px 12px', border: `1.5px solid ${C.goldDark || C.gold}`, borderRadius: 8, boxSizing: 'border-box', background: 'transparent' }}
                       value={scheda.nome}
                       onChange={(e) => aggiorna({ nome: e.target.value })}
                       onBlur={() => {
@@ -10681,7 +10705,7 @@ export default function App() {
                     />
                   ) : (
                     <div
-                      style={{ position: 'relative', width: '100%', display: 'flex', overflow: 'hidden', borderRadius: 8, border: `1.5px solid ${C.border}`, height: 38, background: 'rgba(0,0,0,0.03)', boxSizing: 'border-box', cursor: isSolaLettura ? 'default' : 'pointer' }}
+                      style={{ position: 'relative', width: '100%', display: 'flex', overflow: 'hidden', borderRadius: 8, border: 'none', height: 38, background: 'transparent', boxSizing: 'border-box', cursor: isSolaLettura ? 'default' : 'pointer' }}
                       onDoubleClick={() => { if (!isSolaLettura) setRinominando(true); }}
                       title={t('nome.tooltip_selettore') + (!isSolaLettura ? (lingua === 'en' ? ' · Double click to rename' : ' · Doppio clic per rinominare') : '')}
                     >
@@ -10836,7 +10860,7 @@ export default function App() {
                           flexDirection: 'column',
                           gap: 2,
                           padding: '2px 4px',
-                          background: 'rgba(0,0,0,0.02)',
+                          background: 'transparent',
                           borderRadius: 4,
                           transition: 'background 0.15s ease',
                         }}
