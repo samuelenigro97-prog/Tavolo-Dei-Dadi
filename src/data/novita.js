@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.95.3',
+    voci: {
+      it: ['Versione dell\'app rimossa dall\'intestazione superiore e mostrata esclusivamente nel menu iniziale (Home) con font coerente.', 'Manuale Araldi del Segreto: tema cuoio antico, ritratto ufficiale di Myrdhal e anteprima token evocazioni nel Combat Tracker.'],
+      en: ['App version removed from top header and shown exclusively in the main menu (Home) with matching typography.', 'Heralds of the Secret manual: antique leather theme, official Myrdhal artwork and summon tokens in Combat Tracker.'],
+    },
+  },
+  {
     versione: '4.95.2',
     voci: {
       it: ['Nel tema scuro le sezioni tornano quasi nere. Il colore della classe resta su titoli, bordi e controlli; il tema chiaro non cambia.'],

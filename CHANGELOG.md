@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.95.3] – 2026-10-11
+
+### Cambiato
+- Versione dell'app rimossa dalla barra superiore/intestazione e visibile unicamente nel menu iniziale (Home) con font coerente e allineamento ribassato.
+- Supporto manuale homebrew Araldi del Segreto con palette in cuoio antico, mezza scheda evocazioni e token originali nel Combat Tracker.
+
 ## [4.95.2] – 2026-10-09
 
 ### Cambiato
