@@ -4,6 +4,7 @@ import { styles } from '../stili.js';
 import { BESTIE, FAMIGLI, EVOCAZIONI, EVOCAZIONI_ARALDI, raggruppaPerGS } from '../../data/bestiario.js';
 import { manualeAttivo } from '../../data/dati5e.js';
 import { calcolaPfCompagno, parseAzioniCompagno } from '../../rules/regole.js';
+import { generaAvatarBestia } from '../../ritratti.js';
 
 export function AggiungiCompagnoModal({ aggiorna, cercaCompagnoText, filtroCompagnoCat, lingua, manualiAttivi, registra, scheda, setBestiaDettaglio, setCercaCompagnoText, setFiltroCompagnoCat, setMostraModalAggiungiCompagno }) {
   return (
@@ -205,6 +206,9 @@ export function AggiungiCompagnoModal({ aggiorna, cercaCompagnoText, filtroCompa
                             tratti: Array.isArray(c.tratti) ? c.tratti : [],
                             azioni: azioniParsed,
                             note: c.note || '',
+                            car: c.car || null,
+                            gs: c.gs != null ? c.gs : null,
+                            ritratto: c.ritratto || generaAvatarBestia(c),
                           };
                           aggiorna({ alleati: [...(scheda.alleati || []), nuovo] });
                           setMostraModalAggiungiCompagno(false);

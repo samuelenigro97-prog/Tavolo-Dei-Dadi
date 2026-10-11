@@ -84,12 +84,18 @@ const miniPm = { ...styles.buttonMini, padding: '0 6px', fontSize: 12, lineHeigh
 function PotereCard({ potere, scheda, onApri, lingua, nomiNelPannello = [] }) {
   const [sceltaEffetto, setSceltaEffetto] = useState(false);
   const bloccato = !potereSbloccato(potere, livelloTotaleScheda(scheda));
+  const isAraldiPotere = Boolean(
+    potere.modello === 'araldi-del-segreto' ||
+    /araldi/i.test(potere.nome || '') ||
+    /araldi/i.test(potere.descrizione || '') ||
+    /debito.*patrono|maschera.*\+3\s*m/i.test(potere.nome || '')
+  );
   return (
     <div
       onClick={() => onApri(potere.id)}
       style={{
-        background: C.panelLight,
-        border: `1px solid ${potere.attivo ? C.border : C.inkDim}`,
+        background: isAraldiPotere ? 'var(--c-araldi-bg, rgba(140, 74, 30, 0.08))' : C.panelLight,
+        border: isAraldiPotere ? '1.5px solid var(--c-araldi-border, #a45a2a)' : `1px solid ${potere.attivo ? C.border : C.inkDim}`,
         borderRadius: 8,
         padding: '10px 12px',
         cursor: 'pointer',
@@ -102,13 +108,20 @@ function PotereCard({ potere, scheda, onApri, lingua, nomiNelPannello = [] }) {
       title={lingua === 'en' ? 'Click for details, edit, delete or reorder' : 'Clicca per dettagli, modifica, eliminazione o riordino'}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
-        <strong style={{ fontSize: 13, color: C.ink }}>
-          {potere.nome || (lingua === 'en' ? 'Unnamed power' : 'Potere senza nome')}
-        </strong>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <strong style={{ fontSize: 13, color: isAraldiPotere ? 'var(--c-araldi, #a45a2a)' : C.ink }}>
+            {potere.nome || (lingua === 'en' ? 'Unnamed power' : 'Potere senza nome')}
+          </strong>
+          {isAraldiPotere && (
+            <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--c-araldi, #a45a2a)', border: '1px solid var(--c-araldi-border, #a45a2a)', borderRadius: 4, padding: '0 4px', whiteSpace: 'nowrap' }}>
+              Araldi
+            </span>
+          )}
+        </div>
         <span style={{ display: 'inline-flex', gap: 5, alignItems: 'center' }}>
           {potere.livelloMin > 0 && (
             <span
-              style={{ fontSize: 11, fontWeight: 700, color: bloccato ? C.inkDim : C.goldDark, border: `1px solid ${bloccato ? C.border : C.goldDark}`, borderRadius: 6, padding: '1px 6px', whiteSpace: 'nowrap' }}
+              style={{ fontSize: 11, fontWeight: 700, color: bloccato ? C.inkDim : (isAraldiPotere ? 'var(--c-araldi, #a45a2a)' : C.goldDark), border: `1px solid ${bloccato ? C.border : (isAraldiPotere ? 'var(--c-araldi-border, #a45a2a)' : C.goldDark)}`, borderRadius: 6, padding: '1px 6px', whiteSpace: 'nowrap' }}
               title={bloccato
                 ? (lingua === 'en' ? `Unlocks at level ${potere.livelloMin}` : `Si sblocca al ${potere.livelloMin}° livello`)
                 : (lingua === 'en' ? `Unlocked at level ${potere.livelloMin}` : `Sbloccato al ${potere.livelloMin}° livello`)}
@@ -593,14 +606,14 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
       )}
 
       {!chiusa && pannelloAraldi && (
-        <div style={{ ...etichettaGruppo, marginTop: 2 }}>{lingua === 'en' ? 'Heralds of the Secret' : 'Araldi del Segreto'}</div>
+        <div style={{ ...etichettaGruppo, marginTop: 2, color: 'var(--c-araldi, #a45a2a)', fontWeight: 800 }}>{lingua === 'en' ? 'Heralds of the Secret' : 'Araldi del Segreto'}</div>
       )}
       {!chiusa && pannelloAraldi && (
         <AraldiPannello scheda={scheda} aggiorna={aggiorna} lingua={lingua} registra={registra} onModifica={setPotereApertoId} onInfo={mostraInfo} />
       )}
 
       {!chiusa && ripristinoCampagna && (poteriInLista.length > 0 || pannelloAraldi) && (
-        <button type="button" data-testid="ripristina-poteri-campagna-sezione" style={{ ...styles.buttonMini, fontWeight: 700, color: C.goldDark, borderColor: C.goldDark, alignSelf: 'center', marginBottom: 8 }} onClick={ripristinoCampagna}>
+        <button type="button" data-testid="ripristina-poteri-campagna-sezione" style={{ ...styles.buttonMini, fontWeight: 700, color: 'var(--c-araldi, #a45a2a)', borderColor: 'var(--c-araldi-border, #a45a2a)', background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.10))', alignSelf: 'center', marginBottom: 8 }} onClick={ripristinoCampagna}>
           {lingua === 'en' ? 'Restore the missing campaign powers (Heralds of the Secret)' : 'Ripristina i Poteri della campagna mancanti (Araldi del Segreto)'}
         </button>
       )}
@@ -608,7 +621,7 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
         <div style={{ ...styles.detail, fontSize: 12, textAlign: 'center', padding: '10px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
           {lingua === 'en' ? 'No custom powers yet.' : 'Nessun potere personalizzato per ora.'}
           {ripristinoCampagna && (
-            <button type="button" data-testid="ripristina-poteri-campagna-sezione" style={{ ...styles.buttonMini, fontWeight: 700, color: C.goldDark, borderColor: C.goldDark }} onClick={ripristinoCampagna}>
+            <button type="button" data-testid="ripristina-poteri-campagna-sezione" style={{ ...styles.buttonMini, fontWeight: 700, color: 'var(--c-araldi, #a45a2a)', borderColor: 'var(--c-araldi-border, #a45a2a)', background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.10))' }} onClick={ripristinoCampagna}>
               {lingua === 'en' ? 'Restore the campaign powers (Heralds of the Secret)' : 'Ripristina i Poteri della campagna (Araldi del Segreto)'}
             </button>
           )}

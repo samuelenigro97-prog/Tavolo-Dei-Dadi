@@ -157,46 +157,60 @@ export function generaAvatarBestia(forma) {
   }
   const nome = forma?.nome || 'Bestia';
   const gs = forma?.gs != null ? (forma.gs === 0.25 ? '1/4' : forma.gs === 0.5 ? '1/2' : forma.gs) : '';
-  const path = trovaPathBestia(nome);
+  const isMyrdhal = (nome || '').toLowerCase().includes('myrdhal');
+  const path = isMyrdhal ? (ICONE_CLASSE['warlock'] || trovaPathBestia(nome)) : trovaPathBestia(nome);
   
+  const bgGrad = isMyrdhal
+    ? `<stop offset="0%" stop-color="#4a044e"/><stop offset="45%" stop-color="#240046"/><stop offset="85%" stop-color="#10002b"/><stop offset="100%" stop-color="#050014"/>`
+    : `<stop offset="0%" stop-color="#40916c"/><stop offset="45%" stop-color="#1b4332"/><stop offset="85%" stop-color="#081c15"/><stop offset="100%" stop-color="#020c08"/>`;
+  const moonGlow = isMyrdhal
+    ? `<stop offset="0%" stop-color="#e879f9" stop-opacity="0.38"/><stop offset="60%" stop-color="#a855f7" stop-opacity="0.16"/><stop offset="100%" stop-color="#000" stop-opacity="0"/>`
+    : `<stop offset="0%" stop-color="#ffd166" stop-opacity="0.32"/><stop offset="60%" stop-color="#74c69d" stop-opacity="0.12"/><stop offset="100%" stop-color="#000" stop-opacity="0"/>`;
+  const shadowColor = isMyrdhal ? '#c084fc' : '#52b788';
+  const strokeColor = isMyrdhal ? '#c084fc' : '#74c69d';
+  const innerStroke = isMyrdhal ? '#f3e8ff' : '#d8f3dc';
+  const badgeBg = isMyrdhal ? 'rgba(16, 0, 43, 0.94)' : 'rgba(8, 28, 21, 0.94)';
+  const badgeBorder = isMyrdhal ? '#a855f7' : '#52b788';
+  const badgeTitleColor = isMyrdhal ? '#f3e8ff' : '#d8f3dc';
+  const badgeSubColor = isMyrdhal ? '#d8b4fe' : '#74c69d';
+  const iconaSimbolo = isMyrdhal ? '💀' : '🐾';
+  const sottotitolo = isMyrdhal
+    ? `${gs ? `GS ${gs} · ` : ''}NON MORTO · ARALDI`
+    : `${gs ? `GS ${gs} · ` : ''}${forma?.tipo ? String(forma.tipo).toUpperCase() : 'FORMA BESTIALE'}`;
+
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">` +
     `<defs>` +
     `<radialGradient id="bgBestia" cx="50%" cy="38%" r="75%">` +
-    `<stop offset="0%" stop-color="#40916c"/>` +
-    `<stop offset="45%" stop-color="#1b4332"/>` +
-    `<stop offset="85%" stop-color="#081c15"/>` +
-    `<stop offset="100%" stop-color="#020c08"/>` +
+    bgGrad +
     `</radialGradient>` +
     `<radialGradient id="moonGlow" cx="50%" cy="46%" r="50%">` +
-    `<stop offset="0%" stop-color="#ffd166" stop-opacity="0.32"/>` +
-    `<stop offset="60%" stop-color="#74c69d" stop-opacity="0.12"/>` +
-    `<stop offset="100%" stop-color="#000" stop-opacity="0"/>` +
+    moonGlow +
     `</radialGradient>` +
     `<filter id="goldShadow" x="-20%" y="-20%" width="140%" height="140%">` +
-    `<feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#52b788" flood-opacity="0.5"/>` +
+    `<feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="${shadowColor}" flood-opacity="0.5"/>` +
     `</filter>` +
     `</defs>` +
     `<rect width="512" height="512" fill="url(#bgBestia)"/>` +
     `<!-- Luna mistica e aura silvestre -->` +
     `<circle cx="256" cy="224" r="160" fill="url(#moonGlow)"/>` +
-    `<circle cx="256" cy="224" r="138" fill="none" stroke="#52b788" stroke-width="2" stroke-dasharray="6,4" opacity="0.4"/>` +
+    `<circle cx="256" cy="224" r="138" fill="none" stroke="${strokeColor}" stroke-width="2" stroke-dasharray="6,4" opacity="0.4"/>` +
     `<!-- Zampa silvestre runica sottile di sfondo -->` +
     `<g opacity="0.12" fill="#fff" transform="translate(106, 50) scale(0.6)">` +
     `<circle cx="150" cy="110" r="35"/><circle cx="230" cy="80" r="35"/><circle cx="310" cy="80" r="35"/><circle cx="390" cy="110" r="35"/>` +
     `<ellipse cx="270" cy="270" rx="140" ry="110"/>` +
     `</g>` +
     `<!-- Silhouette Vettoriale Artistica della Bestia D&D -->` +
-    `<g filter="url(#goldShadow)" transform="translate(64, 40) scale(0.75)" fill="#d8f3dc">` +
+    `<g filter="url(#goldShadow)" transform="translate(64, 40) scale(0.75)" fill="${innerStroke}">` +
     `<path d="${path}"/>` +
     `</g>` +
     `<!-- Cornice runica esterna con angoli ornati -->` +
-    `<rect x="12" y="12" width="488" height="488" rx="20" fill="none" stroke="#74c69d" stroke-width="2.5" opacity="0.55"/>` +
-    `<rect x="18" y="18" width="476" height="476" rx="16" fill="none" stroke="#d8f3dc" stroke-width="1" opacity="0.25"/>` +
+    `<rect x="12" y="12" width="488" height="488" rx="20" fill="none" stroke="${strokeColor}" stroke-width="2.5" opacity="0.55"/>` +
+    `<rect x="18" y="18" width="476" height="476" rx="16" fill="none" stroke="${innerStroke}" stroke-width="1" opacity="0.25"/>` +
     `<!-- Targhetta badge dorata inferiore -->` +
-    `<rect x="32" y="394" width="448" height="92" rx="18" fill="rgba(8, 28, 21, 0.94)" stroke="#52b788" stroke-width="3.5"/>` +
-    `<text x="256" y="433" font-size="27" font-weight="900" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" fill="#d8f3dc" text-anchor="middle" letter-spacing="1">🐾 ${nome.toUpperCase()}</text>` +
-    `<text x="256" y="467" font-size="18" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" fill="#74c69d" text-anchor="middle" letter-spacing="0.5">${gs ? `GS ${gs} · ` : ''}FORMA BESTIALE</text>` +
+    `<rect x="32" y="394" width="448" height="92" rx="18" fill="${badgeBg}" stroke="${badgeBorder}" stroke-width="3.5"/>` +
+    `<text x="256" y="433" font-size="27" font-weight="900" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" fill="${badgeTitleColor}" text-anchor="middle" letter-spacing="1">${iconaSimbolo} ${nome.toUpperCase()}</text>` +
+    `<text x="256" y="467" font-size="16" font-weight="700" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" fill="${badgeSubColor}" text-anchor="middle" letter-spacing="0.5">${sottotitolo}</text>` +
     `</svg>`;
     
   return 'data:image/svg+xml,' + encodeURIComponent(svg);

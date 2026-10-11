@@ -439,6 +439,8 @@ export const GLOBAL_CSS = `
   --c-border: #ddd5c6; --c-ink: #2b2620; --c-ink-dim: #8d8272;
   --c-gold: #b8860b; --c-gold-dark: #8a6508; --c-red: #b03a2e;
   --c-green: #3e7d32; --c-title: #9e2b25;
+  --c-araldi: #8c4a1e; --c-araldi-border: #a45a2a; --c-araldi-bg: rgba(140, 74, 30, 0.10);
+  --c-araldi-glow: rgba(140, 74, 30, 0.25); --c-araldi-badge: #7a3e16;
   --font-title: 'Cinzel', Georgia, 'Times New Roman', serif;
 }
 :root[data-tema="scuro"] {
@@ -446,6 +448,8 @@ export const GLOBAL_CSS = `
   --c-border: #24242d; --c-ink: #ebecee; --c-ink-dim: #868692;
   --c-gold: #c9a227; --c-gold-dark: #dcb84f; --c-red: #d0685a;
   --c-green: #7fb069; --c-title: #de8f88;
+  --c-araldi: #e08b4a; --c-araldi-border: #b86b33; --c-araldi-bg: rgba(184, 107, 51, 0.16);
+  --c-araldi-glow: rgba(184, 107, 51, 0.30); --c-araldi-badge: #d27d3c;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema="chiaro"]) {
@@ -453,6 +457,8 @@ export const GLOBAL_CSS = `
     --c-border: #24242d; --c-ink: #ebecee; --c-ink-dim: #868692;
     --c-gold: #c9a227; --c-gold-dark: #dcb84f; --c-red: #d0685a;
     --c-green: #7fb069; --c-title: #de8f88;
+    --c-araldi: #e08b4a; --c-araldi-border: #b86b33; --c-araldi-bg: rgba(184, 107, 51, 0.16);
+    --c-araldi-glow: rgba(184, 107, 51, 0.30); --c-araldi-badge: #d27d3c;
   }
 }
 html {

@@ -1346,7 +1346,7 @@ import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modif
 import { PoteriRisorse } from './ui/PoteriRisorse.jsx';
 import { unisciPoteriCampagna, poteriCampagnaIncompleti } from './data/poteriCampagna.js';
 import { aggiornaTestiAraldi } from './data/modelliPoteri.js';
-import { incantesimiAraldiMancanti } from './data/incantesimiAraldi.js';
+import { incantesimiAraldiMancanti, INCANTESIMI_ARALDI } from './data/incantesimiAraldi.js';
 import { DadiModal } from './ui/modali/DadiModal.jsx';
 import { DiarioModal } from './ui/modali/DiarioModal.jsx';
 import { IspirazioneBgModal } from './ui/modali/IspirazioneBgModal.jsx';
@@ -5208,6 +5208,9 @@ export default function App() {
       condizioni: dati.condizioni || [],
       concentrazione: !!dati.concentrazione,
       tsMorte: dati.tsMorte || { successi: 0, fallimenti: 0 },
+      avatar: dati.avatar || (tipo === 'pg' ? scheda.ritratto : null),
+      creaturaNome: dati.creaturaNome || dati.nomeOriginale || dati.nome || null,
+      dati: dati.dati || null,
     };
 
     // Se è un alleato creato con un nome personalizzato, memorizzalo nella scheda
@@ -5236,6 +5239,7 @@ export default function App() {
     aggiungiCombattente('pg', {
       nome: scheda.nome, iniziativa: initRoll,
       pfMax: pfMassimiEffettivi(scheda), pfAttuali: scheda.pfAttuali, ca: caTotale(scheda),
+      avatar: scheda.ritratto || generaAvatar(scheda.classe, scheda.specie, scheda.nome),
     });
     registra({ etichetta: `${t('vital.iniziativa')}: ${scheda.nome}`, tipo: 'd20', totale: initRoll, dettaglio: `d20 ${conSegno(iniziativaTotale(scheda))}` });
   }
@@ -14103,6 +14107,11 @@ export default function App() {
                             ) : null;
 
                             const isUltimoCritInc = ultimoAttaccoCritico && (ultimoAttaccoCritico.id === s.id || ultimoAttaccoCritico.nome === s.nome);
+                            const isAraldiSpell = Boolean(
+                              s.id?.startsWith('araldi-') ||
+                              /araldi/i.test(s.note || '') ||
+                              (s.bonus && INCANTESIMI_ARALDI.some(([n]) => n.toLowerCase() === (s.nome || '').trim().toLowerCase()))
+                            );
 
                             return (
                               <div
@@ -14121,7 +14130,9 @@ export default function App() {
                                       ? '2px solid var(--c-green)'
                                       : (isRowUnpreparedMancante
                                         ? '1.5px dashed var(--c-green)'
-                                        : `1px ${(classePreparata && s.livello >= 1 && s.preparato === false) ? 'dashed' : 'solid'} ${C.border}`)),
+                                        : (isAraldiSpell
+                                          ? '1.5px solid var(--c-araldi-border, #a45a2a)'
+                                          : `1px ${(classePreparata && s.livello >= 1 && s.preparato === false) ? 'dashed' : 'solid'} ${C.border}`))),
                                   borderRadius: 6,
                                   padding: '4px 8px',
                                   background: isRowInEccesso
@@ -14130,20 +14141,24 @@ export default function App() {
                                       ? 'rgba(46,157,77,0.1)'
                                       : (isRowUnpreparedMancante
                                         ? 'rgba(46,157,77,0.06)'
-                                        : C.panelLight)),
+                                        : (isAraldiSpell
+                                          ? 'var(--c-araldi-bg, rgba(140, 74, 30, 0.10))'
+                                          : C.panelLight))),
                                   boxShadow: isRowInEccesso
                                     ? '0 0 10px rgba(239,68,68,0.3)'
                                     : (isRowCatalogoMancante
                                       ? '0 0 10px rgba(46,157,77,0.3)'
                                       : (isRowUnpreparedMancante
                                         ? '0 0 8px rgba(46,157,77,0.2)'
-                                        : 'none')),
-                                                                    transition: 'all 0.2s ease',
+                                        : (isAraldiSpell
+                                          ? '0 0 8px var(--c-araldi-glow, rgba(140, 74, 30, 0.20))'
+                                          : 'none'))),
+                                  transition: 'all 0.2s ease',
                                 }}
                               >
                                 <div className="spell-row" style={{ display: 'flex', flexWrap: 'nowrap', alignItems: 'center', gap: 4 }}>
                                   <button
-                                    style={{ background: 'transparent', border: 'none', color: isRowInEccesso ? C.red : C.ink, fontWeight: 700, cursor: 'help', textAlign: 'left', padding: 0, fontSize: 14, lineHeight: 1.2, textDecoration: 'underline dotted', textUnderlineOffset: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
+                                    style={{ background: 'transparent', border: 'none', color: isRowInEccesso ? C.red : (isAraldiSpell ? 'var(--c-araldi, #a45a2a)' : C.ink), fontWeight: 700, cursor: 'help', textAlign: 'left', padding: 0, fontSize: 14, lineHeight: 1.2, textDecoration: 'underline dotted', textUnderlineOffset: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
                                     onClick={() => setInfo({ titolo: `${s.nome || 'Incantesimo'}${s.livello === 0 ? (en ? ' · Cantrip' : ' · Trucchetto') : (en ? ` · Level ${s.livello}` : ` · ${s.livello}° livello`)}`, testo: testoModal || (en ? 'No description available for this spell.' : 'Nessuna descrizione disponibile per questo incantesimo.') })}
                                   >
                                     {s.nome || t('menu.senza_nome')}
@@ -14249,10 +14264,21 @@ export default function App() {
                                   )}
                                   {s.bonus && (
                                     <span role="button" tabIndex={0}
-                                      title={t('spell.bonus_badge_tooltip')}
-                                      style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, border: `1px solid ${C.goldDark}`, borderRadius: 6, padding: '0 4px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}
+                                      title={isAraldiSpell ? (en ? 'Heralds of the Secret expanded spell list (does not count against class limit)' : 'Lista ampliata degli Araldi del Segreto (non conta nel limite di classe)') : t('spell.bonus_badge_tooltip')}
+                                      style={{
+                                        fontSize: 11,
+                                        fontWeight: 700,
+                                        color: isAraldiSpell ? 'var(--c-araldi, #a45a2a)' : C.goldDark,
+                                        border: `1px solid ${isAraldiSpell ? 'var(--c-araldi-border, #a45a2a)' : C.goldDark}`,
+                                        background: isAraldiSpell ? 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))' : undefined,
+                                        borderRadius: 6,
+                                        padding: '0 4px',
+                                        cursor: 'pointer',
+                                        whiteSpace: 'nowrap',
+                                        flexShrink: 0,
+                                      }}
                                       onClick={() => aggiorna({ incantesimiLista: scheda.incantesimiLista.map((x) => (x.id === s.id ? { ...x, bonus: false } : x)) })}
-                                    >✦ {t('spell.bonus_badge')}</span>
+                                    >✦ {isAraldiSpell ? 'Araldi' : t('spell.bonus_badge')}</span>
                                   )}
                                   {/* Chip colorati come nelle Azioni (tempo, distanza, area, concentrazione, rituale, scuola); il resto nella nuvoletta del nome. */}
                                   <div className="spell-chips" tabIndex={0} role="group" aria-label={tr('Dettagli dell\'incantesimo', 'Spell details')} style={{ display: 'flex', flexWrap: 'nowrap', gap: 4, alignItems: 'center', overflowX: 'auto', flex: '1 1 auto', minWidth: 0, scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
@@ -14265,10 +14291,11 @@ export default function App() {
                                       chipIncantesimo(iconaTipoDanno(tipoDanno), 'Danno', [danno, tipoDanno].filter(Boolean).join(' '), coloreCategoria(tipoDanno === 'Guarigione' ? 'guarigione' : 'danno', notteAttiva))
                                     )}
                                     {note && (() => {
-                                      const notaBreve = (/araldi del segreto.*senza slot.*segreto.*debito/i.test(note) || /lista ampliata araldi/i.test(note))
+                                      const isAraldiNota = (/araldi del segreto.*senza slot.*segreto.*debito/i.test(note) || /lista ampliata araldi/i.test(note) || isAraldiSpell);
+                                      const notaBreve = isAraldiNota
                                         ? (en ? 'Araldi: 1 Secret/lvl (+1 Debt)' : 'Araldi: 1 Segreto/liv (+1 Debito)')
                                         : note;
-                                      return chipIncantesimo('', t('spell.chip_note'), notaBreve, undefined, 'chip-nota', note);
+                                      return chipIncantesimo('', t('spell.chip_note'), notaBreve, isAraldiNota ? 'var(--c-araldi, #a45a2a)' : undefined, 'chip-nota', note);
                                     })()}
                                   </div>
                                   {scuola && (
@@ -15302,6 +15329,9 @@ export default function App() {
                     tratti: Array.isArray(creatura.tratti) ? creatura.tratti : [],
                     azioni: azioniParsed,
                     note: creatura.note || '',
+                    car: creatura.car || null,
+                    gs: creatura.gs != null ? creatura.gs : null,
+                    ritratto: creatura.ritratto || generaAvatarBestia(creatura),
                   };
                   aggiorna({ alleati: [...alleati, nuovo] });
                   setMostraModalAggiungiCompagno(false);
@@ -15361,6 +15391,10 @@ export default function App() {
                           const percPf = Math.min(100, Math.max(0, Math.round((pfAttuali / pfMax) * 100)));
                           const coloreBarra = percPf > 50 ? '#10b981' : percPf > 20 ? '#f59e0b' : '#ef4444';
                           const creatureMatch = TUTTE_LE_CREATURE.find((c) => c.nome === all.nomeOriginale || c.nome === all.nome);
+                          const avatarCreatura = all.ritratto || (creatureMatch ? generaAvatarBestia(creatureMatch) : null);
+                          const carDati = all.car || creatureMatch?.car;
+                          const abilitaTesto = all.abilita || creatureMatch?.abilita;
+                          const gsCreatura = all.gs != null ? all.gs : creatureMatch?.gs;
 
                           return (
                             <div
@@ -15376,11 +15410,53 @@ export default function App() {
                                 boxShadow: '0 2px 5px rgba(0,0,0,0.04)',
                               }}
                             >
-                              {/* Intestazione Compagno */}
+                              {/* Intestazione Compagno con Avatar Token */}
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                  {avatarCreatura ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => creatureMatch && setBestiaDettaglio(creatureMatch)}
+                                      style={{
+                                        padding: 0,
+                                        border: `2px solid ${C.border}`,
+                                        borderRadius: 8,
+                                        background: C.panel,
+                                        width: 48,
+                                        height: 48,
+                                        overflow: 'hidden',
+                                        cursor: creatureMatch ? 'pointer' : 'default',
+                                        flexShrink: 0,
+                                        boxShadow: '0 2px 5px rgba(0,0,0,0.12)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                      }}
+                                      title={creatureMatch ? (lingua === 'en' ? 'Click to view full statblock' : 'Clicca per vedere lo statblock completo') : all.nome}
+                                    >
+                                      <img src={avatarCreatura} alt={all.nome} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    </button>
+                                  ) : (
+                                    <div
+                                      style={{
+                                        width: 48,
+                                        height: 48,
+                                        borderRadius: 8,
+                                        border: `1.5px solid ${C.border}`,
+                                        background: C.panel,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: 22,
+                                        flexShrink: 0,
+                                      }}
+                                    >
+                                      🐾
+                                    </div>
+                                  )}
+
                                   <div>
-                                    <div style={{ fontWeight: 700, fontSize: 14, color: C.goldDark, display: 'flex', alignItems: 'center', gap: 6 }}>
+                                    <div style={{ fontWeight: 700, fontSize: 14, color: C.goldDark, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                                       <Editable
                                         value={all.nome}
                                         onChange={(v) => {
@@ -15393,6 +15469,11 @@ export default function App() {
                                       {all.taglia && (
                                         <span style={{ fontSize: 11, fontWeight: 500, color: C.inkDim, background: C.panel, padding: '1px 6px', borderRadius: 4, border: `1px solid ${C.border}` }}>
                                           {all.taglia}
+                                        </span>
+                                      )}
+                                      {gsCreatura != null && (
+                                        <span style={{ fontSize: 11, fontWeight: 700, color: C.goldDark, background: C.panel, padding: '1px 6px', borderRadius: 4, border: `1px solid ${C.goldDark}` }}>
+                                          GS {gsCreatura}
                                         </span>
                                       )}
                                     </div>
@@ -15431,9 +15512,13 @@ export default function App() {
                                       aggiungiCombattente('alleato', {
                                         id: all.id,
                                         nome: all.nome,
+                                        nomeOriginale: all.nomeOriginale,
+                                        creaturaNome: all.nomeOriginale || all.nome,
                                         pfMax: pfMax,
                                         pfAttuali: pfAttuali,
                                         ca: all.ca ?? 10,
+                                        avatar: avatarCreatura,
+                                        dati: creatureMatch || all,
                                       });
                                     }}
                                     style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 7px', color: C.green, borderColor: C.green }}
@@ -15482,6 +15567,53 @@ export default function App() {
                                   <div style={{ height: '100%', width: `${percPf}%`, background: coloreBarra, transition: 'width 0.25s ease' }} />
                                 </div>
                               </div>
+
+                              {/* Mezza Scheda: 6 Caratteristiche con Tiro Prova */}
+                              {carDati && (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 4, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 6, padding: '4px 6px' }}>
+                                  {[
+                                    { k: 'forza', label: 'FOR' },
+                                    { k: 'destrezza', label: 'DES' },
+                                    { k: 'costituzione', label: 'COS' },
+                                    { k: 'intelligenza', label: 'INT' },
+                                    { k: 'saggezza', label: 'SAG' },
+                                    { k: 'carisma', label: 'CAR' },
+                                  ].map(({ k, label }) => {
+                                    const punteggio = Number(carDati[k]) || 10;
+                                    const mod = Math.floor((punteggio - 10) / 2);
+                                    return (
+                                      <button
+                                        key={k}
+                                        type="button"
+                                        onClick={() => lanciaD20(`${all.nome}: Prova di ${label}`, mod, { suono: 'tiro' })}
+                                        style={{
+                                          background: 'transparent',
+                                          border: 'none',
+                                          display: 'flex',
+                                          flexDirection: 'column',
+                                          alignItems: 'center',
+                                          cursor: 'pointer',
+                                          padding: '2px 0',
+                                          borderRadius: 4,
+                                        }}
+                                        title={lingua === 'en' ? `Roll ${label} check (${conSegno(mod)})` : `Tira prova di ${label} (${conSegno(mod)})`}
+                                      >
+                                        <span style={{ fontSize: 10, fontWeight: 800, color: C.inkDim }}>{label}</span>
+                                        <span style={{ fontSize: 12, fontWeight: 800, color: C.ink }}>{conSegno(mod)}</span>
+                                        <span style={{ fontSize: 10, color: C.inkDim, opacity: 0.8 }}>({punteggio})</span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              )}
+
+                              {/* Tiri Salvezza & Abilità Chiave */}
+                              {abilitaTesto && (
+                                <div style={{ fontSize: 11, color: C.inkDim, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 6, padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                                  <strong style={{ color: C.goldDark, fontSize: 11 }}>{lingua === 'en' ? 'Saves & Skills:' : 'TS & Abilità:'}</strong>
+                                  <span>{abilitaTesto}</span>
+                                </div>
+                              )}
 
                               {/* Attacchi & Azioni con Tiri Dadi */}
                               {all.azioni && all.azioni.length > 0 && (
@@ -17536,9 +17668,86 @@ export default function App() {
                               </div>
                             </div>
 
-                            {/* Nome */}
-                            <div style={{ flex: 1, minWidth: 0, fontWeight: 700, fontSize: 13, color: C.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              <Editable value={cb.nome} onChange={(v) => modCombat(cb.id, { nome: v })} width={110} />
+                            {/* Avatar Token nel Combat Tracker con anteprima/scheda */}
+                            {(() => {
+                              let avToken = cb.avatar;
+                              const matchCreatura = TUTTE_LE_CREATURE.find((c) => c.nome === cb.creaturaNome || c.nome === cb.nome);
+                              if (!avToken) {
+                                if (cb.tipo === 'pg') {
+                                  avToken = scheda.ritratto || generaAvatar(scheda.classe, scheda.specie, scheda.nome);
+                                } else if (matchCreatura) {
+                                  avToken = matchCreatura.ritratto || generaAvatarBestia(matchCreatura);
+                                }
+                              }
+
+                              return avToken ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (matchCreatura) {
+                                      setBestiaDettaglio(matchCreatura);
+                                    } else if (cb.tipo === 'pg') {
+                                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    }
+                                  }}
+                                  style={{
+                                    padding: 0,
+                                    width: 32,
+                                    height: 32,
+                                    borderRadius: '50%',
+                                    border: `1.5px solid ${inTurno ? 'var(--c-gold-dark)' : C.border}`,
+                                    overflow: 'hidden',
+                                    cursor: matchCreatura ? 'pointer' : 'default',
+                                    flexShrink: 0,
+                                    background: C.panel,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    boxShadow: inTurno ? '0 0 6px var(--c-gold-dark)' : 'none',
+                                  }}
+                                  title={matchCreatura ? (lingua === 'en' ? `Click to view statblock of ${cb.nome}` : `Clicca per aprire la scheda di ${cb.nome}`) : cb.nome}
+                                >
+                                  <img src={avToken} alt={cb.nome} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                </button>
+                              ) : (
+                                <div
+                                  style={{
+                                    width: 32,
+                                    height: 32,
+                                    borderRadius: '50%',
+                                    border: `1.5px solid ${C.border}`,
+                                    background: C.bg,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: 14,
+                                    flexShrink: 0,
+                                  }}
+                                  title={cb.nome}
+                                >
+                                  {cb.tipo === 'pg' ? '🧙' : cb.tipo === 'alleato' ? '🐾' : '💀'}
+                                </div>
+                              );
+                            })()}
+
+                            {/* Nome ed eventuale pulsante Scheda */}
+                            <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 4, overflow: 'hidden' }}>
+                              <div style={{ flex: 1, minWidth: 0, fontWeight: 700, fontSize: 13, color: C.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                <Editable value={cb.nome} onChange={(v) => modCombat(cb.id, { nome: v })} width={110} />
+                              </div>
+                              {(() => {
+                                const match = TUTTE_LE_CREATURE.find((c) => c.nome === cb.creaturaNome || c.nome === cb.nome);
+                                return match ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => setBestiaDettaglio(match)}
+                                    style={{ ...styles.buttonMini, fontSize: 10, padding: '1px 5px', color: C.goldDark, flexShrink: 0 }}
+                                    title={lingua === 'en' ? 'Open creature statblock' : 'Apri scheda creatura'}
+                                  >
+                                    {lingua === 'en' ? 'Sheet' : 'Scheda'}
+                                  </button>
+                                ) : null;
+                              })()}
                             </div>
 
                             {/* Rimuovi */}

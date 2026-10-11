@@ -27,11 +27,12 @@ import {
 import { incantesimiAraldiMancanti } from '../data/incantesimiAraldi.js';
 import { EVOCAZIONI_ARALDI } from '../data/bestiario.js';
 import { parseAzioniCompagno } from '../rules/regole.js';
+import { generaAvatarBestia } from '../ritratti.js';
 
 const NOMI_BASE = ['Segreti', 'Debito'];
 
-const scatola = { border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 10px', background: C.panelLight };
-const etichetta = { fontSize: 11, fontWeight: 700, color: C.inkDim, textTransform: 'uppercase', letterSpacing: 0.5 };
+const scatola = { border: '1px solid var(--c-araldi-border, #a45a2a)', borderRadius: 8, padding: '8px 10px', background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.08))' };
+const etichetta = { fontSize: 11, fontWeight: 700, color: 'var(--c-araldi, #a45a2a)', textTransform: 'uppercase', letterSpacing: 0.5 };
 
 function Contatore({ titolo, valore, max, onMeno, onPiu, onImposta, sotto, suggerimento, children }) {
   return (
@@ -131,7 +132,7 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
           {segreti.max > 0 && segreti.max <= 12 && (
             <div style={{ display: 'flex', gap: 4, justifyContent: 'center', flexWrap: 'wrap' }} aria-hidden>
               {Array.from({ length: segreti.max }, (_, i) => (
-                <span key={i} style={{ width: 10, height: 10, borderRadius: 2, transform: 'rotate(45deg)', border: `1.5px solid ${C.goldDark}`, background: i < valSegreti ? C.goldDark : 'transparent' }} />
+                <span key={i} style={{ width: 10, height: 10, borderRadius: 2, transform: 'rotate(45deg)', border: '1.5px solid var(--c-araldi, #a45a2a)', background: i < valSegreti ? 'var(--c-araldi, #a45a2a)' : 'transparent' }} />
               ))}
             </div>
           )}
@@ -155,7 +156,7 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
             aria-label={en ? 'Progress to the next Debt threshold' : 'Avanzamento verso la prossima soglia del Debito'}
             style={{ height: 6, borderRadius: 3, background: C.border, overflow: 'hidden', margin: '2px 8px 0' }}
           >
-            <div style={{ width: `${percentuale}%`, height: '100%', background: C.goldDark, transition: 'width 0.25s ease' }} />
+            <div style={{ width: `${percentuale}%`, height: '100%', background: 'var(--c-araldi, #a45a2a)', transition: 'width 0.25s ease' }} />
           </div>
         </Contatore>
       </div>
@@ -175,9 +176,9 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
               >
                 <span style={{
                   flexShrink: 0, minWidth: 42, textAlign: 'center', fontWeight: 800, padding: '1px 6px', borderRadius: 4,
-                  border: `1px ${raggiunta ? 'solid' : 'dashed'} ${raggiunta ? C.goldDark : C.border}`,
-                  color: raggiunta ? C.goldDark : C.inkDim,
-                  background: raggiunta ? 'rgba(201,162,39,0.12)' : 'transparent',
+                  border: `1px ${raggiunta ? 'solid' : 'dashed'} ${raggiunta ? 'var(--c-araldi, #a45a2a)' : C.border}`,
+                  color: raggiunta ? 'var(--c-araldi, #a45a2a)' : C.inkDim,
+                  background: raggiunta ? 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))' : 'transparent',
                 }}>{raggiunta ? '✓ ' : ''}{s.soglia}</span>
                 <span style={{ minWidth: 0 }}>
                   <strong style={{ color: raggiunta ? C.ink : C.inkDim }}>{en ? s.nomeEn : s.nome}</strong>
@@ -220,6 +221,9 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
                     tratti: Array.isArray(m.tratti) ? m.tratti : [],
                     azioni: parseAzioniCompagno(m.azioni || []),
                     note: m.note || 'Evocato per 1d6 turni (10 Segreti).',
+                    car: m.car || { forza: 20, destrezza: 22, costituzione: 20, intelligenza: 14, saggezza: 18, carisma: 22 },
+                    gs: m.gs || '17',
+                    ritratto: m.ritratto || generaAvatarBestia(m),
                   };
                   alleatiNuovi = [...alleatiNuovi, nuovo];
                 }
@@ -264,7 +268,7 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
             <button
               type="button"
               data-testid="aggiungi-incantesimi-araldi"
-              style={{ ...styles.buttonMini, fontWeight: 700, color: C.goldDark, borderColor: C.goldDark }}
+              style={{ ...styles.buttonMini, fontWeight: 700, color: 'var(--c-araldi, #a45a2a)', borderColor: 'var(--c-araldi-border, #a45a2a)', background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))' }}
               onClick={aggiungiIncanti}
               title={en ? 'Adds the handbook\'s expanded spell list (levels 1-5) to the known spells.' : 'Aggiunge agli incantesimi conosciuti la lista ampliata del manuale (cerchi 1-5).'}
             >
@@ -288,7 +292,7 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
             const futuro = !potereSbloccato(lista[0], livello);
             return (
               <div key={livelloMin} style={{ display: 'flex', gap: 10, padding: '8px 0', borderBottom: `1px solid ${C.border}`, opacity: futuro ? 0.5 : 1 }}>
-                <div style={{ flexShrink: 0, width: 62, fontWeight: 'bold', color: futuro ? C.inkDim : C.goldDark }}>
+                <div style={{ flexShrink: 0, width: 62, fontWeight: 'bold', color: futuro ? C.inkDim : 'var(--c-araldi, #a45a2a)' }}>
                   {en ? 'Lvl' : 'Liv.'} {livelloMin}
                 </div>
                 <div style={{ flex: 1, minWidth: 0, fontSize: 13, display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -338,7 +342,7 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
                                     title={disponibile
                                       ? (debitoUso ? (en ? `Use it (+${debitoUso} Debt)` : `Usalo (+${debitoUso} Debito)`) : (en ? 'Use it' : 'Usalo'))
                                       : (en ? 'Spent: click to restore' : 'Speso: clicca per ripristinarlo')}
-                                    style={{ width: 16, height: 16, padding: 0, borderRadius: '50%', cursor: 'pointer', border: `2px solid ${C.goldDark}`, background: disponibile ? C.goldDark : 'transparent', transition: 'all 0.15s ease' }}
+                                    style={{ width: 16, height: 16, padding: 0, borderRadius: '50%', cursor: 'pointer', border: '2px solid var(--c-araldi, #a45a2a)', background: disponibile ? 'var(--c-araldi, #a45a2a)' : 'transparent', transition: 'all 0.15s ease' }}
                                   />
                                 );
                               })}
