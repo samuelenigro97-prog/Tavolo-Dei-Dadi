@@ -183,7 +183,7 @@ export const VAELION_JSON = {
   dadiVita: "10d8",
   dadiVitaSpesi: 0,
   ca: 19,
-  velocita: 10.5,
+  velocita: 9,
   sensi: "Scurovisione 18 m",
   ispirazione: false,
   sfinimento: 0,

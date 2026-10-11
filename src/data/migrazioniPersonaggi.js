@@ -101,6 +101,7 @@ export function migrazioneRegoleVaelion(roster) {
       s.incantesimiLista = s.incantesimiLista.filter((inc) => !(inc.livello === 0 && /^folata$/i.test(String(inc.nome || '').trim())));
     }
     if (s.maxTrucchetti === 5) s.maxTrucchetti = 0;
+    if (s.velocita === 10.5) s.velocita = 9;
   }
 }
 
