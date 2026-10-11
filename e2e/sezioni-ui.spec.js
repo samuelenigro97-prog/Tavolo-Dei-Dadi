@@ -70,5 +70,33 @@ test.describe('Sezioni: angoli decorati', () => {
       }
     }
   });
+
+  test('i 4 riquadri vitali (Competenza, Iniziativa, Velocità, Sfinimento) hanno la stessa altezza dei 4 riquadri sotto (Visione, Percezione, Resistenze, Condizioni)', async ({ page }) => {
+    const heights = await page.evaluate(() => {
+      const getH = (text) => {
+        const needle = text.toLowerCase();
+        const el = Array.from(document.querySelectorAll('.vital-box')).find((b) => b.textContent.toLowerCase().includes(needle));
+        return el ? Math.round(el.getBoundingClientRect().height) : null;
+      };
+      return {
+        comp: getH('BONUS DI COMPETENZA'),
+        iniz: getH('INIZIATIVA'),
+        vel: getH('VELOCITÀ'),
+        sfin: getH('SFINIMENTO'),
+        vis: getH('VISIONE'),
+        perc: getH('PERCEZIONE PASSIVA'),
+        res: getH('RESISTENZE'),
+        cond: getH('CONDIZIONI'),
+      };
+    });
+
+    expect(heights.comp).toBeTruthy();
+    expect(heights.vis).toBeTruthy();
+    expect(heights.comp).toBe(heights.iniz);
+    expect(heights.iniz).toBe(heights.vel);
+    expect(heights.vel).toBe(heights.sfin);
+    expect(Math.abs(heights.comp - heights.vis)).toBeLessThanOrEqual(2);
+  });
 });
+
 

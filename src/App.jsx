@@ -11384,9 +11384,9 @@ export default function App() {
               <div className="pm-vitali-container profilo-vitali-box" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {/* Tier 2: Difesa e mobilità (CA, Riposo, Comp, Iniziativa, Velocità, Sfinimento) */}
                 <div className="pm-tier-2">
-                  <div className="vitali pm-gruppo">
-            <div className="vital-box" style={{ ...styles.vitalBox, gridColumn: 'span 2' }}>
-              <div style={styles.vitalLabel}>{t("vital.ca")}</div>
+                  <div className="vitali-difesa">
+                    <div className="vital-box" style={{ ...styles.vitalBox }}>
+                      <div style={styles.vitalLabel}>{t("vital.ca")}</div>
               <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={styles.vitalValue}>
                   {scheda.armatura.tipo === 'manuale' && !scheda.armatura.scudo && !scheda.armatura.bonus && !bonusClasseArmaturaOggetti(scheda) && !bonusPotereBersaglio(scheda, 'ca') ? (
@@ -11473,15 +11473,17 @@ export default function App() {
                 )}
               </div>
             </div>
-            <div className="vital-box" style={{ ...styles.vitalBox, gridColumn: 'span 2' }}>
-              <div style={styles.vitalLabel}>{t("vital.riposo")}</div>
-              <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
-                <button style={{ ...styles.buttonMini, fontSize: 14, fontWeight: 700, padding: '8px 18px', width: '100%', maxWidth: 220 }} onClick={() => riposoBreve()} title={t('vital.riposo_breve_tip')}>{t("vital.breve")}</button>
-                <button style={{ ...styles.buttonMini, fontSize: 14, fontWeight: 700, padding: '8px 18px', width: '100%', maxWidth: 220 }} onClick={() => riposoLungo()} title={t('vital.riposo_lungo_tip')}>{t("vital.lungo")}</button>
-              </div>
-            </div>
-            <div className="vital-box" style={{ ...styles.vitalBox }}>
-              <div style={styles.vitalLabel}>{t("vital.competenza")}</div>
+                    <div className="vital-box" style={{ ...styles.vitalBox }}>
+                      <div style={styles.vitalLabel}>{t("vital.riposo")}</div>
+                      <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
+                        <button style={{ ...styles.buttonMini, fontSize: 14, fontWeight: 700, padding: '8px 18px', width: '100%', maxWidth: 220 }} onClick={() => riposoBreve()} title={t('vital.riposo_breve_tip')}>{t("vital.breve")}</button>
+                        <button style={{ ...styles.buttonMini, fontSize: 14, fontWeight: 700, padding: '8px 18px', width: '100%', maxWidth: 220 }} onClick={() => riposoLungo()} title={t('vital.riposo_lungo_tip')}>{t("vital.lungo")}</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="vitali-sezioni-4 pm-gruppo">
+                    <div className="vital-box" style={{ ...styles.vitalBox }}>
+                      <div style={styles.vitalLabel}>{t("vital.competenza")}</div>
               <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={styles.vitalValue}>
                   <Editable value={conSegno(scheda.bonusCompetenza)} onChange={(v) => aggiorna({ bonusCompetenza: parseInt(v, 10) || 0 })} width={48} title={t('tip.click_modifica')} />
@@ -11578,7 +11580,7 @@ export default function App() {
                     textAlign: 'center',
                     fontWeight: 600,
                     position: 'absolute',
-                    bottom: 10,
+                    bottom: 6,
                     left: '50%',
                     transform: 'translateX(-50%)',
                     whiteSpace: 'nowrap',

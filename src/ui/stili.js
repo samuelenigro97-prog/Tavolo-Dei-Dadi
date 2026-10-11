@@ -1369,6 +1369,7 @@ tbody tr:hover {
 .pm-tier-2 {
   display: flex;
   flex-direction: column;
+  gap: 8px;
   min-width: 0;
 }
 .pm-gruppo { display: flex; flex-direction: column; flex: 1 1 auto; }
@@ -1598,15 +1599,19 @@ tbody tr:hover {
   .car-coppia { gap: 8px; }
 }
 .vitali { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 8px; align-items: stretch; }
-/* 4 riquadri vitali separati (Visione, Perc. Passiva, Resistenze, Condizioni) identici alla riga sopra */
+/* 2 riquadri vitali superiori per Difesa e Riposo (CA e Riposo) */
+.vitali-difesa { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: stretch; width: 100%; }
+.vitali-difesa > * { min-width: 0; }
+/* 4 riquadri vitali separati (Comp, Iniziativa, Velocità, Sfinimento / Visione, Perc. Passiva, Resistenze, Condizioni) */
 .vitali-sezioni-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 8px; align-items: stretch; width: 100%; }
 .vitali-sezioni-4 > * { min-width: 0; }
 @media (max-width: 768px) {
+  .vitali-difesa { grid-template-columns: 1fr; }
   .vitali-sezioni-4 { grid-template-columns: repeat(2, 1fr); }
 }
 /* consente ai riquadri di stringersi sotto la larghezza del contenuto (niente overflow) */
-.vitali > *, .vitali-sezioni-4 > * { min-width: 0; }
-.vitali > * > *, .vitali-sezioni-4 > * > * { min-width: 0; }
+.vitali > *, .vitali-difesa > *, .vitali-sezioni-4 > * { min-width: 0; }
+.vitali > * > *, .vitali-difesa > * > *, .vitali-sezioni-4 > * > * { min-width: 0; }
 /* Fascia dettagli incantesimo: scorre in orizzontale su una riga senza barre visibili. */
 .spell-chips { scrollbar-width: none !important; -ms-overflow-style: none !important; }
 .spell-chips::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
@@ -2041,8 +2046,9 @@ tbody tr:hover {
   .campi-anagrafica { grid-template-columns: repeat(2, 1fr) !important; gap: 8px 10px !important; }
   .campi-anagrafica .campo-modulo-box { min-height: 32px !important; height: auto !important; overflow: visible !important; }
   .vitali { grid-template-columns: repeat(2, 1fr) !important; grid-auto-rows: auto !important; }
+  .vitali-difesa { grid-template-columns: repeat(2, 1fr) !important; grid-auto-rows: auto !important; }
   /* niente riquadri a doppia colonna su mobile: griglia 2×N perfettamente uniforme */
-  .vitali > * { grid-column: auto !important; }
+  .vitali > *, .vitali-difesa > * { grid-column: auto !important; }
 }
 /* su mobile i campi con font < 16px fanno zoomare iOS al focus */
 @media (max-width: 820px) {
