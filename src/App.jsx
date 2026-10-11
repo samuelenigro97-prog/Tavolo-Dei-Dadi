@@ -10650,22 +10650,20 @@ export default function App() {
                 </Sezione>
               </div>
 
-              {/* Tier 3b: Poteri (Segreti, Debito, usi dei privilegi...) separati dalle risorse di classe — solo con manuale Araldi del Segreto attivo */}
-              {manualeAttivo(scheda?.manuali || manualiAttivi, 'araldi') && (
-                <div className="risorse-tier-3 profilo-risorse-box" style={{ marginTop: 10 }}>
-                  <Sezione titolo={lingua === 'en' ? 'Powers' : 'Poteri'} senzaAngoli={true} {...apertoProps('poteriRisorse')}>
-                    <PoteriRisorse
-                      scheda={scheda}
-                      aggiorna={aggiorna}
-                      lingua={lingua}
-                      registra={registra}
-                      mostraInfo={setInfo}
-                      recupero={!isSolaLettura ? recuperoPoteriDaCronologia() : null}
-                      ripristinoCampagna={!isSolaLettura && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null}
-                    />
-                  </Sezione>
-                </div>
-              )}
+              {/* Tier 3b: Poteri (Segreti, Debito, usi dei privilegi...) separati dalle risorse di classe */}
+              <div className="risorse-tier-3 profilo-risorse-box" style={{ marginTop: 10 }}>
+                <Sezione titolo={lingua === 'en' ? 'Powers' : 'Poteri'} senzaAngoli={true} {...apertoProps('poteriRisorse')}>
+                  <PoteriRisorse
+                    scheda={scheda}
+                    aggiorna={aggiorna}
+                    lingua={lingua}
+                    registra={registra}
+                    mostraInfo={setInfo}
+                    recupero={!isSolaLettura ? recuperoPoteriDaCronologia() : null}
+                    ripristinoCampagna={!isSolaLettura && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null}
+                  />
+                </Sezione>
+              </div>
             </div>
 
             {/* COLONNA CENTRALE: anagrafica + riquadri vitali */}

@@ -2589,8 +2589,8 @@ export function sincronizzaRisorseClasse(scheda, versione = '2024') {
       const n = String(r.nome || '').toLocaleLowerCase('it').trim();
       const a = String(auto.nome || '').toLocaleLowerCase('it').trim();
       if (a === 'forma selvatica') {
-        if (/^(forma\s*(bestiale|selvatica)|wild\s*shape)(\b|\s*\(|$)/i.test(n)) return true;
-        if (typeof r.id === 'string' && /forma-(selvatica|bestiale)/i.test(r.id)) return true;
+        if (/^(forma\s*(bestiale|selvatica)|wild\s*shape)(\s*\(.*)?$/i.test(n)) return true;
+        if (typeof r.id === 'string' && /^(auto-.*|vecchia-)?forma-(selvatica|bestiale)$/i.test(r.id)) return true;
       }
       return n === a;
     };
@@ -2629,7 +2629,7 @@ export function sincronizzaRisorseClasse(scheda, versione = '2024') {
   }
 
   // Deduplicazione e pulizia finale di sicurezza per Forma Selvatica / Forma Bestiale
-  const isForma = (r) => /^(forma\s*(bestiale|selvatica)|wild\s*shape)(\b|\s*\(|$)/i.test(String(r?.nome || '').trim()) || (typeof r?.id === 'string' && /forma-(selvatica|bestiale)/i.test(r.id));
+  const isForma = (r) => /^(forma\s*(bestiale|selvatica)|wild\s*shape)(\s*\(.*)?$/i.test(String(r?.nome || '').trim()) || (typeof r?.id === 'string' && /^(auto-.*|vecchia-)?forma-(selvatica|bestiale)$/i.test(r.id));
   const indiciForma = [];
   risultato.forEach((r, idx) => {
     if (isForma(r)) indiciForma.push(idx);
@@ -2653,7 +2653,7 @@ export function sincronizzaRisorseClasse(scheda, versione = '2024') {
 
   // Rinomina ovunque "Forma Bestiale" residuo in "Forma Selvatica"
   for (let i = 0; i < risultato.length; i++) {
-    if (/^forma\s*bestiale$/i.test(String(risultato[i]?.nome || '').trim())) {
+    if (/^forma\s*bestiale(\s*\(.*)?$/i.test(String(risultato[i]?.nome || '').trim())) {
       risultato[i] = { ...risultato[i], nome: 'Forma Selvatica' };
       cambiate = true;
     }
