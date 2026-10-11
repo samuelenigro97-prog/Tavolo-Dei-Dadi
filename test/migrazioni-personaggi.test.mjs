@@ -125,3 +125,25 @@ test('autoIdratazionePersonaggioPredefinito: NOTA — il riconoscimento è per n
   autoIdratazionePersonaggioPredefinito(s, 'pg-un-id-qualsiasi-non-il-seed');
   assert.ok(s.note, 'il nome da solo basta a far scattare la migrazione');
 });
+
+test('migrazioneRegoleVaelion: forza Elfo dei Boschi e rimuove tratti Tiefling o residui come grazia del velo', () => {
+  const s = personaggioBase({
+    nome: 'Vaelion (Val) Leafwhisper',
+    specie: 'Tiefling',
+    trattiSpecie: 'Presenza Ultraterrena\nResistenza Infernale\nGrazia del Velo',
+    privilegi: 'Druidico\nEredità Infernale',
+    talenti: 'Grazia del Velo\nAllerta',
+    poteri: [{ id: 'p1', nome: 'Grazia del Velo', contatori: [] }, { id: 'p2', nome: 'Patrono', contatori: [] }],
+  });
+  const roster = { personaggi: { 'pg-vaelion': s } };
+  migrazioneRegoleVaelion(roster);
+
+  assert.equal(s.specie, 'Elfo dei Boschi');
+  assert.equal(s.taglia, 'Media');
+  assert.match(s.trattiSpecie, /Maschera della Selva/);
+  assert.doesNotMatch(s.trattiSpecie, /Tiefling|Infernale|Grazia del Velo/i);
+  assert.equal(s.privilegi, 'Druidico');
+  assert.equal(s.talenti, 'Allerta');
+  assert.deepEqual(s.poteri.map((p) => p.nome), ['Patrono']);
+});
+

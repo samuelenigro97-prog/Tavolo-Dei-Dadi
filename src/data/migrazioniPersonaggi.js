@@ -107,6 +107,29 @@ export function migrazioneRegoleVaelion(roster) {
     }
     if (s.maxTrucchetti === 5) s.maxTrucchetti = 0;
     if (s.velocita === 10.5) s.velocita = 9;
+
+    // Garantisci specie Elfo dei Boschi (evita razze errate come Tiefling)
+    if (s.specie !== 'Elfo dei Boschi') {
+      s.specie = 'Elfo dei Boschi';
+      s.taglia = 'Media';
+    }
+    // Rimuovi qualsiasi tratto o residuo Tiefling o voci spurie ("grazia del velo")
+    const patternSpurio = /tiefling|infernale|ultraterrena|grazia\s*del\s*velo/i;
+    if (!s.trattiSpecie || !s.trattiSpecie.includes('Maschera della Selva') || patternSpurio.test(s.trattiSpecie)) {
+      s.trattiSpecie = VAELION_JSON.trattiSpecie;
+    }
+    if (typeof s.privilegi === 'string' && patternSpurio.test(s.privilegi)) {
+      s.privilegi = s.privilegi.split('\n').filter((l) => !patternSpurio.test(l)).join('\n');
+    }
+    if (typeof s.privilegiSottoclasse === 'string' && patternSpurio.test(s.privilegiSottoclasse)) {
+      s.privilegiSottoclasse = s.privilegiSottoclasse.split('\n').filter((l) => !patternSpurio.test(l)).join('\n');
+    }
+    if (typeof s.talenti === 'string' && patternSpurio.test(s.talenti)) {
+      s.talenti = s.talenti.split('\n').filter((l) => !patternSpurio.test(l)).join('\n');
+    }
+    if (Array.isArray(s.poteri)) {
+      s.poteri = s.poteri.filter((p) => !patternSpurio.test(p?.nome || '') && !patternSpurio.test(p?.descrizione || ''));
+    }
   }
 }
 
@@ -117,6 +140,7 @@ export function migrazioneRegoleVaelion(roster) {
  */
 export function autoIdratazionePersonaggioPredefinito(s, id) {
   if (/vaelion/i.test(s.nome) || id === 'pg-vaelion') {
+    if (s.specie !== 'Elfo dei Boschi') s.specie = 'Elfo dei Boschi';
     if (!s.note && VAELION_JSON.note) s.note = VAELION_JSON.note;
     if (!s.trattiCaratteriali && VAELION_JSON.trattiCaratteriali) s.trattiCaratteriali = VAELION_JSON.trattiCaratteriali;
     if (!s.ideali && VAELION_JSON.ideali) s.ideali = VAELION_JSON.ideali;
