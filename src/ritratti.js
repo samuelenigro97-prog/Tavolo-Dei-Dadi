@@ -156,9 +156,12 @@ export function generaAvatarBestia(forma) {
     return forma.ritratto;
   }
   const nome = forma?.nome || 'Bestia';
-  const gs = forma?.gs != null ? (forma.gs === 0.25 ? '1/4' : forma.gs === 0.5 ? '1/2' : forma.gs) : '';
   const isMyrdhal = (nome || '').toLowerCase().includes('myrdhal');
-  const path = isMyrdhal ? (ICONE_CLASSE['warlock'] || trovaPathBestia(nome)) : trovaPathBestia(nome);
+  if (isMyrdhal) {
+    return '/araldi/myrdhal.png';
+  }
+  const gs = forma?.gs != null ? (forma.gs === 0.25 ? '1/4' : forma.gs === 0.5 ? '1/2' : forma.gs) : '';
+  const path = trovaPathBestia(nome);
   
   const bgGrad = isMyrdhal
     ? `<stop offset="0%" stop-color="#4a044e"/><stop offset="45%" stop-color="#240046"/><stop offset="85%" stop-color="#10002b"/><stop offset="100%" stop-color="#050014"/>`

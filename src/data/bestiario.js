@@ -1531,6 +1531,7 @@ export function limitiMetamorfosi(livello) {
 export const EVOCAZIONI_ARALDI = [
   {
     nome: 'Myrdhal', nomeEn: 'Myrdhal', tipo: 'Non morto (Evocazione Araldi del Segreto)', manuale: 'araldi',
+    ritratto: '/araldi/myrdhal.png',
     taglia: 'Grande', ca: 20, pf: 210, pfFormula: '20d10 + 100',
     velocita: { terra: 12 },
     gs: '17', gsNum: 17,
