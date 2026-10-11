@@ -1695,14 +1695,18 @@ tbody tr:hover {
 }
 .app-version {
   display: inline-block;
-  padding: 0 0 0 3px;
+  padding: 0 0 0 4px;
   border: none !important;
   border-radius: 0 !important;
   background: transparent !important;
-  /* Cifre allineate sulla stessa riga (Georgia le ha "a onde"), subito dopo il titolo e un po' più in basso. */
-  color: var(--c-ink-dim); font: 600 11px/1 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  font-variant-numeric: lining-nums tabular-nums; letter-spacing: .2px;
-  position: relative; top: 0;
+  /* Eredita lo stesso font del titolo (Cinzel/Georgia), posizionata sulla linea di base e leggermente abbassata */
+  color: var(--c-ink-dim);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  position: relative;
+  top: 2px;
 }
 /* Simboli di sfondo ed emoji opachi nei riquadri vitali e caratteristiche */
 .sfondo-vit-emoji {

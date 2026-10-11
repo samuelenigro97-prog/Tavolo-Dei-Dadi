@@ -97,6 +97,25 @@ test.describe('Sezioni: angoli decorati', () => {
     expect(heights.vel).toBe(heights.sfin);
     expect(Math.abs(heights.comp - heights.vis)).toBeLessThanOrEqual(2);
   });
+
+  test('versione dell’app: visibile nel menu iniziale/home e non nella barra dell’intestazione', async ({ page }) => {
+    // Nell'intestazione desktop non deve esserci il numero di versione
+    const headerTitle = await page.locator('.selettore-personaggio-desktop').textContent();
+    expect(headerTitle).toContain('Tavolo dei Dadi');
+    expect(headerTitle).not.toMatch(/v\d+\.\d+/);
+
+    // Il menu iniziale / home può essere già aperto all'avvio oppure aperto tramite 🏠
+    const menuIniziale = page.locator('[data-testid="menu-iniziale"]');
+    if (!(await menuIniziale.isVisible())) {
+      await page.locator('.btn-header-azione:has-text("🏠")').first().click();
+    }
+    await expect(menuIniziale).toBeVisible();
+
+    // Nel menu iniziale è presente la versione con classe .app-version
+    const versionEl = menuIniziale.locator('.app-version');
+    await expect(versionEl).toBeVisible();
+    await expect(versionEl).toHaveText(/v\d+\.\d+/);
+  });
 });
 
 

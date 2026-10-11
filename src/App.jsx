@@ -9593,9 +9593,6 @@ export default function App() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, userSelect: 'none', flexShrink: 0, alignSelf: 'center' }}>
                     <span style={{ fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", fontSize: 16, fontWeight: 800, color: 'var(--c-title)', letterSpacing: 0.5, whiteSpace: 'nowrap', transition: 'color 0.2s ease', display: 'inline-flex', alignItems: 'baseline', gap: 0 }}>
                       Tavolo dei Dadi
-                      <span className="app-version" style={{ whiteSpace: 'nowrap' }}>
-                        v{APP_VERSION}
-                      </span>
                     </span>
                   </div>
 
@@ -9866,9 +9863,6 @@ export default function App() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, userSelect: 'none', flexShrink: 0 }}>
                     <span style={{ fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", fontSize: 15, fontWeight: 800, color: 'var(--c-title)', letterSpacing: 0.4, whiteSpace: 'nowrap', transition: 'color 0.2s ease', display: 'inline-flex', alignItems: 'baseline', gap: 0 }}>
                       Tavolo dei Dadi
-                      <span className="app-version" style={{ whiteSpace: 'nowrap' }}>
-                        v{APP_VERSION}
-                      </span>
                     </span>
                   </div>
 

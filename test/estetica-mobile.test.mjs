@@ -7,8 +7,9 @@ const app = readFileSync(join(process.cwd(), 'src/App.jsx'), 'utf8');
 const css = readFileSync(join(process.cwd(), 'src/ui/stili.js'), 'utf8');
 const menu = readFileSync(join(process.cwd(), 'src/ui/modali/MenuPersonaggiModal.jsx'), 'utf8');
 
-test('estetica: la versione è parte del titolo e non è posizionata assolutamente', () => {
-  assert.match(app, /className="app-version"/);
+test('estetica: la versione è presente nel menu iniziale/home e non nell’intestazione', () => {
+  assert.match(menu, /className="app-version"/);
+  assert.doesNotMatch(app, /className="app-version"/);
   assert.match(css, /\.app-version\s*\{/);
   const regola = css.match(/\.app-version\s*\{([^}]*)\}/)?.[1] || '';
   assert.doesNotMatch(regola, /position:\s*absolute/);

@@ -47,7 +47,7 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 {lingua === 'en' ? 'Menu and tools' : 'Menu e strumenti'}
               </h2>
               <div style={{ fontSize: 12, color: 'var(--c-title)', fontWeight: 800, fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)" }}>
-                Tavolo dei Dadi <span style={{ fontSize: 11, color: C.inkDim, opacity: 0.75, fontWeight: 600 }}>v{APP_VERSION}</span>
+                Tavolo dei Dadi
               </div>
             </div>
           </div>
