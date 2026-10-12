@@ -1958,7 +1958,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.96.0';
+const APP_VERSION = '4.97.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -3772,7 +3772,8 @@ export default function App() {
   }, [presetColori]);
 
   // Tema Cornici & Bordi di Classe
-  const [temaCornici, setTemaCornici] = useState(() => localStorage.getItem('scheda-interattiva:tema-cornici') || 'auto');
+  // Le cornici seguono sempre la classe del personaggio (la scelta manuale è stata tolta dal menu).
+  const [temaCornici, setTemaCornici] = useState('auto');
   useEffect(() => {
     try { localStorage.setItem('scheda-interattiva:tema-cornici', temaCornici); } catch { /* niente */ }
   }, [temaCornici]);
@@ -3994,7 +3995,7 @@ export default function App() {
     const finali = { ...valoriPreferenze };
     if ('tema' in v) { finali.tema = v.tema; setTema(v.tema); }
     if ('presetColori' in v && PRESET_COLORI.some((x) => x.id === v.presetColori)) { finali.presetColori = v.presetColori; setPresetColori(v.presetColori); }
-    if ('temaCornici' in v) { finali.temaCornici = v.temaCornici; setTemaCornici(v.temaCornici); }
+
     if ('ambienteAudio' in v) { finali.ambienteAudio = v.ambienteAudio; setAmbienteAudio(v.ambienteAudio); }
     if ('volumeAudio' in v) { finali.volumeAudio = v.volumeAudio; setVolumeAudio(v.volumeAudio); }
     if ('volumeEffetti' in v) { finali.volumeEffetti = v.volumeEffetti; setVolumeEffetti(v.volumeEffetti); }

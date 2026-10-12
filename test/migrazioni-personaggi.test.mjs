@@ -147,3 +147,12 @@ test('migrazioneRegoleVaelion: forza Elfo dei Boschi e rimuove tratti Tiefling o
   assert.deepEqual(s.poteri.map((p) => p.nome), ['Patrono']);
 });
 
+
+test('Vaelion, Elfo dei Boschi: velocità base 10,5 m (la 9 m viene corretta) (v4.97.0)', async () => {
+  const { migrazioneRegoleVaelion } = await import('../src/data/migrazioniPersonaggi.js');
+  const { VAELION_JSON } = await import('../src/data/esempi.js');
+  assert.equal(VAELION_JSON.velocita, 10.5);
+  const roster = { attivo: 'v', personaggi: { v: { ...JSON.parse(JSON.stringify(VAELION_JSON)), velocita: 9 } } };
+  migrazioneRegoleVaelion(roster);
+  assert.equal(roster.personaggi.v.velocita, 10.5);
+});

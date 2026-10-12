@@ -2,6 +2,20 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.97.0] – 2026-10-12
+
+### Corretto
+- **Velocità di Vaelion**: la base torna a **10,5 m** (Elfo dei Boschi, 35 ft, in entrambe
+  le edizioni). La 4.95 l'aveva portata a 9 m, anche sulle schede salvate: la migrazione
+  ora riporta 9 → 10,5. Il totale mostrato resta base + Poteri attivi (Maschera +3 m →
+  13,5 m, in blu, dettaglio nel tooltip).
+
+### Cambiato
+- **Menu iniziale**: i titoletti delle sezioni (Azioni rapide, Dati e backup,
+  Informazioni) hanno lo stesso stile delle etichette della barra (Sistema, Scheda,
+  Sessione); la versione poggia sulla linea di base della scritta "Tavolo dei Dadi".
+- **Tolta la scelta delle cornici** dal menu: seguono sempre la classe del personaggio.
+
 ## [4.96.0] – 2026-10-12
 
 Controllo completo delle regole automatiche (PF, TS contro morte, riposi, sfinimento,

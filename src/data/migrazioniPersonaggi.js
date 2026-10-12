@@ -106,7 +106,8 @@ export function migrazioneRegoleVaelion(roster) {
       }
     }
     if (s.maxTrucchetti === 5) s.maxTrucchetti = 0;
-    if (s.velocita === 10.5) s.velocita = 9;
+    // Elfo dei Boschi: velocità base 10,5 m (35 ft) in entrambe le edizioni; la 9 m era un errore.
+    if (s.velocita === 9) s.velocita = 10.5;
 
     // Garantisci specie Elfo dei Boschi (evita razze errate come Tiefling)
     if (s.specie !== 'Elfo dei Boschi') {

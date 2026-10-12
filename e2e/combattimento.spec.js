@@ -102,7 +102,7 @@ test.describe('Combattimento', () => {
     await apriScheda(page);
     const box = page.locator('.velocita-modificata');
     await expect(box).toHaveCount(1);
-    await expect(box).toContainText('12');
+    await expect(box).toContainText('13.5');
     await expect(box).not.toContainText('+3m');
     const colore = await box.locator('span').first().evaluate((e) => getComputedStyle(e).color);
     // Il blu "valore modificato" è quello della palette dei chip (tema chiaro), non un numero scritto a mano nel test.

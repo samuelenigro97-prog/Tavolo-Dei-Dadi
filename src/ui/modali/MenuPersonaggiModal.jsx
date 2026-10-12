@@ -5,6 +5,12 @@ import { C } from '../tema.js';
 import { t } from '../../i18n';
 import { URL_ARCHIVIO_PG } from '../../utils/ambiente.js';
 
+/** Titoletti delle sezioni del menu: stesso stile delle etichette della barra (SISTEMA, SCHEDA, SESSIONE). */
+const etichettaSezione = {
+  fontSize: 11, fontWeight: 800, letterSpacing: 0.6, textTransform: 'uppercase', color: C.goldDark,
+  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', opacity: 0.9, userSelect: 'none', marginBottom: 8,
+};
+
 export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, esportaBackupCompleto, generaPgCasuale, idDispositivo, isCloudAttivo, jsonRef, leggiSnapshots, lingua, manualiAttivi, mostraListaCarica, novitaNonLette, roster, scheda, setBozzaCrea, setCloudStatus, setConferma, setLingua, setMostraArchivioDm, setMostraCloud, setMostraCrea, setMostraDonazioni, setMostraListaCarica, setMostraMenu, setMostraMenuEsporta, setMostraModalManuali, setMostraNoteLegali, setMostraRipristino, setPosEsporta, setRoster, setSchedaSolaLettura, setTemaCornici, statoBgCloud, statoColoreCloud, statoGlowCloud, temaCornici }) {
   // `attivo` viene salvato nel roster: è quindi anche l'ultimo personaggio effettivamente usato.
   const ultimoPersonaggio = roster?.personaggi?.[roster?.attivo] || scheda;
@@ -136,7 +142,7 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
     
         {/* Specchio tasti header globali nello stesso identico ordine, con le stesse etichette e icone */}
         <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px solid ${C.border}` }}>
-          <div style={{ ...styles.detail, marginBottom: 8, fontWeight: 700 }}>{lingua === 'en' ? 'Quick actions' : 'Azioni rapide'}</div>
+          <div style={etichettaSezione}>{lingua === 'en' ? 'Quick actions' : 'Azioni rapide'}</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
             <button
               style={{ ...styles.button, width: '100%', minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
@@ -188,38 +194,11 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
               
               <span>{lingua === 'en' ? 'Backup & sync' : 'Backup e sincronizzazione'}</span>
             </button>
-            <div style={{ gridColumn: 'span 2', marginTop: 4 }}>
-              <div style={{ fontSize: 11, color: C.inkDim, marginBottom: 4, fontWeight: 600 }}>
-                {lingua === 'en' ? 'Section frames' : 'Cornici delle sezioni'}
-              </div>
-              <select
-                value={temaCornici}
-                onChange={(e) => setTemaCornici(e.target.value)}
-                style={{ ...styles.inlineInput, width: '100%', height: 32, padding: '4px 8px', borderRadius: 6, background: C.panel, color: C.ink, fontSize: 12, border: `1px solid ${C.border}` }}
-                title={lingua === 'en' ? 'Choose the style of the section frames' : 'Scegli lo stile delle cornici delle sezioni'}
-              >
-                <option value="auto">{lingua === 'en' ? `Automatic (character class: ${scheda.classe || 'default'})` : `Automatiche (classe del personaggio: ${scheda.classe || 'predefinita'})`}</option>
-                <option value="druido">Druido (rami e foglie)</option>
-                <option value="mago">Mago (rune arcane e stelle)</option>
-                <option value="guerriero">Guerriero (piastre rivettate)</option>
-                <option value="ladro">Ladro (lame e ombre)</option>
-                <option value="chierico">Chierico (reliquiario e luce)</option>
-                <option value="paladino">Paladino (scudo araldico)</option>
-                <option value="bardo">Bardo (volute barocche e note)</option>
-                <option value="barbaro">Barbaro (artigli e zanne)</option>
-                <option value="ranger">Ranger (frecce e nodi silvestri)</option>
-                <option value="stregone">Stregone (energia arcana e fulmini)</option>
-                <option value="warlock">Warlock (spirali occulte e occhi)</option>
-                <option value="monaco">Monaco (cerchio zen e giada)</option>
-                <option value="artefice">Artefice (ingranaggi e ottone)</option>
-                <option value="disattivato">{lingua === 'en' ? 'No frames' : 'Nessuna cornice'}</option>
-              </select>
-            </div>
           </div>
         </div>
     
         <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${C.border}` }}>
-          <div style={{ ...styles.detail, marginBottom: 8, fontWeight: 700 }}>{t('menu.sezione_backup')}</div>
+          <div style={etichettaSezione}>{t('menu.sezione_backup')}</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
             <button style={{ ...styles.button, width: '100%', minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }} onClick={() => jsonRef.current?.click()} title={t('menu.ripristina_tip')}>
               <span>{t('menu.ripristina')}</span>
@@ -245,7 +224,7 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
         </div>
 
         <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${C.border}` }}>
-          <div style={{ ...styles.detail, marginBottom: 8, fontWeight: 700 }}>{t('menu.sezione_info')}</div>
+          <div style={etichettaSezione}>{lingua === 'en' ? 'About' : 'Informazioni'}</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
             <button
               style={{ ...styles.button, width: '100%', height: 38, minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0 6px', fontSize: 13, boxSizing: 'border-box' }}

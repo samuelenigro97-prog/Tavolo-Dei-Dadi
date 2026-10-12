@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.97.0',
+    voci: {
+      it: [
+        'Vaelion: velocità base di nuovo 10,5 m (Elfo dei Boschi); con la Maschera del Patrono il totale è 13,5 m.',
+        'Menu iniziale: titoletti nello stile della barra, versione allineata al titolo, tolta la scelta delle cornici (seguono la classe).',
+      ],
+      en: [
+        'Vaelion: base speed back to 35 ft (Wood Elf); with the Patron\'s Mask the total is 13.5 m.',
+        'Start menu: section labels styled like the toolbar, version aligned with the title, frame choice removed (frames follow the class).',
+      ],
+    },
+  },
+  {
     versione: '4.96.0',
     voci: {
       it: [

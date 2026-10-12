@@ -1705,14 +1705,14 @@ tbody tr:hover {
   border: none !important;
   border-radius: 0 !important;
   background: transparent !important;
-  /* Eredita lo stesso font del titolo (Cinzel/Georgia), posizionata sulla linea di base e leggermente abbassata */
+  /* Eredita lo stesso font del titolo (Cinzel/Georgia) e poggia sulla sua stessa linea di base */
   color: var(--c-ink-dim);
   font-family: inherit;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: .4px;
   position: relative;
-  top: 2px;
+  top: 0;
 }
 /* Simboli di sfondo ed emoji opachi nei riquadri vitali e caratteristiche */
 .sfondo-vit-emoji {
