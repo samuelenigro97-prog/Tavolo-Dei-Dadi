@@ -36,11 +36,24 @@ test.describe('Equipaggiamento', () => {
     await expect(riga.getByText('⚡')).toBeVisible();
   });
 
-  test('un oggetto con un effetto già attivo mostra sempre le 4 icone', async ({ page }) => {
+  test('anche un oggetto con un effetto attivo apre e chiude le icone dal "⋯" (v4.98.0)', async ({ page }) => {
     const riga = page.locator('tr.inventario-riga').filter({ hasText: 'Perla del Potere' });
-    await expect(riga.getByRole('button', { name: '⋯' })).toHaveCount(0);
+    const altro = riga.getByRole('button', { name: '⋯' });
+    await expect(altro).toBeVisible();
+    await expect(riga.getByText('🎒')).toHaveCount(0);
+    await altro.click();
     await expect(riga.getByText('🎒')).toBeVisible();
     await expect(riga.getByText('✨')).toBeVisible();
     await expect(riga.getByText('⚡')).toBeVisible();
+    await altro.click();
+    await expect(riga.getByText('🎒')).toHaveCount(0);
+  });
+
+  test('il tasto ✎ rinomina l\'oggetto (v4.98.0)', async ({ page }) => {
+    const riga = page.locator('tr.inventario-riga').filter({ hasText: 'Antitossina' });
+    await riga.getByRole('button', { name: '⋯' }).click();
+    page.once('dialog', (d) => d.accept('Antitossina del Druido'));
+    await riga.getByRole('button', { name: 'Rinomina l\'oggetto' }).click();
+    await expect(page.locator('tr.inventario-riga').filter({ hasText: 'Antitossina del Druido' })).toHaveCount(1);
   });
 });

@@ -1958,7 +1958,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.97.0';
+const APP_VERSION = '4.98.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -16485,18 +16485,34 @@ export default function App() {
                                   </td>
                                   <td className="inventario-azioni" style={{ ...styles.td, textAlign: 'right', whiteSpace: 'nowrap', ...((mostraEffetto || mostraUtilizzi || mostraContenuto) && senzaBordo) }}>
                                     {(() => {
-                                      const giaAttivo = isContainer || effettoAttivo || o.usiMax > 0;
-                                      if (!giaAttivo && !azioniInvEspanse[o.id]) {
-                                        return (
-                                          <button
-                                            style={{ ...styles.buttonMini, color: C.inkDim }}
-                                            title={lingua === 'en' ? 'More options (container, magic effect, uses)' : 'Altre opzioni (contenitore, effetto magico, utilizzi)'}
-                                            onClick={() => setAzioniInvEspanse((prev) => ({ ...prev, [o.id]: true }))}
-                                          >⋯</button>
-                                        );
-                                      }
+                                      // Tutte le righe uguali: le icone (rinomina, contenitore, effetto, utilizzi)
+                                      // si aprono e si chiudono dal "⋯", anche quando l'oggetto le usa già.
+                                      const aperto = Boolean(azioniInvEspanse[o.id]);
+                                      const tastoAltro = (
+                                        <button
+                                          type="button"
+                                          aria-expanded={aperto}
+                                          style={{ ...styles.buttonMini, color: aperto ? C.ink : C.inkDim }}
+                                          title={aperto
+                                            ? (lingua === 'en' ? 'Hide the options' : 'Nascondi le opzioni')
+                                            : (lingua === 'en' ? 'More options (rename, container, magic effect, uses)' : 'Altre opzioni (rinomina, contenitore, effetto magico, utilizzi)')}
+                                          onClick={() => setAzioniInvEspanse((prev) => ({ ...prev, [o.id]: !prev[o.id] }))}
+                                        >⋯</button>
+                                      );
+                                      if (!aperto) return <>{tastoAltro}{' '}</>;
                                       return (
                                         <>
+                                          {tastoAltro}{' '}
+                                          <button
+                                            type="button"
+                                            style={styles.buttonMini}
+                                            title={lingua === 'en' ? 'Rename the item' : 'Rinomina l\'oggetto'}
+                                            aria-label={lingua === 'en' ? 'Rename the item' : 'Rinomina l\'oggetto'}
+                                            onClick={() => {
+                                              const nuovo = prompt(lingua === 'en' ? 'New name for the item' : 'Nuovo nome dell\'oggetto', o.nome || '');
+                                              if (nuovo && nuovo.trim() && nuovo.trim() !== o.nome) modInv(o.id, { nome: nuovo.trim() });
+                                            }}
+                                          >✎</button>{' '}
                                           <button
                                             style={{ ...styles.buttonMini, color: isContainer ? C.goldDark : C.inkDim, borderColor: isContainer ? C.goldDark : C.border, background: isContainer ? 'rgba(201,162,39,0.12)' : undefined }}
                                             title={isContainer ? t('inv.apri_contenitore') : (lingua === 'en' ? 'Add sub-items (turn into container)' : 'Inserisci sotto-oggetti (rendi contenitore)')}

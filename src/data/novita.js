@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.98.0',
+    voci: {
+      it: ['Equipaggiamento: le icone di ogni oggetto si aprono e chiudono dai "⋯", e c\'è il tasto ✎ per rinominare l\'oggetto.'],
+      en: ['Equipment: each item\'s icons open and close from "⋯", and there is a ✎ button to rename the item.'],
+    },
+  },
+  {
     versione: '4.97.0',
     voci: {
       it: [

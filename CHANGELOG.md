@@ -2,6 +2,17 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.98.0] – 2026-10-12
+
+### Cambiato
+- **Equipaggiamento, righe tutte uguali**: ogni oggetto mostra solo "⋯" e il cestino;
+  "⋯" apre e chiude le icone (anche per gli oggetti con contenitore, effetto o
+  utilizzi già attivi, che prima le mostravano sempre). Le righe "Effetto"/"Utilizzi"
+  degli oggetti che li usano restano visibili.
+
+### Aggiunto
+- **✎ Rinomina l'oggetto**, fra le icone aperte da "⋯".
+
 ## [4.97.0] – 2026-10-12
 
 ### Corretto
