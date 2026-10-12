@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.96.0',
+    voci: {
+      it: [
+        'A 0 PF il personaggio diventa Privo di sensi e perde la concentrazione da solo; recuperando PF torna in piedi e i TS contro morte si azzerano.',
+        'Concentrazione: nella 5.5 la CD arriva al massimo a 30. Sfinimento 6 indica la morte anche con le regole 2024.',
+      ],
+      en: [
+        'At 0 HP the character becomes Unconscious and loses concentration automatically; regaining HP brings them back up and resets death saves.',
+        'Concentration: in 5.5 the DC is capped at 30. Exhaustion 6 now shows death with the 2024 rules too.',
+      ],
+    },
+  },
+  {
     versione: '4.95.4',
     voci: {
       it: ['Corretto l\'errore "startsWith is not a function" che impediva di aprire le schede con incantesimi salvati da versioni vecchie.'],

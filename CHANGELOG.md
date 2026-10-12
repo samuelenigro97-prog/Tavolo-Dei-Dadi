@@ -2,6 +2,31 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.96.0] – 2026-10-12
+
+Controllo completo delle regole automatiche (PF, TS contro morte, riposi, sfinimento,
+concentrazione, critici). Già corretti e coperti da test: PF temporanei assorbiti per
+primi, fallimento automatico per danno a 0 PF, danno massiccio = morte istantanea,
+20 naturale ai TS contro morte = 1 PF, 1 naturale = due fallimenti, riposo lungo (PF,
+PF temporanei, slot, dadi vita per edizione, risorse, −1 sfinimento, TS contro morte),
+riposo breve (risorse "breve" e slot del Patto del Warlock), sfinimento 5.5 (−2 ai d20 e
+−1,5 m per livello) e 5.0 (effetti cumulativi, PF massimi dimezzati al 4°), critico che
+raddoppia solo i dadi.
+
+### Corretto
+- **A 0 PF** la scheda aggiunge da sola la condizione **Privo di sensi** e interrompe la
+  **concentrazione** (prima restava attiva e poteva comparire perfino il TS di
+  concentrazione). Vale da qualunque parte arrivi il danno: tasti rapidi, Combat
+  Tracker, PF scritti a mano (`patchTransizionePf`).
+- **Recuperando PF da 0** si toglie Privo di sensi e i **TS contro morte si azzerano**
+  (prima restavano i successi/fallimenti di prima: bastavano meno fallimenti per morire).
+- **CD della concentrazione** nella 5.5 al massimo 30 (`cdConcentrazione`).
+- **Sfinimento 6** mostra "Morte" anche con le regole 2024 (prima "−12").
+
+### Nota
+- Scendere a 0 PF **non** dà livelli di sfinimento né nelle regole 2014 né nelle 2024:
+  la scheda non li aggiunge.
+
 ## [4.95.4] – 2026-10-12
 
 ### Corretto

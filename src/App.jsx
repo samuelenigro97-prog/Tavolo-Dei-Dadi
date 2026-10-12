@@ -8,7 +8,7 @@ import { C, BASE_TEMA, PRESET_COLORI, ambientazioneCasuale } from "./ui/tema.js"
 import { styles, GLOBAL_CSS } from './ui/stili.js';
 import { Editable, Rollable, iconaTipoDanno, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
-import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
+import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, patchTransizionePf, cdConcentrazione, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
 import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } from "./data/esempi.js";
 import { fixEquipaggiamentoVaelion, migrazioneRegoleVaelion, autoIdratazionePersonaggioPredefinito } from './data/migrazioniPersonaggi.js';
 import { CARATTERISTICHE, ABILITA } from './data/caratteristiche.js';
@@ -1958,7 +1958,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.95.4';
+const APP_VERSION = '4.96.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4584,6 +4584,32 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scheda?.poteri]);
 
+  // PF che scendono a 0 o risalgono, da qualunque parte arrivi il cambio (tasti
+  // rapidi, Combat Tracker, PF scritti a mano, cure, TS contro morte con 20):
+  // Privo di sensi + fine concentrazione a 0 PF; TS contro morte azzerati e via
+  // Privo di sensi quando si torna sopra 0 (vedi patchTransizionePf).
+  const pfPrecedentiRef = useRef({ id: roster.attivo, pf: scheda?.pfAttuali });
+  useEffect(() => {
+    if (!scheda) return;
+    const prec = pfPrecedentiRef.current;
+    pfPrecedentiRef.current = { id: roster.attivo, pf: scheda.pfAttuali };
+    // Cambio di personaggio o scheda in sola lettura: nessuna regola da applicare.
+    if (prec.id !== roster.attivo || isSolaLettura) return;
+    const patch = patchTransizionePf(scheda, prec.pf);
+    if (!patch) return;
+    aggiorna(patch);
+    const aZero = (Number(scheda.pfAttuali) || 0) === 0;
+    if (aZero) setCheckConc(null);
+    registra({
+      etichetta: aZero ? tr('0 PF', '0 HP') : tr('Di nuovo in piedi', 'Back on your feet'),
+      tipo: 'tattica',
+      dettaglio: aZero
+        ? tr(`${scheda.nome || 'PG'} cade a 0 PF: Privo di sensi${patch.concentrazione === '' ? ', concentrazione interrotta' : ''}. Ora si tirano i TS contro morte.`, `${scheda.nome || 'PC'} drops to 0 HP: Unconscious${patch.concentrazione === '' ? ', concentration broken' : ''}. Death saves start now.`)
+        : tr(`${scheda.nome || 'PG'} recupera PF: non è più Privo di sensi e i TS contro morte si azzerano.`, `${scheda.nome || 'PC'} regains HP: no longer Unconscious, death saves reset.`),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scheda?.pfAttuali, roster.attivo]);
+
   // Myrdhal evocato con la 4.87 aveva 250 PF (210 + Evocatore Possente di Vaelion):
   // il suo blocco è fisso, torna a 210.
   useEffect(() => {
@@ -5345,7 +5371,7 @@ export default function App() {
         // stessa regola già applicata dai tasti rapidi danno/cura in scheda.
         if (delta < 0 && scheda.concentrazione) {
           const dannoSubito = -delta;
-          setCheckConc({ danno: dannoSubito, cd: Math.max(10, Math.floor(dannoSubito / 2)), spell: scheda.concentrazione, esito: null });
+          setCheckConc({ danno: dannoSubito, cd: cdConcentrazione(dannoSubito, scheda.versione), spell: scheda.concentrazione, esito: null });
         }
       } else if (cb.tipo === 'alleato' && Array.isArray(scheda.alleati) && cb.nome) {
         const alleatiAgg = scheda.alleati.map((a) =>
@@ -11108,7 +11134,7 @@ export default function App() {
                                     aggiorna({ pfAttuali: v });
                                   }
                                   if (danno > 0 && scheda.concentrazione) {
-                                    setCheckConc({ danno, cd: Math.max(10, Math.floor(danno / 2)), spell: scheda.concentrazione, esito: null });
+                                    setCheckConc({ danno, cd: cdConcentrazione(danno, scheda.versione), spell: scheda.concentrazione, esito: null });
                                   }
                                 }}
                                 width={34}
@@ -11222,7 +11248,7 @@ export default function App() {
                           aggiorna(patch);
                         }
                         if (scheda.concentrazione) {
-                          setCheckConc({ danno: quantita, cd: Math.max(10, Math.floor(quantita / 2)), spell: scheda.concentrazione, esito: null });
+                          setCheckConc({ danno: quantita, cd: cdConcentrazione(quantita, scheda.versione), spell: scheda.concentrazione, esito: null });
                         }
                       };
 
@@ -11633,7 +11659,7 @@ export default function App() {
                 </div>
                 {scheda.sfinimento > 0 && (
                   <div style={{ fontSize: 11, color: C.red }} title={versione === '2024' ? tr('Regole 2024: −2 ai tiri di d20 per livello', '2024 rules: −2 to d20 rolls per level') : `${tr('Regole 2014', '2014 rules')}: ${SFINIMENTO_2014[scheda.sfinimento]}`}>
-                    {versione === '2024' ? `−${scheda.sfinimento * 2}` : SFINIMENTO_2014[scheda.sfinimento]}
+                    {scheda.sfinimento >= 6 ? tr('Morte', 'Death') : versione === '2024' ? `−${scheda.sfinimento * 2}` : SFINIMENTO_2014[scheda.sfinimento]}
                   </div>
                 )}
               </div>

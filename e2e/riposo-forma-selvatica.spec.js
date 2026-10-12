@@ -68,3 +68,28 @@ test('regole 2014: il riposo breve restituisce tutti gli usi', async ({ page }) 
   await page.getByRole('button', { name: /Conferma Riposo Breve/ }).click();
   await expect.poll(async () => (await forma(page))?.attuali).toBe(2);
 });
+
+test('a 0 PF: Privo di sensi e concentrazione interrotta; con una cura si azzerano i TS contro morte (v4.96.0)', async ({ page }) => {
+  await apriScheda(page);
+  await page.evaluate(() => {
+    const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+    const pg = r.personaggi[r.attivo];
+    pg.pfAttuali = 15; pg.pfTemp = 0; pg.condizioni = []; pg.concentrazione = 'Benedizione';
+    pg.tsMorte = { successi: 0, fallimenti: 0 }; pg.sfinimento = 0;
+    localStorage.setItem('scheda-interattiva:v1', JSON.stringify(r));
+  });
+  await apriScheda(page);
+  const leggi = () => page.evaluate(() => {
+    const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+    const pg = r.personaggi[r.attivo];
+    return { pf: pg.pfAttuali, condizioni: pg.condizioni, conc: pg.concentrazione, ts: pg.tsMorte, sfin: pg.sfinimento };
+  });
+  await page.getByRole('button', { name: '-20', exact: true }).first().click();
+  await expect.poll(leggi).toMatchObject({ pf: 0, condizioni: ['Privo di sensi'], conc: '', sfin: 0 });
+  // Danno a 0 PF: un fallimento automatico.
+  await page.getByRole('button', { name: '-1', exact: true }).first().click();
+  await expect.poll(async () => (await leggi()).ts).toEqual({ successi: 0, fallimenti: 1 });
+  // Una cura: in piedi, TS azzerati, via Privo di sensi.
+  await page.getByRole('button', { name: '+5', exact: true }).first().click();
+  await expect.poll(leggi).toMatchObject({ pf: 5, condizioni: [], ts: { successi: 0, fallimenti: 0 } });
+});

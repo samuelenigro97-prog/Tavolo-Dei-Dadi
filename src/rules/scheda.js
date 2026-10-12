@@ -632,6 +632,37 @@ export function esitoDannoPf0(pfMax, pfPrima, dannoReale, tsMortePrima) {
 
 
 /**
+ * Cosa cambia da solo quando i PF passano da sopra 0 a 0, o tornano sopra 0
+ * (qualunque sia la via: tasti rapidi, Combat Tracker, PF scritti a mano, cure):
+ * - a 0 PF: condizione Privo di sensi e fine della concentrazione (sei incapacitato);
+ * - di nuovo sopra 0: via Privo di sensi e TS contro morte azzerati (PHB: si
+ *   azzerano quando recuperi PF).
+ * Restituisce la patch da applicare, o null. Nessun livello di sfinimento: le
+ * regole (2014 e 2024) non lo danno per essere scesi a 0 PF.
+ */
+export function patchTransizionePf(scheda, pfPrima) {
+  const prima = Math.max(0, Number(pfPrima) || 0);
+  const dopo = Math.max(0, Number(scheda?.pfAttuali) || 0);
+  const condizioni = Array.isArray(scheda?.condizioni) ? scheda.condizioni : [];
+  const patch = {};
+  if (prima > 0 && dopo === 0) {
+    if (!condizioni.includes('Privo di sensi')) patch.condizioni = [...condizioni, 'Privo di sensi'];
+    if (scheda?.concentrazione) patch.concentrazione = '';
+  } else if (prima === 0 && dopo > 0) {
+    if (condizioni.includes('Privo di sensi')) patch.condizioni = condizioni.filter((c) => c !== 'Privo di sensi');
+    const ts = scheda?.tsMorte || {};
+    if ((Number(ts.successi) || 0) > 0 || (Number(ts.fallimenti) || 0) > 0) patch.tsMorte = { successi: 0, fallimenti: 0 };
+  }
+  return Object.keys(patch).length ? patch : null;
+}
+
+/** CD del TS di Concentrazione dopo un danno: 10 o metà danno (il più alto); nella 5.5 al massimo 30. */
+export function cdConcentrazione(danno, versione) {
+  const cd = Math.max(10, Math.floor((Number(danno) || 0) / 2));
+  return versione === '2014' ? cd : Math.min(30, cd);
+}
+
+/**
  * Dadi Vita recuperati con un riposo lungo, per edizione:
  * - 5.0 (PHB 2014): metà dei Dadi Vita totali (minimo 1);
  * - 5.5 (PHB 2024): tutti i Dadi Vita spesi.
