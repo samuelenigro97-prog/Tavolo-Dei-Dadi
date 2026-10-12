@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.100.0] – 2026-10-12
+
+### Aggiunto
+- **Combat tracker ridotto**: accanto a "Round · Di turno" c'è il riquadro **Iniz. N**
+  con l'iniziativa di chi è di turno, ben in vista.
+
 ## [4.99.0] – 2026-10-12
 
 ### Corretto

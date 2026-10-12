@@ -221,3 +221,21 @@ test.describe('Combattimento', () => {
     await expect(nuvola).toContainText('Danno:');
   });
 });
+
+test('combat tracker ridotto: l\'iniziativa di chi è di turno è in bella vista (v4.100.0)', async ({ page }) => {
+  await apriScheda(page);
+  await page.evaluate(() => {
+    localStorage.setItem('scheda-interattiva:combat', JSON.stringify({
+      attivo: true, aperto: false, round: 2, turno: 1,
+      combattenti: [
+        { id: 'n1', nome: 'Goblin', tipo: 'nemico', iniziativa: 21, pfMax: 7, pfAttuali: 7, ca: 15, condizioni: [] },
+        { id: 'p1', nome: 'Vaelion', tipo: 'pg', iniziativa: 17, pfMax: 64, pfAttuali: 61, ca: 19, condizioni: [], tsMorte: { successi: 0, fallimenti: 0 } },
+      ],
+    }));
+  });
+  await apriScheda(page);
+  const pill = page.locator('[data-combat-toggle="true"]').filter({ hasText: 'Round' });
+  await expect(pill).toContainText('Round 2');
+  await expect(pill).toContainText('Vaelion');
+  await expect(pill.getByTestId('ct-mini-iniziativa')).toContainText('17');
+});

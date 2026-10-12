@@ -1958,7 +1958,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.99.0';
+const APP_VERSION = '4.100.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -18199,6 +18199,17 @@ export default function App() {
           }}
           title={t('ct.apri')}
         >
+          {/* Iniziativa di chi è di turno, in bella vista. */}
+          {combat.combattenti[combat.turno]?.iniziativa != null && combat.combattenti[combat.turno]?.iniziativa !== '' && (
+            <span
+              data-testid="ct-mini-iniziativa"
+              title={tr('Iniziativa di chi è di turno', 'Initiative of the creature whose turn it is')}
+              style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, background: 'var(--c-gold-dark)', color: C.onGold, borderRadius: 14, padding: '2px 10px', lineHeight: 1.2 }}
+            >
+              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', opacity: 0.85 }}>{tr('Iniz.', 'Init.')}</span>
+              <span style={{ fontSize: 18, fontWeight: 900 }}>{combat.combattenti[combat.turno].iniziativa}</span>
+            </span>
+          )}
           <span>
             {t('ct.round')} {combat.round} · {t('ct.in_turno')}: {combat.combattenti[combat.turno]?.nome || 'PG'}
           </span>

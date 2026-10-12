@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.100.0',
+    voci: {
+      it: ['Combat tracker ridotto: l\'iniziativa di chi è di turno è in bella vista accanto al nome.'],
+      en: ['Minimized combat tracker: the initiative of whoever\'s turn it is is shown prominently next to the name.'],
+    },
+  },
+  {
     versione: '4.99.0',
     voci: {
       it: ['Vaelion: tolto il +3 m di velocità della Maschera del Patrono; la velocità è 10,5 m (Elfo dei Boschi).'],
