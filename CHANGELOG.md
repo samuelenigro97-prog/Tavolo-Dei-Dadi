@@ -2,6 +2,11 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.101.1] – 2026-10-12
+
+### Corretto
+- **Combat tracker ridotto**: "Round 1 · Turno di Vaelion" al posto di "Di turno: Vaelion".
+
 ## [4.101.0] – 2026-10-12
 
 ### Corretto

@@ -1959,7 +1959,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.101.0';
+const APP_VERSION = '4.101.1';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -18204,7 +18204,7 @@ export default function App() {
             </span>
           )}
           <span>
-            {t('ct.round')} {combat.round} · {t('ct.in_turno')}: {combat.combattenti[combat.turno]?.nome || 'PG'}
+            {t('ct.round')} {combat.round} · {lingua === 'en' ? `${combat.combattenti[combat.turno]?.nome || 'PC'}'s turn` : `Turno di ${combat.combattenti[combat.turno]?.nome || 'PG'}`}
           </span>
           <span style={{ fontSize: 11, opacity: 0.9 }}>▲</span>
         </div>

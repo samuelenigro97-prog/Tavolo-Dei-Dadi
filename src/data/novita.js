@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.101.1',
+    voci: {
+      it: ['Combat tracker ridotto: si legge "Turno di Vaelion" invece di "Di turno: Vaelion".'],
+      en: ['Minimized combat tracker: it now reads "Vaelion\'s turn".'],
+    },
+  },
+  {
     versione: '4.101.0',
     voci: {
       it: [

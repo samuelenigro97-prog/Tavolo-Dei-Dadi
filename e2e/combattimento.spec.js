@@ -236,6 +236,7 @@ test('combat tracker ridotto: l\'iniziativa di chi è di turno è in bella vista
   await apriScheda(page);
   const pill = page.locator('[data-combat-toggle="true"]').filter({ hasText: 'Round' });
   await expect(pill).toContainText('Round 2');
-  await expect(pill).toContainText('Vaelion');
+  await expect(pill).toContainText('Turno di Vaelion');
+  await expect(pill).not.toContainText('Di turno');
   await expect(pill.getByTestId('ct-mini-iniziativa')).toContainText('17');
 });
