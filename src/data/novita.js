@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.95.4',
+    voci: {
+      it: ['Corretto l\'errore "startsWith is not a function" che impediva di aprire le schede con incantesimi salvati da versioni vecchie.'],
+      en: ['Fixed the "startsWith is not a function" error that prevented opening sheets with spells saved by older versions.'],
+    },
+  },
+  {
     versione: '4.95.3',
     voci: {
       it: ['Versione dell\'app rimossa dall\'intestazione superiore e mostrata esclusivamente nel menu iniziale (Home) con font coerente.', 'Manuale Araldi del Segreto: tema cuoio antico, ritratto ufficiale di Myrdhal e anteprima token evocazioni nel Combat Tracker.'],

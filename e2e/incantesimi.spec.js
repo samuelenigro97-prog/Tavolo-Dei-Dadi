@@ -78,3 +78,19 @@ test.describe('Incantesimi', () => {
     await expect(page.locator('.spell-row').filter({ has: page.getByRole('button', { name: 'Metamorfosi', exact: true }) })).toHaveCount(1);
   });
 });
+
+test('incantesimi con id numerico (schede vecchie) non mandano in errore la scheda (v4.95.4)', async ({ page }) => {
+  const errori = [];
+  page.on('pageerror', (e) => errori.push(e.message));
+  await apriScheda(page);
+  await page.evaluate(() => {
+    const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+    const pg = r.personaggi[r.attivo];
+    pg.incantesimiLista = (pg.incantesimiLista || []).map((s, i) => ({ ...s, id: 1000 + i }));
+    localStorage.setItem('scheda-interattiva:v1', JSON.stringify(r));
+  });
+  await apriScheda(page);
+  await expect(page.getByText('Errore di Visualizzazione Scheda')).toHaveCount(0);
+  await expect(page.locator('.spell-row').first()).toBeVisible();
+  expect(errori.filter((m) => /startsWith/.test(m))).toEqual([]);
+});

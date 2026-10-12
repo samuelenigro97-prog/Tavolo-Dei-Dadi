@@ -2,6 +2,15 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.95.4] – 2026-10-12
+
+### Corretto
+- **"Errore di Visualizzazione Scheda — startsWith is not a function"**: il controllo
+  degli incantesimi degli Araldi (`isAraldiSpell`) chiamava `s.id?.startsWith(...)`, ma
+  gli incantesimi delle schede più vecchie hanno un id numerico e la scheda andava in
+  errore all'apertura. Ora l'id viene letto come testo (`String(s.id ?? '')`).
+  Test e2e con incantesimi a id numerico.
+
 ## [4.95.3] – 2026-10-11
 
 ### Cambiato
