@@ -19,6 +19,7 @@ export function NotificheModal({ APP_VERSION, aggiorna, avvisoBackup, controlliA
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
           <strong style={{ color: C.goldDark, fontSize: 15, marginRight: 'auto' }}>{t('notifiche.titolo')}</strong>
+          <span data-testid="notifiche-versione" style={{ fontSize: 12, fontWeight: 700, color: C.inkDim, fontVariantNumeric: 'tabular-nums' }}>v{APP_VERSION}</span>
           <button style={{ ...styles.buttonMini, padding: '2px 7px' }} onClick={() => setMostraNotifiche(false)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
         </div>
     
@@ -210,23 +211,6 @@ export function NotificheModal({ APP_VERSION, aggiorna, avvisoBackup, controlliA
           </div>
         </div>
     
-        {/* SEZIONE 4: RICARICA / AGGIORNAMENTO PWA */}
-        <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 8 }}>
-          <button
-            style={{ ...styles.button, width: '100%', fontSize: 12, padding: '6px 10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
-            onClick={() => {
-              if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then((regs) => {
-                  for (const r of regs) r.update();
-                });
-              }
-              window.location.reload();
-            }}
-            title={t('aggiorna.ricarica_desc')}
-          >
-            <span>{t('aggiorna.ricarica_app')}</span>
-          </button>
-        </div>
       </div>
     </div>
   );

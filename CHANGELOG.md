@@ -2,6 +2,24 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.101.0] – 2026-10-12
+
+### Corretto
+- **Nuvolette che partivano a metà frase** (es. Chiaroveggenza: ") entro 1,5 km…"): il
+  riassunto delle descrizioni cercava le frasi con una regex che scartava in silenzio
+  quelle in cui il punto era seguito da ")" o da una cifra ("boschetto...)", "(5.5)").
+  Nuovo `src/utils/testo.js` (`dividiFrasi`, `riassumiDescrizione`): un punto chiude la
+  frase solo fuori dalle parentesi, seguito da uno spazio, e non dopo abbreviazioni
+  (es., ecc., liv.); il riassunto è sempre l'inizio del testo. Controllo su tutto il
+  progetto: 227 testi colpiti col vecchio metodo, 0 con il nuovo (test su tutti i testi
+  di `src/data` e `src/dati`).
+- **Talenti di Xanathar**: le 15 descrizioni dei talenti razziali erano tagliate a 300
+  caratteri con "..."; ora sono complete.
+
+### Cambiato
+- **Avvisi e novità**: la versione dell'app è scritta accanto alla X; tolto il tasto
+  "Ricarica l'applicazione" in fondo.
+
 ## [4.100.0] – 2026-10-12
 
 ### Aggiunto

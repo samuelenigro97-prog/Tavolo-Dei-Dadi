@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.101.0',
+    voci: {
+      it: [
+        'Le nuvolette delle descrizioni non partono più a metà frase (es. Chiaroveggenza): corretti tutti i testi del progetto.',
+        'Talenti di Xanathar con la descrizione completa. Negli Avvisi la versione è accanto alla X.',
+      ],
+      en: [
+        'Description bubbles no longer start mid-sentence (e.g. Clairvoyance): all the project texts are fixed.',
+        'Xanathar feats have their full description. In Notices the version sits next to the X.',
+      ],
+    },
+  },
+  {
     versione: '4.100.0',
     voci: {
       it: ['Combat tracker ridotto: l\'iniziativa di chi è di turno è in bella vista accanto al nome.'],

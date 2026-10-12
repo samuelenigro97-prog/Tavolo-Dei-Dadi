@@ -23,6 +23,7 @@ import { normalizzaPreferenze } from './utils/preferenze.js';
 import { improntaRoster, contenutoBase, decidiSync, riepilogoConflitto, leggiBaseSync, salvaBaseSync, revisioneGist } from './utils/conflittiSync.js';
 import { potaSnapshot } from './utils/cronologia.js';
 import { CHIAVE_AVVIO_DIRETTO } from './utils/avvio.js';
+import { riassumiDescrizione } from './utils/testo.js';
 import { trovaBackdropInCima, eCampoModificabile, deveAttivareDaTastiera } from './utils/accessibilita.js';
 import { salvaJsonLiberandoSpazio, deveRicordareBackup, rosterSenzaImmagini, riagganciaImmagini, salvaImmaginiRoster, caricaImmaginiRoster, rimuoviImmaginePersonaggio, preservaImmaginiSeMancanti } from './utils/persistenza.js';
 import { datiTabelleBackground } from './data/tabelleBackground.js';
@@ -1958,7 +1959,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.100.0';
+const APP_VERSION = '4.101.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -3260,14 +3261,6 @@ function leggiUltimaModificaLocale() {
  * informazioni essenziali, una per riga (tipo di azione, distanza, durata...),
  * poi al massimo un paio di frasi di descrizione.
  */
-function riassumiDescrizione(testo, maxFrasi = 2, maxCaratteri = 320) {
-  const pulito = String(testo || '').replace(/\s+/g, ' ').trim();
-  if (!pulito) return '';
-  const frasi = pulito.match(/[^.!?]+[.!?]+(\s|$)/g) || [pulito];
-  let breve = frasi.slice(0, maxFrasi).join('').trim();
-  if (breve.length > maxCaratteri) breve = `${breve.slice(0, maxCaratteri - 1).trimEnd()}…`;
-  return breve;
-}
 function testoNuvoletta(righe, descrizione, maxFrasi = 2, maxCaratteri = 320) {
   const essenziale = righe.filter(Boolean).join('\n');
   const breve = riassumiDescrizione(descrizione, maxFrasi, maxCaratteri);
