@@ -2,6 +2,15 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.99.0] – 2026-10-12
+
+### Corretto
+- **Tolto il +3 m di velocità della "Maschera"** dal Potere del Patrono di Vaelion: non è
+  più una regola della campagna, ma era rimasto nei dati dal 21/09 (e "Ripristina i Poteri
+  della campagna" lo rimetteva). Via dal personaggio di esempio, dai Poteri della
+  campagna e, con una migrazione, dalle schede già salvate. La velocità di Vaelion è
+  10,5 m (Elfo dei Boschi).
+
 ## [4.98.0] – 2026-10-12
 
 ### Cambiato

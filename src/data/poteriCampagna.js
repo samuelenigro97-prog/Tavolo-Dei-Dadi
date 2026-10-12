@@ -1,5 +1,5 @@
-// Poteri della campagna impostati per Vaelion: il Potere del Patrono (Debito,
-// Maschera +3 m) e i privilegi degli Araldi del Segreto. Servono a rimetterli
+// Poteri della campagna impostati per Vaelion: il Potere del Patrono (Debito)
+// e i privilegi degli Araldi del Segreto. Servono a rimetterli
 // con un tocco se un personaggio li ha persi (es. collegando un dispositivo
 // che non li aveva). Il Debito del Patrono resta l'unico Debito: gli Araldi lo
 // usano invece di crearne un secondo, come fa il pulsante "Da modello".

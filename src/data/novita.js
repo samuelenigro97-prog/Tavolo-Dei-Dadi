@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.99.0',
+    voci: {
+      it: ['Vaelion: tolto il +3 m di velocità della Maschera del Patrono; la velocità è 10,5 m (Elfo dei Boschi).'],
+      en: ['Vaelion: removed the Patron\'s Mask +3 m speed; speed is 35 ft (Wood Elf).'],
+    },
+  },
+  {
     versione: '4.98.0',
     voci: {
       it: ['Equipaggiamento: le icone di ogni oggetto si aprono e chiudono dai "⋯", e c\'è il tasto ✎ per rinominare l\'oggetto.'],

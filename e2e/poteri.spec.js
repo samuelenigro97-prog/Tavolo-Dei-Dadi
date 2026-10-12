@@ -38,7 +38,14 @@ test.describe('Poteri', () => {
     });
 
     test('l\'etichetta del bersaglio di un modificatore è visibile senza passare il mouse', async ({ page }) => {
-      // Il PG di esempio ha un potere "Potere del Patrono" con un modificatore su Velocità.
+      // Un modificatore su Velocità messo sul "Potere del Patrono" del PG di esempio.
+      await page.evaluate(() => {
+        const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+        const p = r.personaggi[r.attivo].poteri.find((x) => x.nome === 'Potere del Patrono');
+        p.modificatori = [{ bersaglio: 'velocita', valore: 3, fonte: 'Prova' }];
+        localStorage.setItem('scheda-interattiva:v1', JSON.stringify(r));
+      });
+      await apriScheda(page);
       await expect(page.getByText(/Velocità \+\d+m/)).toBeVisible();
     });
 

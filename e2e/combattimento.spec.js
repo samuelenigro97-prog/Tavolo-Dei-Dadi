@@ -98,7 +98,13 @@ test.describe('Combattimento', () => {
     // Il colore atteso qui sotto è quello del tema chiaro: va forzato esplicitamente,
     // perché il tema di default "auto" passa al tema scuro di notte (eNotte: 20-7),
     // rendendo altrimenti il test dipendente dall'orario reale di esecuzione.
-    await page.evaluate(() => localStorage.setItem('scheda-interattiva:tema', 'chiaro'));
+    await page.evaluate(() => {
+      localStorage.setItem('scheda-interattiva:tema', 'chiaro');
+      const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+      const p = r.personaggi[r.attivo].poteri.find((x) => x.nome === 'Potere del Patrono');
+      p.modificatori = [{ bersaglio: 'velocita', valore: 3, fonte: 'Prova' }];
+      localStorage.setItem('scheda-interattiva:v1', JSON.stringify(r));
+    });
     await apriScheda(page);
     const box = page.locator('.velocita-modificata');
     await expect(box).toHaveCount(1);

@@ -362,9 +362,8 @@ export const VAELION_JSON = {
       contatori: [
         { nome: "Debito", attuali: 5, max: null }
       ],
-      modificatori: [
-        { bersaglio: "velocita", valore: 3, fonte: "Maschera" }
-      ]
+      // Il +3 m di velocità della "Maschera" è stato tolto (non è più una regola della campagna).
+      modificatori: []
     }
   ],
   denari: { mr: 0, ma: 0, me: 0, mo: 250, mp: 0 },

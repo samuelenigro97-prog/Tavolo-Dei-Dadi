@@ -156,3 +156,15 @@ test('Vaelion, Elfo dei Boschi: velocità base 10,5 m (la 9 m viene corretta) (v
   migrazioneRegoleVaelion(roster);
   assert.equal(roster.personaggi.v.velocita, 10.5);
 });
+
+test('Vaelion: tolto il +3 m di velocità della Maschera, anche dalle schede salvate (v4.99.0)', async () => {
+  const { migrazioneRegoleVaelion } = await import('../src/data/migrazioniPersonaggi.js');
+  const { VAELION_JSON } = await import('../src/data/esempi.js');
+  const patrono = VAELION_JSON.poteri.find((p) => p.nome === 'Potere del Patrono');
+  assert.deepEqual(patrono.modificatori, []);
+  const vecchio = JSON.parse(JSON.stringify(VAELION_JSON));
+  vecchio.poteri[0].modificatori = [{ bersaglio: 'velocita', valore: 3, fonte: 'Maschera' }, { bersaglio: 'ca', valore: 1, fonte: 'Altro' }];
+  const roster = { attivo: 'v', personaggi: { v: vecchio } };
+  migrazioneRegoleVaelion(roster);
+  assert.deepEqual(roster.personaggi.v.poteri[0].modificatori, [{ bersaglio: 'ca', valore: 1, fonte: 'Altro' }]);
+});

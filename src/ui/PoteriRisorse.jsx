@@ -44,7 +44,7 @@ export function PoteriRisorse({ scheda, aggiorna, lingua = 'it', registra, mostr
           data-testid="ripristina-poteri-campagna"
           style={{ ...styles.buttonMini, width: '100%', padding: '5px 8px', fontWeight: 700, marginTop: recupero ? 6 : 0, color: C.goldDark, borderColor: C.goldDark }}
           onClick={ripristinoCampagna}
-          title={en ? 'Patron\'s Power (Debt, Mask +3 m) and all the Heralds of the Secret features' : 'Potere del Patrono (Debito, Maschera +3 m) e tutti i privilegi degli Araldi del Segreto'}
+          title={en ? 'Patron\'s Power (Debt) and all the Heralds of the Secret features' : 'Potere del Patrono (Debito) e tutti i privilegi degli Araldi del Segreto'}
         >
           {en ? 'Restore the campaign powers (Heralds of the Secret)' : 'Ripristina i Poteri della campagna (Araldi del Segreto)'}
         </button>
