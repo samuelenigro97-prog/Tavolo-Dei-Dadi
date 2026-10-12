@@ -439,7 +439,7 @@ export const GLOBAL_CSS = `
   --c-border: #ddd5c6; --c-ink: #2b2620; --c-ink-dim: #8d8272;
   --c-gold: #b8860b; --c-gold-dark: #8a6508; --c-red: #b03a2e;
   --c-green: #3e7d32; --c-title: #9e2b25;
-  --c-araldi: #8c4a1e; --c-araldi-border: #a45a2a; --c-araldi-bg: rgba(140, 74, 30, 0.10);
+  --c-araldi: #6e3612; --c-araldi-border: #a45a2a; --c-araldi-bg: rgba(140, 74, 30, 0.10);
   --c-araldi-glow: rgba(140, 74, 30, 0.25); --c-araldi-badge: #7a3e16;
   --font-title: 'Cinzel', Georgia, 'Times New Roman', serif;
 }

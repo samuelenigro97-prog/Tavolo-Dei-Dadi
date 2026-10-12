@@ -46,7 +46,9 @@ test('nessun errore JavaScript all\'avvio della build', async ({ page }) => {
   page.on('pageerror', (e) => errori.push(e.message));
   await page.goto('./');
   await chiudiIniziali(page);
-  await expect(page.getByText(`v${versioneInSorgente}`).first()).toBeVisible();
+  // La versione ora compare solo nel menu iniziale (Home): qui basta che la scheda sia disegnata, senza errori.
+  await expect(page.getByText(/Tavolo dei Dadi/i).first()).toBeVisible();
+  await expect(page.getByText('Errore di Visualizzazione Scheda')).toHaveCount(0);
   expect(errori).toEqual([]);
 });
 

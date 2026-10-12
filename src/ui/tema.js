@@ -14,7 +14,7 @@ export const C = {
   red: 'var(--c-red)',
   green: 'var(--c-green)',
   title: 'var(--c-title)',
-  araldi: 'var(--c-araldi, #8c4a1e)',
+  araldi: 'var(--c-araldi, #6e3612)',
   araldiBorder: 'var(--c-araldi-border, #a45a2a)',
   araldiBg: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.10))',
 };

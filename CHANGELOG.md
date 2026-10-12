@@ -10,6 +10,11 @@ Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
   gli incantesimi delle schede più vecchie hanno un id numerico e la scheda andava in
   errore all'apertura. Ora l'id viene letto come testo (`String(s.id ?? '')`).
   Test e2e con incantesimi a id numerico.
+- **CI di nuovo verde** (era rossa dalla 4.95.0, per cui il sito non si aggiornava da
+  solo): il colore "cuoio" degli Araldi nel tema chiaro (`--c-araldi`) passa da
+  `#8c4a1e` a `#6e3612`, perché sugli sfondi chiari delle ambientazioni non arrivava al
+  contrasto minimo 4.5:1; il test della build controlla la scheda senza errori invece
+  della versione, che ora compare solo nel menu iniziale.
 
 ## [4.95.3] – 2026-10-11
 
