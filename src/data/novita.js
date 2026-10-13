@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.102.1',
+    voci: {
+      it: ['Menu: la versione è accanto alla "i" finale di Tavolo dei Dadi, allineata in basso con le lettere.'],
+      en: ['Menu: the version sits right after the final "i" of Tavolo dei Dadi, aligned with the bottom of the letters.'],
+    },
+  },
+  {
     versione: '4.102.0',
     voci: {
       it: [

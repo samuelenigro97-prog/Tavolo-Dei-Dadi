@@ -2,6 +2,13 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.102.1] – 2026-10-13
+
+### Corretto
+- **Versione nel menu**: attaccata alla "i" finale di "Tavolo dei Dadi" e sulla stessa linea
+  di base delle lettere (niente spazio nel markup, `margin-left: 5px`), anche su iPhone dove
+  lo spazio diventava largo.
+
 ## [4.102.0] – 2026-10-12
 
 ### Aggiunto

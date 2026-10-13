@@ -1701,18 +1701,20 @@ tbody tr:hover {
 }
 .app-version {
   display: inline-block;
-  padding: 0 0 0 4px;
+  margin-left: 5px;
+  padding: 0;
   border: none !important;
   border-radius: 0 !important;
   background: transparent !important;
-  /* Eredita lo stesso font del titolo (Cinzel/Georgia) e poggia sulla sua stessa linea di base */
+  /* Attaccata alla "i" finale del titolo (niente spazio prima nel markup): stesso font
+     (Cinzel/Georgia) e stessa linea di base, così il numero poggia in basso come le lettere */
   color: var(--c-ink-dim);
   font-family: inherit;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: .4px;
-  position: relative;
-  top: 0;
+  line-height: 1;
+  vertical-align: baseline;
 }
 /* Simboli di sfondo ed emoji opachi nei riquadri vitali e caratteristiche */
 .sfondo-vit-emoji {

@@ -40,7 +40,7 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
         }}
       >
         <h1 style={{ ...styles.title, textAlign: 'center', marginBottom: 12, fontSize: 24, fontWeight: 800, color: 'var(--c-title)' }}>
-          Tavolo dei Dadi <span className="app-version">v{APP_VERSION}</span>
+          Tavolo dei Dadi<span className="app-version">v{APP_VERSION}</span>
         </h1>
 
         {ultimoPersonaggio && (
