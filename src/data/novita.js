@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.102.0',
+    voci: {
+      it: [
+        'Combat tracker: il danno ad area si applica a più bersagli insieme, nemici, te e i tuoi alleati, contando resistenze, immunità, vulnerabilità e TS superato.',
+        'Il tasto per ridurre il combat tracker è un "−".',
+      ],
+      en: [
+        'Combat tracker: area damage hits several targets at once, enemies, you and your allies, counting resistances, immunities, vulnerabilities and passed saves.',
+        'The button that minimizes the combat tracker is a "−".',
+      ],
+    },
+  },
+  {
     versione: '4.101.1',
     voci: {
       it: ['Combat tracker ridotto: si legge "Turno di Vaelion" invece di "Di turno: Vaelion".'],

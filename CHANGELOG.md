@@ -2,6 +2,22 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.102.0] – 2026-10-12
+
+### Aggiunto
+- **Danno ad area nel combat tracker**: il tasto "Area" apre una finestra con danno (numero
+  o dadi, es. 8d6, tirabili lì), tipo di danno, "magico" e la lista di tutti i combattenti,
+  nemici, te e i tuoi alleati, da spuntare (scorciatoie: tutti i nemici, io e alleati, tutti,
+  nessuno). Per ognuno propone resistenza, immunità o vulnerabilità lette dai tratti della
+  creatura, dalle resistenze/tratti di specie del PG o dalla scheda dell'alleato
+  (`difesaControDanno` in `src/rules/scheda.js`; la difesa si può cambiare a mano), il TS
+  superato dimezza, e si vede il danno finale riga per riga. Un solo aggiornamento applica
+  PF temporanei, PF, TS contro morte e concentrazione del PG e i PF degli alleati.
+- Il tasto per ridurre il combat tracker è un "−".
+
+### Corretto
+- Un PG nel combat tracker senza TS contro morte salvati mandava in errore la scheda.
+
 ## [4.101.1] – 2026-10-12
 
 ### Corretto

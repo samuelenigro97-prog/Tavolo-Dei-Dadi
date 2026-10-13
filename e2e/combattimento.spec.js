@@ -240,3 +240,48 @@ test('combat tracker ridotto: l\'iniziativa di chi è di turno è in bella vista
   await expect(pill).not.toContainText('Di turno');
   await expect(pill.getByTestId('ct-mini-iniziativa')).toContainText('17');
 });
+
+test('danno ad area: più bersagli, vulnerabilità e immunità lette dai tratti (v4.102.0)', async ({ page }) => {
+  await apriScheda(page);
+  await page.evaluate(() => {
+    localStorage.setItem('scheda-interattiva:combat', JSON.stringify({
+      attivo: true, aperto: false, round: 1, turno: 0,
+      combattenti: [
+        { id: 'n1', nome: 'Scheletro', tipo: 'nemico', iniziativa: 15, pfMax: 13, pfAttuali: 13, ca: 13, condizioni: [],
+          dati: { tratti: ['Vulnerabilità ai danni: contundente', 'Immunità ai danni: veleno', 'Immunità alle condizioni: avvelenato'] } },
+        { id: 'n2', nome: 'Goblin', tipo: 'nemico', iniziativa: 12, pfMax: 7, pfAttuali: 7, ca: 15, condizioni: [] },
+        { id: 'p1', nome: 'Vaelion', tipo: 'pg', iniziativa: 10, pfMax: 64, pfAttuali: 61, ca: 19, condizioni: [] },
+      ],
+    }));
+  });
+  await apriScheda(page);
+  await page.locator('[data-combat-toggle="true"]').filter({ hasText: 'Round' }).click();
+  // Il tasto per ridurre il tracker è un "−", non più un quadrato.
+  await expect(page.getByRole('button', { name: 'Riduci a icona' })).toHaveText('−');
+
+  await page.getByTestId('ct-area').click();
+  const finestra = page.getByTestId('area-modal');
+  await expect(finestra).toBeVisible();
+  await finestra.getByTestId('area-valore').fill('5');
+  await finestra.getByTestId('area-tipo').selectOption('Contundente');
+  await finestra.getByTestId('area-tutti-nemici').click();
+  await expect(finestra.getByTestId('area-sel-p1')).not.toBeChecked();
+  await expect(finestra.getByTestId('area-difesa-n1')).toHaveValue('vulnerabile');
+  await expect(finestra.getByTestId('area-anteprima-n1')).toHaveText('−10');
+  await expect(finestra.getByTestId('area-anteprima-n2')).toHaveText('−5');
+  await finestra.getByTestId('area-applica').click();
+  await expect(finestra).toHaveCount(0);
+
+  const pf = async () => page.evaluate(() => Object.fromEntries(JSON.parse(localStorage.getItem('scheda-interattiva:combat')).combattenti.filter((c) => c.tipo === 'nemico').map((c) => [c.id, c.pfAttuali])));
+  await expect.poll(pf).toEqual({ n1: 3, n2: 2 });
+
+  // Veleno: lo scheletro è immune, il goblin no.
+  await page.getByTestId('ct-area').click();
+  await finestra.getByTestId('area-valore').fill('2');
+  await finestra.getByTestId('area-tipo').selectOption('Veleno');
+  await finestra.getByTestId('area-tutti-nemici').click();
+  await expect(finestra.getByTestId('area-difesa-n1')).toHaveValue('immune');
+  await expect(finestra.getByTestId('area-anteprima-n1')).toHaveText('−0');
+  await finestra.getByTestId('area-applica').click();
+  await expect.poll(pf).toEqual({ n1: 3, n2: 0 });
+});

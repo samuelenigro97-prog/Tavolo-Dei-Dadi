@@ -8,7 +8,7 @@ import { C, BASE_TEMA, PRESET_COLORI, ambientazioneCasuale } from "./ui/tema.js"
 import { styles, GLOBAL_CSS } from './ui/stili.js';
 import { Editable, Rollable, iconaTipoDanno, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
-import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, patchTransizionePf, cdConcentrazione, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
+import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
 import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } from "./data/esempi.js";
 import { fixEquipaggiamentoVaelion, migrazioneRegoleVaelion, autoIdratazionePersonaggioPredefinito } from './data/migrazioniPersonaggi.js';
 import { CARATTERISTICHE, ABILITA } from './data/caratteristiche.js';
@@ -1372,6 +1372,7 @@ import { MovimentoModal } from './ui/modali/MovimentoModal.jsx';
 import { PeModal } from './ui/modali/PeModal.jsx';
 import { CloudModal } from './ui/modali/CloudModal.jsx';
 import { ConcentrazioneModal } from './ui/modali/ConcentrazioneModal.jsx';
+import { DannoAreaModal } from './ui/modali/DannoAreaModal.jsx';
 import { BestiaDettaglioModal } from './ui/modali/BestiaDettaglioModal.jsx';
 
 /**
@@ -1959,7 +1960,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.101.1';
+const APP_VERSION = '4.102.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4115,6 +4116,8 @@ export default function App() {
   const [mostraPrivilegiSub, setMostraPrivilegiSub] = useState(false); // panoramica privilegi di sottoclasse
   const [info, setInfo] = useState(null); // nuvoletta esplicativa: { titolo, testo }
   const [checkConc, setCheckConc] = useState(null); // TS concentrazione automatico: { danno, cd, spell, esito }
+  // Danno ad area nel Combat Tracker: { valore, tipo, magico, dettaglio, sel: {id: bool}, ts: {id: bool}, difese: {id: difesa} }
+  const [areaDanno, setAreaDanno] = useState(null);
   const [dettaglioInc, setDettaglioInc] = useState(null); // id incantesimo aperto nel sottomenu
   const [mostraMenuEsporta, setMostraMenuEsporta] = useState(false);
   const [mostraDiarioModal, setMostraDiarioModal] = useState(false);
@@ -5381,6 +5384,69 @@ export default function App() {
           return { ...x, pfTemp: newTemp, pfAttuali: newPf };
         }),
       };
+    });
+  }
+
+  /** Il combattente è il PG della scheda aperta? (stessa regola di dannoCura) */
+  function eCombattentePgAttivo(cb, lista) {
+    return cb.tipo === 'pg' && (cb.nome === scheda.nome || cb.id === 'pg-attivo' || lista.filter((x) => x.tipo === 'pg').length === 1);
+  }
+
+  /** Testo da cui leggere resistenze/immunità/vulnerabilità di un combattente. */
+  function testoDifeseCombattente(cb) {
+    if (eCombattentePgAttivo(cb, combat.combattenti)) return [scheda.resistenze, scheda.trattiSpecie].filter(Boolean).join('. ');
+    if (cb.tipo === 'alleato') {
+      const a = (scheda.alleati || []).find((x) => x.id === cb.id || String(x.nome || '').toLowerCase() === String(cb.nome || '').toLowerCase());
+      return [...(Array.isArray(a?.tratti) ? a.tratti : []), a?.resistenze, a?.note, cb.note].filter(Boolean).join('. ');
+    }
+    return [...(Array.isArray(cb.dati?.tratti) ? cb.dati.tratti : []), cb.dati?.note, cb.note].filter(Boolean).join('. ');
+  }
+
+  /**
+   * Applica un danno ad area a più combattenti in un colpo solo: per ognuno TS superato
+   * (metà) e resistenza/immunità/vulnerabilità, poi PF temporanei, PF, TS contro morte e
+   * concentrazione del PG, PF degli alleati della scheda. Un solo aggiornamento, così
+   * colpire più alleati insieme non perde nessun danno.
+   */
+  function applicaDannoArea(area) {
+    const base = Math.max(0, Math.floor(Number(area.valore) || 0));
+    const bersagli = combat.combattenti.filter((cb) => area.sel[cb.id]);
+    if (!base || bersagli.length === 0) return;
+    const danni = Object.fromEntries(bersagli.map((cb) => [
+      cb.id,
+      dannoConDifesa(base, area.difese[cb.id] || difesaControDanno(testoDifeseCombattente(cb), area.tipo, { magico: area.magico }), Boolean(area.ts[cb.id])),
+    ]));
+    const patchPg = {};
+    let alleatiAgg = Array.isArray(scheda.alleati) ? [...scheda.alleati] : null;
+    let dannoPg = 0;
+    const nuovi = combat.combattenti.map((cb) => {
+      if (!(cb.id in danni)) return cb;
+      let dmg = danni[cb.id];
+      const assorbito = Math.min(cb.pfTemp || 0, dmg);
+      const pfTemp = (cb.pfTemp || 0) - assorbito;
+      dmg -= assorbito;
+      const pfAttuali = Math.max(0, (Number(cb.pfAttuali) || 0) - dmg);
+      if (eCombattentePgAttivo(cb, combat.combattenti)) {
+        dannoPg = danni[cb.id];
+        Object.assign(patchPg, { pfAttuali, pfTemp });
+        const esitoPf0 = esitoDannoPf0(scheda.pfMax, cb.pfAttuali, dmg, scheda.tsMorte);
+        if (esitoPf0.tsMorteDopo) patchPg.tsMorte = esitoPf0.tsMorteDopo;
+      } else if (cb.tipo === 'alleato' && alleatiAgg) {
+        alleatiAgg = alleatiAgg.map((a) => ((a.id === cb.id || String(a.nome || '').toLowerCase() === String(cb.nome || '').toLowerCase()) ? { ...a, pfAttuali } : a));
+      }
+      return { ...cb, pfTemp, pfAttuali };
+    });
+    setCombat((c) => ({ ...c, combattenti: c.combattenti.map((cb) => nuovi.find((x) => x.id === cb.id) || cb) }));
+    const patchScheda = { ...patchPg };
+    if (alleatiAgg && bersagli.some((cb) => cb.tipo === 'alleato')) patchScheda.alleati = alleatiAgg;
+    if (Object.keys(patchScheda).length) aggiorna(patchScheda);
+    if (dannoPg > 0 && scheda.concentrazione && (patchPg.pfAttuali || 0) > 0) {
+      setCheckConc({ danno: dannoPg, cd: cdConcentrazione(dannoPg, scheda.versione), spell: scheda.concentrazione, esito: null });
+    }
+    registra({
+      etichetta: tr(`Danno ad area: ${base} ${area.tipo}`, `Area damage: ${base} ${area.tipo}`),
+      tipo: 'tattica',
+      dettaglio: bersagli.map((cb) => `${cb.nome} −${danni[cb.id]}`).join(', '),
     });
   }
 
@@ -7826,6 +7892,16 @@ export default function App() {
            registra={registra}
            scheda={scheda}
            setCheckConc={setCheckConc}
+         />}
+
+      {/* Danno ad area dal combat tracker: più bersagli, tipo di danno, resistenze e immunità */}
+      {areaDanno && <DannoAreaModal
+           applica={applicaDannoArea}
+           area={areaDanno}
+           combattenti={combat.combattenti}
+           lingua={lingua}
+           setArea={setAreaDanno}
+           testoDifese={testoDifeseCombattente}
          />}
 
       {caricandoCloud && (
@@ -17701,16 +17777,9 @@ export default function App() {
                 </button>
                 <button
                   style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, whiteSpace: 'nowrap', padding: '3px 8px' }}
-                  title={tr('Applica danni ad area (es. Palla di Fuoco) a tutti i nemici del combattimento', 'Apply area damage (e.g. Fireball) to every enemy in the fight')}
-                  onClick={() => {
-                    const dmg = parseInt(window.prompt(tr('Danni ad area da applicare a tutti i nemici:', 'Area damage to apply to every enemy:')), 10);
-                    if (dmg > 0) {
-                      setCombat((c) => ({
-                        ...c,
-                        combattenti: c.combattenti.map((cb) => cb.tipo === 'nemico' ? { ...cb, pfAttuali: Math.max(0, cb.pfAttuali - dmg) } : cb)
-                      }));
-                    }
-                  }}
+                  title={tr('Danno ad area (es. Palla di Fuoco): scegli i bersagli, anche te e i tuoi alleati, con resistenze e immunità', 'Area damage (e.g. Fireball): choose the targets, including you and your allies, with resistances and immunities')}
+                  data-testid="ct-area"
+                  onClick={() => setAreaDanno({ valore: '', tipo: 'Fuoco', magico: true, dettaglio: '', sel: {}, ts: {}, difese: {} })}
                 >
                   Area
                 </button>
@@ -17718,8 +17787,9 @@ export default function App() {
                   style={{ ...styles.buttonMini, padding: '3px 7px' }}
                   onClick={() => setCombat((c) => ({ ...c, aperto: false }))}
                   title={t('ct.minimizza')}
+                  aria-label={t('ct.minimizza')}
                 >
-                  🗕
+                  −
                 </button>
                 <button
                   style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '3px 7px' }}
@@ -18124,11 +18194,11 @@ export default function App() {
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 11, background: 'rgba(0,0,0,0.02)', padding: '2px 4px', borderRadius: 4 }} title={t('vital.ts_morte')}>
                               <span style={{ color: C.inkDim, fontSize: 11 }}>💀</span>
                               {[1, 2, 3].map((i) => (
-                                <span role="button" tabIndex={0} key={`s${i}`} style={styles.pip(cb.tsMorte.successi >= i, C.green)} onClick={() => modCombat(cb.id, { tsMorte: { ...cb.tsMorte, successi: cb.tsMorte.successi >= i ? i - 1 : i } })} />
+                                <span role="button" tabIndex={0} key={`s${i}`} style={styles.pip((cb.tsMorte?.successi || 0) >= i, C.green)} onClick={() => modCombat(cb.id, { tsMorte: { ...cb.tsMorte, successi: (cb.tsMorte?.successi || 0) >= i ? i - 1 : i } })} />
                               ))}
                               <span style={{ color: C.border }}>|</span>
                               {[1, 2, 3].map((i) => (
-                                <span role="button" tabIndex={0} key={`f${i}`} style={styles.pip(cb.tsMorte.fallimenti >= i, C.red)} onClick={() => modCombat(cb.id, { tsMorte: { ...cb.tsMorte, fallimenti: cb.tsMorte.fallimenti >= i ? i - 1 : i } })} />
+                                <span role="button" tabIndex={0} key={`f${i}`} style={styles.pip((cb.tsMorte?.fallimenti || 0) >= i, C.red)} onClick={() => modCombat(cb.id, { tsMorte: { ...cb.tsMorte, fallimenti: (cb.tsMorte?.fallimenti || 0) >= i ? i - 1 : i } })} />
                               ))}
                             </div>
                           )}

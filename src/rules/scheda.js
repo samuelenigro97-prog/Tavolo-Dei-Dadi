@@ -672,3 +672,68 @@ export function dadiVitaRecuperatiRiposoLungo(livelloTotale, versione) {
   const liv = Math.max(1, Math.floor(Number(livelloTotale) || 1));
   return String(versione) === '2014' ? Math.max(1, Math.floor(liv / 2)) : liv;
 }
+
+
+// --- Danno ad area: resistenze, immunità e vulnerabilità ----------------------
+
+/** Radici dei tipi di danno (per riconoscerli nei testi: "danni da fuoco", "contundenti"...). */
+const RADICI_DANNO = {
+  Acido: 'acid', Contundente: 'contundent', Freddo: 'fredd', Fuoco: 'fuoc', Fulmine: 'fulmin',
+  Necrotico: 'necrotic', Perforante: 'perforant', Psichico: 'psichic', Radiante: 'radiant',
+  Tagliente: 'taglient', Tuono: 'tuon', Veleno: 'velen', Forza: 'forza',
+};
+
+/**
+ * Legge da un testo libero (resistenze del PG, tratti di un mostro o di un alleato)
+ * come la creatura reagisce a un tipo di danno: 'immune', 'resistente', 'vulnerabile'
+ * o 'normale'. Riconosce frasi come "Resistenze: freddo; contundente... da attacchi
+ * non magici. Immunità ai danni: necrotico, veleno" o "Vulnerabile ai danni contundenti".
+ * Le resistenze "da attacchi non magici" non valgono per un incantesimo (`magico`).
+ * Resistenza + vulnerabilità insieme si annullano; l'immunità vince su tutto.
+ */
+export function difesaControDanno(testo, tipoDanno, { magico = true } = {}) {
+  const radice = RADICI_DANNO[tipoDanno];
+  const t = String(testo || '').toLowerCase();
+  if (!radice || !t) return 'normale';
+  const re = /(immun[\wàèéìòù]*|resisten[\wàèéìòù]*|vulnerabil[\wàèéìòù]*)/g;
+  const trovati = [];
+  let m;
+  while ((m = re.exec(t))) trovati.push({ parola: m[1], da: m.index, inizioAmbito: m.index + m[1].length });
+  let immune = false;
+  let resistente = false;
+  let vulnerabile = false;
+  trovati.forEach((k, i) => {
+    const fineFrase = t.slice(k.inizioAmbito).search(/\.(\s|$)/);
+    const limiteFrase = fineFrase < 0 ? t.length : k.inizioAmbito + fineFrase;
+    const limite = Math.min(limiteFrase, i + 1 < trovati.length ? trovati[i + 1].da : t.length);
+    // Le condizioni ("Immunità alle condizioni: avvelenato", "...e condizioni Avvelenato")
+    // non riguardano i danni: l'ambito si ferma lì.
+    const ambito = t.slice(k.inizioAmbito, limite).split(/condizion/)[0];
+    // Il tipo di danno può stare in una parte con "da attacchi non magici": allora vale solo se il danno non è magico.
+    const parti = ambito.split(';');
+    const colpito = parti.some((p) => p.includes(radice) && (!magico || !/non magic/.test(p)));
+    if (!colpito) return;
+    if (k.parola.startsWith('immun')) immune = true;
+    else if (k.parola.startsWith('resisten')) resistente = true;
+    else vulnerabile = true;
+  });
+  if (immune) return 'immune';
+  if (resistente && vulnerabile) return 'normale';
+  if (resistente) return 'resistente';
+  if (vulnerabile) return 'vulnerabile';
+  return 'normale';
+}
+
+/**
+ * Danno finale di un effetto ad area su una creatura: prima il dimezzamento per il
+ * tiro salvezza superato (per difetto), poi resistenza (metà, per difetto),
+ * vulnerabilità (doppio) o immunità (0).
+ */
+export function dannoConDifesa(danno, difesa, tsSuperato = false) {
+  let d = Math.max(0, Math.floor(Number(danno) || 0));
+  if (tsSuperato) d = Math.floor(d / 2);
+  if (difesa === 'immune') return 0;
+  if (difesa === 'resistente') return Math.floor(d / 2);
+  if (difesa === 'vulnerabile') return d * 2;
+  return d;
+}
