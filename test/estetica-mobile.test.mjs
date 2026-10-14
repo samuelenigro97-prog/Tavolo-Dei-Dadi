@@ -17,7 +17,7 @@ test('estetica: la versione è presente nel menu iniziale/home e non nell’inte
 
 test('inventario mobile: usa schede responsive senza scorrimento orizzontale', () => {
   assert.match(app, /className="inventario-table"/);
-  assert.match(app, /className="inventario-riga"/);
+  assert.match(app, /inventario-riga/);
   assert.match(css, /\.inventario-wrap\s*\{\s*overflow-x:\s*visible/);
   assert.match(css, /\.inventario-table \.inventario-riga\s*\{[\s\S]*?display:\s*grid/);
 });

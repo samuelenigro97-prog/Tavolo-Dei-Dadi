@@ -441,6 +441,7 @@ export const GLOBAL_CSS = `
   --c-green: #3e7d32; --c-title: #9e2b25;
   --c-araldi: #6e3612; --c-araldi-border: #a45a2a; --c-araldi-bg: rgba(140, 74, 30, 0.10);
   --c-araldi-glow: rgba(140, 74, 30, 0.25); --c-araldi-badge: #7a3e16;
+  --c-magico: #2b64b4;
   --c-car-forza: #a8443a; --c-car-destrezza: #4f7d3a; --c-car-costituzione: #a0702a;
   --c-car-intelligenza: #3f6a9e; --c-car-saggezza: #7a5aa0; --c-car-carisma: #b06a74;
   --font-title: 'Cinzel', Georgia, 'Times New Roman', serif;
@@ -452,6 +453,7 @@ export const GLOBAL_CSS = `
   --c-green: #7fb069; --c-title: #de8f88;
   --c-araldi: #e08b4a; --c-araldi-border: #b86b33; --c-araldi-bg: rgba(184, 107, 51, 0.16);
   --c-araldi-glow: rgba(184, 107, 51, 0.30); --c-araldi-badge: #d27d3c;
+  --c-magico: #4f86d6;
   --c-car-forza: #d0685a; --c-car-destrezza: #86b26a; --c-car-costituzione: #d2a35a;
   --c-car-intelligenza: #6f9fd6; --c-car-saggezza: #ab8ad6; --c-car-carisma: #d99aa0;
 }
@@ -463,6 +465,7 @@ export const GLOBAL_CSS = `
     --c-green: #7fb069; --c-title: #de8f88;
     --c-araldi: #e08b4a; --c-araldi-border: #b86b33; --c-araldi-bg: rgba(184, 107, 51, 0.16);
     --c-araldi-glow: rgba(184, 107, 51, 0.30); --c-araldi-badge: #d27d3c;
+    --c-magico: #4f86d6;
     --c-car-forza: #d0685a; --c-car-destrezza: #86b26a; --c-car-costituzione: #d2a35a;
     --c-car-intelligenza: #6f9fd6; --c-car-saggezza: #ab8ad6; --c-car-carisma: #d99aa0;
   }
@@ -1667,21 +1670,26 @@ tbody tr:hover {
 /* i campi anagrafica (con le tendine): font uniforme, padding compatto, allineati in basso */
 .campi-anagrafica > * { min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; }
 .campi-anagrafica select { max-width: 100%; font-size: 12px !important; font-family: inherit !important; font-weight: 600 !important; color: var(--c-ink) !important; padding: 1px 13px 1px 0 !important; height: 100% !important; line-height: 1.2; background-position: right 1px center !important; background-size: 7px !important; }
-.campi-anagrafica .campo-modulo-box { padding: 0 !important; min-height: 26px !important; height: 26px; display: flex; align-items: center; overflow: hidden; font-size: 12px; font-weight: 600 !important; color: var(--c-ink) !important; font-family: inherit !important; border: none !important; background: transparent !important; box-shadow: none !important; }
+.campi-anagrafica .campo-modulo-box { padding: 0 !important; min-height: 26px !important; height: auto; display: flex; align-items: center; overflow: visible; font-size: 12px; font-weight: 600 !important; color: var(--c-ink) !important; font-family: inherit !important; border: none !important; background: transparent !important; box-shadow: none !important; }
 .campi-anagrafica .campo-modulo-box * { font-size: inherit; font-family: inherit; font-weight: 600; }
 .campi-anagrafica .campo-modulo-box > div { padding-left: 0 !important; }
 .campi-anagrafica .campo-modulo-box.testo-compatto, .campi-anagrafica .campo-modulo-box.testo-compatto * { font-size: 11px !important; letter-spacing: -0.2px; }
 /* Anagrafica: le due righe hanno le stesse quattro colonne, quindi Sesso sta sopra
    Background, Razza sopra Classe, Taglia sopra Sottoclasse e Allineamento sopra i PE. */
-.anagrafica-riga-1, .anagrafica-riga-2 { grid-template-columns: minmax(0, 19%) minmax(0, 25%) minmax(0, 1fr) minmax(96px, 23%); }
+.anagrafica-riga-1, .anagrafica-riga-2 { grid-template-columns: minmax(0, 19%) minmax(0, 25%) minmax(0, 1fr) minmax(112px, 23%); }
 /* Tablet: colonna centrale stretta, una colonna PE larga taglierebbe la Sottoclasse.
    Si torna alle colonne proporzionate, con i PE a filo destro come Allineamento. */
 @media (max-width: 1100px) and (min-width: 781px) {
   .anagrafica-riga-1 { grid-template-columns: 16% 26% minmax(56px, 0.6fr) minmax(110px, 1.45fr); }
-  .anagrafica-riga-2 { grid-template-columns: 24% 18% minmax(140px, 1.75fr) minmax(56px, 0.65fr); }
-  .campi-anagrafica > .campo-pe { justify-self: end; width: max-content; min-width: 56px; }
+  .anagrafica-riga-2 { grid-template-columns: 22% 17% minmax(110px, 1.5fr) minmax(104px, 0.95fr); }
+  .campi-anagrafica > .campo-pe { justify-self: stretch; width: auto; }
+  .campi-anagrafica > .campo-pe .campo-modulo-box > div > div:first-child { flex-wrap: wrap; gap: 2px 4px; }
 }
-.campi-anagrafica .campo-modulo-label { font-size: 11px !important; margin-top: 2px; font-weight: 700 !important; letter-spacing: 0.25px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 !important; }
+/* Etichette e valori si leggono SEMPRE per intero: se lo spazio è poco vanno a capo (e le
+   etichette si rimpiccioliscono con la larghezza del blocco), non si tagliano con "…". */
+.profilo-anagrafica-campi { container-type: inline-size; }
+.campi-anagrafica .campo-modulo-label { font-size: clamp(9px, 2.5cqw, 11px) !important; margin-top: 2px; font-weight: 700 !important; letter-spacing: 0.1px !important; white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.15; padding: 0 !important; }
+.campi-anagrafica .campo-modulo-box > div { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; overflow-wrap: anywhere; line-height: 1.2; }
 /* Sottoclasse con più classi (multiclasse): una riga per classe, l'altezza fissa
     da campo singolo taglierebbe via le righe in più. */
 .campi-anagrafica .campo-modulo-box.sottoclasse-multi { height: auto !important; align-items: flex-start !important; overflow: visible !important; padding-top: 2px !important; padding-bottom: 2px !important; }
@@ -1700,6 +1708,11 @@ tbody tr:hover {
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
   background: color-mix(in srgb, var(--c-panel) 95%, transparent) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+  /* Tema scuro: grigio scuro e non nero, così la barra si stacca dallo sfondo della scheda. */
+}
+:root[data-tema="scuro"] .barra-superiore-fissa {
+  background: color-mix(in srgb, #2a2a31 96%, transparent) !important;
+  border-color: color-mix(in srgb, var(--c-ink) 18%, #2a2a31) !important;
   border-top-left-radius: 0 !important;
   border-top-right-radius: 12px !important;
   border-bottom-right-radius: 0 !important;
@@ -2421,6 +2434,12 @@ tbody tr:hover {
 }
 .btn-header-azione:hover {
   border-color: var(--c-gold-dark);
+}
+/* Il contorno di focus da tastiera della barra è neutro, non dorato: il doppio anello dorato
+   sembrava un tasto "acceso" (come ⚔️ col combattimento attivo). Resta visibile per l'accessibilità. */
+.btn-header-azione:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--c-ink) 55%, transparent);
+  outline-offset: 1px;
 }
 
 /* Bersagli touch più grandi sui dispositivi touch (pulsanti piccoli e vicini

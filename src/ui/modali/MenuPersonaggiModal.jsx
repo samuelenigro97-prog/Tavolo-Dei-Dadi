@@ -87,8 +87,7 @@ export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg
         </button>
         {mostraListaCarica && (
           <>
-            <div id="lista-carica-pg" style={{ ...styles.detail, marginBottom: 6, fontWeight: 'bold' }}>{t('menu.carica_personaggio')}</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+            <div id="lista-carica-pg" style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
               {Object.entries(roster.personaggi).map(([id, p]) => {
                 // Ogni personaggio nel colore della sua classe: barra a sinistra, fondo appena tinto,
                 // nome della classe leggibile (il colore si avvicina all'inchiostro del tema).

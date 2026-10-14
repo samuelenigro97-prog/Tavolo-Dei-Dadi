@@ -285,3 +285,49 @@ test('danno ad area: più bersagli, vulnerabilità e immunità lette dai tratti 
   await finestra.getByTestId('area-applica').click();
   await expect.poll(pf).toEqual({ n1: 3, n2: 0 });
 });
+
+test('combat tracker ridotto: la ✕ chiude il fight solo dopo la conferma (v4.105.5)', async ({ page }) => {
+  await apriScheda(page);
+  await page.evaluate(() => {
+    localStorage.setItem('scheda-interattiva:combat', JSON.stringify({
+      attivo: true, aperto: false, round: 1, turno: 0,
+      combattenti: [
+        { id: 'n1', nome: 'Goblin', tipo: 'nemico', iniziativa: 21, pfMax: 7, pfAttuali: 7, ca: 15, condizioni: [] },
+        { id: 'p1', nome: 'Vaelion', tipo: 'pg', iniziativa: 17, pfMax: 64, pfAttuali: 61, ca: 19, condizioni: [], tsMorte: { successi: 0, fallimenti: 0 } },
+      ],
+    }));
+  });
+  await apriScheda(page);
+  const stato = () => page.evaluate(() => JSON.parse(localStorage.getItem('scheda-interattiva:combat')));
+  // Annullando la conferma il combattimento resta; il clic non riapre il tracker.
+  page.once('dialog', (d) => d.dismiss());
+  await page.getByTestId('ct-mini-chiudi').click();
+  await expect.poll(async () => { const s = await stato(); return `${s.attivo}/${s.aperto}/${s.combattenti.length}`; }).toBe('true/false/2');
+  // Confermando si chiude e si svuota l'elenco.
+  page.once('dialog', (d) => d.accept());
+  await page.getByTestId('ct-mini-chiudi').click();
+  await expect.poll(async () => { const s = await stato(); return `${s.attivo}/${s.combattenti.length}`; }).toBe('false/0');
+  await expect(page.getByTestId('combat-pillola')).toHaveCount(0);
+});
+
+test('gli attacchi non hanno la ✕: un incantesimo non più preparato sparisce da solo e torna con lui (v4.105.5)', async ({ page }) => {
+  await apriScheda(page);
+  const modifica = (js) => page.evaluate((src) => {
+    const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+    // eslint-disable-next-line no-new-func
+    new Function('pg', src)(r.personaggi[r.attivo]);
+    localStorage.setItem('scheda-interattiva:v1', JSON.stringify(r));
+  }, js);
+  await expect(page.locator('tr.attacchi-riga').filter({ hasText: 'Frusta di Spine' })).toHaveCount(1);
+  // Nessun tasto per eliminare gli attacchi di armi e incantesimi.
+  await expect(page.getByRole('button', { name: /^(Elimina|Nascondi) .* (dagli attacchi)?/ }).filter({ hasText: '×' })).toHaveCount(0);
+  await expect(page.locator('tr.attacchi-riga button[aria-label^="Nascondi"], tr.attacchi-riga button[aria-label^="Elimina"]')).toHaveCount(0);
+  // Un incantesimo toglie dalla lista: l'attacco sparisce.
+  await modifica(`pg.incantesimiLista = pg.incantesimiLista.filter((x) => x.nome !== 'Frusta di Spine');`);
+  await apriScheda(page);
+  await expect(page.locator('tr.attacchi-riga').filter({ hasText: 'Frusta di Spine' })).toHaveCount(0);
+  // Se l'incantesimo torna, torna anche l'attacco.
+  await modifica(`pg.incantesimiLista.push({ id: 'ts-frusta', nome: 'Frusta di Spine', livello: 0 });`);
+  await apriScheda(page);
+  await expect(page.locator('tr.attacchi-riga').filter({ hasText: 'Frusta di Spine' })).toHaveCount(1);
+});

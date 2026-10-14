@@ -8,7 +8,7 @@ import { C, BASE_TEMA, PRESET_COLORI, ambientazioneCasuale } from "./ui/tema.js"
 import { styles, GLOBAL_CSS } from './ui/stili.js';
 import { Editable, Rollable, iconaTipoDanno, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, caratteristicaDaTesto, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
-import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
+import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, attaccoIncantesimoAttivo, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
 import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } from "./data/esempi.js";
 import { fixEquipaggiamentoVaelion, migrazioneRegoleVaelion, autoIdratazionePersonaggioPredefinito } from './data/migrazioniPersonaggi.js';
 import { CARATTERISTICHE, ABILITA } from './data/caratteristiche.js';
@@ -1980,7 +1980,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.105.4';
+const APP_VERSION = '4.105.5';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -12843,13 +12843,13 @@ export default function App() {
                       }
                     }
                     return att;
-                  });
+                  }).filter((att) => !att.isSpell || attaccoIncantesimoAttivo(att, scheda.incantesimiLista, classePreparaIncantesimi(scheda.classe)));
 
                   const normalizzaNomeAttacco = (str) => String(str || '').replace(/^✨\s*/, '').replace(/\s*\((shillelagh|bastone incantato)\)/gi, '').trim().toLowerCase();
                   const nomiSalvati = new Set(attacchiSalvati.map((a) => normalizzaNomeAttacco(a.nome)));
 
                   const attacchiSpettro = (scheda.incantesimiLista || []).filter((s) => {
-                    if (scheda.mostraIncantesimiAttacco === false || s.nascondiAttacco) return false;
+                    if (scheda.mostraIncantesimiAttacco === false) return false;
                     // I trucchetti (livello 0) sono sempre conosciuti/preparati.
                     // Gli incantesimi di livello 1+ per le classi che preparano gli incantesimi (Druido, Chierico, Mago, Paladino, Artefice)
                     // devono essere preparati (o bonus/sempre preparati) per comparire in combattimento!
@@ -13580,9 +13580,13 @@ export default function App() {
                                           <span>{scheda.reazioneUsata ? (lingua === 'en' ? 'Used' : 'Usata') : (lingua === 'en' ? 'Use' : 'Usa')}</span>
                                         </button>
                                       )}
-                                      {!a.isAuto && (
+                                      {/* Niente ✕ per armi e incantesimi: spariscono da soli (disequipaggi l'arma,
+                                          cambi o togli l'incantesimo). Resta solo per un attacco "orfano": non è
+                                          un incantesimo e non c'è l'oggetto in inventario (es. aggiunto dal compendio). */}
+                                      {!a.isAuto && !a.isSpell && !(scheda.inventario || []).some((x) => String(x.nome || '').toLowerCase() === String(a.nome || '').toLowerCase()) && (
                                         <button
                                           type="button"
+                                          data-testid="attacco-orfano-elimina"
                                           style={{ ...styles.buttonRiga, color: C.red, borderColor: C.red }}
                                           title={a.isSpell ? tr('Nascondi questo incantesimo dalla sezione Armi e attacchi', 'Hide this spell from Weapons and attacks') : tr('Elimina attacco', 'Delete attack')}
                                           aria-label={a.isSpell ? tr(`Nascondi ${a.nome} dagli attacchi`, `Hide ${a.nome} from attacks`) : tr(`Elimina ${a.nome}`, `Delete ${a.nome}`)}
@@ -16385,6 +16389,10 @@ export default function App() {
                               // divisoria fra il nome e le sue righe di dettaglio, che restano
                               // "attaccate" come un unico blocco (bordo solo dopo l'ultima).
                               const mostraEffetto = effettoInventarioAperto === o.id || o.effettoMeccanico;
+                              // Oggetto magico: ha un effetto meccanico, richiede sintonia o è sintonizzato.
+                              // Sfondo blu (--c-magico) sulla riga, sulla sua riga dell'effetto e negli slot di sintonia.
+                              const eMagico = Boolean(o.effettoMeccanico || o.richiedeSintonia || isSintonizzato);
+                              const sfondoMagico = 'color-mix(in srgb, var(--c-magico) 16%, transparent)';
                               const mostraUtilizzi = o.usiMax > 0;
                               const senzaBordo = { borderBottom: 'none' };
 
@@ -16453,7 +16461,7 @@ export default function App() {
 
                               return (
                                 <Fragment key={o.id}>
-                                <tr className="inventario-riga" style={{ opacity: isEquip ? 1 : 0.92 }}>
+                                <tr className={eMagico ? 'inventario-riga inventario-magico' : 'inventario-riga'} style={{ opacity: isEquip ? 1 : 0.92, ...(eMagico ? { background: sfondoMagico } : {}) }}>
                                   <td data-label={t('inv.equip')} style={{ ...styles.td, textAlign: 'center', ...((mostraEffetto || mostraUtilizzi || mostraContenuto) && senzaBordo) }}>
                                     <input type="checkbox" checked={isEquip} onChange={(e) => toggleEquip(o, e.target.checked)} title={t('inv.equip_tooltip')} />
                                   </td>
@@ -16769,7 +16777,7 @@ export default function App() {
                                   </tr>
                                 )}
                                 {(mostraEffetto || mostraUtilizzi) && (
-                                  <tr style={{ background: (effettoAttivo || mostraUtilizzi) ? 'rgba(201,162,39,0.08)' : 'rgba(0,0,0,0.025)' }}>
+                                  <tr className={eMagico ? 'inventario-magico' : undefined} style={{ background: eMagico ? sfondoMagico : (effettoAttivo || mostraUtilizzi) ? 'rgba(201,162,39,0.08)' : 'rgba(0,0,0,0.025)' }}>
                                     <td style={{ ...styles.td, borderTop: 'none' }} />
                                     <td colSpan={5} style={{ ...styles.td, borderTop: 'none', paddingTop: 4, paddingBottom: 6 }}>
                                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', fontSize: 12 }}>
@@ -17081,7 +17089,8 @@ export default function App() {
                               value={slots[i]}
                               onChange={(e) => setSlot(i, e.target.value)}
                               placeholder={t("equip.sintonia_ph")}
-                              style={{ ...styles.inlineInput, flex: 1, minWidth: 0, padding: '6px 10px', fontSize: 13, background: isAttivo ? 'rgba(46,157,77,0.08)' : undefined, borderColor: isAttivo ? C.green : undefined }}
+                              data-testid={`sintonia-slot-${i}`}
+                              style={{ ...styles.inlineInput, flex: 1, minWidth: 0, padding: '6px 10px', fontSize: 13, background: String(slots[i] || '').trim() ? 'color-mix(in srgb, var(--c-magico) 16%, transparent)' : undefined, borderColor: String(slots[i] || '').trim() ? 'var(--c-magico)' : (isAttivo ? C.green : undefined) }}
                             />
                           </div>
                         );
@@ -18251,9 +18260,8 @@ export default function App() {
           data-testid="combat-pillola"
           onClick={() => setCombat((c) => ({ ...c, aperto: true }))}
           style={{
-            // Tema base dell'app; solo se è il turno del PG la pillola prende i suoi colori.
+            // Sempre il tema base dell'app, anche quando è il turno del personaggio.
             ...stileTemaBase,
-            ...(combat.combattenti[combat.turno] && eCombattentePgAttivo(combat.combattenti[combat.turno], combat.combattenti) ? stileColoriPg : {}),
             position: 'fixed',
             bottom: 14,
             right: 18,
@@ -18291,6 +18299,20 @@ export default function App() {
             {t('ct.round')} {combat.round} · {lingua === 'en' ? `${combat.combattenti[combat.turno]?.nome || 'PC'}'s turn` : `Turno di ${combat.combattenti[combat.turno]?.nome || 'PG'}`}
           </span>
           <span style={{ fontSize: 11, opacity: 0.9 }}>▲</span>
+          {/* ✕ per chiudere il combattimento senza riaprire il tracker: chiede conferma. */}
+          <button
+            type="button"
+            data-testid="ct-mini-chiudi"
+            title={t('ct.fine')}
+            aria-label={t('ct.fine')}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (window.confirm(t('ct.fine_conferma'))) setCombat({ attivo: false, aperto: true, round: 1, turno: 0, combattenti: [] });
+            }}
+            style={{ marginLeft: 2, padding: '1px 7px', borderRadius: 12, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 700, lineHeight: 1.3, color: 'var(--c-red)', background: 'transparent', border: '1.5px solid var(--c-red)' }}
+          >
+            ✕
+          </button>
         </div>
       ) : null}
       <NuvolettaGlobale />

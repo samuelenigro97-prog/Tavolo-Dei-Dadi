@@ -5,6 +5,23 @@
 
 export const NOVITA = [
   {
+    versione: '4.105.5',
+    voci: {
+      it: [
+        'Combat tracker ridotto: ✕ per chiudere il combattimento (chiede conferma) e sempre sul tema base.',
+        'Attacchi: niente più ✕, spariscono da soli quando disequipaggi l\'arma o cambi gli incantesimi.',
+        'Oggetti magici con sfondo blu nell\'inventario e negli slot di sintonia.',
+        'Barra in alto grigio scuro nel tema scuro; anagrafica leggibile per intero a ogni larghezza; tolto il titolo doppio "I miei personaggi".',
+      ],
+      en: [
+        'Minimised combat tracker: ✕ to end the fight (asks for confirmation) and always on the base theme.',
+        'Attacks: no more ✕, they disappear by themselves when you unequip the weapon or change your spells.',
+        'Magic items with a blue background in the inventory and in the attunement slots.',
+        'Dark-grey top bar in the dark theme; profile fields readable in full at every width; duplicate "My characters" heading removed.',
+      ],
+    },
+  },
+  {
     versione: '4.105.4',
     voci: {
       it: ['La barra in alto usa il tema base dell\'app. Il modificatore e il punteggio di ogni caratteristica hanno il colore del suo bordo.'],

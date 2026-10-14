@@ -2,6 +2,32 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.105.5] – 2026-10-14
+
+### Aggiunto
+- **✕ sulla pillola del combat tracker ridotto** per chiudere il combattimento, con la stessa
+  conferma del tracker aperto; il clic non riapre il tracker.
+- **Sfondo blu per gli oggetti magici** (token `--c-magico`): sulla riga dell'inventario, sulla
+  sua riga dell'effetto e negli slot di "Oggetti magici sintonizzati". È magico un oggetto con un
+  effetto meccanico, che richiede sintonia o che è sintonizzato.
+
+### Modificato
+- **Barra in alto grigio scuro** nel tema scuro (non più nera), così si stacca dallo sfondo
+  della scheda.
+- **Anagrafica sempre leggibile per intero**: etichette (BACKGROUND, ALLINEAMENTO...) e valori
+  (Sottoclasse, Classe...) vanno a capo invece di tagliarsi con "…"; le etichette si
+  rimpiccioliscono con la larghezza (container query); la colonna di Allineamento è più larga e
+  su tablet il blocco PE non esce più dal bordo. Misurato da 390 a 1920 px con i testi più lunghi.
+- **Contorno di focus dei tasti della barra neutro** (grigio) invece che dorato: l'anello dorato
+  dopo una conferma o un tasto da tastiera sembrava un tasto "acceso" (es. giorno/notte).
+- **Menu iniziale**: tolto il secondo titolo "I miei personaggi" sopra la lista.
+- **Pillola del combat tracker sempre sul tema base**, anche quando è il turno del personaggio.
+- **Niente più ✕ per eliminare gli attacchi** di armi e incantesimi: spariscono da soli. L'arma
+  se disequipaggi o togli l'oggetto (già così); l'incantesimo se lo togli dalla lista o non è più
+  preparato, e torna se l'incantesimo torna (`attaccoIncantesimoAttivo`). Gli incantesimi che
+  prima si "nascondevano" a mano tornano visibili. La ✕ resta solo per un attacco "orfano" (non è
+  un incantesimo e non c'è l'oggetto in inventario, es. aggiunto dal compendio).
+
 ## [4.105.4] – 2026-10-14
 
 ### Modificato
