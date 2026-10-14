@@ -99,7 +99,7 @@ export function ConcentrazioneModal({ aggiorna, checkConc, lingua, registra, sch
         ) : (
           <div style={{ textAlign: 'center', marginBottom: 12, padding: '10px', background: C.panelLight, borderRadius: 8, border: `1px solid ${esito.passa ? C.green : C.red}` }}>
             <div style={{ fontSize: 13, color: C.inkDim }}>
-              {esito.vantaggio !== 0 ? `2d20 [${esito.d1}, ${esito.d2}] -> [${esito.d20}]` : `d20 [${esito.d20}]`} {conSegno(bonusCon)} = <strong style={{ fontSize: 15, color: C.ink }}>{esito.tot}</strong> · CD {checkConc.cd}
+              {esito.vantaggio !== 0 ? `2d20 [${esito.d1}, ${esito.d2}] -> [${esito.d20}]` : `d20 [${esito.d20}]`} {conSegno(bonusCon)} = <strong style={{ fontSize: 14, color: C.ink }}>{esito.tot}</strong> · CD {checkConc.cd}
             </div>
             <div style={{ fontSize: 16, fontWeight: 800, marginTop: 6, color: esito.passa ? C.green : C.red }}>
               {esito.passa

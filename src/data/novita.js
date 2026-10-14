@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.104.0',
+    voci: {
+      it: ['Caratteri uniformati in tutta l\'app: solo Cinzel per titoli ed etichette e Georgia per il testo, con poche dimensioni fisse. Menu iniziale con tutti i pulsanti uguali.'],
+      en: ['Fonts unified across the app: only Cinzel for titles and labels and Georgia for text, with a few fixed sizes. Start menu with matching buttons.'],
+    },
+  },
+  {
     versione: '4.103.1',
     voci: {
       it: ['Ogni caratteristica ha il suo colore sul bordo (Forza rosso, Destrezza verde, Costituzione ocra, Intelligenza blu, Saggezza viola, Carisma rosato). Tolta la matita della velocità: la calcola l\'app. Anagrafica in colonne allineate (Razza sopra Classe, Allineamento sopra i PE). Il modificatore delle caratteristiche non ha più il "+" e non tira: i TS dalla riga Tiro salvezza.'],

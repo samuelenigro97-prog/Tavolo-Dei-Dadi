@@ -34,7 +34,7 @@ export const styles = {
     margin: '0 auto 6px auto',
     padding: '12px 0 8px',
   },
-  title: { margin: 0, fontSize: 21, letterSpacing: 1, color: 'var(--c-title)', fontFamily: 'var(--font-title, inherit)' },
+  title: { margin: 0, fontSize: 22, letterSpacing: 1, color: 'var(--c-title)', fontFamily: 'var(--font-title, inherit)' },
   hint: { margin: '3px 0 0', color: C.inkDim, fontStyle: 'italic', fontSize: 12 },
   main: { maxWidth: 1080, margin: '0 auto' },
   panel: {
@@ -49,7 +49,7 @@ export const styles = {
   },
   panelTitle: {
     margin: '0 0 12px',
-    fontSize: 15,
+    fontSize: 16,
     color: C.title,
     textAlign: 'center',
     fontWeight: 'bold',
@@ -62,7 +62,7 @@ export const styles = {
   },
   // campo in stile modulo: valore su riga con etichetta sotto
   moduloLabel: {
-    fontSize: 9,
+    fontSize: 10,
     color: C.inkDim,
     letterSpacing: 0.7,
     textTransform: 'uppercase',
@@ -193,7 +193,7 @@ export const styles = {
     borderRadius: 8,
     color: C.onGold,
     fontFamily: 'inherit',
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: 'bold',
     cursor: 'pointer',
     boxShadow: '0 2px 6px rgba(184, 134, 11, 0.25)',
@@ -357,7 +357,7 @@ export const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: livello === 3 ? 16 : livello === 2 ? 14 : 15,
+    fontSize: livello === 3 ? 16 : 14,
     // competenza chiara a colpo d'occhio con bagliore arcano e rune cesellate:
     // oro = Maestria/Expertise (✦), azzurro = classe/razza (★), verde = competente (●), tenue = non competente (○).
     color: livello === 3 ? '#ffd700' : livello === 2 ? '#38bdf8' : livello === 1 ? '#4ade80' : C.inkDim,
@@ -550,6 +550,10 @@ input[type="url"], input[type="tel"], input:not([type]), textarea {
   color: var(--c-ink);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
+/* Pulsanti nello stesso carattere del testo e voci delle tendine sulla scala dei
+   caratteri (il browser userebbe il suo carattere di sistema e 13,33 px). */
+button { font-family: inherit; }
+option { font-size: 13px; }
 select:hover, input:hover, textarea:hover { border-color: var(--c-gold); }
 select:focus-visible, input:focus-visible, textarea:focus-visible {
   outline: 2px solid var(--c-gold);
@@ -1458,7 +1462,7 @@ tbody tr:hover {
 }
 
 .profilo-col-sinistra .sezione { margin-bottom: 0 !important; }
-.profilo-col-sinistra .sezione > summary { font-size: 11.5px !important; letter-spacing: 0.7px !important; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis; }
+.profilo-col-sinistra .sezione > summary { font-size: 11px !important; letter-spacing: 0.7px !important; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis; }
 .profilo-col-sinistra .sezione-titolo-testo,
 .competenze-tier-2 .sezione-titolo-testo,
 .risorse-tier-3 .sezione-titolo-testo,
@@ -1613,15 +1617,15 @@ tbody tr:hover {
     gap: 4px !important;
   }
   .car-header-label {
-    font-size: 11.5px !important;
+    font-size: 11px !important;
     letter-spacing: 0px !important;
   }
   .blocco-car div[role="button"] {
-    font-size: 12.5px !important;
+    font-size: 12px !important;
     gap: 5px !important;
   }
   .blocco-car .skill-nome {
-    font-size: 11.5px !important;
+    font-size: 11px !important;
   }
   /* 7. Competenze (Armature, Armi, Strumenti, Lingue) */
   .profilo-competenze-box {

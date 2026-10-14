@@ -1980,7 +1980,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.103.1';
+const APP_VERSION = '4.104.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -7927,7 +7927,7 @@ export default function App() {
             style={{ position: 'fixed', inset: 0, zIndex: 3100, padding: 16, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             <div style={{ ...styles.panel, maxWidth: 480, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
-              <h2 id="conflitto-sync-titolo" style={{ ...styles.title, fontSize: 20, marginTop: 0, marginBottom: 8, color: 'var(--c-title)' }}>{t('conflitto.titolo')}</h2>
+              <h2 id="conflitto-sync-titolo" style={{ ...styles.title, fontSize: 18, marginTop: 0, marginBottom: 8, color: 'var(--c-title)' }}>{t('conflitto.titolo')}</h2>
               <p style={{ ...styles.detail, fontSize: 13, lineHeight: 1.5, marginTop: 0 }}>{t('conflitto.spiegazione')}</p>
               <div style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 12px', margin: '12px 0', background: 'rgba(0,0,0,0.03)' }}>
                 <div style={{ ...styles.detail, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>
@@ -8245,7 +8245,7 @@ export default function App() {
           <div style={{ ...styles.panel, maxWidth: 500, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
             {/* INTESTAZIONE MODALE */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, paddingBottom: 10, borderBottom: `1px solid ${C.border}` }}>
-              <h1 style={{ ...styles.title, margin: 0, fontSize: 20 }}>{t('levelup.titolo')}</h1>
+              <h1 style={{ ...styles.title, margin: 0, fontSize: 18 }}>{t('levelup.titolo')}</h1>
               <span style={{ fontSize: 13, background: 'rgba(214,169,15,0.14)', border: `1px solid ${C.goldDark}`, color: C.goldDark, padding: '3px 12px', borderRadius: 14, fontWeight: 700 }}>
                 Livello {livTotVecchio} ➔ <strong>{nuovoLivello}</strong>
               </span>
@@ -8367,7 +8367,7 @@ export default function App() {
                   onClick={() => setLevelUpBozza((b) => ({ ...b, metodo: 'media' }))}
                 >
                   <div style={{ fontWeight: 700, fontSize: 13 }}>{t('levelup.media_fissa')}</div>
-                  <div style={{ fontSize: 20, color: C.goldDark, fontWeight: 800 }}>+{levelUpBozza.hpGainMedia != null ? levelUpBozza.hpGainMedia : avgHpGainTarget} PF</div>
+                  <div style={{ fontSize: 18, color: C.goldDark, fontWeight: 800 }}>+{levelUpBozza.hpGainMedia != null ? levelUpBozza.hpGainMedia : avgHpGainTarget} PF</div>
                   <div style={{ fontSize: 11, color: C.inkDim }}>({Math.floor(facceTargetDV / 2) + 1} {modCos !== 0 ? conSegno(modCos) : ''})</div>
                 </div>
 
@@ -8382,7 +8382,7 @@ export default function App() {
                   onClick={() => setLevelUpBozza((b) => ({ ...b, metodo: 'tiro' }))}
                 >
                   <div style={{ fontWeight: 700, fontSize: 13 }}>{t('levelup.tira_dado', { facce: facceTargetDV })}</div>
-                  <div style={{ fontSize: 20, color: C.goldDark, fontWeight: 800 }}>
+                  <div style={{ fontSize: 18, color: C.goldDark, fontWeight: 800 }}>
                     {levelUpBozza.tiroFatto > 0 ? `+${Math.max(1, levelUpBozza.tiroFatto + modCos)} PF` : '? PF'}
                   </div>
                   <div>
@@ -8747,7 +8747,7 @@ export default function App() {
             </div>
 
             <button
-              style={{ ...styles.buttonPrimary, width: '100%', marginBottom: 8, padding: '10px 14px', fontSize: 15 }}
+              style={{ ...styles.buttonPrimary, width: '100%', marginBottom: 8, padding: '10px 14px', fontSize: 14 }}
               disabled={!hpOk || !asiCompleto}
               onClick={() => {
                 const g = levelUpBozza.metodo === 'media' ? (levelUpBozza.hpGainMedia != null ? levelUpBozza.hpGainMedia : avgHpGainTarget) : Math.max(1, levelUpBozza.tiroFatto + modCos);
@@ -8848,7 +8848,7 @@ export default function App() {
 
       {mostraCrea && (() => {
         const setB = (patch) => setBozzaCrea((b) => ({ ...b, ...patch }));
-        const stileSelect = { ...styles.inlineInput, width: '100%', padding: '6px 8px', fontSize: 15 };
+        const stileSelect = { ...styles.inlineInput, width: '100%', padding: '6px 8px', fontSize: 14 };
         const bonusBg = regoleVersione === '2024' ? bonusCaratteristicheBackground(bozzaCrea.background, bozzaCrea.classe) : [];
         const bonusRazza = regoleVersione === '2014' ? bonusCaratteristicheSpecie2014(bozzaCrea.specie, bozzaCrea.classe) : {};
         return (
@@ -9408,7 +9408,7 @@ export default function App() {
           onClick={(e) => { if (e.target === e.currentTarget) setStanzaUi((s) => ({ ...s, aperta: false })); }}
         >
           <div style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 480, width: '100%' }}>
-            <h2 style={{ ...styles.title, fontSize: 20, margin: '0 0 6px', textAlign: 'center' }}>{t('stanze.titolo')}</h2>
+            <h2 style={{ ...styles.title, fontSize: 18, margin: '0 0 6px', textAlign: 'center' }}>{t('stanze.titolo')}</h2>
             <p style={{ ...styles.detail, fontSize: 13, margin: '0 0 14px', textAlign: 'center' }}>{t('stanze.snapshot_desc', { ore: DURATA_STANZA_ORE })}</p>
 
             <button style={{ ...styles.buttonPrimary, width: '100%' }} disabled={stanzaUi.caricamento} onClick={creaStanzaCorrente}>
@@ -9464,7 +9464,7 @@ export default function App() {
           onClick={(e) => { if (e.target === e.currentTarget) setCondivisione(null); }}
         >
           <div style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 520, width: '100%', maxHeight: '86vh', overflowY: 'auto' }}>
-            <h2 style={{ ...styles.title, fontSize: 20, margin: '0 0 4px', textAlign: 'center' }}>{t('condividi.titolo')}</h2>
+            <h2 style={{ ...styles.title, fontSize: 18, margin: '0 0 4px', textAlign: 'center' }}>{t('condividi.titolo')}</h2>
             <p style={{ ...styles.detail, textAlign: 'center', margin: '0 0 12px' }}>
               {condivisione.copiato ? t('condividi.copiato') : t('condividi.copia_a_mano')}
             </p>
@@ -9496,7 +9496,7 @@ export default function App() {
       {pgDaLink && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1011, padding: 16, background: 'rgba(0,0,0,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 460, width: '100%' }}>
-            <h2 style={{ ...styles.title, fontSize: 20, margin: '0 0 10px', textAlign: 'center' }}>{t('condividi.ricevuto')}</h2>
+            <h2 style={{ ...styles.title, fontSize: 18, margin: '0 0 10px', textAlign: 'center' }}>{t('condividi.ricevuto')}</h2>
             <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', marginBottom: 12 }}>
               <div style={{ fontWeight: 700, color: C.ink, fontSize: 16 }}>{pgDaLink.nome || t('menu.senza_nome')}</div>
               <div style={styles.detail}>
@@ -9572,7 +9572,7 @@ export default function App() {
             flexWrap: 'wrap'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-              <span style={{ fontSize: 20 }}>🔒</span>
+              <span style={{ fontSize: 18 }}>🔒</span>
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontWeight: 800, fontSize: 13, textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
                   {lingua === 'en' ? 'Archive: read-only sheet' : 'Archivio: scheda in sola lettura'}
@@ -9627,7 +9627,7 @@ export default function App() {
               minHeight: 32,
               maxHeight: 32,
               padding: 0,
-              fontSize: 15,
+              fontSize: 14,
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -9666,7 +9666,7 @@ export default function App() {
               alignItems: 'center',
               gap: 3,
               opacity: 0.9,
-              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+              fontFamily: 'var(--font-title)',
             };
 
             return (
@@ -9955,7 +9955,7 @@ export default function App() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, userSelect: 'none', flexShrink: 0 }}>
-                    <span style={{ fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", fontSize: 15, fontWeight: 800, color: 'var(--c-title)', letterSpacing: 0.4, whiteSpace: 'nowrap', transition: 'color 0.2s ease', display: 'inline-flex', alignItems: 'baseline', gap: 0 }}>
+                    <span style={{ fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", fontSize: 14, fontWeight: 800, color: 'var(--c-title)', letterSpacing: 0.4, whiteSpace: 'nowrap', transition: 'color 0.2s ease', display: 'inline-flex', alignItems: 'baseline', gap: 0 }}>
                       Tavolo dei Dadi
                     </span>
                   </div>
@@ -10180,7 +10180,7 @@ export default function App() {
                   <span style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>
                     {lingua === 'en' ? 'Form Hit Points' : 'Punti Ferita della Forma'}
                   </span>
-                  <span style={{ fontSize: 15, fontWeight: 800, color: C.ink }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: C.ink }}>
                     {formaAttiva.dati.pfAttuali} / {formaAttiva.dati.pfMax} PF
                   </span>
                 </div>
@@ -10256,7 +10256,7 @@ export default function App() {
                       title={sostituita ? `Clicca per tirare Prova di ${t('attr.' + car)}: 1d20 ${conSegno(mod)}` : `Tua: non sostituita dalla forma. Clicca per tirare Prova di ${t('attr.' + car)}: 1d20 ${conSegno(mod)}`}
                     >
                       <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: C.inkDim }}>{sigla} ({sostituita ? 'Forma' : 'Tua'}) 🎲</div>
-                      <div style={{ fontSize: 15, fontWeight: 800, color: C.ink }}>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: C.ink }}>
                         {val} <span style={{ color: C.goldDark, fontSize: 13 }}>({conSegno(mod)})</span>
                       </div>
                     </div>
@@ -10456,7 +10456,7 @@ export default function App() {
                         }}
                       >
                         <span style={{
-                          fontSize: 15, lineHeight: 1,
+                          fontSize: 14, lineHeight: 1,
                           color: scheda.ispirazione ? '#f0c43f' : '#bbb',
                           textShadow: scheda.ispirazione ? '0 0 8px rgba(240, 196, 63, 0.9)' : 'none',
                         }}>
@@ -11926,7 +11926,7 @@ export default function App() {
                         title={t('tip.cosa_governa')}
                         onClick={() => setInfo({ titolo: t('attr.' + key), testo: t('spieg.' + key) })}
                       >{t('attr.' + key).toUpperCase()}</div>
-                      <div style={{ flexShrink: 0, fontSize: 15, fontWeight: 'bold', color: C.goldDark, display: 'flex', alignItems: 'center' }} title={t('tip.punteggio_car')}>
+                      <div style={{ flexShrink: 0, fontSize: 14, fontWeight: 'bold', color: C.goldDark, display: 'flex', alignItems: 'center' }} title={t('tip.punteggio_car')}>
                         <Editable
                           value={scheda.caratteristiche[key]}
                           tipo="numero"
@@ -11948,7 +11948,7 @@ export default function App() {
                                   setFontePopover((v) => (v && v.tipo === 'car' && v.key === key ? null : { tipo: 'car', key, ...posizionePopover(r, window) }));
                                 }}
                                 title={t('inv.fonte_bonus_tip')}
-                                style={{ marginLeft: 4, fontSize: 15, fontWeight: 'bold', color: C.goldDark, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                                style={{ marginLeft: 4, fontSize: 14, fontWeight: 'bold', color: C.goldDark, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                               >→ {punteggioEffettivo}</button>
                               {fontePopover?.tipo === 'car' && fontePopover.key === key && createPortal(
                                 <div
@@ -12716,7 +12716,7 @@ export default function App() {
               {/* Intestazione Combattimento & Filtri Armi / Incantesimi Offensivi */}
               <div className="sottosezione-titolo" style={{ display: 'grid', gridTemplateColumns: 'minmax(28px, 1fr) auto minmax(28px, 1fr)', alignItems: 'center', columnGap: 6, marginTop: 18, marginBottom: 8 }}>
                 <div />
-                <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 15 }}>
+                <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 14 }}>
                   {t('combat.titolo')}
                 </h3>
                 <div style={{ justifySelf: 'end', display: 'inline-flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -13022,7 +13022,7 @@ export default function App() {
                         {cat !== 'Azione' && (
                           <div className="sottosezione-titolo" style={{ display: 'grid', gridTemplateColumns: 'minmax(28px, 1fr) auto minmax(28px, 1fr)', alignItems: 'center', columnGap: 6, marginTop: 18, marginBottom: 8 }}>
                             <div />
-                            <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 15 }}>
+                            <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 14 }}>
                               {cat === 'Bonus' ? t('combat.azioni_bonus') : t('combat.reazioni')}
                             </h3>
                             {/* I chip della reazione vanno su una riga propria sotto il titolo:
@@ -14759,7 +14759,7 @@ export default function App() {
                           {livelliIncChiusi[0] ? '▸' : '▾'}
                         </span>
                       </div>
-                      <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 15 }}>
+                      <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 14 }}>
                         {t('spell.trucchetti')}
                       </h3>
                       <div style={{ justifySelf: 'end', display: 'inline-flex', alignItems: 'center', gap: 6 }} onClick={(e) => e.stopPropagation()}>
@@ -14791,7 +14791,7 @@ export default function App() {
                     {maxLiv >= 1 && (
                       <div className="sottosezione-titolo" style={{ display: 'grid', gridTemplateColumns: 'minmax(28px, 1fr) auto minmax(28px, 1fr)', alignItems: 'center', columnGap: 6, marginTop: 18, marginBottom: 8 }}>
                         <div />
-                        <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 15 }}>
+                        <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 14 }}>
                           {t('spell.incantesimi')}
                         </h3>
                         {/* Il conteggio "Preparati" è sceso nell'intestazione del 1° Livello qui
@@ -15258,7 +15258,7 @@ export default function App() {
                   }}>
                     {/* Card 1: Privilegi di Classe */}
                     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: 13.5, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
                         {t('priv.classe_titolo')}{scheda.classe ? ` (${traduciDato(scheda.classe)})` : ''}
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, justifyContent: 'center' }}>
@@ -15284,7 +15284,7 @@ export default function App() {
 
                     {/* Card 2: Privilegi di Sottoclasse */}
                     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: 13.5, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
                         {t('priv.sub_titolo')}{scheda.sottoclasse ? ` (${traduciDato(scheda.sottoclasse)})` : ''}
                       </div>
                       {(() => {
@@ -15356,7 +15356,7 @@ export default function App() {
                     gap: 10
                   }}>
                     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: 13.5, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
                         {t("sez.tratti_specie")}{scheda.specie ? ` (${traduciDato(scheda.specie)})` : ''}
                       </div>
                       <ListaQuadratini
@@ -15368,7 +15368,7 @@ export default function App() {
                     </div>
 
                     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: 13.5, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
                         {t("sez.talenti")}
                       </div>
                       <ListaQuadratini
@@ -16517,7 +16517,7 @@ export default function App() {
                                       aria-label={isSintonizzato ? t('inv.sintonizzato') : t('inv.non_sintonizzato')}
                                       title={isSintonizzato ? t('inv.sintonizzato') : t('inv.non_sintonizzato')}
                                       onClick={() => toggleSintonia(o)}
-                                      style={{ border: 0, background: 'transparent', padding: '1px 5px', fontSize: 20, lineHeight: 1, color: isSintonizzato ? C.goldDark : C.inkDim, cursor: 'pointer' }}
+                                      style={{ border: 0, background: 'transparent', padding: '1px 5px', fontSize: 18, lineHeight: 1, color: isSintonizzato ? C.goldDark : C.inkDim, cursor: 'pointer' }}
                                     >{isSintonizzato ? '✦' : '◇'}</button>
                                   </td>
                                   <td data-label={t('inv.peso')} style={{ ...styles.td, color: C.inkDim, whiteSpace: 'nowrap', ...((mostraEffetto || mostraUtilizzi || mostraContenuto) && senzaBordo) }}>
@@ -17562,7 +17562,7 @@ export default function App() {
             style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: C.panel, borderBottom: `1px solid ${C.border}` }}
             onClick={(e) => e.stopPropagation()}
           >
-            <strong style={{ color: 'var(--c-title)', fontSize: 15 }}>{t('mappa.titolo')}</strong>
+            <strong style={{ color: 'var(--c-title)', fontSize: 14 }}>{t('mappa.titolo')}</strong>
             <span style={{ flex: 1 }} />
             <button style={{ ...styles.buttonMini, ...(mappaScala === 0 ? { borderColor: C.gold, color: C.gold } : {}) }} onClick={() => setMappaScala(0)} title={t('mappa.adatta_tip')}>{t('mappa.adatta')}</button>
             <button style={styles.buttonMini} onClick={() => setMappaScala((s) => Math.max(0.5, (s === 0 ? 1 : s) - 0.5))} title={t('mappa.riduci')}>➖</button>
@@ -17895,7 +17895,7 @@ export default function App() {
                                     width: 26,
                                     textAlign: 'center',
                                     fontWeight: 900,
-                                    fontSize: 15,
+                                    fontSize: 14,
                                     color: col,
                                     padding: 0,
                                     border: 'none',

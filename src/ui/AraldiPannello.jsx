@@ -39,12 +39,12 @@ function Contatore({ titolo, valore, max, onMeno, onPiu, onImposta, sotto, sugge
     <div style={{ ...scatola, flex: '1 1 200px', minWidth: 160, textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 4 }} title={suggerimento}>
       <div style={etichetta}>{titolo}</div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-        <button type="button" style={{ ...styles.buttonMini, padding: '2px 10px', fontSize: 15 }} onClick={onMeno} disabled={valore <= 0} aria-label={`${titolo} −1`}>−</button>
+        <button type="button" style={{ ...styles.buttonMini, padding: '2px 10px', fontSize: 14 }} onClick={onMeno} disabled={valore <= 0} aria-label={`${titolo} −1`}>−</button>
         <span style={{ fontSize: 26, fontWeight: 800, color: C.ink, minWidth: 34, fontVariantNumeric: 'tabular-nums', display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
           <Editable value={valore} tipo="numero" width={46} style={{ fontSize: 26, fontWeight: 800, textAlign: 'center' }} onChange={(v) => onImposta(Math.max(0, Math.floor(Number(v) || 0)))} title={`${titolo}: clicca per scrivere il valore`} />
           {max != null && <span style={{ fontSize: 14, fontWeight: 600, color: C.inkDim }}>/ {max}</span>}
         </span>
-        <button type="button" style={{ ...styles.buttonMini, padding: '2px 10px', fontSize: 15 }} onClick={onPiu} disabled={max != null && valore >= max} aria-label={`${titolo} +1`}>+</button>
+        <button type="button" style={{ ...styles.buttonMini, padding: '2px 10px', fontSize: 14 }} onClick={onPiu} disabled={max != null && valore >= max} aria-label={`${titolo} +1`}>+</button>
       </div>
       {children}
       {sotto && <div style={{ fontSize: 11, color: C.inkDim }}>{sotto}</div>}

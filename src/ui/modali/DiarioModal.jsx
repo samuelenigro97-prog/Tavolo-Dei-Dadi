@@ -38,7 +38,7 @@ export function DiarioModal({ aggiorna, filtroDiario, lingua, scheda, setConferm
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, borderBottom: `1px solid ${C.border}`, paddingBottom: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div>
-              <h2 style={{ ...styles.title, margin: 0, fontSize: 20, letterSpacing: 0.5, color: C.ink }}>
+              <h2 style={{ ...styles.title, margin: 0, fontSize: 18, letterSpacing: 0.5, color: C.ink }}>
                 {t('sez.diario')}
               </h2>
               <div style={{ ...styles.detail, fontSize: 12, color: C.goldDark, fontWeight: 700 }}>
@@ -193,7 +193,7 @@ export function DiarioModal({ aggiorna, filtroDiario, lingua, scheda, setConferm
               {diario.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '36px 16px', background: 'rgba(0,0,0,0.02)', borderRadius: 10, border: `1px dashed ${C.border}`, margin: '12px 0' }}>
                   <div style={{ fontSize: 38, marginBottom: 10, opacity: 0.85 }}>📜</div>
-                  <div style={{ fontWeight: 700, fontSize: 15, color: C.ink, marginBottom: 6 }}>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: C.ink, marginBottom: 6 }}>
                     {lingua === 'en' ? 'Your Adventurer’s Journal is Empty' : 'Il Diario del tuo Avventuriero è Vuoto'}
                   </div>
                   <div style={{ ...styles.detail, fontSize: 13, maxWidth: 420, margin: '0 auto 16px' }}>

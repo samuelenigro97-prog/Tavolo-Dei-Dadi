@@ -7,8 +7,8 @@ import { URL_ARCHIVIO_PG } from '../../utils/ambiente.js';
 
 /** Titoletti delle sezioni del menu: stesso stile delle etichette della barra (SISTEMA, SCHEDA, SESSIONE). */
 const etichettaSezione = {
-  fontSize: 11, fontWeight: 800, letterSpacing: 0.6, textTransform: 'uppercase', color: C.goldDark,
-  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', opacity: 0.9, userSelect: 'none', marginBottom: 8,
+  fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', color: C.goldDark,
+  fontFamily: 'var(--font-title)', opacity: 0.9, userSelect: 'none', marginBottom: 8,
 };
 
 export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, esportaBackupCompleto, generaPgCasuale, idDispositivo, isCloudAttivo, jsonRef, leggiSnapshots, lingua, manualiAttivi, mostraListaCarica, novitaNonLette, roster, scheda, setBozzaCrea, setCloudStatus, setConferma, setLingua, setMostraArchivioDm, setMostraCloud, setMostraCrea, setMostraDonazioni, setMostraListaCarica, setMostraMenu, setMostraMenuEsporta, setMostraModalManuali, setMostraNoteLegali, setMostraRipristino, setPosEsporta, setRoster, setSchedaSolaLettura, setTemaCornici, statoBgCloud, statoColoreCloud, statoGlowCloud, temaCornici }) {
@@ -56,17 +56,17 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
               border: '1.5px solid var(--c-gold)', boxShadow: '0 5px 16px color-mix(in srgb, var(--c-gold) 19%, transparent)',
             }}
           >
-            <span style={{ width: 44, height: 44, flexShrink: 0, overflow: 'hidden', display: 'grid', placeItems: 'center', borderRadius: 8, border: '1px solid var(--c-gold)', background: 'var(--c-panel)', color: 'var(--c-title)', fontSize: 21, fontWeight: 800 }}>
+            <span style={{ width: 44, height: 44, flexShrink: 0, overflow: 'hidden', display: 'grid', placeItems: 'center', borderRadius: 8, border: '1px solid var(--c-gold)', background: 'var(--c-panel)', color: 'var(--c-title)', fontSize: 22, fontWeight: 800 }}>
               {typeof ultimoPersonaggio.ritratto === 'string' && ultimoPersonaggio.ritratto ? (
                 <img src={ultimoPersonaggio.ritratto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (ultimoPersonaggio.nome || '?').trim().slice(0, 1).toUpperCase()}
             </span>
             <span style={{ minWidth: 0, display: 'flex', flex: 1, flexDirection: 'column', gap: 2 }}>
-              <span style={{ fontSize: 11, lineHeight: 1.1, color: C.inkDim, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{t('menu.ultimo_usato')}</span>
+              <span style={{ ...etichettaSezione, color: C.inkDim, marginBottom: 0, lineHeight: 1.1 }}>{t('menu.ultimo_usato')}</span>
               <strong style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 16 }}>{ultimoPersonaggio.nome || t('menu.senza_nome')}</strong>
               <span style={{ color: C.inkDim, fontSize: 13 }}>{ultimoPersonaggio.classe || '—'} · {t('profilo.livello')} {ultimoPersonaggio.livello || 1}</span>
             </span>
-            <span style={{ color: 'var(--c-gold-dark)', fontSize: 13, fontWeight: 800, whiteSpace: 'nowrap' }}>{t('menu.riprendi')}</span>
+            <span style={{ color: 'var(--c-gold-dark)', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}>{t('menu.riprendi')}</span>
           </button>
         )}
 
@@ -133,7 +133,7 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
         )}
         <button style={{ ...styles.button, width: '100%', marginBottom: 8 }} onClick={() => generaPgCasuale()} title={t('menu.pg_casuale_tooltip')}>{t('menu.pg_casuale')}</button>
         <button
-          style={{ ...styles.button, width: '100%', marginBottom: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontWeight: 700, color: C.goldDark, borderColor: C.goldDark }}
+          style={{ ...styles.button, width: '100%', marginBottom: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
           onClick={() => { setMostraModalManuali(true); }}
         >
           
@@ -184,7 +184,6 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
                 border: `1.5px solid ${statoColoreCloud}`,
                 background: statoBgCloud,
                 color: statoColoreCloud,
-                fontWeight: 700,
                 boxShadow: statoGlowCloud,
                 transition: 'all 0.25s ease',
               }}
@@ -227,14 +226,14 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
           <div style={etichettaSezione}>{lingua === 'en' ? 'About' : 'Informazioni'}</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
             <button
-              style={{ ...styles.button, width: '100%', height: 38, minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0 6px', fontSize: 13, boxSizing: 'border-box' }}
+              style={{ ...styles.button, width: '100%', height: 38, minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0 6px', boxSizing: 'border-box' }}
               onClick={() => { setMostraMenu(false); setMostraNoteLegali(true); }}
               title={t('legali.titolo')}
             >
               <span>{t('menu.note_legali')}</span>
             </button>
             <button
-              style={{ ...styles.button, width: '100%', height: 38, minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0 6px', fontSize: 13, boxSizing: 'border-box' }}
+              style={{ ...styles.button, width: '100%', height: 38, minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0 6px', boxSizing: 'border-box' }}
               onClick={() => { setMostraMenu(false); setMostraDonazioni(true); }}
               title={t('donazioni.titolo')}
             >
@@ -244,7 +243,7 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
               href="https://github.com/samuelenigro97-prog/Tavolo-Dei-Dadi"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ ...styles.button, textDecoration: 'none', width: '100%', height: 38, minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0 6px', fontSize: 13, boxSizing: 'border-box' }}
+              style={{ ...styles.button, textDecoration: 'none', width: '100%', height: 38, minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0 6px', boxSizing: 'border-box' }}
               title={t('menu.github_tip')}
             >
               <span>{t('menu.github')}</span>

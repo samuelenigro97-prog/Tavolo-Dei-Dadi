@@ -18,7 +18,7 @@ export function NotificheModal({ APP_VERSION, aggiorna, avvisoBackup, controlliA
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-          <strong style={{ color: C.goldDark, fontSize: 15, marginRight: 'auto' }}>{t('notifiche.titolo')}</strong>
+          <strong style={{ color: C.goldDark, fontSize: 14, marginRight: 'auto' }}>{t('notifiche.titolo')}</strong>
           <span data-testid="notifiche-versione" style={{ fontSize: 12, fontWeight: 700, color: C.inkDim, fontVariantNumeric: 'tabular-nums' }}>v{APP_VERSION}</span>
           <button style={{ ...styles.buttonMini, padding: '2px 7px' }} onClick={() => setMostraNotifiche(false)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
         </div>

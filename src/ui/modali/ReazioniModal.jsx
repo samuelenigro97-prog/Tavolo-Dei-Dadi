@@ -71,7 +71,7 @@ export function ReazioniModal({ aggiorna, lingua, registra, scheda, setInfo, set
         {/* Header */}
         <div style={{ padding: '14px 18px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: C.panelLight }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <strong style={{ fontSize: 15, color: C.goldDark }}>
+            <strong style={{ fontSize: 14, color: C.goldDark }}>
               {lingua === 'en' ? `Reactions and combat triggers (${versione === '2024' ? '5.5' : '5e'})` : `Reazioni e inneschi in combattimento (${versione === '2024' ? '5.5' : '5e'})`}
             </strong>
           </div>

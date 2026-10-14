@@ -2,6 +2,22 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.104.0] – 2026-10-14
+
+### Modificato
+- **Caratteri uniformati in tutto il progetto**:
+  - due famiglie sole: Cinzel per titoli ed etichette, Georgia per il testo. Le etichette
+    della barra (SISTEMA, SCHEDA, SESSIONE) e dei titoletti del menu non sono più in
+    monospace; le schermate d'errore non usano più il carattere di sistema; pulsanti e voci
+    delle tendine ereditano Georgia. Il monospace resta solo nei codici di sincronizzazione e
+    delle stanze, dove serve a distinguere 0 da O;
+  - una scala di dimensioni: 10 · 11 · 12 · 13 · 14 · 16 · 18 · 22 px, più i numeri grandi
+    (CA, PF, dadi). I valori fuori scala (9; 10,5; 11,5; 12,5; 13,5; 15; 19; 20; 21) sono
+    stati portati al gradino più vicino; le voci delle tendine a 13 px invece dei 13,33 del
+    browser;
+  - menu iniziale: tutti i pulsanti con la stessa dimensione e lo stesso peso, solo "Nuovo
+    personaggio" in evidenza; "Ultimo usato" con lo stesso titoletto delle sezioni.
+
 ## [4.103.1] – 2026-10-14
 
 ### Aggiunto

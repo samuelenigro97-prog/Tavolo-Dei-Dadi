@@ -19,21 +19,21 @@ class ErrorBoundary extends React.Component {
         <div style={{
           minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: 20, background: 'rgba(20,12,8,0.88)', backdropFilter: 'blur(8px)', color: '#fff',
-          fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+          fontFamily: "Georgia, 'Times New Roman', serif"
         }}>
           <div style={{
             maxWidth: 480, width: '100%', background: '#2c1e14', border: '1.5px solid #d4af37',
             borderRadius: 12, padding: 24, boxShadow: '0 10px 40px rgba(0,0,0,0.6)', textAlign: 'center'
           }}>
             <div style={{ fontSize: 44, marginBottom: 12 }}>⚠️</div>
-            <h2 style={{ color: '#d4af37', fontSize: 20, margin: '0 0 10px 0' }}>Errore di Visualizzazione Scheda</h2>
+            <h2 style={{ color: '#d4af37', fontSize: 18, margin: '0 0 10px 0' }}>Errore di Visualizzazione Scheda</h2>
             <p style={{ fontSize: 13, color: '#e0d8cc', margin: '0 0 16px 0', lineHeight: 1.5 }}>
               La scheda non è stata caricata correttamente a causa di dati non previsti.
             </p>
             {this.state.error && (
               <pre style={{
                 background: 'rgba(0,0,0,0.5)', padding: '10px 12px', borderRadius: 6,
-                fontSize: 11.5, color: '#ff8a80', textAlign: 'left', overflowX: 'auto',
+                fontSize: 11, color: '#ff8a80', textAlign: 'left', overflowX: 'auto',
                 margin: '0 0 20px 0', maxHeight: 120, border: '1px solid rgba(255,255,255,0.1)'
               }}>
                 {String(this.state.error.message || this.state.error)}

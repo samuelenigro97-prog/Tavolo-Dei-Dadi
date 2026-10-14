@@ -135,7 +135,7 @@ export function CloudModal({ sostituisciOnlineConQuesta, autoSyncCodice, codiceS
                   {t('cloud.sync_codice_info')}
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <div style={{ color: C.goldDark, fontSize: 20, fontWeight: 800, letterSpacing: 2, fontFamily: 'monospace' }}>{formattaCodiceSync(codiceSync)}</div>
+                  <div style={{ color: C.goldDark, fontSize: 18, fontWeight: 800, letterSpacing: 2, fontFamily: 'monospace' }}>{formattaCodiceSync(codiceSync)}</div>
                   <button style={styles.buttonMini} onClick={() => navigator.clipboard?.writeText(formattaCodiceSync(codiceSync))}>📋</button>
                 </div>
                 {ultimoSyncCodice && <div style={{ ...styles.detail, fontSize: 11, marginBottom: 8 }}>{lingua === 'en' ? 'Last sync:' : 'Ultimo salvataggio:'} {ultimoSyncCodice}</div>}
@@ -186,7 +186,7 @@ export function CloudModal({ sostituisciOnlineConQuesta, autoSyncCodice, codiceS
                 <div style={{ display: 'flex', gap: 6 }}>
                   <input
                     type="text"
-                    style={{ ...styles.inlineInput, flex: 1, padding: '6px 8px', fontSize: 15, fontFamily: 'monospace', textTransform: 'uppercase' }}
+                    style={{ ...styles.inlineInput, flex: 1, padding: '6px 8px', fontSize: 14, fontFamily: 'monospace', textTransform: 'uppercase' }}
                     placeholder="XXXXX-XXXXX"
                     value={formattaCodiceSync(codiceSyncInput)}
                     onChange={(e) => setCodiceSyncInput(normalizzaCodiceSync(e.target.value))}

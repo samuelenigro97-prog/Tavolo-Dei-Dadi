@@ -611,7 +611,7 @@ export function ListaQuadratini({ value, onChange, lookup, placeholder, opzioni,
                 {listaOpzioni.length > 0 && (
                   <select
                     autoFocus
-                    style={{ ...styles.inlineInput, width: '100%', padding: '8px 10px', fontSize: 15, marginBottom: 8, boxSizing: 'border-box' }}
+                    style={{ ...styles.inlineInput, width: '100%', padding: '8px 10px', fontSize: 14, marginBottom: 8, boxSizing: 'border-box' }}
                     value={listaOpzioni.some((o) => o.nome === edit.valore) ? edit.valore : ''}
                     onChange={(e) => setEdit({ ...edit, valore: e.target.value })}
                   >
@@ -623,7 +623,7 @@ export function ListaQuadratini({ value, onChange, lookup, placeholder, opzioni,
                 )}
                 <input
                   autoFocus={listaOpzioni.length === 0}
-                  style={{ ...styles.inlineInput, width: '100%', padding: '8px 10px', fontSize: 15, boxSizing: 'border-box' }}
+                  style={{ ...styles.inlineInput, width: '100%', padding: '8px 10px', fontSize: 14, boxSizing: 'border-box' }}
                   value={edit.valore}
                   placeholder={listaOpzioni.length > 0 ? tr('…oppure scrivi un nome libero', '…or type any name') : tr('Nome della voce', 'Entry name')}
                   list={listaOpzioni.length > 0 ? listId : undefined}
@@ -639,7 +639,7 @@ export function ListaQuadratini({ value, onChange, lookup, placeholder, opzioni,
             ) : (
               // Voce ESISTENTE: il nome non si modifica. Rinominandolo si perdeva
               // la spiegazione, che viene cercata proprio in base al nome.
-              <div style={{ ...styles.inlineInput, width: '100%', padding: '8px 10px', fontSize: 15, borderColor: C.border, color: C.ink, boxSizing: 'border-box' }}>
+              <div style={{ ...styles.inlineInput, width: '100%', padding: '8px 10px', fontSize: 14, borderColor: C.border, color: C.ink, boxSizing: 'border-box' }}>
                 {edit.valore}
               </div>
             )}
@@ -681,7 +681,7 @@ export function Sezione({ id, titolo, children, aperto = true, onToggleAperto, m
         style={{ ...styles.panel, opacity: trascinando ? 0.4 : 1, ...style }}
         className={`sezione ${className}`.trim()}
       >
-        <summary className="sezione-titolo" style={{ ...styles.panelTitle, fontSize: 19, cursor: 'pointer', listStyle: 'none', marginBottom: 0, userSelect: 'none' }}>
+        <summary className="sezione-titolo" style={{ ...styles.panelTitle, fontSize: 18, cursor: 'pointer', listStyle: 'none', marginBottom: 0, userSelect: 'none' }}>
           <span className="sezione-titolo-sinistra">
             <span className="freccia">▾</span>
           </span>

@@ -86,7 +86,7 @@ export function PoteriRisorse({ scheda, aggiorna, lingua = 'it', registra, mostr
               style={{ padding: 0, border: 0, background: 'transparent', color: C.ink, font: 'inherit', fontWeight: 600, textAlign: 'left', cursor: descrizione ? 'help' : 'default', flex: '1 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
             >
               {nome}
-              {prossima && <span style={{ color: C.inkDim, fontWeight: 400, fontSize: 10.5 }}> → {prossima.soglia}</span>}
+              {prossima && <span style={{ color: C.inkDim, fontWeight: 400, fontSize: 11 }}> → {prossima.soglia}</span>}
             </button>
             {conPerle ? (
               <span style={{ display: 'inline-flex', gap: 3, flexShrink: 0, alignItems: 'center' }} role="group" aria-label={`${nome}: ${attuali}/${max}`}>

@@ -22,7 +22,7 @@ export function GuidaModal({ chiudiGuida }) {
             ...(URL_ARCHIVIO_PG ? [['🗄️', t('guida.archivio_t'), t('guida.archivio_d')]] : []),
           ].map(([icona, titolo, desc]) => (
             <div key={titolo} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 10px' }}>
-              <span style={{ fontSize: 20, lineHeight: 1.2, flexShrink: 0 }} aria-hidden>{icona}</span>
+              <span style={{ fontSize: 18, lineHeight: 1.2, flexShrink: 0 }} aria-hidden>{icona}</span>
               <span style={{ minWidth: 0 }}>
                 <strong style={{ color: C.ink, fontSize: 14 }}>{titolo}</strong>
                 <span style={{ ...styles.detail, display: 'block', fontSize: 13 }}>{desc}</span>
