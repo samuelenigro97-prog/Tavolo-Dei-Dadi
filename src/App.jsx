@@ -1980,7 +1980,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.105.2';
+const APP_VERSION = '4.105.3';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4426,6 +4426,14 @@ export default function App() {
       '--c-aura-glow-min': rgba(t.gold, notteAttiva ? 0.14 : 0.06), '--c-aura-glow-pulse-1': rgba(t.gold, notteAttiva ? 0.36 : 0.18),
     };
   }, [notteAttiva]);
+  // Colori della classe del personaggio (--c-pg-*, definiti sulla radice) rimappati sulle
+  // variabili normali: servono dentro il combat tracker, che usa il tema base dell'app,
+  // per la scheda del PG e per la pillola ridotta quando è il suo turno.
+  const stileColoriPg = {
+    '--c-gold': 'var(--c-pg-gold)', '--c-gold-dark': 'var(--c-pg-gold-dark)', '--c-title': 'var(--c-pg-title)',
+    '--c-border': 'var(--c-pg-border)', '--c-panel-light': 'var(--c-pg-panel-light)', '--c-panel': 'var(--c-pg-panel)',
+    '--c-classe': 'var(--c-pg-gold)', '--c-aura-color': 'var(--c-pg-gold)',
+  };
   const intervalRef = useRef(null);
   const jsonRef = useRef(null);
   const pdfRef = useRef(null);
@@ -17626,7 +17634,7 @@ export default function App() {
 
       {/* ===== Combat tracker: barra fissa in basso (stile Fantasy Grounds) ===== */}
       {combat.attivo && combat.aperto ? (
-        <div ref={combatRef} style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 1500, background: C.panel, borderTop: `2px solid var(--c-gold-dark)`, boxShadow: '0 -6px 24px rgba(0,0,0,0.45)' }}>
+        <div ref={combatRef} data-testid="combat-tracker" style={{ ...stileTemaBase, position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 1500, background: C.panel, borderTop: `2px solid var(--c-gold-dark)`, boxShadow: '0 -6px 24px rgba(0,0,0,0.45)' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', padding: '8px 12px' }}>
             {/* BARRA SUPERIORE CONTROLLI COMBAT TRACKER */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 8, paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
@@ -17837,7 +17845,9 @@ export default function App() {
                     return (
                       <div
                         key={cb.id}
+                        data-testid={`ct-card-${cb.tipo}`}
                         style={{
+                          ...(eCombattentePgAttivo(cb, combat.combattenti) ? stileColoriPg : {}),
                           flex: '0 0 auto',
                           width: 236,
                           border: inTurno
@@ -18236,8 +18246,12 @@ export default function App() {
       ) : combat.attivo && !combat.aperto && combat.combattenti.length > 0 ? (
         <div role="button" tabIndex={0}
           data-combat-toggle="true"
+          data-testid="combat-pillola"
           onClick={() => setCombat((c) => ({ ...c, aperto: true }))}
           style={{
+            // Tema base dell'app; solo se è il turno del PG la pillola prende i suoi colori.
+            ...stileTemaBase,
+            ...(combat.combattenti[combat.turno] && eCombattentePgAttivo(combat.combattenti[combat.turno], combat.combattenti) ? stileColoriPg : {}),
             position: 'fixed',
             bottom: 14,
             right: 18,

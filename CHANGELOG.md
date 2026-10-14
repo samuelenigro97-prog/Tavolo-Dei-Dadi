@@ -2,6 +2,15 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.105.3] – 2026-10-14
+
+### Modificato
+- **Combat tracker sul tema base dell'app**, non sui colori della classe: lo stesso tema del
+  menu iniziale (`stileTemaBase`). Prendono i colori della classe solo i riferimenti al
+  personaggio: la sua scheda nel tracker e la pillola ridotta quando è il suo turno
+  (`stileColoriPg`, dalle variabili `--c-pg-*`). Nemici, alleati e le pillole del loro turno
+  restano sul tema base.
+
 ## [4.105.2] – 2026-10-14
 
 ### Modificato

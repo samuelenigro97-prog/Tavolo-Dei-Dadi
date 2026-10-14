@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.105.3',
+    voci: {
+      it: ['Combat tracker sul tema base dell\'app: i colori della classe restano solo sulla scheda del tuo personaggio e sulla pillola nel suo turno.'],
+      en: ['Combat tracker on the app\'s base theme: class colours only stay on your character\'s card and on the pill during its turn.'],
+    },
+  },
+  {
     versione: '4.105.2',
     voci: {
       it: ['Menu iniziale: ogni personaggio della lista ha il colore della sua classe.'],
