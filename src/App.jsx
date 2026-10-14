@@ -1343,7 +1343,7 @@ const INCANTESIMI_NOMI = Array.from(new Set([...NOMI_SPIEG_INC, ...Object.keys(I
 import { NOMI_CLASSI, BACKGROUND_5E, TAGLIE_5E, ALLINEAMENTI_5E, SESSO_5E, SOTTOCLASSI_5E, INCANTESIMI_CLASSE, DANNI_5E, SENSI_5E, CONDIZIONI_5E, NOMI_OGGETTI, LINGUE_5E, ARMI_5E, STRUMENTI_5E, REAZIONI_5E, AZIONI_BONUS_5E, GRUPPI_ARMI_5E, GRUPPI_STRUMENTI_5E, GRUPPI_LINGUE_5E, DEFAULT_MANUALI, manualeAttivo, SOTTOCLASSI_FONTI, talentiPerManuali, PE_PER_LIVELLO, BACKGROUND_COMPETENZE, BACKGROUND_TALENTO_ORIGINE_2024, SPECIE_5E, tabellaPrivilegiSottoclasse, CARATT_INCANTATORE, PRIORITA_CARATT, DADO_VITA_CLASSE, BACKGROUND_CARATT, TS_CLASSE, ADDESTRAMENTO_CLASSE, COMPETENZE_CLASSE, PRIVILEGI_CLASSE_L1, PRIVILEGI_CLASSE_L1_2014, ASI_LIV, SOTTOCLASSE_LIV, COMPETENZE_SPECIE, NOMI_SPECIE, NOMI_SPECIE_GENERE, COGNOMI_SPECIE, NOMI_GENERICI, SPECIE_DATI, SPECIE_DATI_2014, BONUS_CARATT_SPECIE_2014, SFINIMENTO_2014, BASE_ARMATURA_DEFAULT, ESEMPI_ARMATURA } from "./data/dati5e.js";
 import { modificatore, conSegno, tiraDado, parseEspressioneDado, facceDadoVita, esprDadiVita, gruppiDadoVita, bonusCompetenzaDaLivello, tiraDanni, tiraD20, capacitaCarico, modalitaEffettiva } from "./rules/dadi.js";
 import { risorseAutoClasse, sincronizzaRisorseClasse, trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from "./rules/regole.js";
-import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda, contatoriInGioco, valoreContatore, soglieDebitoAttive } from './rules/poteri.js';
+import { normalizzaPoteri, garantisciDebitoAraldi, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda, contatoriInGioco, valoreContatore, soglieDebitoAttive } from './rules/poteri.js';
 import { PoteriRisorse } from './ui/PoteriRisorse.jsx';
 import { unisciPoteriCampagna, poteriCampagnaIncompleti } from './data/poteriCampagna.js';
 import { aggiornaTestiAraldi } from './data/modelliPoteri.js';
@@ -1373,6 +1373,7 @@ import { PeModal } from './ui/modali/PeModal.jsx';
 import { CloudModal } from './ui/modali/CloudModal.jsx';
 import { ConcentrazioneModal } from './ui/modali/ConcentrazioneModal.jsx';
 import { DannoAreaModal } from './ui/modali/DannoAreaModal.jsx';
+import { useAllineaProfilo } from './ui/useAllineaProfilo.js';
 import { BestiaDettaglioModal } from './ui/modali/BestiaDettaglioModal.jsx';
 
 /**
@@ -1764,6 +1765,25 @@ function trovaArmatura(nome) {
 function eScudo(nome) {
   return /scudo|shield/i.test(String(nome || ''));
 }
+/**
+ * CA di un oggetto dell'inventario da mostrare tra parentesi accanto al nome:
+ * "CA 14" per un'armatura, "CA +2" per uno scudo, "CA +1" per un oggetto magico
+ * che dà CA (+1/+2/+3 nel nome si somma). '' se il nome la riporta già
+ * (es. "Corazza a Piastre in Legnoferro (CA 14)") o l'oggetto non dà CA.
+ */
+function etichettaCaOggetto(o) {
+  const nome = String(o?.nome || '');
+  if (!nome || /\bCA\s*\+?\d/i.test(nome)) return '';
+  const magia = /\+([123])\b/.exec(nome);
+  const bonus = magia ? Number(magia[1]) : 0;
+  if (/^(scudo|shield)\b/i.test(nome.trim())) return `CA +${2 + bonus}`;
+  const eArmatura = o?.categoria === 'Armatura' || /^(armatura|corazza|cotta|giaco|mezza armatura|cuoio)/i.test(nome.trim());
+  const arm = eArmatura ? trovaArmatura(nome) : null;
+  if (arm) return `CA ${arm.base + bonus}`;
+  if (o?.effettoMeccanico === 'classe_armatura_tiri_salvezza_1') return 'CA +1';
+  const m = /^classe_armatura_([123])$/.exec(o?.effettoMeccanico || '');
+  return m ? `CA +${m[1]}` : '';
+}
 const KIT_CLASSE = {
   barbaro:  { armi: ['Ascia bipenne'], equip: ['Ascia ×4', 'Dotazione da esploratore'], denari: 15, armatura: ARM_NESSUNA, scudo: false, strumenti: '' },
   bardo:    { armi: ['Stocco'], equip: ['Armatura di cuoio', 'Pugnale', 'Strumento musicale', 'Dotazione da intrattenitore'], denari: 19, armatura: ARM_CUOIO, scudo: false, strumenti: 'Strumenti musicali (3 a scelta)' },
@@ -1960,7 +1980,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.102.2';
+const APP_VERSION = '4.103.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -2207,7 +2227,7 @@ function loadState() {
         // senza il campo) e ricrea le risorse "manuale" collegate ai contatori,
         // così sono presenti anche appena dopo un import/una sincronizzazione
         // da codice stanza, senza aspettare la prima modifica dalla sezione Poteri.
-        s.poteri = normalizzaPoteri(s.poteri);
+        s.poteri = normalizzaPoteri(garantisciDebitoAraldi(s.poteri, s.risorse));
         s.risorse = sincronizzaRisorsePoteri(s.poteri, s.risorse, livelloTotaleScheda(s), s.bonusCompetenza);
         s.risorse = sincronizzaRisorseClasse(s, s.versione || '2024');
         // assegna un id agli incantesimi che ne fossero privi (schede legacy),
@@ -4118,6 +4138,7 @@ export default function App() {
   const [checkConc, setCheckConc] = useState(null); // TS concentrazione automatico: { danno, cd, spell, esito }
   // Danno ad area nel Combat Tracker: { valore, tipo, magico, dettaglio, sel: {id: bool}, ts: {id: bool}, difese: {id: difesa} }
   const [areaDanno, setAreaDanno] = useState(null);
+  const refGrigliaProfilo = useAllineaProfilo();
   const [dettaglioInc, setDettaglioInc] = useState(null); // id incantesimo aperto nel sottomenu
   const [mostraMenuEsporta, setMostraMenuEsporta] = useState(false);
   const [mostraDiarioModal, setMostraDiarioModal] = useState(false);
@@ -4468,11 +4489,14 @@ export default function App() {
     setRoster((r) => {
       const corrente = r.personaggi[r.attivo];
       if (!corrente) return r;
-      const sincronizzate = sincronizzaRisorsePoteri(corrente.poteri, corrente.risorse, livelloTotaleScheda(corrente), corrente.bonusCompetenza);
-      if (JSON.stringify(sincronizzate) === JSON.stringify(corrente.risorse || [])) return r;
+      // Debito degli Araldi sparito (potere che lo conteneva tolto o spento): torna da solo.
+      const poteri = garantisciDebitoAraldi(corrente.poteri, corrente.risorse);
+      const poteriCambiati = poteri !== corrente.poteri;
+      const sincronizzate = sincronizzaRisorsePoteri(poteri, corrente.risorse, livelloTotaleScheda(corrente), corrente.bonusCompetenza);
+      if (!poteriCambiati && JSON.stringify(sincronizzate) === JSON.stringify(corrente.risorse || [])) return r;
       return {
         ...r,
-        personaggi: { ...r.personaggi, [r.attivo]: { ...corrente, risorse: sincronizzate } },
+        personaggi: { ...r.personaggi, [r.attivo]: { ...corrente, ...(poteriCambiati ? { poteri } : {}), risorse: sincronizzate } },
       };
     });
   }, [roster.attivo, scheda?.poteri, scheda?.livello, scheda?.multiclasse, scheda?.bonusCompetenza, isSolaLettura]);
@@ -6206,38 +6230,6 @@ export default function App() {
 
   // Snapshot automatici: rete di sicurezza contro cancellazioni/reset accidentali.
   // Sono leggeri (senza immagini) per non riempire lo spazio del browser.
-  /**
-   * Poteri di questo personaggio nella copia più recente della Cronologia versioni
-   * che ne aveva (stesso id, o stesso nome): { quando, applica } oppure null.
-   * Serve quando un caricamento online li ha tolti (es. collegando un dispositivo).
-   */
-  function recuperoPoteriDaCronologia() {
-    if (!scheda) return null;
-    // Si propone la copia più recente che ha PIÙ poteri di quelli attuali
-    // (es. una sincronizzazione ha riportato una versione con il solo Debito).
-    const quantiOra = Array.isArray(scheda.poteri) ? scheda.poteri.length : 0;
-    const idAttivo = roster?.attivo;
-    const nome = String(scheda.nome || '').trim().toLowerCase();
-    for (const snap of [...leggiSnapshots()].sort((a, b) => (b.ts || 0) - (a.ts || 0))) {
-      const pgs = snap?.roster?.personaggi || {};
-      const pg = pgs[idAttivo] || Object.values(pgs).find((x) => String(x?.nome || '').trim().toLowerCase() === nome);
-      if (Array.isArray(pg?.poteri) && pg.poteri.length > quantiOra) {
-        const quando = new Date(snap.ts || Date.now()).toLocaleString(lingua === 'en' ? 'en-GB' : 'it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-        return {
-          quando,
-          applica: () => {
-            const poteri = normalizzaPoteri(pg.poteri);
-            // Riporta anche i valori dei contatori salvati nella copia (Segreti, Debito...).
-            const risorsePrecedenti = (pg.risorse || []).filter((r) => String(r?.id || '').startsWith('potere-'));
-            const base = [...(scheda.risorse || []).filter((r) => !String(r?.id || '').startsWith('potere-')), ...risorsePrecedenti];
-            aggiorna({ poteri, risorse: sincronizzaRisorsePoteri(poteri, base, livelloTotaleScheda(scheda), scheda.bonusCompetenza) });
-            registra({ etichetta: tr('Poteri recuperati', 'Powers restored'), tipo: 'privilegio', dettaglio: tr(`Dalla cronologia del ${quando}`, `From the history of ${quando}`) });
-          },
-        };
-      }
-    }
-    return null;
-  }
   /** Rimette i Poteri della campagna (Potere del Patrono + Araldi del Segreto) e
    *  attiva il manuale degli Araldi se era spento. */
   function ripristinaPoteriCampagna() {
@@ -10396,7 +10388,7 @@ export default function App() {
           )}
 
           {/* Con il ritratto ridotto, Addestramento/Risorse si prendono lo spazio libero. */}
-          <div className="profilo-griglia">
+          <div className="profilo-griglia" ref={refGrigliaProfilo}>
             {/* COLONNA SINISTRA: Ritratto + Competenze + Risorse di classe */}
             <div className="profilo-col-sinistra">
               {/* Tier 1: Ritratto */}
@@ -10751,7 +10743,7 @@ export default function App() {
               </div>
 
               {/* Tier 3b: Poteri (Segreti, Debito, usi dei privilegi...) separati dalle risorse di classe */}
-              <div className="risorse-tier-3 profilo-risorse-box" style={{ marginTop: 10 }}>
+              <div className="risorse-tier-3 profilo-risorse-box profilo-poteri-box" style={{ marginTop: 10 }}>
                 <Sezione titolo={lingua === 'en' ? 'Powers' : 'Poteri'} senzaAngoli={true} {...apertoProps('poteriRisorse')}>
                   <PoteriRisorse
                     scheda={scheda}
@@ -10759,7 +10751,6 @@ export default function App() {
                     lingua={lingua}
                     registra={registra}
                     mostraInfo={setInfo}
-                    recupero={!isSolaLettura ? recuperoPoteriDaCronologia() : null}
                     ripristinoCampagna={!isSolaLettura && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null}
                   />
                 </Sezione>
@@ -10845,8 +10836,9 @@ export default function App() {
                 </div>
 
                 <div className="profilo-anagrafica-campi" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {/* Riga 1: Sesso, Specie/Razza, Taglia, Allineamento */}
-                  <div className="campi-anagrafica" style={{ display: 'grid', gridTemplateColumns: 'minmax(58px, 0.65fr) minmax(100px, 1.3fr) minmax(56px, 0.6fr) minmax(110px, 1.45fr)', gap: 10, alignItems: 'end' }}>
+                  {/* Riga 1: Sesso, Specie/Razza, Taglia, Allineamento. Le prime due colonne
+                      di entrambe le righe sommano al 42%, così Taglia parte dove parte Sottoclasse. */}
+                  <div className="campi-anagrafica" style={{ display: 'grid', gridTemplateColumns: '16% 26% minmax(56px, 0.6fr) minmax(110px, 1.45fr)', gap: 10, alignItems: 'end' }}>
                     <CampoModulo
                       label={t("profilo.sesso")}
                       boxClassName={String(
@@ -10924,7 +10916,7 @@ export default function App() {
                   </div>
 
                   {/* Riga 2: Background, Classe (compatta), Sottoclasse (larga), P.E. (adeguato per 6 cifre) */}
-                  <div className="campi-anagrafica" style={{ display: 'grid', gridTemplateColumns: 'minmax(94px, 0.85fr) minmax(75px, 0.85fr) minmax(140px, 1.75fr) minmax(56px, 0.65fr)', gap: 10, alignItems: 'end' }}>
+                  <div className="campi-anagrafica" style={{ display: 'grid', gridTemplateColumns: '24% 18% minmax(140px, 1.75fr) minmax(56px, 0.65fr)', gap: 10, alignItems: 'end' }}>
                     <CampoModulo label={t("profilo.background")} boxClassName={String(scheda.background || '').length > 12 ? 'testo-compatto' : undefined}>
                       <CampoBloccato
                         valore={traduciDato(scheda.background) || t('profilo.nessuno')}
@@ -10949,7 +10941,7 @@ export default function App() {
                         aggiorna(patch);
                       })}
                     </CampoModulo>
-                    <CampoModulo label={t("profilo.pe")}>
+                    <CampoModulo label={t("profilo.pe")} className="campo-pe">
                       <div role="button" tabIndex={0}
                         onClick={() => setMostraModalPe(true)}
                         style={{
@@ -11148,7 +11140,7 @@ export default function App() {
 
               {/* Riga 2 — Punti Ferita e Tiri Morte (spaziature bilanciate e sezioni centrate) */}
               <div className="pm-pf profilo-pf-box">
-                <div style={{ ...styles.vitalBox, gridColumn: 'span 4', padding: '8px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', minHeight: 'auto', height: '100%', boxSizing: 'border-box' }}>
+                <div className="riquadro-pf" style={{ ...styles.vitalBox, gridColumn: 'span 4', padding: '8px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', minHeight: 'auto', height: '100%', boxSizing: 'border-box' }}>
                   {/* Sezione Superiore: Punti Ferita — perfettamente centrata nello spazio disponibile */}
                   <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2px 0' }}>
                     <div style={{ ...styles.vitalLabel, position: 'static', margin: 0, marginBottom: 6, fontSize: 12 }}>
@@ -11561,7 +11553,11 @@ export default function App() {
                       </span>
                     );
                   })()}
-                  <span>+ <Editable value={scheda.armatura.bonus} tipo="numero" width={22} onChange={(v) => aggiorna({ armatura: { ...scheda.armatura, bonus: v } })} /></span>
+                  {/* Bonus CA manuale: lo danno gli oggetti (✨). Si vede solo se una scheda
+                      vecchia ne ha uno diverso da 0, così non resta nascosto nella CA. */}
+                  {Number(scheda.armatura.bonus) !== 0 && Number.isFinite(Number(scheda.armatura.bonus)) && (
+                    <span title={tr('Bonus manuale alla CA: mettilo a 0 per toglierlo', 'Manual AC bonus: set it to 0 to remove it')}>+ <Editable value={scheda.armatura.bonus} tipo="numero" width={22} onChange={(v) => aggiorna({ armatura: { ...scheda.armatura, bonus: v } })} /></span>
+                  )}
                   {bonusClasseArmaturaOggetti(scheda) > 0 && <span title={t('inv.effetto_attivo')}>✨ +{bonusClasseArmaturaOggetti(scheda)}</span>}
                 </div>
                 <div style={{ marginTop: 3, width: '100%' }}>
@@ -11677,6 +11673,7 @@ export default function App() {
                       <div
                         style={{ ...styles.vitalValue, cursor: 'pointer', position: 'relative' }}
                         className={modificata ? 'velocita-modificata' : undefined}
+                        data-testid="velocita-valore"
                         title={titolo}
                         onClick={() => setMostraModalMovimento(true)}
                       >
@@ -15633,10 +15630,12 @@ export default function App() {
                       <div style={{ display: 'flex', gap: 6 }}>
                         <button
                           type="button"
+                          data-testid="apri-evoca-compagno"
                           onClick={() => setMostraModalAggiungiCompagno(true)}
+                          title={lingua === 'en' ? 'Summon a companion, familiar or creature' : 'Evoca un compagno, un famiglio o una creatura'}
                           style={{ ...styles.buttonMini, fontSize: 12, padding: '3px 10px', color: C.goldDark, borderColor: C.gold, background: 'rgba(201,162,39,0.12)', fontWeight: 700 }}
                         >
-                          {lingua === 'en' ? 'Summon / Add Companion' : 'Evoca / Aggiungi Compagno'}
+                          {lingua === 'en' ? 'Summon' : 'Evoca'}
                         </button>
                       </div>
                     </div>
@@ -16446,6 +16445,9 @@ export default function App() {
                                           >{traduciDato(o.nome) || o.nome}</button>
                                         );
                                       })()}
+                                      {etichettaCaOggetto(o) && (
+                                        <span data-testid="oggetto-ca" style={{ color: C.inkDim, fontSize: 12, whiteSpace: 'nowrap' }}>({etichettaCaOggetto(o)})</span>
+                                      )}
                                       {isContainer && (
                                         <button
                                           type="button"

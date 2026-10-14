@@ -39,7 +39,8 @@ test.describe('Finestre estratte', () => {
   });
 
   test('Movimento (MovimentoModal)', async ({ page }) => {
-    await page.getByText('Movimenti').first().click();
+    // Dalla 4.102.2 si apre cliccando il valore della velocità (niente più etichetta "Movimenti").
+    await page.getByTestId('velocita-valore').click();
     await expect(page.getByText(/salto|Salto|carico|Carico/i).first()).toBeVisible();
     await page.keyboard.press('Escape');
   });
@@ -58,9 +59,9 @@ test.describe('Finestre estratte', () => {
     await page.keyboard.press('Escape');
   });
 
-  test('Evoca / aggiungi compagno (AggiungiCompagnoModal)', async ({ page }) => {
-    await page.getByRole('button', { name: /Evoca \/ Aggiungi Compagno/ }).first().click();
-    await expect(page.getByText('Evoca / Aggiungi Compagno o Famiglio')).toBeVisible();
+  test('Evoca compagno (AggiungiCompagnoModal)', async ({ page }) => {
+    await page.getByTestId('apri-evoca-compagno').first().click();
+    await expect(page.getByText('Evoca un Compagno o un Famiglio')).toBeVisible();
     await page.keyboard.press('Escape');
   });
 

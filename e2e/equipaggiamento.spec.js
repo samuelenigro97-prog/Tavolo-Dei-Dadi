@@ -57,3 +57,30 @@ test.describe('Equipaggiamento', () => {
     await expect(page.locator('tr.inventario-riga').filter({ hasText: 'Antitossina del Druido' })).toHaveCount(1);
   });
 });
+
+test('la CA degli oggetti compare tra parentesi e lo Scudo in Legnoferro è nel catalogo (v4.103.0)', async ({ page }) => {
+  await apriScheda(page);
+  await page.evaluate(() => {
+    const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+    const pg = r.personaggi[r.attivo];
+    pg.inventario.push(
+      { id: 't-scudo', nome: 'Scudo in Legnoferro', qta: 1, peso: 3, equip: false },
+      { id: 't-anello', nome: 'Anello di Protezione', qta: 1, peso: 0, equip: false, effettoMeccanico: 'classe_armatura_tiri_salvezza_1' },
+      { id: 't-cuoio', nome: 'Armatura di cuoio +1', qta: 1, peso: 5, equip: false, categoria: 'Armatura' },
+    );
+    localStorage.setItem('scheda-interattiva:v1', JSON.stringify(r));
+  });
+  await apriScheda(page);
+  await scrollaA(page, 'h3', 'Equipaggiamento');
+  const riga = (nome) => page.locator('tr.inventario-riga').filter({ has: page.locator('.oggetto-nome', { hasText: nome }) });
+  await expect(riga('Scudo in Legnoferro').getByTestId('oggetto-ca')).toHaveText('(CA +2)');
+  await expect(riga('Anello di Protezione').getByTestId('oggetto-ca')).toHaveText('(CA +1)');
+  await expect(riga('Armatura di cuoio +1').getByTestId('oggetto-ca')).toHaveText('(CA 12)');
+  // Il nome riporta già la CA: niente doppione.
+  await expect(riga('Corazza a Piastre in Legnoferro').getByTestId('oggetto-ca')).toHaveCount(0);
+  // Oggetti senza CA: niente parentesi.
+  await expect(riga('Antitossina').getByTestId('oggetto-ca')).toHaveCount(0);
+  // Catalogo: cercando "legnoferro" si propone lo scudo.
+  const { NOMI_OGGETTI } = await import('../src/data/dati5e.js');
+  expect(NOMI_OGGETTI).toContain('Scudo in Legnoferro');
+});

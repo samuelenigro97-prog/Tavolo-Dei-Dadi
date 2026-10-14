@@ -5,6 +5,23 @@
 
 export const NOVITA = [
   {
+    versione: '4.103.0',
+    voci: {
+      it: [
+        'Il Debito degli Araldi non sparisce più dai Poteri: se mancava, torna da solo con l\'ultimo valore.',
+        'Equipaggiamento: la CA tra parentesi accanto ad armature, scudi e oggetti magici; nuovo Scudo in Legnoferro nel catalogo.',
+        'Profilo: riquadri di sinistra allineati a quelli centrali, Taglia allineata a Sottoclasse, PE a filo destro, luce al passaggio del cursore anche su PF, CA e caselle. Tolti "Recupera i Poteri dalla cronologia" e il "+ 0" della CA.',
+        'Creature: Forma Selvatica e Metamorfosi solo per le bestie ammesse al tuo livello; Myrdhal e le altre evocazioni si possono solo evocare. Il tasto si chiama "Evoca".',
+      ],
+      en: [
+        'The Heralds\' Debt no longer disappears from Powers: if it was missing, it comes back by itself with its last value.',
+        'Equipment: AC in brackets next to armour, shields and magic items; new Ironwood Shield in the catalogue.',
+        'Profile: left boxes aligned with the central ones, Size aligned with Subclass, XP flush right, hover glow on HP, AC and boxes too. "Restore powers from history" and the AC "+ 0" removed.',
+        'Creatures: Wild Shape and Polymorph only for beasts allowed at your level; Myrdhal and the other summons can only be summoned. The button is now "Summon".',
+      ],
+    },
+  },
+  {
     versione: '4.102.2',
     voci: {
       it: ['Il valore della velocità è direttamente cliccabile per aprire il calcolatore di movimento e salti, con interfaccia più pulita.', 'Semplificata la dicitura dell\'Archivio delle schede.'],

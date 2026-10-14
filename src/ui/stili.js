@@ -1192,6 +1192,17 @@ tbody tr:hover {
   box-shadow: 0 3px 12px -2px var(--c-aura-glow-1, rgba(60,50,30,0.04)),
               0 1px 3px rgba(0, 0, 0, 0.25) !important;
   /* un solo bordo: niente filetto interno (outline) come nelle sezioni grandi */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+/* Al passaggio del cursore si illumina come le sezioni e le caratteristiche
+   (anche il riquadro Punti Ferita, che non è un .vital-box: ha un'altra struttura). */
+.riquadro-pf { transition: border-color 0.3s ease, box-shadow 0.3s ease; }
+.vital-box:hover,
+.riquadro-pf:hover {
+  border-color: var(--c-border-glow-max, var(--c-gold)) !important;
+  box-shadow: 0 4px 18px -2px var(--c-aura-glow-pulse-1, rgba(201, 162, 39, 0.12)),
+              0 0 6px 1px var(--c-aura-glow-min, rgba(201, 162, 39, 0.08)),
+              0 1px 4px rgba(0, 0, 0, 0.35) !important;
 }
 /* Contenuto solo per tecnologie assistive (visivamente nascosto ma raggiungibile da tastiera). */
 .solo-sr {
@@ -1628,6 +1639,8 @@ tbody tr:hover {
 .campi-anagrafica .campo-modulo-box * { font-size: inherit; font-family: inherit; font-weight: 600; }
 .campi-anagrafica .campo-modulo-box > div { padding-left: 0 !important; }
 .campi-anagrafica .campo-modulo-box.testo-compatto, .campi-anagrafica .campo-modulo-box.testo-compatto * { font-size: 11px !important; letter-spacing: -0.2px; }
+/* PE a filo del bordo destro, come la tendina di Allineamento sopra (su mobile resta a sinistra). */
+.campi-anagrafica > .campo-pe { justify-self: end; width: max-content; min-width: 56px; }
 .campi-anagrafica .campo-modulo-label { font-size: 11px !important; margin-top: 2px; font-weight: 700 !important; letter-spacing: 0.25px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 !important; }
 /* Sottoclasse con più classi (multiclasse): una riga per classe, l'altezza fissa
     da campo singolo taglierebbe via le righe in più. */
@@ -2056,6 +2069,7 @@ tbody tr:hover {
   /* su telefono i riquadri anagrafica e vitali passano a 2 colonne (leggibili,
      niente 5 colonne schiacciate); le altezze non sono più forzate uguali */
   .campi-anagrafica { grid-template-columns: repeat(2, 1fr) !important; gap: 8px 10px !important; }
+  .campi-anagrafica > .campo-pe { justify-self: stretch; width: auto; }
   .campi-anagrafica .campo-modulo-box { min-height: 32px !important; height: auto !important; overflow: visible !important; }
   .vitali { grid-template-columns: repeat(2, 1fr) !important; grid-auto-rows: auto !important; }
   .vitali-difesa { grid-template-columns: repeat(2, 1fr) !important; grid-auto-rows: auto !important; }

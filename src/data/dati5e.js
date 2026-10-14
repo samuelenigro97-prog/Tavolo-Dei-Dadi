@@ -155,6 +155,8 @@ export const PESI_OGGETTI = {
   'Armatura di cuoio': 4.5, 'Cuoio borchiato': 6, 'Armatura di pelle': 5.5, 'Corazza di scaglie': 20,
   'Corazza a strisce': 9, 'Corazza di maglia': 8, 'Cotta di maglia': 25, 'Corazza di piastre': 30,
   'Corazza a piastre da torneo': 32.5, 'Scudo': 3,
+  // Legnoferro: legno duro come il metallo, ammesso dai druidi (stessa CA dello scudo normale).
+  'Scudo in Legnoferro': 3,
   // Armi
   'Pugnale': 0.5, 'Spada corta': 1, 'Spada lunga': 1.5, 'Spadone': 3, 'Ascia': 1, 'Ascia bipenne': 3.5,
   'Mazza': 2, 'Mazzafrusto': 1, 'Martello da guerra': 1, 'Bastone ferrato': 2, 'Lancia': 1.5,

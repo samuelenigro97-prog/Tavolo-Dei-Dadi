@@ -312,3 +312,34 @@ export function contatoriInGioco(scheda) {
   }
   return voci;
 }
+
+/**
+ * Gli Araldi del Segreto contano il Debito, ma il loro modello non ha un contatore
+ * Debito proprio quando lo dà un altro potere (es. il Potere del Patrono). Se quel
+ * potere sparisce o viene spento, il Debito non si vede più da nessuna parte: qui
+ * torna nel potere "Segreti e Debito" degli Araldi, con l'ultimo valore ancora
+ * noto (contatore spento, o risorsa "Debito"). Senza poteri degli Araldi, o con un
+ * Debito già attivo, restituisce `poteri` così com'è (stesso riferimento).
+ */
+export function garantisciDebitoAraldi(poteri, risorse) {
+  const lista = normalizzaPoteri(poteri);
+  const araldi = lista.filter((p) => p.modello === 'araldi-del-segreto');
+  if (!araldi.length) return poteri;
+  const eDebito = (c) => String(c?.nome || '').trim().toLowerCase() === 'debito';
+  if (lista.some((p) => p.attivo && p.contatori.some(eDebito))) return poteri;
+  const schedaFinta = { risorse: Array.isArray(risorse) ? risorse : [] };
+  let valore = 0;
+  for (const p of lista) {
+    const i = p.contatori.findIndex(eDebito);
+    if (i >= 0) { valore = valoreContatore(schedaFinta, p.id, i, p.contatori[i]).attuali; break; }
+  }
+  if (!valore) {
+    const ris = schedaFinta.risorse.find((r) => eDebito(r));
+    if (ris) valore = Number(ris.attuali) || 0;
+  }
+  const bersaglio = araldi.find((p) => p.attivo && p.contatori.some((c) => String(c.nome || '').trim().toLowerCase() === 'segreti'))
+    || araldi.find((p) => p.attivo) || araldi[0];
+  return lista.map((p) => (p === bersaglio
+    ? { ...p, attivo: true, contatori: [...p.contatori, { nome: 'Debito', attuali: valore, max: null }] }
+    : p));
+}

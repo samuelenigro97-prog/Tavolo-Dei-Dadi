@@ -18,31 +18,19 @@ function etichettaRicarica(ricarica, en) {
 
 /**
  * Elenco dei contatori dei Poteri in gioco. Senza contatori il riquadro resta
- * comunque visibile con una spiegazione e, se in Cronologia versioni c'è una copia
- * di questo personaggio con dei Poteri (es. persi collegando un altro dispositivo),
- * il pulsante per recuperarli: `recupero` = { quando, applica }. Gli stessi
- * pulsanti compaiono anche sotto i contatori quando i Poteri sono incompleti.
+ * comunque visibile con una spiegazione e, se mancano i Poteri della campagna, il
+ * pulsante per rimetterli (compare anche sotto i contatori quando sono incompleti).
  */
-export function PoteriRisorse({ scheda, aggiorna, lingua = 'it', registra, mostraInfo, recupero, ripristinoCampagna }) {
+export function PoteriRisorse({ scheda, aggiorna, lingua = 'it', registra, mostraInfo, ripristinoCampagna }) {
   const en = lingua === 'en';
   const voci = contatoriInGioco(scheda);
   const pulsanti = (
     <>
-      {recupero && (
-        <button
-          type="button"
-          data-testid="recupera-poteri"
-          style={{ ...styles.buttonMini, width: '100%', padding: '5px 8px', fontWeight: 700, color: C.goldDark, borderColor: C.goldDark }}
-          onClick={recupero.applica}
-        >
-          {en ? `Restore powers from history (${recupero.quando})` : `Recupera i Poteri dalla cronologia (${recupero.quando})`}
-        </button>
-      )}
       {ripristinoCampagna && (
         <button
           type="button"
           data-testid="ripristina-poteri-campagna"
-          style={{ ...styles.buttonMini, width: '100%', padding: '5px 8px', fontWeight: 700, marginTop: recupero ? 6 : 0, color: C.goldDark, borderColor: C.goldDark }}
+          style={{ ...styles.buttonMini, width: '100%', padding: '5px 8px', fontWeight: 700, color: C.goldDark, borderColor: C.goldDark }}
           onClick={ripristinoCampagna}
           title={en ? 'Patron\'s Power (Debt) and all the Heralds of the Secret features' : 'Potere del Patrono (Debito) e tutti i privilegi degli Araldi del Segreto'}
         >
@@ -130,7 +118,7 @@ export function PoteriRisorse({ scheda, aggiorna, lingua = 'it', registra, mostr
           </div>
         );
       })}
-      {(recupero || ripristinoCampagna) && <div style={{ marginTop: 6 }}>{pulsanti}</div>}
+      {ripristinoCampagna && <div style={{ marginTop: 6 }}>{pulsanti}</div>}
     </div>
   );
 }

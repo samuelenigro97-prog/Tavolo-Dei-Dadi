@@ -2,6 +2,51 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.103.0] – 2026-10-14
+
+### Aggiunto
+- **CA tra parentesi accanto agli oggetti** dell'equipaggiamento: "(CA 14)" per le armature,
+  "(CA +2)" per gli scudi, "(CA +1)" per gli oggetti magici che danno CA; un +1/+2/+3 nel
+  nome si somma (`etichettaCaOggetto`). Se il nome la riporta già non si ripete.
+- **Scudo in Legnoferro** nel catalogo degli oggetti (3 kg, CA +2).
+- **Colonne del Profilo allineate** (`src/ui/useAllineaProfilo.js`): Competenze finisce con
+  Punti Ferita, Risorse di classe con CA/Riposo, Poteri con l'ultima fila dei riquadri. Si
+  allunga il riquadro più corto; quello centrale solo di pochi pixel, così aprendo una sezione
+  a sinistra la colonna centrale non viene stirata. Su mobile non cambia nulla.
+- **Luce al passaggio del cursore** anche su Punti Ferita, CA, Riposo e le caselle sotto, come
+  già per le sezioni e le caratteristiche.
+
+### Corretto
+- **Debito sparito dai Poteri**: il contatore Debito degli Araldi del Segreto stava solo nel
+  "Potere del Patrono"; se quel potere mancava o era spento il Debito non compariva più, e il
+  pulsante di ripristino restava nascosto perché gli Araldi c'erano. Ora torna da solo nel
+  potere "Segreti e Debito" con l'ultimo valore noto (`garantisciDebitoAraldi`).
+- **Taglia allineata a Sottoclasse** nell'anagrafica: le prime due colonne delle due righe
+  sommano alla stessa larghezza.
+- **Solo le bestie si assumono**: nella scheda di una creatura i tasti Forma Selvatica e
+  Metamorfosi compaiono solo per le bestie del catalogo (non per evocazioni come Myrdhal,
+  elementali, spiriti, famigli o mostri) e restano spenti, con il motivo, oltre i limiti:
+  GS del livello da druido e volo/nuoto per la Forma Selvatica (`esitoFormaSelvatica`),
+  GS fino al livello per la Metamorfosi (`esitoMetamorfosi`). La Forma Selvatica compare
+  solo a chi ha livelli da druido.
+- Test e2e della finestra Movimento: si apre dal valore della velocità (4.102.2).
+
+### Modificato
+- "Evoca / Aggiungi" diventa **"Evoca"** (scheda creatura, catalogo e sezione Compagni).
+- **PE a filo del bordo destro**, come la tendina di Allineamento sopra (desktop).
+
+### Rimosso
+- Il pulsante "Recupera i Poteri dalla cronologia" nel riquadro Poteri (la Cronologia
+  versioni resta nel menu).
+- Il "+ 0" del bonus CA manuale accanto allo scudo: la CA extra la danno gli oggetti (✨).
+  Resta visibile solo se una scheda vecchia ha un valore diverso da 0.
+
+## [4.102.2] – 2026-10-14
+
+### Modificato
+- Velocità cliccabile per aprire il calcolatore di movimento, senza l'etichetta "Movimenti".
+- "Archivio del Master" si chiama ora "Archivio".
+
 ## [4.102.1] – 2026-10-13
 
 ### Corretto
