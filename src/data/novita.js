@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.105.6',
+    voci: {
+      it: ['Classe Armatura: il numero è centrato e il menu Copertura è più stretto e centrato.'],
+      en: ['Armor Class: the number is centered and the Cover menu is narrower and centered.'],
+    },
+  },
+  {
     versione: '4.105.5',
     voci: {
       it: [

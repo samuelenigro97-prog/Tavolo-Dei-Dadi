@@ -1980,7 +1980,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.105.5';
+const APP_VERSION = '4.105.6';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -11529,7 +11529,8 @@ export default function App() {
                     <div className="vital-box" style={{ ...styles.vitalBox }}>
                       <div style={styles.vitalLabel}>{t("vital.ca")}</div>
               <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={styles.vitalValue}>
+                {/* Il numero della CA si centra nello spazio libero fra il titolo e i controlli sotto. */}
+                <div data-testid="ca-valore" style={{ ...styles.vitalValue, flex: '1 1 auto', alignItems: 'center', alignContent: 'center', minHeight: 40 }}>
                   {scheda.armatura.tipo === 'manuale' && !scheda.armatura.scudo && !scheda.armatura.bonus && !bonusClasseArmaturaOggetti(scheda) && !bonusPotereBersaglio(scheda, 'ca') ? (
                     <Editable value={scheda.ca} tipo="numero" onChange={(v) => aggiorna({ ca: v })} width={48} />
                   ) : (
@@ -11592,9 +11593,10 @@ export default function App() {
                   )}
                   {bonusClasseArmaturaOggetti(scheda) > 0 && <span title={t('inv.effetto_attivo')}>✨ +{bonusClasseArmaturaOggetti(scheda)}</span>}
                 </div>
-                <div style={{ marginTop: 3, width: '100%' }}>
+                <div style={{ marginTop: 3, width: '100%', display: 'flex', justifyContent: 'center' }}>
                   <select
-                    style={{ ...styles.inlineInput, fontSize: 11, padding: '1px 3px', width: '100%', maxWidth: '100%', color: (scheda.copertura && scheda.copertura !== 'nessuna') ? C.green : C.inkDim, fontWeight: (scheda.copertura && scheda.copertura !== 'nessuna') ? 700 : 400 }}
+                    data-testid="ca-copertura"
+                    style={{ ...styles.inlineInput, fontSize: 11, padding: '1px 3px', width: '78%', maxWidth: '100%', color: (scheda.copertura && scheda.copertura !== 'nessuna') ? C.green : C.inkDim, fontWeight: (scheda.copertura && scheda.copertura !== 'nessuna') ? 700 : 400 }}
                     value={scheda.copertura || 'nessuna'}
                     onChange={(e) => {
                       const v = e.target.value;

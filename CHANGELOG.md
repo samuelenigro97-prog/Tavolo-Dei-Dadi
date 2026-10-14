@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.105.6] – 2026-10-14
+
+### Modificato
+- **Riquadro Classe Armatura**: il numero della CA è centrato nello spazio libero fra il titolo e i
+  controlli sotto, e il menu "Copertura" è più stretto (78%) e centrato.
+
 ## [4.105.5] – 2026-10-14
 
 ### Aggiunto
