@@ -2,6 +2,28 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.103.1] – 2026-10-14
+
+### Aggiunto
+- **Un colore per ogni caratteristica** sul bordo del riquadro: Forza rosso mattone,
+  Destrezza verde muschio, Costituzione ocra, Intelligenza blu, Saggezza viola, Carisma oro
+  rosato (token `--c-car-*`, tema chiaro e scuro). A riposo il bordo è smorzato, al
+  passaggio del cursore si accende con l'alone dello stesso colore.
+
+### Modificato
+- **Anagrafica in quattro colonne uguali** (schermi da 1100 px in su): le colonne passano in
+  `stili.js` (`.anagrafica-riga-1/2`) e sono le stesse nelle due righe, quindi Sesso sta
+  sopra Background, Razza sopra Classe, Taglia sopra Sottoclasse e Allineamento sopra i PE.
+  Su tablet restano le colonne proporzionate (quelle uguali taglierebbero Sottoclasse e
+  Allineamento).
+- **Modificatore della caratteristica senza "+" e senza tiro**: il numero grande accanto a
+  Forza, Destrezza... è solo da leggere; i TS si tirano dalla riga "Tiro salvezza", le prove
+  dalle abilità.
+
+### Rimosso
+- La matita accanto alla velocità: la velocità la calcola l'app (specie, Poteri,
+  sfinimento) e non si modifica a mano. Il clic sul valore apre movimento e salti.
+
 ## [4.103.0] – 2026-10-14
 
 ### Aggiunto

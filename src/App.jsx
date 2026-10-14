@@ -1980,7 +1980,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.103.0';
+const APP_VERSION = '4.103.1';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -10836,9 +10836,10 @@ export default function App() {
                 </div>
 
                 <div className="profilo-anagrafica-campi" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {/* Riga 1: Sesso, Specie/Razza, Taglia, Allineamento. Le prime due colonne
-                      di entrambe le righe sommano al 42%, così Taglia parte dove parte Sottoclasse. */}
-                  <div className="campi-anagrafica" style={{ display: 'grid', gridTemplateColumns: '16% 26% minmax(56px, 0.6fr) minmax(110px, 1.45fr)', gap: 10, alignItems: 'end' }}>
+                  {/* Riga 1: Sesso, Specie/Razza, Taglia, Allineamento. Colonne in stili.js
+                      (.anagrafica-riga-1/2): Taglia parte dove parte Sottoclasse e, su schermo
+                      grande, Allineamento è in colonna con i PE. */}
+                  <div className="campi-anagrafica anagrafica-riga-1" style={{ display: 'grid', gap: 10, alignItems: 'end' }}>
                     <CampoModulo
                       label={t("profilo.sesso")}
                       boxClassName={String(
@@ -10916,7 +10917,7 @@ export default function App() {
                   </div>
 
                   {/* Riga 2: Background, Classe (compatta), Sottoclasse (larga), P.E. (adeguato per 6 cifre) */}
-                  <div className="campi-anagrafica" style={{ display: 'grid', gridTemplateColumns: '24% 18% minmax(140px, 1.75fr) minmax(56px, 0.65fr)', gap: 10, alignItems: 'end' }}>
+                  <div className="campi-anagrafica anagrafica-riga-2" style={{ display: 'grid', gap: 10, alignItems: 'end' }}>
                     <CampoModulo label={t("profilo.background")} boxClassName={String(scheda.background || '').length > 12 ? 'testo-compatto' : undefined}>
                       <CampoBloccato
                         valore={traduciDato(scheda.background) || t('profilo.nessuno')}
@@ -11655,7 +11656,8 @@ export default function App() {
                     // Il numero mostrato è il TOTALE vero (base + Poteri, con lo Sfinimento
                     // applicato: stesso calcolo del Calcolatore Movimenti). Se differisce
                     // dalla base è in BLU, senza il piccolo "+3m" sotto; il dettaglio
-                    // resta nel tooltip. 1 click modifica sempre la velocità BASE.
+                    // resta nel tooltip. Il clic apre il Calcolatore Movimenti; la velocità
+                    // base la imposta la specie.
                     const base = Number(scheda.velocita) || 0;
                     const totale = calcolaMovimentoESalti(scheda).velBase;
                     const modificata = totale !== base;
@@ -11667,8 +11669,8 @@ export default function App() {
                     else if (sfin.velocitaDimezzata) fonti.push(lingua === 'en' ? 'Exhaustion: halved' : 'Sfinimento: dimezzata');
                     else if (sfin.penalitaVelocita) fonti.push(`−${sfin.penalitaVelocita}m (${lingua === 'en' ? 'Exhaustion' : 'Sfinimento'})`);
                     const titolo = modificata
-                      ? `${lingua === 'en' ? 'Total' : 'Totale'} ${totale}m = ${lingua === 'en' ? 'base' : 'base'} ${base}m ${fonti.join(', ')} · ${lingua === 'en' ? 'click: edit base speed' : 'clic: modifica la velocità base'}`
-                      : undefined;
+                      ? `${lingua === 'en' ? 'Total' : 'Totale'} ${totale}m = base ${base}m ${fonti.join(', ')} · ${lingua === 'en' ? 'click: movement and jumping' : 'clic: movimento e salti'}`
+                      : (lingua === 'en' ? 'Click: movement and jumping' : 'Clic: movimento e salti');
                     return (
                       <div
                         style={{ ...styles.vitalValue, cursor: 'pointer', position: 'relative' }}
@@ -11681,15 +11683,6 @@ export default function App() {
                           {totale}
                         </span>
                         <span style={{ fontSize: 18, color: modificata ? coloreCategoria('modificato', notteAttiva) : C.inkDim, marginLeft: 2, fontWeight: 600 }}> m</span>
-                        <div style={{ position: 'absolute', top: -10, right: -12, zoom: 0.8, padding: 4 }} onClick={(e) => e.stopPropagation()}>
-                          <Editable
-                            value={base}
-                            tipo="numero"
-                            onChange={(v) => aggiorna({ velocita: v })}
-                            soloIcona
-                            title={lingua === 'en' ? 'Edit base speed' : 'Modifica velocità base'}
-                          />
-                        </div>
                       </div>
                     );
                   })()
@@ -11909,7 +11902,7 @@ export default function App() {
               const abilitaDellaCar = ABILITA.filter((a) => a.car === key);
               const sfondoCar = SFONDO_CARATTERISTICA[key];
               return (
-                <div key={key} className="blocco-car" style={{ ...styles.abilityBlock, position: 'relative', overflow: 'hidden' }}>
+                <div key={key} className={`blocco-car car-colore car-${key}`} style={{ ...styles.abilityBlock, position: 'relative', overflow: 'hidden' }}>
                   {/* Sfondo emoji opaco che rappresenta la caratteristica */}
                   {sfondoCar && (
                     <span aria-hidden className="sfondo-car-emoji">
@@ -11917,13 +11910,15 @@ export default function App() {
                     </span>
                   )}
                   <div className="blocco-car-header" style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                    <Rollable
-                      onRoll={() => lanciaD20(`Prova di ${t('attr.' + key)}`, mod, { tipoTiro: 'prova' })}
-                      style={{ ...styles.abilityMod, fontSize: 22, padding: '0 4px' }}
-                      title={`Tieni premuto e rilascia: prova di ${t('attr.' + key)}`}
+                    {/* Solo il modificatore, senza "+" e senza tiro: i TS si tirano dalla riga
+                        "Tiro salvezza", le prove dalle abilità. */}
+                    <span
+                      className="car-modificatore"
+                      style={{ ...styles.abilityMod, fontSize: 22, padding: '0 4px', cursor: 'default' }}
+                      title={tr(`Modificatore di ${t('attr.' + key)}`, `${t('attr.' + key)} modifier`)}
                     >
-                      {conSegno(mod)}
-                    </Rollable>
+                      {mod < 0 ? `−${Math.abs(mod)}` : mod}
+                    </span>
                     <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 3 }}>
                       <div role="button" tabIndex={0}
                         className="car-header-label"

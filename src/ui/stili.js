@@ -441,6 +441,8 @@ export const GLOBAL_CSS = `
   --c-green: #3e7d32; --c-title: #9e2b25;
   --c-araldi: #6e3612; --c-araldi-border: #a45a2a; --c-araldi-bg: rgba(140, 74, 30, 0.10);
   --c-araldi-glow: rgba(140, 74, 30, 0.25); --c-araldi-badge: #7a3e16;
+  --c-car-forza: #a8443a; --c-car-destrezza: #4f7d3a; --c-car-costituzione: #a0702a;
+  --c-car-intelligenza: #3f6a9e; --c-car-saggezza: #7a5aa0; --c-car-carisma: #b06a74;
   --font-title: 'Cinzel', Georgia, 'Times New Roman', serif;
 }
 :root[data-tema="scuro"] {
@@ -450,6 +452,8 @@ export const GLOBAL_CSS = `
   --c-green: #7fb069; --c-title: #de8f88;
   --c-araldi: #e08b4a; --c-araldi-border: #b86b33; --c-araldi-bg: rgba(184, 107, 51, 0.16);
   --c-araldi-glow: rgba(184, 107, 51, 0.30); --c-araldi-badge: #d27d3c;
+  --c-car-forza: #d0685a; --c-car-destrezza: #86b26a; --c-car-costituzione: #d2a35a;
+  --c-car-intelligenza: #6f9fd6; --c-car-saggezza: #ab8ad6; --c-car-carisma: #d99aa0;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema="chiaro"]) {
@@ -459,6 +463,8 @@ export const GLOBAL_CSS = `
     --c-green: #7fb069; --c-title: #de8f88;
     --c-araldi: #e08b4a; --c-araldi-border: #b86b33; --c-araldi-bg: rgba(184, 107, 51, 0.16);
     --c-araldi-glow: rgba(184, 107, 51, 0.30); --c-araldi-badge: #d27d3c;
+    --c-car-forza: #d0685a; --c-car-destrezza: #86b26a; --c-car-costituzione: #d2a35a;
+    --c-car-intelligenza: #6f9fd6; --c-car-saggezza: #ab8ad6; --c-car-carisma: #d99aa0;
   }
 }
 html {
@@ -1164,6 +1170,22 @@ tbody tr:hover {
               0 0 6px 1px var(--c-aura-glow-min, rgba(201, 162, 39, 0.08)),
               0 1px 4px rgba(0, 0, 0, 0.35) !important;
 }
+/* Ogni caratteristica ha il suo colore: Forza rosso mattone, Destrezza verde muschio,
+   Costituzione ocra, Intelligenza blu, Saggezza viola, Carisma oro rosato. A riposo il
+   bordo è smorzato (si mescola col bordo normale), al passaggio si accende con l'alone. */
+.blocco-car.car-forza { --car: var(--c-car-forza); }
+.blocco-car.car-destrezza { --car: var(--c-car-destrezza); }
+.blocco-car.car-costituzione { --car: var(--c-car-costituzione); }
+.blocco-car.car-intelligenza { --car: var(--c-car-intelligenza); }
+.blocco-car.car-saggezza { --car: var(--c-car-saggezza); }
+.blocco-car.car-carisma { --car: var(--c-car-carisma); }
+.blocco-car.car-colore { border-color: color-mix(in srgb, var(--car) 55%, var(--c-border)) !important; }
+.blocco-car.car-colore:hover {
+  border-color: var(--car) !important;
+  box-shadow: 0 4px 18px -2px color-mix(in srgb, var(--car) 35%, transparent),
+              0 0 6px 1px color-mix(in srgb, var(--car) 22%, transparent),
+              0 1px 4px rgba(0, 0, 0, 0.35) !important;
+}
 /* Riquadri statistica (CA, Competenza, Iniziativa, Velocità, Sfinimento, Visione...):
    - etichetta sempre alta due righe e centrata, così i valori stanno alla stessa
      altezza in tutta la riga e i titoli lunghi ("Bonus di competenza") non
@@ -1639,8 +1661,16 @@ tbody tr:hover {
 .campi-anagrafica .campo-modulo-box * { font-size: inherit; font-family: inherit; font-weight: 600; }
 .campi-anagrafica .campo-modulo-box > div { padding-left: 0 !important; }
 .campi-anagrafica .campo-modulo-box.testo-compatto, .campi-anagrafica .campo-modulo-box.testo-compatto * { font-size: 11px !important; letter-spacing: -0.2px; }
-/* PE a filo del bordo destro, come la tendina di Allineamento sopra (su mobile resta a sinistra). */
-.campi-anagrafica > .campo-pe { justify-self: end; width: max-content; min-width: 56px; }
+/* Anagrafica: le due righe hanno le stesse quattro colonne, quindi Sesso sta sopra
+   Background, Razza sopra Classe, Taglia sopra Sottoclasse e Allineamento sopra i PE. */
+.anagrafica-riga-1, .anagrafica-riga-2 { grid-template-columns: minmax(0, 19%) minmax(0, 25%) minmax(0, 1fr) minmax(96px, 23%); }
+/* Tablet: colonna centrale stretta, una colonna PE larga taglierebbe la Sottoclasse.
+   Si torna alle colonne proporzionate, con i PE a filo destro come Allineamento. */
+@media (max-width: 1100px) and (min-width: 781px) {
+  .anagrafica-riga-1 { grid-template-columns: 16% 26% minmax(56px, 0.6fr) minmax(110px, 1.45fr); }
+  .anagrafica-riga-2 { grid-template-columns: 24% 18% minmax(140px, 1.75fr) minmax(56px, 0.65fr); }
+  .campi-anagrafica > .campo-pe { justify-self: end; width: max-content; min-width: 56px; }
+}
 .campi-anagrafica .campo-modulo-label { font-size: 11px !important; margin-top: 2px; font-weight: 700 !important; letter-spacing: 0.25px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 !important; }
 /* Sottoclasse con più classi (multiclasse): una riga per classe, l'altezza fissa
     da campo singolo taglierebbe via le righe in più. */
@@ -2069,7 +2099,6 @@ tbody tr:hover {
   /* su telefono i riquadri anagrafica e vitali passano a 2 colonne (leggibili,
      niente 5 colonne schiacciate); le altezze non sono più forzate uguali */
   .campi-anagrafica { grid-template-columns: repeat(2, 1fr) !important; gap: 8px 10px !important; }
-  .campi-anagrafica > .campo-pe { justify-self: stretch; width: auto; }
   .campi-anagrafica .campo-modulo-box { min-height: 32px !important; height: auto !important; overflow: visible !important; }
   .vitali { grid-template-columns: repeat(2, 1fr) !important; grid-auto-rows: auto !important; }
   .vitali-difesa { grid-template-columns: repeat(2, 1fr) !important; grid-auto-rows: auto !important; }

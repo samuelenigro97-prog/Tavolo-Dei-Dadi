@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.103.1',
+    voci: {
+      it: ['Ogni caratteristica ha il suo colore sul bordo (Forza rosso, Destrezza verde, Costituzione ocra, Intelligenza blu, Saggezza viola, Carisma rosato). Tolta la matita della velocità: la calcola l\'app. Anagrafica in colonne allineate (Razza sopra Classe, Allineamento sopra i PE). Il modificatore delle caratteristiche non ha più il "+" e non tira: i TS dalla riga Tiro salvezza.'],
+      en: ['Each ability has its own border colour (Strength red, Dexterity green, Constitution ochre, Intelligence blue, Wisdom purple, Charisma rose). The speed pencil is gone: the app calculates it. Profile fields in aligned columns (Species above Class, Alignment above XP). Ability modifiers lose the "+" and no longer roll: saves from the Saving throw row.'],
+    },
+  },
+  {
     versione: '4.103.0',
     voci: {
       it: [
