@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.105.2',
+    voci: {
+      it: ['Menu iniziale: ogni personaggio della lista ha il colore della sua classe.'],
+      en: ['Start menu: every character in the list has its class colour.'],
+    },
+  },
+  {
     versione: '4.105.1',
     voci: {
       it: ['Menu iniziale: la card "Ultimo usato" ha i colori della classe del personaggio, il resto del menu resta sul tema base.'],

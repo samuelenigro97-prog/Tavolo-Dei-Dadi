@@ -1980,7 +1980,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.105.1';
+const APP_VERSION = '4.105.2';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -7985,7 +7985,7 @@ export default function App() {
         );
       })()}
 
-      {mostraMenu && <MenuPersonaggiModal APP_VERSION={APP_VERSION} stileTemaBase={stileTemaBase} apriNotifiche={apriNotifiche} erroreImport={erroreImport} esportaBackupCompleto={esportaBackupCompleto} generaPgCasuale={generaPgCasuale} idDispositivo={idDispositivo} isCloudAttivo={isCloudAttivo} jsonRef={jsonRef} leggiSnapshots={leggiSnapshots} lingua={lingua} manualiAttivi={manualiAttivi} mostraListaCarica={mostraListaCarica} novitaNonLette={novitaNonLette} roster={roster} scheda={scheda} setBozzaCrea={setBozzaCrea} setCloudStatus={setCloudStatus} setConferma={setConferma} setLingua={setLingua} setMostraArchivioDm={setMostraArchivioDm} setMostraCloud={setMostraCloud} setMostraCrea={setMostraCrea} setMostraDonazioni={setMostraDonazioni} setMostraListaCarica={setMostraListaCarica} setMostraMenu={setMostraMenu} setMostraMenuEsporta={setMostraMenuEsporta} setMostraModalManuali={setMostraModalManuali} setMostraNoteLegali={setMostraNoteLegali} setMostraRipristino={setMostraRipristino} setPosEsporta={setPosEsporta} setRoster={setRoster} setSchedaSolaLettura={setSchedaSolaLettura} setTemaCornici={setTemaCornici} statoBgCloud={statoBgCloud} statoColoreCloud={statoColoreCloud} statoGlowCloud={statoGlowCloud} temaCornici={temaCornici} />}
+      {mostraMenu && <MenuPersonaggiModal APP_VERSION={APP_VERSION} stileTemaBase={stileTemaBase} coloreClassePg={(classe) => coloreClasse(classe)?.[notteAttiva ? 'scuro' : 'chiaro'] || ''} apriNotifiche={apriNotifiche} erroreImport={erroreImport} esportaBackupCompleto={esportaBackupCompleto} generaPgCasuale={generaPgCasuale} idDispositivo={idDispositivo} isCloudAttivo={isCloudAttivo} jsonRef={jsonRef} leggiSnapshots={leggiSnapshots} lingua={lingua} manualiAttivi={manualiAttivi} mostraListaCarica={mostraListaCarica} novitaNonLette={novitaNonLette} roster={roster} scheda={scheda} setBozzaCrea={setBozzaCrea} setCloudStatus={setCloudStatus} setConferma={setConferma} setLingua={setLingua} setMostraArchivioDm={setMostraArchivioDm} setMostraCloud={setMostraCloud} setMostraCrea={setMostraCrea} setMostraDonazioni={setMostraDonazioni} setMostraListaCarica={setMostraListaCarica} setMostraMenu={setMostraMenu} setMostraMenuEsporta={setMostraMenuEsporta} setMostraModalManuali={setMostraModalManuali} setMostraNoteLegali={setMostraNoteLegali} setMostraRipristino={setMostraRipristino} setPosEsporta={setPosEsporta} setRoster={setRoster} setSchedaSolaLettura={setSchedaSolaLettura} setTemaCornici={setTemaCornici} statoBgCloud={statoBgCloud} statoColoreCloud={statoColoreCloud} statoGlowCloud={statoGlowCloud} temaCornici={temaCornici} />}
 
       {mostraArchivioDm && (
         <ArchivioDm

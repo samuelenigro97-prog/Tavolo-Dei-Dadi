@@ -11,7 +11,7 @@ const etichettaSezione = {
   fontFamily: 'var(--font-title)', opacity: 0.9, userSelect: 'none', marginBottom: 8,
 };
 
-export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, apriNotifiche, erroreImport, esportaBackupCompleto, generaPgCasuale, idDispositivo, isCloudAttivo, jsonRef, leggiSnapshots, lingua, manualiAttivi, mostraListaCarica, novitaNonLette, roster, scheda, setBozzaCrea, setCloudStatus, setConferma, setLingua, setMostraArchivioDm, setMostraCloud, setMostraCrea, setMostraDonazioni, setMostraListaCarica, setMostraMenu, setMostraMenuEsporta, setMostraModalManuali, setMostraNoteLegali, setMostraRipristino, setPosEsporta, setRoster, setSchedaSolaLettura, setTemaCornici, statoBgCloud, statoColoreCloud, statoGlowCloud, temaCornici }) {
+export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg, apriNotifiche, erroreImport, esportaBackupCompleto, generaPgCasuale, idDispositivo, isCloudAttivo, jsonRef, leggiSnapshots, lingua, manualiAttivi, mostraListaCarica, novitaNonLette, roster, scheda, setBozzaCrea, setCloudStatus, setConferma, setLingua, setMostraArchivioDm, setMostraCloud, setMostraCrea, setMostraDonazioni, setMostraListaCarica, setMostraMenu, setMostraMenuEsporta, setMostraModalManuali, setMostraNoteLegali, setMostraRipristino, setPosEsporta, setRoster, setSchedaSolaLettura, setTemaCornici, statoBgCloud, statoColoreCloud, statoGlowCloud, temaCornici }) {
   // `attivo` viene salvato nel roster: è quindi anche l'ultimo personaggio effettivamente usato.
   const ultimoPersonaggio = roster?.personaggi?.[roster?.attivo] || scheda;
   const apriUltimoPersonaggio = () => {
@@ -89,14 +89,28 @@ export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, apriNotifiche,
           <>
             <div id="lista-carica-pg" style={{ ...styles.detail, marginBottom: 6, fontWeight: 'bold' }}>{t('menu.carica_personaggio')}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
-              {Object.entries(roster.personaggi).map(([id, p]) => (
+              {Object.entries(roster.personaggi).map(([id, p]) => {
+                // Ogni personaggio nel colore della sua classe: barra a sinistra, fondo appena tinto,
+                // nome della classe leggibile (il colore si avvicina all'inchiostro del tema).
+                const col = coloreClassePg?.(p.classe) || '';
+                return (
                 <div key={id} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                   <button
-                    style={{ ...styles.button, flex: 1, display: 'flex', justifyContent: 'space-between', gap: 10, textAlign: 'left' }}
+                    data-testid="menu-pg-riga"
+                    data-colore-classe={col || undefined}
+                    style={{
+                      ...styles.button, flex: 1, display: 'flex', justifyContent: 'space-between', gap: 10, textAlign: 'left',
+                      ...(col ? {
+                        borderLeft: `5px solid ${col}`,
+                        borderColor: `color-mix(in srgb, ${col} 55%, var(--c-border))`,
+                        borderLeftColor: col,
+                        background: `color-mix(in srgb, ${col} 12%, var(--c-panel-light))`,
+                      } : {}),
+                    }}
                     onClick={() => { setSchedaSolaLettura(null); setRoster((r) => ({ ...r, attivo: id })); setMostraMenu(false); }}
                   >
                     <span>{p.nome || t('menu.senza_nome')}</span>
-                    <span style={styles.detail}>{p.classe ? `${p.classe}` : '—'}</span>
+                    <span style={{ ...styles.detail, ...(col ? { color: `color-mix(in srgb, ${col} 65%, var(--c-ink))`, fontWeight: 700 } : {}) }}>{p.classe ? `${p.classe}` : '—'}</span>
                   </button>
                   <button
                     style={{ ...styles.buttonDanger, padding: '4px 10px', fontSize: 13, flexShrink: 0 }}
@@ -127,7 +141,8 @@ export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, apriNotifiche,
                     🗑️
                   </button>
                 </div>
-              ))}
+                );
+              })}
               {Object.keys(roster.personaggi).length === 0 && (
                 <span style={styles.detail}>{t('menu.nessun_personaggio')}</span>
               )}

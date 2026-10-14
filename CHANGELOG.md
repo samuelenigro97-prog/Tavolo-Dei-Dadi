@@ -2,6 +2,13 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.105.2] – 2026-10-14
+
+### Modificato
+- **Lista dei personaggi nel menu nei colori della classe**: ogni riga ha la barra a sinistra,
+  il fondo appena tinto e il nome della classe nel colore della sua classe (verde Druido,
+  rosa Bardo, viola Stregone, arancio Guerriero, blu Mago...), leggibile su tema chiaro e scuro.
+
 ## [4.105.1] – 2026-10-14
 
 ### Modificato
