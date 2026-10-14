@@ -3504,8 +3504,8 @@ export default function App() {
   const [ultimoAttaccoCritico, setUltimoAttaccoCritico] = useState(null);
 
   const [erroreImport, setErroreImport] = useState('');
-  // Import da PDF con l'IA: endpoint configurabile (Cloudflare Worker o server
-  // locale). In dev il proxy manda /api → localhost:3001; online serve un URL.
+  // Import da PDF con l'IA: endpoint configurabile (Cloudflare Worker o URL
+  // esterno). Senza URL configurato l'import PDF non funziona.
   const [transcribeUrl, setTranscribeUrl] = useState(
     () => localStorage.getItem('scheda-interattiva:transcribe-url')
       || (typeof import.meta !== 'undefined' && import.meta.env?.VITE_TRANSCRIBE_URL) || ''

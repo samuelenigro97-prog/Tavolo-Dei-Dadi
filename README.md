@@ -57,6 +57,51 @@ un endpoint esterno (Worker Cloudflare) configurabile da menu o da
 `VITE_TRANSCRIBE_URL` — senza configurarlo, tutto il resto funziona lo stesso
 (si può sempre importare/esportare JSON).
 
+### Installazione come PWA (offline)
+
+Dalla versione pubblicata su GitHub Pages l'app è una **PWA installabile**:
+apri il sito, usa il menu del browser (⋮ → "Installa app" o "Aggiungi a
+Schermo") e l'app si avvia come applicazione nativa. Dopo la prima visita
+funziona anche offline, tranne l'import da PDF.
+
+Per forzare l'aggiornamento alla nuova versione: chiudi l'app con **Cmd+Q**
+(Mac) o chiudi completamente la finestra e riaprila. Il meccanismo interno
+(`version.json` fuori dalla cache + service worker `autoUpdate`) si occupa
+di attivare il nuovo worker non appena rilevato; se resti sulla versione
+vecchia, il pulsante **🔄 Aggiorna** in testata svuota la cache e ricarica.
+
+### Primo utilizzo
+
+All'avvio trovi già quattro personaggi d'esempio. Per iniziare da zero:
+
+1. Clicca **➕ Nuovo personaggio** nel menu (icona 🏠 in alto).
+2. Scegli specie, classe, background e caratteristiche (tutto guidato).
+3. Al primo livello ti viene chiesta la sottoclasse.
+4. Usa **Level Up** per avanzare di livello (si gestisce automaticamente
+   PF, slot, competenze, privilegi).
+
+**Gesti principali:**
+- **1 click** su un valore = modifica inline (scrivi e premi Invio).
+- **Doppio click / tieni premuto e rilascia** su un valore tirabile
+  (caratteristiche, abilità, attacchi, PF, iniziativa…) = tiro del dado.
+- **Barra dei dadi** in alto: scegli d4–d100, scrivi espressioni come `3d6+2`,
+  imposta Vantaggio/Svantaggio.
+- **Riposo Breve/Lungo** nel box PF: ricarica risorse, dadi vita, slot.
+- **Esporta / Importa** nel menu: JSON per backup o per spostare la scheda su
+  un altro dispositivo.
+
+### Configurazione
+
+- **Import PDF (IA)**: nel menu **☁️ Cloud** → "Configura import da PDF".
+  Incolla l'endpoint del Worker o imposta `VITE_TRANSCRIBE_URL` in un file
+  `.env` allo sviluppo. Senza endpoint l'import non funziona.
+- **Endpoint transcrizione**: salvato in `localStorage`
+  (`scheda-interattiva:transcribe-url`).
+- **Tema**: Auto (scuro di notte o se il sistema è in modalità scura) /
+  Chiaro / Scuro. I colori della scheda seguono la classe del personaggio.
+- **Luoghi** (Taverna, Mare, Montagna…): ambientazioni complete con palette,
+  sfondo e audio. Tutto offline.
+
 ## Test
 
 ```bash
@@ -94,3 +139,27 @@ soprattutto in `src/App.jsx`, con una parte crescente di moduli estratti in
 Per le convenzioni di sviluppo, la struttura dei moduli e le regole di
 dominio D&D vedi [CLAUDE.md](./CLAUDE.md); per lo stato dei lavori e la
 roadmap vedi [docs/BACKLOG.md](./docs/BACKLOG.md).
+
+## Contribuire
+
+Prima di aprire una pull request:
+
+1. **Sincronizza** con `main`: `git fetch origin main` e `git rebase origin/main`
+   (il repo usa `pull.rebase=true` + `rebase.autoStash=true`).
+2. **Verifica**: `npm ci && npm run lint && npm test && npm run build`.
+   Se la modifica tocca l'interfaccia, esegui anche `npm run test:e2e`.
+3. **Incrementa `APP_VERSION`** in `src/App.jsx` per ogni modifica visibile.
+4. **Non modificare contemporaneamente `src/App.jsx`** con altri agenti: è il
+   file più a rischio conflitti. La UI è in gran parte già estratta in
+   `src/ui/`, `src/rules/`, `src/data/`, `src/utils/`.
+
+I workflow **CI** (`.github/workflows/ci.yml`) e **Deploy**
+(`.github/workflows/deploy.yml`) girano a ogni push su `main` e PR: lint,
+test unitari, build, smoke test e test e2e. Il sito si aggiorna solo dopo una
+CI tutta verde.
+
+## Licenza
+
+CC-BY-4.0 per i contenuti SRD 5.1. Vedi [LICENSE.md](LICENSE.md); i testi
+legali e la privacy sono anche inside app (menu **ℹ️ Info, Licenza &
+Supporto**).

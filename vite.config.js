@@ -138,10 +138,5 @@ export default defineConfig(({ command, isPreview }) => ({
     }),
     scriveVersionJson,
   ],
-  server: {
-    port: 5173,
-    proxy: {
-      '/api': 'http://localhost:3001',
-    },
-  },
+  server: { port: 5173 },
 }));
