@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.102.2',
+    voci: {
+      it: ['Il valore della velocità è direttamente cliccabile per aprire il calcolatore di movimento e salti, con interfaccia più pulita.', 'Semplificata la dicitura dell\'Archivio delle schede.'],
+      en: ['Speed value is directly clickable to open movement and jumping calculator, with a cleaner interface.', 'Simplified Archive naming across the app.'],
+    },
+  },
+  {
     versione: '4.102.1',
     voci: {
       it: ['Menu: la versione è accanto alla "i" finale di Tavolo dei Dadi, allineata in basso con le lettere.'],

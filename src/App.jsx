@@ -1960,7 +1960,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.102.1';
+const APP_VERSION = '4.102.2';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -2962,7 +2962,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
 
   const eliminaCopia = async (s) => {
     const nomeFmt = formattaNomePg(s.nome) || tr('questa scheda', 'this sheet');
-    if (!window.confirm(tr(`Eliminare "${nomeFmt}" (${quando(s.aggiornato)}) dall'Archivio del Master? L'operazione non può essere annullata.`, `Delete "${nomeFmt}" (${quando(s.aggiornato)}) from the DM Archive? This cannot be undone.`))) return;
+    if (!window.confirm(tr(`Eliminare "${nomeFmt}" (${quando(s.aggiornato)}) dall'Archivio? L'operazione non può essere annullata.`, `Delete "${nomeFmt}" (${quando(s.aggiornato)}) from the Archive? This cannot be undone.`))) return;
     setStato('carico');
     try {
       const r = await fetch(`${base}/pg/${encodeURIComponent(s.id)}`, {
@@ -3020,7 +3020,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
     >
       <div style={{ ...styles.panel, maxWidth: 640, width: '100%', maxHeight: '88vh', overflowY: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <strong style={{ color: C.goldDark, fontSize: 18 }}>{tr('Archivio del Master', 'DM Archive')}</strong>
+          <strong style={{ color: C.goldDark, fontSize: 18 }}>{tr('Archivio', 'Archive')}</strong>
           <button style={styles.buttonMini} onClick={onChiudi} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
         </div>
         <p style={{ ...styles.detail, marginTop: 0 }}>
@@ -3104,7 +3104,7 @@ function ArchivioDm({ url, onChiudi, onApri, onApriSolaLettura }) {
                           <button
                             style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '3px 6px' }}
                             onClick={() => eliminaCopia(s)}
-                            title={tr('Elimina definitivamente questa copia dall\'Archivio del Master', 'Permanently delete this copy from the DM Archive')}
+                            title={tr('Elimina definitivamente questa copia dall\'Archivio', 'Permanently delete this copy from the Archive')}
                           >
                             🗑️
                           </button>
@@ -9583,7 +9583,7 @@ export default function App() {
               <span style={{ fontSize: 20 }}>🔒</span>
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontWeight: 800, fontSize: 13, textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
-                  {lingua === 'en' ? 'DM archive: read-only sheet' : 'Archivio del Master: scheda in sola lettura'}
+                  {lingua === 'en' ? 'Archive: read-only sheet' : 'Archivio: scheda in sola lettura'}
                 </div>
                 <div style={{ fontSize: 11, opacity: 0.95, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {formattaNomePg(scheda.nome) || 'Personaggio'} · {lingua === 'en' ? 'No changes will be saved' : 'Consultazione sicura · nessuna modifica al cloud o al roster'}
@@ -9595,7 +9595,7 @@ export default function App() {
                 style={{ ...styles.buttonMini, background: 'rgba(255,255,255,0.2)', color: '#ffffff', borderColor: 'rgba(255,255,255,0.45)', padding: '4px 8px', fontSize: 11, fontWeight: 700 }}
                 onClick={() => setMostraArchivioDm(true)}
               >
-                {lingua === 'en' ? 'DM archive' : 'Archivio del Master'}
+                {lingua === 'en' ? 'Archive' : 'Archivio'}
               </button>
               <button
                 style={{ ...styles.buttonMini, background: '#c62828', color: '#ffffff', borderColor: '#e53935', padding: '4px 10px', fontSize: 11, fontWeight: 800 }}
@@ -11674,49 +11674,29 @@ export default function App() {
                       ? `${lingua === 'en' ? 'Total' : 'Totale'} ${totale}m = ${lingua === 'en' ? 'base' : 'base'} ${base}m ${fonti.join(', ')} · ${lingua === 'en' ? 'click: edit base speed' : 'clic: modifica la velocità base'}`
                       : undefined;
                     return (
-                      <div style={styles.vitalValue} className={modificata ? 'velocita-modificata' : undefined} title={titolo}>
-                        <Editable
-                          value={totale}
-                          valoreModifica={base}
-                          tipo="numero"
-                          onChange={(v) => aggiorna({ velocita: v })}
-                          width={48}
-                          title={titolo}
-                          style={modificata ? { color: coloreCategoria('modificato', notteAttiva) } : undefined}
-                        />
+                      <div
+                        style={{ ...styles.vitalValue, cursor: 'pointer', position: 'relative' }}
+                        className={modificata ? 'velocita-modificata' : undefined}
+                        title={titolo}
+                        onClick={() => setMostraModalMovimento(true)}
+                      >
+                        <span style={modificata ? { color: coloreCategoria('modificato', notteAttiva) } : undefined}>
+                          {totale}
+                        </span>
                         <span style={{ fontSize: 18, color: modificata ? coloreCategoria('modificato', notteAttiva) : C.inkDim, marginLeft: 2, fontWeight: 600 }}> m</span>
+                        <div style={{ position: 'absolute', top: -10, right: -12, zoom: 0.8, padding: 4 }} onClick={(e) => e.stopPropagation()}>
+                          <Editable
+                            value={base}
+                            tipo="numero"
+                            onChange={(v) => aggiorna({ velocita: v })}
+                            soloIcona
+                            title={lingua === 'en' ? 'Edit base speed' : 'Modifica velocità base'}
+                          />
+                        </div>
                       </div>
                     );
                   })()
                 )}
-                <div role="button" tabIndex={0}
-                  onClick={() => setMostraModalMovimento(true)}
-                  style={{
-                    fontSize: 11,
-                    color: C.goldDark,
-                    textAlign: 'center',
-                    fontWeight: 600,
-                    position: 'absolute',
-                    bottom: 6,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    whiteSpace: 'nowrap',
-                    cursor: 'pointer',
-                    padding: '2px 6px',
-                    borderRadius: 4,
-                    background: 'rgba(201,162,39,0.08)',
-                    border: '1px solid rgba(201,162,39,0.25)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 3,
-                    transition: 'background 0.15s ease',
-                  }}
-                  title={lingua === 'en' ? 'Click to open the movement, jumping and carrying calculator' : 'Clicca per aprire il calcolatore di movimento, salti e capacità fisiche'}
-                >
-                  <span>{t('vital.movimenti')}</span>
-                  <span style={{ fontSize: 11, opacity: 0.8 }}>▼</span>
-                </div>
               </div>
             </div>
             <div className="vital-box" style={{ ...styles.vitalBox }}>
