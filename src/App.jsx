@@ -6,7 +6,7 @@ import { t, tr, setLinguaAttuale, traduciDato } from "./i18n";
 import { avviaAmbiente, fermaAmbiente, setVolumeAmbiente, eseguiEffettoSonoro, precaricaSfx } from './utils/audioAmbiente';
 import { C, BASE_TEMA, PRESET_COLORI, ambientazioneCasuale } from "./ui/tema.js";
 import { styles, GLOBAL_CSS } from './ui/stili.js';
-import { Editable, Rollable, iconaTipoDanno, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
+import { Editable, Rollable, iconaTipoDanno, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, caratteristicaDaTesto, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
 import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
 import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } from "./data/esempi.js";
@@ -1980,7 +1980,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.104.0';
+const APP_VERSION = '4.105.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4403,6 +4403,25 @@ export default function App() {
       // storage non disponibile: pazienza
     }
   }, [tema, sistemaScuro, oraTick, classeAttiva, presetColori, temaCornici, schedaSolaLettura]);
+  // Tema base del progetto (oro "Classica", senza la tinta della classe del PG): lo usa il
+  // menu iniziale, che è dell'app e non del personaggio. Variabili CSS ridefinite sul suo
+  // contenitore, quindi valgono solo lì dentro.
+  const stileTemaBase = useMemo(() => {
+    const t = { ...BASE_TEMA[notteAttiva ? 'scuro' : 'chiaro'] };
+    garantisciContrastoTema(t);
+    const rgba = (hex, a) => {
+      const n = parseInt(String(hex).slice(1), 16);
+      return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+    };
+    return {
+      '--c-bg': t.bg, '--c-panel': t.panel, '--c-panel-light': t.panelLight, '--c-border': t.border,
+      '--c-ink': t.ink, '--c-ink-dim': t.inkDim, '--c-gold': t.gold, '--c-gold-dark': t.goldDark,
+      '--c-red': t.red, '--c-green': t.green, '--c-title': t.title, '--c-on-gold': testoSu(t.goldDark),
+      '--c-classe': t.gold, '--c-aura-color': t.gold,
+      '--c-border-glow-min': rgba(t.gold, notteAttiva ? 0.45 : 0.30), '--c-border-glow-max': rgba(t.gold, notteAttiva ? 0.85 : 0.65),
+      '--c-aura-glow-min': rgba(t.gold, notteAttiva ? 0.14 : 0.06), '--c-aura-glow-pulse-1': rgba(t.gold, notteAttiva ? 0.36 : 0.18),
+    };
+  }, [notteAttiva]);
   const intervalRef = useRef(null);
   const jsonRef = useRef(null);
   const pdfRef = useRef(null);
@@ -7962,7 +7981,7 @@ export default function App() {
         );
       })()}
 
-      {mostraMenu && <MenuPersonaggiModal APP_VERSION={APP_VERSION} apriNotifiche={apriNotifiche} erroreImport={erroreImport} esportaBackupCompleto={esportaBackupCompleto} generaPgCasuale={generaPgCasuale} idDispositivo={idDispositivo} isCloudAttivo={isCloudAttivo} jsonRef={jsonRef} leggiSnapshots={leggiSnapshots} lingua={lingua} manualiAttivi={manualiAttivi} mostraListaCarica={mostraListaCarica} novitaNonLette={novitaNonLette} roster={roster} scheda={scheda} setBozzaCrea={setBozzaCrea} setCloudStatus={setCloudStatus} setConferma={setConferma} setLingua={setLingua} setMostraArchivioDm={setMostraArchivioDm} setMostraCloud={setMostraCloud} setMostraCrea={setMostraCrea} setMostraDonazioni={setMostraDonazioni} setMostraListaCarica={setMostraListaCarica} setMostraMenu={setMostraMenu} setMostraMenuEsporta={setMostraMenuEsporta} setMostraModalManuali={setMostraModalManuali} setMostraNoteLegali={setMostraNoteLegali} setMostraRipristino={setMostraRipristino} setPosEsporta={setPosEsporta} setRoster={setRoster} setSchedaSolaLettura={setSchedaSolaLettura} setTemaCornici={setTemaCornici} statoBgCloud={statoBgCloud} statoColoreCloud={statoColoreCloud} statoGlowCloud={statoGlowCloud} temaCornici={temaCornici} />}
+      {mostraMenu && <MenuPersonaggiModal APP_VERSION={APP_VERSION} stileTemaBase={stileTemaBase} apriNotifiche={apriNotifiche} erroreImport={erroreImport} esportaBackupCompleto={esportaBackupCompleto} generaPgCasuale={generaPgCasuale} idDispositivo={idDispositivo} isCloudAttivo={isCloudAttivo} jsonRef={jsonRef} leggiSnapshots={leggiSnapshots} lingua={lingua} manualiAttivi={manualiAttivi} mostraListaCarica={mostraListaCarica} novitaNonLette={novitaNonLette} roster={roster} scheda={scheda} setBozzaCrea={setBozzaCrea} setCloudStatus={setCloudStatus} setConferma={setConferma} setLingua={setLingua} setMostraArchivioDm={setMostraArchivioDm} setMostraCloud={setMostraCloud} setMostraCrea={setMostraCrea} setMostraDonazioni={setMostraDonazioni} setMostraListaCarica={setMostraListaCarica} setMostraMenu={setMostraMenu} setMostraMenuEsporta={setMostraMenuEsporta} setMostraModalManuali={setMostraModalManuali} setMostraNoteLegali={setMostraNoteLegali} setMostraRipristino={setMostraRipristino} setPosEsporta={setPosEsporta} setRoster={setRoster} setSchedaSolaLettura={setSchedaSolaLettura} setTemaCornici={setTemaCornici} statoBgCloud={statoBgCloud} statoColoreCloud={statoColoreCloud} statoGlowCloud={statoGlowCloud} temaCornici={temaCornici} />}
 
       {mostraArchivioDm && (
         <ArchivioDm
@@ -10309,9 +10328,7 @@ export default function App() {
                               {az.nome}
                             </span>
                             {az.cd != null && (
-                              <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 6px', background: `${coloreCategoria('tiroSalvezza', notteAttiva)}1f`, color: coloreCategoria('tiroSalvezza', notteAttiva), borderRadius: 6, border: `1px solid ${coloreCategoria('tiroSalvezza', notteAttiva)}` }}>
-                                CD {az.cd}
-                              </span>
+                              <BadgeTiroSalvezza cd={az.cd} caratteristica={caratteristicaDaTesto(az.desc || az.testoOriginale)} colore={coloreCategoria('tiroSalvezza', notteAttiva)} />
                             )}
                           </div>
                           {az.desc && (

@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.105.0',
+    voci: {
+      it: ['Il menu iniziale ha il tema base dell\'app, non i colori del personaggio. Bordi delle caratteristiche più marcati e i TS (es. "Costituzione · CD 17") nel colore della loro caratteristica, anche nelle creature e nella concentrazione.'],
+      en: ['The start menu uses the app\'s base theme, not the character colours. Stronger ability borders and saves (e.g. "Constitution · DC 17") in their ability colour, in creatures and concentration too.'],
+    },
+  },
+  {
     versione: '4.104.0',
     voci: {
       it: ['Caratteri uniformati in tutta l\'app: solo Cinzel per titoli ed etichette e Georgia per il testo, con poche dimensioni fisse. Menu iniziale con tutti i pulsanti uguali.'],

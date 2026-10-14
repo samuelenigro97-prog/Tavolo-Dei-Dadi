@@ -1175,15 +1175,15 @@ tbody tr:hover {
               0 1px 4px rgba(0, 0, 0, 0.35) !important;
 }
 /* Ogni caratteristica ha il suo colore: Forza rosso mattone, Destrezza verde muschio,
-   Costituzione ocra, Intelligenza blu, Saggezza viola, Carisma oro rosato. A riposo il
-   bordo è smorzato (si mescola col bordo normale), al passaggio si accende con l'alone. */
+   Costituzione ocra, Intelligenza blu, Saggezza viola, Carisma oro rosato. Bordo da 1,5 px
+   quasi pieno a riposo, colore pieno con l'alone al passaggio del cursore. */
 .blocco-car.car-forza { --car: var(--c-car-forza); }
 .blocco-car.car-destrezza { --car: var(--c-car-destrezza); }
 .blocco-car.car-costituzione { --car: var(--c-car-costituzione); }
 .blocco-car.car-intelligenza { --car: var(--c-car-intelligenza); }
 .blocco-car.car-saggezza { --car: var(--c-car-saggezza); }
 .blocco-car.car-carisma { --car: var(--c-car-carisma); }
-.blocco-car.car-colore { border-color: color-mix(in srgb, var(--car) 55%, var(--c-border)) !important; }
+.blocco-car.car-colore { border-color: color-mix(in srgb, var(--car) 85%, var(--c-border)) !important; border-width: 1.5px !important; }
 .blocco-car.car-colore:hover {
   border-color: var(--car) !important;
   box-shadow: 0 4px 18px -2px color-mix(in srgb, var(--car) 35%, transparent),

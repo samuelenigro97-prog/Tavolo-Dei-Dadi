@@ -2,6 +2,19 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.105.0] – 2026-10-14
+
+### Modificato
+- **Menu iniziale col tema base del progetto** (oro "Classica"), non coi colori della classe
+  del personaggio corrente: le variabili del tema vengono ridefinite sul contenitore del
+  menu (`stileTemaBase` in `App.jsx`, da `BASE_TEMA`).
+- **Bordi delle caratteristiche più forti**: 1,5 px, colore quasi pieno anche a riposo.
+- **TS nel colore della caratteristica**: i badge "Costituzione · CD 17" (incantesimi e
+  attacchi), le CD delle azioni delle creature ("Saggezza · CD 20", lette da "TS Saggezza")
+  e la CD del TS di concentrazione (Costituzione) prendono il colore del riquadro della
+  caratteristica (`chiaveCaratteristica`, `caratteristicaDaTesto`, `coloreCaratteristica` in
+  `componenti.jsx`).
+
 ## [4.104.0] – 2026-10-14
 
 ### Modificato

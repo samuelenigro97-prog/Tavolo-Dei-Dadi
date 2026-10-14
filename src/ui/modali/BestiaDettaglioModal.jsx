@@ -6,6 +6,7 @@ import { parseAzioneBestia, coloreCategoria } from '../../rules/scheda.js';
 import { conSegno } from '../../rules/dadi.js';
 import { calcolaPfCompagno, parseAzioniCompagno } from '../../rules/regole.js';
 import { esitoFormaSelvatica, esitoMetamorfosi } from '../../data/bestiario.js';
+import { BadgeTiroSalvezza, caratteristicaDaTesto } from '../componenti.jsx';
 
 export function BestiaDettaglioModal({ aggiorna, bestiaDettaglio, lanciaD20, lanciaDanniDiretti, lingua, notteAttiva, registra, scheda, setBestiaDettaglio }) {
   return (
@@ -117,9 +118,7 @@ export function BestiaDettaglioModal({ aggiorna, bestiaDettaglio, lanciaD20, lan
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'wrap' }}>
                       <span style={{ fontWeight: 800, color: C.ink }}>{az.nome}</span>
                       {az.cd != null && (
-                        <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 5px', background: `${coloreCategoria('tiroSalvezza', notteAttiva)}1f`, color: coloreCategoria('tiroSalvezza', notteAttiva), borderRadius: 4, border: `1px solid ${coloreCategoria('tiroSalvezza', notteAttiva)}` }}>
-                          CD {az.cd}
-                        </span>
+                        <BadgeTiroSalvezza cd={az.cd} caratteristica={caratteristicaDaTesto(az.desc || az.testoOriginale)} colore={coloreCategoria('tiroSalvezza', notteAttiva)} />
                       )}
                     </div>
                     {az.desc && (
