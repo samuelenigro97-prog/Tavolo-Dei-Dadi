@@ -127,3 +127,22 @@ test.describe('Finestre estratte', () => {
     });
   }
 });
+
+test('creazione personaggio: "Artefice" compare una volta sola, e solo col manuale Tasha attivo (v4.105.7)', async ({ page }) => {
+  await apriScheda(page);
+  const classi = async (tasha) => {
+    await page.evaluate((v) => {
+      const m = JSON.parse(localStorage.getItem('scheda-interattiva:manuali') || '{}');
+      localStorage.setItem('scheda-interattiva:manuali', JSON.stringify({ ...m, tasha: v }));
+    }, tasha);
+    await apriScheda(page);
+    await page.getByRole('button', { name: 'Nuovo personaggio', exact: true }).first().click();
+    const sel = page.locator('select').filter({ has: page.locator('option', { hasText: 'Barbaro' }) }).first();
+    return sel.locator('option').allTextContents();
+  };
+  const con = await classi(true);
+  expect(con.filter((t) => /Artefice/.test(t))).toHaveLength(1);
+  const senza = await classi(false);
+  expect(senza.filter((t) => /Artefice/.test(t))).toHaveLength(0);
+  expect(senza.filter((t) => /Barbaro/.test(t))).toHaveLength(1);
+});

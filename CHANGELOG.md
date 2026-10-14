@@ -2,6 +2,15 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.105.7] – 2026-10-14
+
+### Corretto
+- **"Artefice" compariva due volte** nella scelta della classe in creazione del personaggio:
+  era già nell'elenco base (`NOMI_CLASSI`) e il codice lo aggiungeva ancora col manuale Tasha.
+  Ora un solo elenco (`classiDisponibili`): l'Artefice c'è una volta sola e solo col manuale
+  Tasha attivo (prima, con Tasha spento, compariva lo stesso). Vale anche per multiclasse,
+  Level Up e "Personaggio casuale".
+
 ## [4.105.6] – 2026-10-14
 
 ### Modificato

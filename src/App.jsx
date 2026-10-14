@@ -1980,7 +1980,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.105.6';
+const APP_VERSION = '4.105.7';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4434,6 +4434,8 @@ export default function App() {
     '--c-border': 'var(--c-pg-border)', '--c-panel-light': 'var(--c-pg-panel-light)', '--c-panel': 'var(--c-pg-panel)',
     '--c-classe': 'var(--c-pg-gold)', '--c-aura-color': 'var(--c-pg-gold)',
   };
+  // Classi scegliibili: l'Artefice (Tasha) solo con quel manuale attivo, mai due volte.
+  const classiDisponibili = NOMI_CLASSI.filter((n) => n !== 'Artefice' || manualiAttivi.tasha !== false);
   const intervalRef = useRef(null);
   const jsonRef = useRef(null);
   const pdfRef = useRef(null);
@@ -5077,7 +5079,7 @@ export default function App() {
   /** Genera un personaggio casuale ma coerente (classe/specie/background, stat, competenze, nome). */
   function generaPgCasuale() {
     const rnd = (arr) => arr[Math.floor(Math.random() * arr.length)];
-    const classe = rnd(NOMI_CLASSI);
+    const classe = rnd(classiDisponibili);
     const specie = rnd(Object.keys(SPECIE_DATI));
     const background = rnd(BACKGROUND_5E);
     const cc = competenzeClasseDi(classe);
@@ -8171,7 +8173,7 @@ export default function App() {
         const mcArray = scheda.multiclasse || [];
         const secMcObj = isSecMc ? mcArray[targetMode] : null;
 
-        const firstAvailableNewClass = NOMI_CLASSI.find((n) => n !== scheda.classe && !mcArray.some((x) => x.classe === n)) || NOMI_CLASSI[0];
+        const firstAvailableNewClass = classiDisponibili.find((n) => n !== scheda.classe && !mcArray.some((x) => x.classe === n)) || classiDisponibili[0];
         const targetClasse = isNewMc
           ? (levelUpBozza.nuovaClasseMc || firstAvailableNewClass)
           : (isSecMc ? (secMcObj?.classe || scheda.classe) : scheda.classe);
@@ -8351,7 +8353,7 @@ export default function App() {
                         }}
                         style={{ ...styles.inlineInput, flex: 1, padding: '5px 8px', fontSize: 14, fontWeight: 700 }}
                       >
-                        {NOMI_CLASSI.map((n) => (
+                        {classiDisponibili.map((n) => (
                           <option key={n} value={n} disabled={n === scheda.classe || mcArray.some((x) => x.classe === n)}>{traduciDato(n)}</option>
                         ))}
                       </select>
@@ -8955,7 +8957,7 @@ export default function App() {
               <label style={{ ...styles.detail, display: 'block', marginBottom: 3 }}>{t('crea.classe')}</label>
               <select style={{ ...stileSelect, marginBottom: 12 }} value={bozzaCrea.classe} onChange={(e) => setB({ classe: e.target.value, sottoclasse: '', competenzeClasse: [] })}>
                 <option value="">{t('crea.scegli')}</option>
-                {[...(manualiAttivi.tasha !== false ? [...NOMI_CLASSI, 'Artefice'] : NOMI_CLASSI)].sort((a, b) => a.localeCompare(b, lingua)).map((n) => <option key={n} value={n}>{formattaVoceConIcona(n)}</option>)}
+                {[...(classiDisponibili)].sort((a, b) => a.localeCompare(b, lingua)).map((n) => <option key={n} value={n}>{formattaVoceConIcona(n)}</option>)}
               </select>
 
               {/* Livello iniziale: crea subito un PG di livello alto senza fare Level Up a mano */}
@@ -8977,7 +8979,7 @@ export default function App() {
                       type="checkbox"
                       checked={!!bozzaCrea.multiclasseClasse2}
                       onChange={(e) => {
-                        const listaC = manualiAttivi.tasha !== false ? [...NOMI_CLASSI, 'Artefice'] : NOMI_CLASSI;
+                        const listaC = classiDisponibili;
                         setB({ multiclasseClasse2: e.target.checked ? (listaC.find((n) => n !== bozzaCrea.classe) || '') : '', multiclasseLivello2: 1 });
                       }}
                     />
@@ -8987,7 +8989,7 @@ export default function App() {
                     const maxLiv2 = Math.max(1, 20 - Number(bozzaCrea.livello || 1));
                     const serveSubMc2 = Number(bozzaCrea.multiclasseLivello2 || 1) >= livelloSceltaSottoclasse(bozzaCrea.multiclasseClasse2, regoleVersione);
                     const scelteSubMc2 = serveSubMc2 ? sottoclassiPerClasse(bozzaCrea.multiclasseClasse2, manualiAttivi) : [];
-                    const listaC = manualiAttivi.tasha !== false ? [...NOMI_CLASSI, 'Artefice'] : NOMI_CLASSI;
+                    const listaC = classiDisponibili;
                     return (
                       <>
                         <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
@@ -9016,7 +9018,7 @@ export default function App() {
                       type="checkbox"
                       checked={!!bozzaCrea.multiclasseClasse3}
                       onChange={(e) => {
-                        const listaC = manualiAttivi.tasha !== false ? [...NOMI_CLASSI, 'Artefice'] : NOMI_CLASSI;
+                        const listaC = classiDisponibili;
                         setB({ multiclasseClasse3: e.target.checked ? (listaC.find((n) => n !== bozzaCrea.classe && n !== bozzaCrea.multiclasseClasse2) || '') : '', multiclasseLivello3: 1 });
                       }}
                     />
@@ -9026,7 +9028,7 @@ export default function App() {
                     const maxLiv3 = Math.max(1, 20 - Number(bozzaCrea.livello || 1) - Number(bozzaCrea.multiclasseLivello2 || 1));
                     const serveSubMc3 = Number(bozzaCrea.multiclasseLivello3 || 1) >= livelloSceltaSottoclasse(bozzaCrea.multiclasseClasse3, regoleVersione);
                     const scelteSubMc3 = serveSubMc3 ? sottoclassiPerClasse(bozzaCrea.multiclasseClasse3, manualiAttivi) : [];
-                    const listaC = manualiAttivi.tasha !== false ? [...NOMI_CLASSI, 'Artefice'] : NOMI_CLASSI;
+                    const listaC = classiDisponibili;
                     return (
                       <>
                         <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
@@ -11092,7 +11094,7 @@ export default function App() {
                           style={{ background: 'transparent', border: 'none', color: C.ink, fontFamily: 'inherit', width: '100%', outline: 'none', cursor: 'pointer', fontSize: 13 }}
                         >
                           <option value="">{t('crea.scegli')}</option>
-                          {[...NOMI_CLASSI].sort((a, b) => traduciDato(a).localeCompare(traduciDato(b), lingua)).map((n) => (
+                          {[...classiDisponibili].sort((a, b) => traduciDato(a).localeCompare(traduciDato(b), lingua)).map((n) => (
                             <option key={n} value={n}>{traduciDato(n)}</option>
                           ))}
                         </select>

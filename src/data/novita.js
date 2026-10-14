@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.105.7',
+    voci: {
+      it: ['Creazione personaggio: "Artefice" non compare più due volte, e solo col manuale Tasha attivo.'],
+      en: ['Character creation: "Artificer" no longer shows twice, and only with the Tasha book on.'],
+    },
+  },
+  {
     versione: '4.105.6',
     voci: {
       it: ['Classe Armatura: il numero è centrato e il menu Copertura è più stretto e centrato.'],
