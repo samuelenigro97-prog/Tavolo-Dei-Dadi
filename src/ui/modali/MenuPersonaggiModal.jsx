@@ -54,21 +54,22 @@ export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, apriNotifiche,
             style={{
               width: '100%', marginBottom: 10, padding: 10, borderRadius: 10, cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left', fontFamily: 'inherit',
-              color: C.ink, background: 'color-mix(in srgb, var(--c-gold) 13%, var(--c-panel-light))',
-              border: '1.5px solid var(--c-gold)', boxShadow: '0 5px 16px color-mix(in srgb, var(--c-gold) 19%, transparent)',
+              // Colori della classe del personaggio (--c-pg-*), non quelli base del menu.
+              color: C.ink, background: 'color-mix(in srgb, var(--c-pg-gold, var(--c-gold)) 16%, var(--c-panel-light))',
+              border: '1.5px solid var(--c-pg-gold, var(--c-gold))', boxShadow: '0 5px 16px color-mix(in srgb, var(--c-pg-gold, var(--c-gold)) 24%, transparent)',
             }}
           >
-            <span style={{ width: 44, height: 44, flexShrink: 0, overflow: 'hidden', display: 'grid', placeItems: 'center', borderRadius: 8, border: '1px solid var(--c-gold)', background: 'var(--c-panel)', color: 'var(--c-title)', fontSize: 22, fontWeight: 800 }}>
+            <span style={{ width: 44, height: 44, flexShrink: 0, overflow: 'hidden', display: 'grid', placeItems: 'center', borderRadius: 8, border: '1px solid var(--c-pg-gold, var(--c-gold))', background: 'var(--c-panel)', color: 'var(--c-pg-title, var(--c-title))', fontSize: 22, fontWeight: 800 }}>
               {typeof ultimoPersonaggio.ritratto === 'string' && ultimoPersonaggio.ritratto ? (
                 <img src={ultimoPersonaggio.ritratto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (ultimoPersonaggio.nome || '?').trim().slice(0, 1).toUpperCase()}
             </span>
             <span style={{ minWidth: 0, display: 'flex', flex: 1, flexDirection: 'column', gap: 2 }}>
-              <span style={{ ...etichettaSezione, color: C.inkDim, marginBottom: 0, lineHeight: 1.1 }}>{t('menu.ultimo_usato')}</span>
+              <span style={{ ...etichettaSezione, color: 'var(--c-pg-gold-dark, var(--c-gold-dark))', marginBottom: 0, lineHeight: 1.1 }}>{t('menu.ultimo_usato')}</span>
               <strong style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 16 }}>{ultimoPersonaggio.nome || t('menu.senza_nome')}</strong>
               <span style={{ color: C.inkDim, fontSize: 13 }}>{ultimoPersonaggio.classe || '—'} · {t('profilo.livello')} {ultimoPersonaggio.livello || 1}</span>
             </span>
-            <span style={{ color: 'var(--c-gold-dark)', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}>{t('menu.riprendi')}</span>
+            <span style={{ color: 'var(--c-pg-gold-dark, var(--c-gold-dark))', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}>{t('menu.riprendi')}</span>
           </button>
         )}
 

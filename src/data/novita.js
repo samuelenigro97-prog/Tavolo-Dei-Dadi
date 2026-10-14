@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.105.1',
+    voci: {
+      it: ['Menu iniziale: la card "Ultimo usato" ha i colori della classe del personaggio, il resto del menu resta sul tema base.'],
+      en: ['Start menu: the "Last used" card uses the character\'s class colours, the rest of the menu stays on the base theme.'],
+    },
+  },
+  {
     versione: '4.105.0',
     voci: {
       it: ['Il menu iniziale ha il tema base dell\'app, non i colori del personaggio. Bordi delle caratteristiche più marcati e i TS (es. "Costituzione · CD 17") nel colore della loro caratteristica, anche nelle creature e nella concentrazione.'],

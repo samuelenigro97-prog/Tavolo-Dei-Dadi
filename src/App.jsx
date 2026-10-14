@@ -1980,7 +1980,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.105.0';
+const APP_VERSION = '4.105.1';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4364,6 +4364,10 @@ export default function App() {
     set('--c-on-gold', testoSu(t.goldDark));
     // Colore della classe per angoli, bordi e controlli principali.
     set('--c-classe', t.gold);
+    // Copia con un altro nome, che il menu iniziale (tema base dell'app) non ridefinisce:
+    // serve alla card "Ultimo usato", l'unica parte del menu nei colori del personaggio.
+    set('--c-pg-gold', t.gold); set('--c-pg-gold-dark', t.goldDark); set('--c-pg-title', t.title);
+    set('--c-pg-border', t.border); set('--c-pg-panel-light', t.panelLight); set('--c-pg-panel', t.panel);
 
     const tintaClasse = accClasse ? accClasse[modo] : t.gold;
     const hexRgba = (hex, a) => {

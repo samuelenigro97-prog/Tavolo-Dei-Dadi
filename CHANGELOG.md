@@ -2,6 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.105.1] – 2026-10-14
+
+### Modificato
+- **Card "Ultimo usato" del menu nei colori della classe** del personaggio (verde per il
+  Druido, arancio per il Guerriero...): è l'unica parte del menu che li usa, il resto resta
+  sul tema base. La scheda esporta i colori della classe in variabili `--c-pg-*` che il tema
+  base del menu non ridefinisce.
+
 ## [4.105.0] – 2026-10-14
 
 ### Modificato
