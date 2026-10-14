@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.105.4',
+    voci: {
+      it: ['La barra in alto usa il tema base dell\'app. Il modificatore e il punteggio di ogni caratteristica hanno il colore del suo bordo.'],
+      en: ['The top bar uses the app\'s base theme. Each ability\'s modifier and score use its border colour.'],
+    },
+  },
+  {
     versione: '4.105.3',
     voci: {
       it: ['Combat tracker sul tema base dell\'app: i colori della classe restano solo sulla scheda del tuo personaggio e sulla pillola nel suo turno.'],

@@ -1980,7 +1980,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.105.3';
+const APP_VERSION = '4.105.4';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -9635,6 +9635,8 @@ export default function App() {
           className="selettore-personaggio barra-superiore-fissa"
           style={{
             ...styles.panel,
+            // Barra in alto sul tema base dell'app (come menu e combat tracker), non sui colori della classe.
+            ...stileTemaBase,
             borderTopLeftRadius: 0,
             borderTopRightRadius: 12,
             borderBottomRightRadius: 0,
@@ -11955,7 +11957,7 @@ export default function App() {
                         title={t('tip.cosa_governa')}
                         onClick={() => setInfo({ titolo: t('attr.' + key), testo: t('spieg.' + key) })}
                       >{t('attr.' + key).toUpperCase()}</div>
-                      <div style={{ flexShrink: 0, fontSize: 14, fontWeight: 'bold', color: C.goldDark, display: 'flex', alignItems: 'center' }} title={t('tip.punteggio_car')}>
+                      <div className="car-punteggio" style={{ flexShrink: 0, fontSize: 14, fontWeight: 'bold', color: C.goldDark, display: 'flex', alignItems: 'center' }} title={t('tip.punteggio_car')}>
                         <Editable
                           value={scheda.caratteristiche[key]}
                           tipo="numero"

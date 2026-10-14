@@ -2,6 +2,15 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.105.4] – 2026-10-14
+
+### Modificato
+- **Barra in alto sul tema base dell'app**, come il menu e il combat tracker, non coi colori
+  della classe del personaggio.
+- **Modificatore e punteggio delle caratteristiche nel colore del loro bordo** (il "4" di
+  Forza e il "4 → 19", il "2" di Destrezza...), leggermente avvicinati all'inchiostro del tema
+  per restare leggibili su ogni ambientazione.
+
 ## [4.105.3] – 2026-10-14
 
 ### Modificato

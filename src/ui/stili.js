@@ -1183,6 +1183,12 @@ tbody tr:hover {
 .blocco-car.car-intelligenza { --car: var(--c-car-intelligenza); }
 .blocco-car.car-saggezza { --car: var(--c-car-saggezza); }
 .blocco-car.car-carisma { --car: var(--c-car-carisma); }
+/* Modificatore e punteggio (4 → 19) nel colore del bordo del riquadro, un filo scurito/schiarito
+   verso l'inchiostro del tema perché restino leggibili su ogni ambientazione. */
+.blocco-car.car-colore .car-modificatore { color: color-mix(in srgb, var(--car) 80%, var(--c-ink)) !important; }
+/* Il punteggio è piccolo (14 px): più inchiostro, per il contrasto 4,5:1 anche col Carisma rosato. */
+.blocco-car.car-colore .car-punteggio,
+.blocco-car.car-colore .car-punteggio button { color: color-mix(in srgb, var(--car) 65%, var(--c-ink)) !important; }
 .blocco-car.car-colore { border-color: color-mix(in srgb, var(--car) 85%, var(--c-border)) !important; border-width: 1.5px !important; }
 .blocco-car.car-colore:hover {
   border-color: var(--car) !important;
