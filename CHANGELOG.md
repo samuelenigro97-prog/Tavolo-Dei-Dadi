@@ -2,6 +2,17 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.107.1] – 2026-10-15
+
+### Aggiunto
+- **Import con Google Gemini, gratis**: il Worker ora usa come primo fornitore Gemini (piano gratuito di
+  AI Studio, solo una chiave `GEMINI_API_KEY`, nessuna carta), che legge immagini e PDF a più pagine in una
+  richiesta sola ed è molto più preciso dei modelli gratuiti di Workers AI sulle icone e sulle tabelle.
+  Cascata di modelli (`GEMINI_MODEL` o predefiniti), passaggio al successivo su 404/429, e se nessun nome
+  noto risponde il Worker elenca i modelli e prova i "flash" più recenti da solo (`trascriviGemini`,
+  `estraiJsonScheda`, test con `fetch` finto). Ordine: Gemini → Workers AI → Ollama → Anthropic.
+  Va ripubblicato il Worker; istruzioni in `worker/LEGGIMI.md`.
+
 ## [4.107.0] – 2026-10-15
 
 ### Corretto

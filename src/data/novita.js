@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.107.1',
+    voci: {
+      it: ['Import schede con Google Gemini (gratis): serve solo una chiave gratuita nel Worker. Legge immagini e PDF a più pagine meglio dei modelli gratuiti di prima.'],
+      en: ['Sheet import with Google Gemini (free): only needs a free key in the Worker. It reads images and multi-page PDFs better than the free models used before.'],
+    },
+  },
+  {
     versione: '4.107.0',
     voci: {
       it: [

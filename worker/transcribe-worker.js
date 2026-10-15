@@ -18,6 +18,14 @@
  *              segreto insieme: nessun account, nessun token GitHub.
  *
  * Segreti/variabili (impostati con `wrangler secret put` o dal dashboard):
+ *   - GEMINI_API_KEY     (CONSIGLIATA, GRATIS) chiave di Google AI Studio (aistudio.google.com/apikey).
+ *                        È il primo fornitore tentato: legge immagini E PDF (anche a più pagine) e ha un
+ *                        piano gratuito con visione molto migliore dei modelli di Workers AI. Senza carta di
+ *                        credito. Nota: nel piano gratuito Google può usare i contenuti per migliorare i suoi
+ *                        prodotti (per una scheda di D&D non è un problema, per dati personali sì).
+ *   - GEMINI_MODEL       (opzionale) uno o più modelli separati da virgola, in ordine di preferenza
+ *                        (es. "gemini-2.5-flash,gemini-flash-latest"). Se non ne risponde nessuno il Worker
+ *                        elenca i modelli disponibili e prova i "flash" più recenti da solo.
  *   - ANTHROPIC_API_KEY  (opzionale, fallback per PDF) la tua chiave API Anthropic.
  *                        Se manca, i PDF non sono trascrivibili, ma le immagini (JPG/PNG/WebP)
  *                        funzionano comunque gratis via Workers AI o Ollama.
@@ -564,6 +572,73 @@ async function gestisciArchivio(request, env, headers, percorso) {
   return new Response(JSON.stringify({ error: 'Metodo non supportato su /pg' }), { status: 405, headers });
 }
 
+/** Estrae l'oggetto JSON dalla risposta di un modello (anche se circondato da testo o da ```json). */
+export function estraiJsonScheda(testo) {
+  const t = String(testo || '');
+  const inizio = t.indexOf('{');
+  const fine = t.lastIndexOf('}');
+  if (inizio === -1 || fine <= inizio) throw new Error('risposta non in formato JSON');
+  return JSON.parse(t.slice(inizio, fine + 1));
+}
+
+/**
+ * Trascrizione con Google Gemini (piano gratuito di AI Studio): immagini e PDF, una richiesta sola.
+ * Prova i modelli in ordine (GEMINI_MODEL o i predefiniti); su 404 (modello ritirato) o 429 (limite
+ * raggiunto) passa al successivo; se nessuno risponde elenca i modelli disponibili e prova i "flash"
+ * più recenti, così un cambio di nomi non rompe l'import. `fetchFn` si può sostituire nei test.
+ */
+export async function trascriviGemini(env, base64, mediaType, fetchFn = fetch) {
+  const chiave = String(env.GEMINI_API_KEY || '').trim();
+  if (!chiave) throw new Error('GEMINI_API_KEY mancante');
+  const base = 'https://generativelanguage.googleapis.com/v1beta';
+  const intestazioni = { 'content-type': 'application/json', 'x-goog-api-key': chiave };
+  const preferiti = String(env.GEMINI_MODEL || '').split(',').map((m) => m.trim()).filter(Boolean);
+  const candidati = [...preferiti, 'gemini-2.5-flash', 'gemini-flash-latest'];
+  const corpo = JSON.stringify({
+    contents: [{ parts: [{ inline_data: { mime_type: mediaType || 'image/jpeg', data: base64 } }, { text: PROMPT }] }],
+    generationConfig: { responseMimeType: 'application/json', temperature: 0, maxOutputTokens: 16384 },
+  });
+  const errori = [];
+  const prova = async (modello) => {
+    const r = await fetchFn(`${base}/models/${modello}:generateContent`, { method: 'POST', headers: intestazioni, body: corpo });
+    if (!r.ok) {
+      const txt = await r.text().catch(() => '');
+      const e = new Error(`${modello}: ${r.status} ${txt.slice(0, 160)}`);
+      e.stato = r.status;
+      throw e;
+    }
+    const j = await r.json();
+    const parti = j?.candidates?.[0]?.content?.parts || [];
+    const testo = parti.map((p) => p?.text || '').join('');
+    if (!testo) throw new Error(`${modello}: risposta vuota (${j?.candidates?.[0]?.finishReason || j?.promptFeedback?.blockReason || 'nessun motivo'})`);
+    return estraiJsonScheda(testo);
+  };
+  const visti = new Set();
+  for (const m of candidati.filter((x) => !visti.has(x) && visti.add(x))) {
+    try { return await prova(m); } catch (e) {
+      errori.push(e.message);
+      // 400/401/403: chiave o richiesta sbagliate, inutile insistere con altri modelli
+      if (e.stato === 400 || e.stato === 401 || e.stato === 403) throw new Error(errori.join(' | '));
+    }
+  }
+  // Nessun nome noto funziona: si chiede a Google quali modelli ci sono.
+  try {
+    const r = await fetchFn(`${base}/models?pageSize=200`, { headers: intestazioni });
+    if (r.ok) {
+      const j = await r.json();
+      const flash = (j.models || [])
+        .filter((m) => /flash/i.test(m.name) && !/lite|image|tts|live|audio|thinking|preview-0/i.test(m.name) && (m.supportedGenerationMethods || []).includes('generateContent'))
+        .map((m) => m.name.replace(/^models\//, ''))
+        .filter((m) => !visti.has(m))
+        .sort((a, b) => b.localeCompare(a, 'en', { numeric: true }));
+      for (const m of flash.slice(0, 3)) {
+        try { return await prova(m); } catch (e) { errori.push(e.message); }
+      }
+    }
+  } catch (e) { errori.push(`elenco modelli: ${e.message}`); }
+  throw new Error(`Gemini non ha risposto (${errori.join(' | ').slice(0, 500)})`);
+}
+
 export default {
   async fetch(request, env) {
     const reqOrigin = request.headers.get('Origin') || '';
@@ -602,6 +677,20 @@ export default {
     }
     const isImage = mediaType.startsWith('image/');
     let erroreWorkersPerFallback = '';
+
+    // 0) Gemini (gratis, immagini e PDF): è il primo tentativo se c'è la chiave. Se fallisce si passa
+    // agli altri fornitori configurati; se non ce ne sono si restituisce l'errore di Gemini.
+    let erroreGemini = '';
+    if (env.GEMINI_API_KEY && (isImage || mediaType === 'application/pdf')) {
+      try {
+        const scheda = await trascriviGemini(env, base64, mediaType || (isImage ? 'image/jpeg' : 'application/pdf'));
+        return new Response(JSON.stringify(scheda), { headers });
+      } catch (err) {
+        erroreGemini = String(err.message || err);
+        const altri = (isImage && (env.AI || env.OLLAMA_URL)) || env.ANTHROPIC_API_KEY;
+        if (!altri) return new Response(JSON.stringify({ error: `Gemini: ${erroreGemini}` }), { status: 502, headers });
+      }
+    }
 
     // 1) Se è un'immagine e Workers AI è disponibile → gratis, zero chiavi (10k req/giorno)
     // Prova una cascata di modelli vision EU-friendly. Fallback a Ollama e poi ad Anthropic.

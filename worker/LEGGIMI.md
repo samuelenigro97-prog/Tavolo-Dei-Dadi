@@ -9,8 +9,18 @@ API: la chiave vive qui, nel Worker.
 
 ## Cosa Ti Serve
 - Un account [Cloudflare](https://dash.cloudflare.com/sign-up) (gratis).
-- Una **chiave API Anthropic** (da <https://console.anthropic.com/>).
+- Una **chiave di Google Gemini, GRATIS** (consigliata): vai su <https://aistudio.google.com/apikey>,
+  accedi con un account Google e premi **Create API key**. Niente carta di credito. Legge immagini e
+  PDF (anche a più pagine) molto meglio dei modelli gratuiti di Cloudflare. Il nome del segreto è
+  `GEMINI_API_KEY`. Nel piano gratuito Google può usare i contenuti per migliorare i suoi prodotti:
+  per una scheda di D&D va bene.
+  - Alternativa a pagamento: una chiave API Anthropic (`ANTHROPIC_API_KEY`, <https://console.anthropic.com/>).
+  - Senza nessuna chiave restano le immagini via Workers AI (gratis ma meno precise) o Ollama.
 - Node.js installato (per il comando `npx wrangler`).
+
+L'ordine dei fornitori è: **Gemini** (se c'è `GEMINI_API_KEY`) → Workers AI → Ollama → Anthropic.
+Se uno fallisce si passa al successivo. Se Google cambia i nomi dei modelli il Worker li cerca da solo;
+per forzarne uno imposta `GEMINI_MODEL` (es. `gemini-2.5-flash`).
 
 ## Opzione A — Dal Sito Cloudflare (Senza Terminale, Consigliata)
 
@@ -19,7 +29,7 @@ API: la chiave vive qui, nel Worker.
 2. **Edit code**: cancella il codice di esempio, incolla tutto il contenuto di
    `worker/transcribe-worker.js` (questo file del progetto) → **Deploy**.
 3. **Settings → Variables and Secrets → Add**:
-   - tipo **Secret**, nome `ANTHROPIC_API_KEY`, valore = la tua chiave API. Salva.
+   - tipo **Secret**, nome `GEMINI_API_KEY` (o `ANTHROPIC_API_KEY`), valore = la tua chiave API. Salva.
    - (opzionale) tipo **Text**, nome `ALLOW_ORIGIN`, valore
      `https://TUOUTENTE.github.io` per limitarlo al tuo sito.
 4. In alto trovi l'URL del Worker (es.
@@ -32,7 +42,7 @@ API: la chiave vive qui, nel Worker.
 ```bash
 cd worker
 npx wrangler login                       # 1) accedi (apre il browser)
-npx wrangler secret put ANTHROPIC_API_KEY # 2) incolla la chiave API (nascosta)
+npx wrangler secret put GEMINI_API_KEY    # 2) incolla la chiave API (nascosta)
 npx wrangler deploy                       # 3) pubblica
 ```
 
