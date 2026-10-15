@@ -2,6 +2,32 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.107.0] – 2026-10-15
+
+### Corretto
+- **Import da PDF/immagini: la Maestria andava persa.** Il Worker scrive la Maestria come "2", ma nell'app
+  il 2 è solo un marcatore d'origine (vale ×1) e la Maestria è il 3 (×2): le doppie competenze (es. Inganno
+  +8 e Furtività +13 di Elevorn) arrivavano come competenze semplici. Ora si converte.
+
+### Aggiunto
+- **Le icone si controllano con i numeri** (`src/rules/importSchede.js`): il Worker ora legge anche i totali
+  stampati sulla scheda (`abilitaTotali`, `tiriSalvezzaTotali`) e l'app ricava da sola chi è competente
+  (totale − modificatore = 0, competenza o il doppio) senza fidarsi di stelle e cerchietti. Senza totali, se
+  quasi tutte le abilità risultano accese si azzerano (errore sulle stelle) e valgono le competenze del
+  background. A fine import un avviso elenca cosa è stato corretto.
+- **Unione delle schermate prima del controllo**: Main + Skills dello stesso personaggio si uniscono e solo
+  dopo si verificano i totali (la tab Skills da sola non ha i punteggi); i totali di schermate diverse si
+  fondono.
+- **"Fighter 1 / Ranger 6 / Rogue 3"** e le diciture italiane tipo "Spadaccino 4 / Warlock 1" (sottoclasse al
+  posto della classe → Ladro, Spadaccino) si leggono in classe, livello e multiclasse.
+- **Prompt del Worker**: regola "numeri prima delle icone", niente 10 o livello 1 inventati su schermate
+  parziali, guida per la scheda cartacea italiana a 4 pagine. **Per usarlo va ripubblicato il Worker**
+  (`cd worker && npx wrangler deploy`); le correzioni dell'app funzionano anche col Worker vecchio.
+
+### Modificato
+- **Combat tracker**: "−" (minimizza) e "✕" (chiudi) hanno la stessa forma tonda con contorno della ✕
+  della pillola ridotta.
+
 ## [4.106.1] – 2026-10-15
 
 ### Aggiunto

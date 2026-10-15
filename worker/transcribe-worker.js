@@ -85,6 +85,12 @@ Rispondi SOLO con un oggetto JSON valido, senza testo prima o dopo, con questo s
     "inganno": 0, "intimidire": 0, "intrattenere": 0, "intuizione": 0, "medicina": 0, "natura": 0,
     "percezione": 0, "persuasione": 0, "rapiditaDiMano": 0, "religione": 0, "sopravvivenza": 0, "storia": 0
   },
+  "abilitaTotali": {
+    "acrobazia": null, "addestrareAnimali": null, "arcano": null, "atletica": null, "furtivita": null, "indagare": null,
+    "inganno": null, "intimidire": null, "intrattenere": null, "intuizione": null, "medicina": null, "natura": null,
+    "percezione": null, "persuasione": null, "rapiditaDiMano": null, "religione": null, "sopravvivenza": null, "storia": null
+  },
+  "tiriSalvezzaTotali": { "forza": null, "destrezza": null, "costituzione": null, "intelligenza": null, "saggezza": null, "carisma": null },
   "attacchi": [ { "nome": "string", "bonus": number, "danno": "string — es. \\"2d6+3\\"; vuoto se assente", "tipoDanno": "string", "note": "string" } ],
   "incantatore": { "caratteristica": "forza|destrezza|costituzione|intelligenza|saggezza|carisma oppure vuoto se non incantatore" },
   "slotIncantesimo": { "1": number, "2": number, "3": number, "4": number, "5": number, "6": number, "7": number, "8": number, "9": number },
@@ -105,6 +111,19 @@ Rispondi SOLO con un oggetto JSON valido, senza testo prima o dopo, con questo s
   "addestramento": { "armature": { "leggera": boolean, "media": boolean, "pesante": boolean, "scudi": boolean }, "armi": "string", "strumenti": "string" },
   "denari": { "mr": number, "ma": number, "me": number, "mo": number, "mp": number }
 }
+
+NUMERI PRIMA DELLE ICONE (MOLTO IMPORTANTE):
+- Le icone (stelle, cerchietti, caselle spuntate) si leggono male; i NUMERI no. Quindi copia SEMPRE i totali stampati sulla scheda:
+  * "abilitaTotali": il numero nella colonna TOTAL / accanto al nome di ogni abilità (es. "+9" → 9, "-1" → -1). Se la casella è VUOTA scrivi 0 (la scheda lascia vuoto il totale 0). Se l'abilità non compare in nessuna schermata scrivi null.
+  * "tiriSalvezzaTotali": il numero dei SAVES / tiri salvezza di ciascuna caratteristica (es. "+6" → 6, "0" → 0). null se non visibile.
+  L'app confronta questi totali con i modificatori e ricava da sola chi è competente e chi ha maestria: non provare a indovinarlo dai colori, limitati a leggere bene i numeri. Anche "abilita" e "tiriSalvezza" vanno compilati, ma i totali hanno la precedenza.
+- Se la schermata non contiene un dato (es. solo la tab SKILLS, senza caratteristiche o livello) lascia quel campo vuoto/null: NON inventare 10 né livello 1 per riempire.
+
+COME LEGGERE LA SCHEDA CARTACEA ITALIANA (PDF a 4 pagine, es. "D&D 5e"):
+- Pagina 1: in alto "Classe e livello" (es. "Spadaccino 4 / Warlock 1"), background, razza, allineamento. Se un termine è il nome di una SOTTOCLASSE (Spadaccino, Assassino, Campione...), mettilo in "sottoclasse" e usa la sua classe (Spadaccino → Ladro) in "classe". Il primo numero è il livello della classe principale; le altre voci vanno in "multiclasse". Nei riquadri delle caratteristiche il numero grande è il modificatore, quello piccolo nel cerchio il punteggio (di solito il contrario di come sembra: controlla che punteggio e modificatore siano coerenti, mod = (punteggio-10)/2 arrotondato per difetto). I cerchietti pieni accanto ai tiri salvezza e alle abilità indicano la competenza; leggi anche il numero accanto.
+- Pagina 2: competenze (armature, armi, strumenti), lingue, privilegi di classe e tratti di specie, talenti; descrizione fisica, storia e tratti caratteriali.
+- Pagina 3: inventario con pesi (colonna PESO), monete, oggetti magici e sintonia, cavalcatura/compagni.
+- Pagina 4: caratteristica da incantatore, CD, bonus ad attacco, slot per livello, elenco degli incantesimi per livello (spunta = preparato).
 
 Regole:
 - Le caratteristiche sono i punteggi (1-30), non i modificatori.

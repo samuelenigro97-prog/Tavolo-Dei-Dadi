@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.107.0',
+    voci: {
+      it: [
+        'Import da PDF e immagini più affidabile: le competenze si ricavano dai totali della scheda, non dalle stelle; la Maestria non si perde più; "Fighter 1 / Ranger 6 / Rogue 3" si legge da solo. A fine import un avviso dice cosa è stato corretto.',
+        'Combat tracker: minimizza e chiudi hanno la stessa forma tonda della pillola.',
+      ],
+      en: [
+        'More reliable PDF and image import: proficiencies come from the sheet totals, not the stars; Expertise is no longer lost; "Fighter 1 / Ranger 6 / Rogue 3" is read on its own. A notice lists what was fixed.',
+        'Combat tracker: minimise and close share the pill\'s round shape.',
+      ],
+    },
+  },
+  {
     versione: '4.106.1',
     voci: {
       it: ['Lo sfondo ha un leggero movimento lento (si ferma con "riduci movimento"). Classe Armatura: Copertura larga come il menu sotto e riga base/scudo più spaziata.'],

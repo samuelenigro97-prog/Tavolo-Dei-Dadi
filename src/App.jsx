@@ -9,6 +9,7 @@ import { styles, GLOBAL_CSS } from './ui/stili.js';
 import { Editable, Rollable, iconaTipoDanno, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, caratteristicaDaTesto, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
 import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, attaccoIncantesimoAttivo, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
+import { normalizzaTrascrizione } from './rules/importSchede.js';
 import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } from "./data/esempi.js";
 import { fixEquipaggiamentoVaelion, migrazioneRegoleVaelion, autoIdratazionePersonaggioPredefinito } from './data/migrazioniPersonaggi.js';
 import { CARATTERISTICHE, ABILITA } from './data/caratteristiche.js';
@@ -1988,7 +1989,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.106.1';
+const APP_VERSION = '4.107.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -2033,6 +2034,10 @@ function unisciSchedeFG(lista) {
       } else if (k === 'tiriSalvezza' && cur.tiriSalvezza && base.tiriSalvezza) {
         base.tiriSalvezza = { ...base.tiriSalvezza };
         for (const tk in cur.tiriSalvezza) if (cur.tiriSalvezza[tk]) base.tiriSalvezza[tk] = true;
+      } else if ((k === 'abilitaTotali' || k === 'tiriSalvezzaTotali') && cur[k] && typeof cur[k] === 'object') {
+        // Totali letti su schermate diverse: vale il primo numero trovato per ogni voce.
+        base[k] = { ...(base[k] || {}) };
+        for (const tk in cur[k]) if (typeof cur[k][tk] === 'number' && typeof base[k][tk] !== 'number') base[k][tk] = cur[k][tk];
       } else if (k === 'caratteristiche' && cur.caratteristiche && base.caratteristiche) {
         base.caratteristiche = { ...base.caratteristiche };
         for (const ck in cur.caratteristiche) if (cur.caratteristiche[ck] && cur.caratteristiche[ck] !== 10) base.caratteristiche[ck] = cur.caratteristiche[ck];
@@ -4449,6 +4454,8 @@ export default function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roster.attivo]);
+  // Tasto tondo con contorno (minimizza e chiudi nel combat tracker, pillola ridotta compresa).
+  const stileTastoTondo = { padding: '1px 8px', borderRadius: 14, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 700, lineHeight: 1.4, minWidth: 28, background: 'transparent' };
   const intervalRef = useRef(null);
   const jsonRef = useRef(null);
   const pdfRef = useRef(null);
@@ -6354,23 +6361,24 @@ export default function App() {
       setPdfStato('loading');
       try {
         const trascrizioni = [];
+        const avvisiImport = []; // correzioni automatiche fatte sui dati letti dall'IA
         for (const file of imageFiles) {
           const name = file.name.toLowerCase();
           // Riconoscimento istantaneo per file di personaggi noti (es. Lyrian Faenor, Vaelion, Wendell, Elevorn, Flyora)
           if (/lyrian|faenor|mezzafaccia/i.test(name)) {
-            trascrizioni.push({ ...LYRIAN_JSON });
+            trascrizioni.push({ ...LYRIAN_JSON, __noto: true }); // scheda già nella scala dell'app: niente correzioni
             continue;
           } else if (/vaelion/i.test(name)) {
-            trascrizioni.push({ ...VAELION_JSON });
+            trascrizioni.push({ ...VAELION_JSON, __noto: true }); // scheda già nella scala dell'app: niente correzioni
             continue;
           } else if (/wendell/i.test(name)) {
-            trascrizioni.push({ ...WENDELL_JSON });
+            trascrizioni.push({ ...WENDELL_JSON, __noto: true }); // scheda già nella scala dell'app: niente correzioni
             continue;
           } else if (/elevorn/i.test(name)) {
-            trascrizioni.push({ ...ELEVORN_JSON });
+            trascrizioni.push({ ...ELEVORN_JSON, __noto: true }); // scheda già nella scala dell'app: niente correzioni
             continue;
           } else if (/flyora/i.test(name)) {
-            trascrizioni.push({ ...FLYORA_JSON });
+            trascrizioni.push({ ...FLYORA_JSON, __noto: true }); // scheda già nella scala dell'app: niente correzioni
             continue;
           }
 
@@ -6467,8 +6475,8 @@ export default function App() {
           if (!res) {
             throw lastErr || new Error(`Impossibile contattare l'endpoint IA (${endpoint})`);
           }
-          const dati = await res.json();
-          trascrizioni.push(dati);
+          const letti = await res.json();
+          trascrizioni.push(letti?.scheda && typeof letti.scheda === 'object' ? letti.scheda : letti);
         }
         if (trascrizioni.length) {
           // Raggruppa per nome PG oppure unisce tutte le schermate se appartengono allo stesso PG
@@ -6478,11 +6486,22 @@ export default function App() {
             if (!perNome[k]) perNome[k] = [];
             perNome[k].push(d);
           }
+          // Prima si uniscono le schermate dello stesso personaggio (Main + Skills...), POI si
+          // controllano le icone con i numeri: la sola tab Skills non ha i punteggi delle caratteristiche.
+          // Fuori da setRoster, che React esegue più tardi (altrimenti l'avviso non comparirebbe).
+          const fuse = {};
+          for (const k in perNome) {
+            const unita = unisciSchedeFG(perNome[k]);
+            if (perNome[k].some((d) => d?.__noto)) { fuse[k] = unita; continue; }
+            const { dati: corretta, correzioni } = normalizzaTrascrizione(unita);
+            if (correzioni.length) avvisiImport.push(`${corretta?.nome || k}:\n• ${correzioni.join('\n• ')}`);
+            fuse[k] = corretta;
+          }
           setRoster((r) => {
             const personaggi = { ...r.personaggi };
             let ultimo = r.attivo;
             for (const k in perNome) {
-              const schedaFusa = unisciSchedeFG(perNome[k]);
+              const schedaFusa = fuse[k];
               const norm = normalizeImported(forzaVersione(schedaFusa));
               const chiave = String(norm.nome || '').toLowerCase().trim();
               const idEsistente = chiave ? Object.keys(personaggi).find((id) => String(personaggi[id]?.nome || '').toLowerCase().trim() === chiave) : null;
@@ -6496,6 +6515,7 @@ export default function App() {
         }
         setPdfStato('');
         setMostraMenu(false);
+        if (avvisiImport.length) setInfo({ titolo: tr('Import: correzioni automatiche', 'Import: automatic fixes'), testo: avvisiImport.join('\n\n') });
       } catch (e) {
         setPdfStato('');
         const dove = (transcribeUrl || URL_ARCHIVIO_PG || URL_STANZE || '').trim() ? 'Controlla endpoint IA.' : 'Configura endpoint IA.';
@@ -17818,8 +17838,11 @@ export default function App() {
                 >
                   Area
                 </button>
+                {/* Minimizza e chiudi: stessa forma tonda con contorno della ✕ della pillola ridotta. */}
                 <button
-                  style={{ ...styles.buttonMini, padding: '3px 7px' }}
+                  type="button"
+                  data-testid="ct-minimizza"
+                  style={{ ...stileTastoTondo, color: 'var(--c-gold-dark)', border: '1.5px solid var(--c-gold-dark)' }}
                   onClick={() => setCombat((c) => ({ ...c, aperto: false }))}
                   title={t('ct.minimizza')}
                   aria-label={t('ct.minimizza')}
@@ -17827,9 +17850,12 @@ export default function App() {
                   −
                 </button>
                 <button
-                  style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '3px 7px' }}
+                  type="button"
+                  data-testid="ct-chiudi"
+                  style={{ ...stileTastoTondo, color: 'var(--c-red)', border: '1.5px solid var(--c-red)' }}
                   onClick={() => { if (window.confirm(t('ct.fine_conferma'))) setCombat({ attivo: false, aperto: true, round: 1, turno: 0, combattenti: [] }); }}
                   title={t('ct.fine')}
+                  aria-label={t('ct.fine')}
                 >
                   ✕
                 </button>
@@ -18329,7 +18355,7 @@ export default function App() {
               e.stopPropagation();
               if (window.confirm(t('ct.fine_conferma'))) setCombat({ attivo: false, aperto: true, round: 1, turno: 0, combattenti: [] });
             }}
-            style={{ marginLeft: 2, padding: '1px 7px', borderRadius: 12, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 700, lineHeight: 1.3, color: 'var(--c-red)', background: 'transparent', border: '1.5px solid var(--c-red)' }}
+            style={{ ...stileTastoTondo, marginLeft: 2, color: 'var(--c-red)', border: '1.5px solid var(--c-red)' }}
           >
             ✕
           </button>
