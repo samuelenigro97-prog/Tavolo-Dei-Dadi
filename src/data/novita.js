@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.107.2',
+    voci: {
+      it: ['Menu iniziale, barra in alto e combat tracker con lo stesso grigio e lo stesso bordo del tema generico.', 'Il menu iniziale sta tutto nello schermo, senza barra per scorrere.'],
+      en: ['Start menu, top bar and combat tracker share the same gray and border of the generic theme.', 'The start menu fits the screen, with no scrollbar.'],
+    },
+  },
+  {
     versione: '4.107.1',
     voci: {
       it: ['Import schede con Google Gemini (gratis): serve solo una chiave gratuita nel Worker. Legge immagini e PDF a più pagine meglio dei modelli gratuiti di prima.'],

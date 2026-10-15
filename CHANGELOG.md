@@ -2,6 +2,17 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.107.2] – 2026-10-15
+
+### Modificato
+- **Tema generico unico**: menu iniziale, barra in alto e combat tracker (aperto e ridotto) usano lo
+  stesso grigio e lo stesso bordo, quelli del menu iniziale (`--c-tema-sfondo`, `--c-tema-bordo` in
+  `stileTemaBase`). Tolto il grigio a parte della barra in tema scuro e il bordo oro del tracker.
+- **Menu iniziale tutto nello schermo**: niente barra di scorrimento; tasti affiancati (Personaggio
+  casuale e Manuali, Importa ed esporta e Backup, Dati e backup su una riga), spaziature più strette,
+  il pannello parte sotto la barra fissa (prima su telefono la barra copriva il titolo). Sugli schermi
+  bassi i tasti si stringono ancora un po'.
+
 ## [4.107.1] – 2026-10-15
 
 ### Aggiunto

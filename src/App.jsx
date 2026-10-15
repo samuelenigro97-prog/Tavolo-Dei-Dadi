@@ -1989,7 +1989,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.107.1';
+const APP_VERSION = '4.107.2';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4438,6 +4438,9 @@ export default function App() {
       '--c-classe': t.gold, '--c-aura-color': t.gold,
       '--c-border-glow-min': rgba(t.gold, notteAttiva ? 0.45 : 0.30), '--c-border-glow-max': rgba(t.gold, notteAttiva ? 0.85 : 0.65),
       '--c-aura-glow-min': rgba(t.gold, notteAttiva ? 0.14 : 0.06), '--c-aura-glow-pulse-1': rgba(t.gold, notteAttiva ? 0.36 : 0.18),
+      // Grigio e bordo del tema generico: uguali per menu iniziale, barra in alto e combat tracker.
+      '--c-tema-sfondo': `color-mix(in srgb, ${t.panelLight} 85%, ${t.ink} 15%)`,
+      '--c-tema-bordo': `color-mix(in srgb, ${t.ink} 38%, ${t.border})`,
     };
   }, [notteAttiva]);
   // Classi scegliibili: l'Artefice (Tasha) solo con quel manuale attivo, mai due volte.
@@ -9722,14 +9725,14 @@ export default function App() {
               fontWeight: 800,
               letterSpacing: 0.6,
               textTransform: 'uppercase',
-              color: C.goldDark,
+              // Oro scurito verso l'inchiostro: leggibile sul grigio del tema generico.
+              color: 'color-mix(in srgb, var(--c-gold-dark) 60%, var(--c-ink))',
               marginRight: 6,
               userSelect: 'none',
               whiteSpace: 'nowrap',
               display: 'inline-flex',
               alignItems: 'center',
               gap: 3,
-              opacity: 0.9,
               fontFamily: 'var(--font-title)',
             };
 
@@ -17683,7 +17686,7 @@ export default function App() {
 
       {/* ===== Combat tracker: barra fissa in basso (stile Fantasy Grounds) ===== */}
       {combat.attivo && combat.aperto ? (
-        <div ref={combatRef} data-testid="combat-tracker" style={{ ...stileTemaBase, position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 1500, background: C.panel, borderTop: `2px solid var(--c-gold-dark)`, boxShadow: '0 -6px 24px rgba(0,0,0,0.45)' }}>
+        <div ref={combatRef} data-testid="combat-tracker" style={{ ...stileTemaBase, position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 1500, background: 'var(--c-tema-sfondo)', borderTop: '1.5px solid var(--c-tema-bordo)', boxShadow: '0 -6px 24px rgba(0,0,0,0.45)' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', padding: '8px 12px' }}>
             {/* BARRA SUPERIORE CONTROLLI COMBAT TRACKER */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 8, paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
@@ -18312,8 +18315,8 @@ export default function App() {
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            background: 'var(--c-panel)',
-            border: '2px solid var(--c-gold-dark)',
+            background: 'var(--c-tema-sfondo)',
+            border: '1.5px solid var(--c-tema-bordo)',
             color: 'var(--c-gold-dark)',
             padding: '7px 14px',
             borderRadius: 24,

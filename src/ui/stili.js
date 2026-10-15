@@ -1728,13 +1728,11 @@ tbody tr:hover {
   z-index: 1200 !important;
   backdrop-filter: blur(14px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
-  background: color-mix(in srgb, var(--c-panel) 95%, transparent) !important;
+  /* Grigio e bordo del tema generico (--c-tema-*, da stileTemaBase): gli stessi del menu
+     iniziale e del combat tracker. In tema scuro il grigio si stacca dallo sfondo della scheda. */
+  background: color-mix(in srgb, var(--c-tema-sfondo, var(--c-panel)) 96%, transparent) !important;
+  border: 1.5px solid var(--c-tema-bordo, var(--c-border)) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
-  /* Tema scuro: grigio scuro e non nero, così la barra si stacca dallo sfondo della scheda. */
-}
-:root[data-tema="scuro"] .barra-superiore-fissa {
-  background: color-mix(in srgb, #2a2a31 96%, transparent) !important;
-  border-color: color-mix(in srgb, var(--c-ink) 18%, #2a2a31) !important;
   border-top-left-radius: 0 !important;
   border-top-right-radius: 12px !important;
   border-bottom-right-radius: 0 !important;
@@ -1743,6 +1741,20 @@ tbody tr:hover {
   overflow-x: auto !important;
   overflow-y: hidden !important;
   scrollbar-width: none;
+}
+/* Menu iniziale: sotto la barra fissa e tutto nello schermo, senza barra di scorrimento. */
+.menu-iniziale-sfondo { padding: 58px 12px 12px; }
+.menu-iniziale::-webkit-scrollbar { display: none; }
+@media (max-width: 480px) {
+  .menu-iniziale-sfondo { padding: 50px 8px 8px; }
+  .menu-iniziale h1 { font-size: 20px !important; }
+  .menu-iniziale button, .menu-iniziale a { font-size: 13px !important; }
+}
+@media (max-height: 660px) {
+  .menu-iniziale button:not([data-testid="continua-ultimo-pg"]), .menu-iniziale a { min-height: 30px !important; padding-top: 3px !important; padding-bottom: 3px !important; }
+  .menu-iniziale { padding: 8px 10px !important; }
+  .menu-iniziale h1 { font-size: 18px !important; margin-bottom: 4px !important; }
+  .menu-iniziale-sfondo { padding-top: 47px; padding-bottom: 6px; }
 }
 .barra-superiore-fissa::-webkit-scrollbar {
   display: none;
