@@ -1765,21 +1765,29 @@ function trovaArmatura(nome) {
 function eScudo(nome) {
   return /scudo|shield/i.test(String(nome || ''));
 }
+/** "(CA 14)" già scritto nel nome di un oggetto salvato: da togliere dal nome e riscrivere come "CA +14". */
+const RE_CA_NEL_NOME = /\s*\(\s*CA\s*\+?(\d+)\s*\)/i;
+/** Nome dell'oggetto senza l'eventuale "(CA n)" scritto a mano: la CA si mostra a parte, sempre come "CA +n". */
+function nomeSenzaCa(nome) {
+  return String(nome || '').replace(RE_CA_NEL_NOME, '');
+}
 /**
- * CA di un oggetto dell'inventario da mostrare tra parentesi accanto al nome:
- * "CA 14" per un'armatura, "CA +2" per uno scudo, "CA +1" per un oggetto magico
- * che dà CA (+1/+2/+3 nel nome si somma). '' se il nome la riporta già
- * (es. "Corazza a Piastre in Legnoferro (CA 14)") o l'oggetto non dà CA.
+ * CA di un oggetto dell'inventario da mostrare tra parentesi accanto al nome, SEMPRE nella
+ * forma "CA +valore": "CA +14" per un'armatura, "CA +2" per uno scudo, "CA +1" per un
+ * oggetto magico che dà CA (+1/+2/+3 nel nome si somma). Un "(CA 14)" già scritto nel nome
+ * si legge da lì. '' se l'oggetto non dà CA.
  */
 function etichettaCaOggetto(o) {
   const nome = String(o?.nome || '');
-  if (!nome || /\bCA\s*\+?\d/i.test(nome)) return '';
+  const scritta = RE_CA_NEL_NOME.exec(nome);
+  if (scritta) return `CA +${scritta[1]}`;
+  if (!nome) return '';
   const magia = /\+([123])\b/.exec(nome);
   const bonus = magia ? Number(magia[1]) : 0;
   if (/^(scudo|shield)\b/i.test(nome.trim())) return `CA +${2 + bonus}`;
   const eArmatura = o?.categoria === 'Armatura' || /^(armatura|corazza|cotta|giaco|mezza armatura|cuoio)/i.test(nome.trim());
   const arm = eArmatura ? trovaArmatura(nome) : null;
-  if (arm) return `CA ${arm.base + bonus}`;
+  if (arm) return `CA +${arm.base + bonus}`;
   if (o?.effettoMeccanico === 'classe_armatura_tiri_salvezza_1') return 'CA +1';
   const m = /^classe_armatura_([123])$/.exec(o?.effettoMeccanico || '');
   return m ? `CA +${m[1]}` : '';
@@ -1980,7 +1988,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.105.7';
+const APP_VERSION = '4.106.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4367,6 +4375,7 @@ export default function App() {
     // Copia con un altro nome, che il menu iniziale (tema base dell'app) non ridefinisce:
     // serve alla card "Ultimo usato", l'unica parte del menu nei colori del personaggio.
     set('--c-pg-gold', t.gold); set('--c-pg-gold-dark', t.goldDark); set('--c-pg-title', t.title);
+    set('--c-pg-on-gold', testoSu(t.goldDark));
     set('--c-pg-border', t.border); set('--c-pg-panel-light', t.panelLight); set('--c-pg-panel', t.panel);
 
     const tintaClasse = accClasse ? accClasse[modo] : t.gold;
@@ -4426,16 +4435,20 @@ export default function App() {
       '--c-aura-glow-min': rgba(t.gold, notteAttiva ? 0.14 : 0.06), '--c-aura-glow-pulse-1': rgba(t.gold, notteAttiva ? 0.36 : 0.18),
     };
   }, [notteAttiva]);
-  // Colori della classe del personaggio (--c-pg-*, definiti sulla radice) rimappati sulle
-  // variabili normali: servono dentro il combat tracker, che usa il tema base dell'app,
-  // per la scheda del PG e per la pillola ridotta quando è il suo turno.
-  const stileColoriPg = {
-    '--c-gold': 'var(--c-pg-gold)', '--c-gold-dark': 'var(--c-pg-gold-dark)', '--c-title': 'var(--c-pg-title)',
-    '--c-border': 'var(--c-pg-border)', '--c-panel-light': 'var(--c-pg-panel-light)', '--c-panel': 'var(--c-pg-panel)',
-    '--c-classe': 'var(--c-pg-gold)', '--c-aura-color': 'var(--c-pg-gold)',
-  };
   // Classi scegliibili: l'Artefice (Tasha) solo con quel manuale attivo, mai due volte.
   const classiDisponibili = NOMI_CLASSI.filter((n) => n !== 'Artefice' || manualiAttivi.tasha !== false);
+  // Manuale della campagna (Araldi del Segreto): acceso solo con la password, dal menu Manuali e fonti.
+  const araldiAttivo = manualeAttivo(manualiAttivi, 'araldi');
+  // Aprendo un personaggio, Competenze e Risorse di classe sono sempre aperte. Poteri parte
+  // chiusa e, da lì in poi, ricorda l'ultima scelta (come tutte le altre sezioni).
+  useEffect(() => {
+    if (!scheda || isSolaLettura) return;
+    const a = scheda.sezioniAperte || {};
+    if (a.addestramento === false || a.risorse === false) {
+      aggiorna({ sezioniAperte: { ...a, addestramento: true, risorse: true } });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roster.attivo]);
   const intervalRef = useRef(null);
   const jsonRef = useRef(null);
   const pdfRef = useRef(null);
@@ -4681,12 +4694,9 @@ export default function App() {
   useEffect(() => {
     if (!scheda || isSolaLettura || !Array.isArray(scheda.poteri)) return;
     const usaAraldi = scheda.poteri.some((p) => p?.modello === 'araldi-del-segreto');
-    if (!usaAraldi) return;
+    // Il manuale non si accende più da solo: serve la password. Senza manuale, niente da inserire.
+    if (!usaAraldi || !araldiAttivo) return;
     try {
-      if (!localStorage.getItem('scheda-interattiva:araldi-manuale-auto')) {
-        localStorage.setItem('scheda-interattiva:araldi-manuale-auto', '1');
-        if (manualiAttivi?.araldi !== true) setManualiAttivi((m) => ({ ...m, araldi: true }));
-      }
       const chiave = `scheda-interattiva:araldi-incantesimi:${roster.attivo}`;
       if (!localStorage.getItem(chiave)) {
         const nuovi = incantesimiAraldiMancanti(scheda);
@@ -4697,7 +4707,7 @@ export default function App() {
       }
     } catch { /* niente */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scheda?.poteri, scheda?.slotIncantesimo, roster.attivo]);
+  }, [scheda?.poteri, scheda?.slotIncantesimo, roster.attivo, araldiAttivo]);
 
   // Corregge definitivamente anche le schede create/importate prima
   // dell'automatismo, senza ritardare i calcoli del render corrente.
@@ -6263,14 +6273,13 @@ export default function App() {
 
   // Snapshot automatici: rete di sicurezza contro cancellazioni/reset accidentali.
   // Sono leggeri (senza immagini) per non riempire lo spazio del browser.
-  /** Rimette i Poteri della campagna (Potere del Patrono + Araldi del Segreto) e
-   *  attiva il manuale degli Araldi se era spento. */
+  /** Rimette i Poteri della campagna (Potere del Patrono + Araldi del Segreto). Si offre solo
+   *  col manuale degli Araldi attivo (che si accende con la password). */
   function ripristinaPoteriCampagna() {
     // I contatori già presenti (es. Debito) tengono il valore attuale.
     const poteri = unisciPoteriCampagna(scheda.poteri, (p, i, c) => valoreContatore(scheda, p.id, i, c).attuali);
     const base = (scheda.risorse || []).filter((r) => !String(r?.id || '').startsWith('potere-'));
     aggiorna({ poteri, risorse: sincronizzaRisorsePoteri(poteri, base, livelloTotaleScheda(scheda), scheda.bonusCompetenza) });
-    if (manualiAttivi?.araldi !== true) setManualiAttivi((m) => ({ ...m, araldi: true }));
     registra({ etichetta: tr('Poteri della campagna ripristinati', 'Campaign powers restored'), tipo: 'privilegio', dettaglio: tr('Potere del Patrono e Araldi del Segreto', "Patron's Power and Heralds of the Secret") });
   }
   function leggiSnapshots() {
@@ -10776,18 +10785,20 @@ export default function App() {
               </div>
 
               {/* Tier 3b: Poteri (Segreti, Debito, usi dei privilegi...) separati dalle risorse di classe */}
-              <div className="risorse-tier-3 profilo-risorse-box profilo-poteri-box" style={{ marginTop: 10 }}>
-                <Sezione titolo={lingua === 'en' ? 'Powers' : 'Poteri'} senzaAngoli={true} {...apertoProps('poteriRisorse')}>
+              {araldiAttivo && (
+              <div className="risorse-tier-3 profilo-risorse-box profilo-poteri-box" style={{ marginTop: 10 }} data-testid="poteri-riquadro">
+                <Sezione titolo={lingua === 'en' ? 'Powers' : 'Poteri'} senzaAngoli={true} {...apertoProps('poteriRisorse', false)}>
                   <PoteriRisorse
                     scheda={scheda}
                     aggiorna={aggiorna}
                     lingua={lingua}
                     registra={registra}
                     mostraInfo={setInfo}
-                    ripristinoCampagna={!isSolaLettura && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null}
+                    ripristinoCampagna={!isSolaLettura && araldiAttivo && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null}
                   />
                 </Sezione>
               </div>
+              )}
             </div>
 
             {/* COLONNA CENTRALE: anagrafica + riquadri vitali */}
@@ -11547,6 +11558,26 @@ export default function App() {
                     </span>
                   )}
                 </div>
+                <div style={{ marginTop: 3, width: '100%', display: 'flex', justifyContent: 'center' }}>
+                  <select
+                    data-testid="ca-copertura"
+                    style={{ ...styles.inlineInput, fontSize: 11, padding: '1px 3px', width: '62%', maxWidth: '100%', color: (scheda.copertura && scheda.copertura !== 'nessuna') ? C.green : C.inkDim, fontWeight: (scheda.copertura && scheda.copertura !== 'nessuna') ? 700 : 400 }}
+                    value={scheda.copertura || 'nessuna'}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      aggiorna({ copertura: v });
+                      const copInfo = TIPI_COPERTURA_5E.find((c) => c.key === v);
+                      if (v !== 'nessuna') {
+                        registra({ etichetta: 'Copertura', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'}: ${lingua === 'en' ? copInfo.labelEn : copInfo.labelIt}` });
+                      }
+                    }}
+                    title="Copertura 5e: +2 CA/TS Des (mezza), +5 CA/TS Des (tre quarti), totale"
+                  >
+                    {TIPI_COPERTURA_5E.map((c) => (
+                      <option key={c.key} value={c.key}>{lingua === 'en' ? c.labelEn : c.labelIt}</option>
+                    ))}
+                  </select>
+                </div>
                 <select
                   aria-label={tr('Tipo di armatura', 'Armor type')}
                   style={{ ...styles.inlineInput, fontSize: 11, padding: '1px 3px', maxWidth: '100%', marginTop: 2 }}
@@ -11561,7 +11592,7 @@ export default function App() {
                     aggiorna({ armatura: { ...scheda.armatura, tipo, base } });
                   }}
                 >
-                  {TIPI_ARMATURA.map((ta) => {
+                  {TIPI_ARMATURA.filter((ta) => ta.key !== 'manuale' || scheda.armatura.tipo === 'manuale').map((ta) => {
                     const bloccato = !competenteInArmatura(scheda, ta.key);
                     // Niente lucchetto: l'opzione resta semplicemente non selezionabile.
                     return <option key={ta.key} value={ta.key} disabled={bloccato}>{t('armor.' + ta.key)}</option>;
@@ -11594,26 +11625,6 @@ export default function App() {
                     <span title={tr('Bonus manuale alla CA: mettilo a 0 per toglierlo', 'Manual AC bonus: set it to 0 to remove it')}>+ <Editable value={scheda.armatura.bonus} tipo="numero" width={22} onChange={(v) => aggiorna({ armatura: { ...scheda.armatura, bonus: v } })} /></span>
                   )}
                   {bonusClasseArmaturaOggetti(scheda) > 0 && <span title={t('inv.effetto_attivo')}>✨ +{bonusClasseArmaturaOggetti(scheda)}</span>}
-                </div>
-                <div style={{ marginTop: 3, width: '100%', display: 'flex', justifyContent: 'center' }}>
-                  <select
-                    data-testid="ca-copertura"
-                    style={{ ...styles.inlineInput, fontSize: 11, padding: '1px 3px', width: '78%', maxWidth: '100%', color: (scheda.copertura && scheda.copertura !== 'nessuna') ? C.green : C.inkDim, fontWeight: (scheda.copertura && scheda.copertura !== 'nessuna') ? 700 : 400 }}
-                    value={scheda.copertura || 'nessuna'}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      aggiorna({ copertura: v });
-                      const copInfo = TIPI_COPERTURA_5E.find((c) => c.key === v);
-                      if (v !== 'nessuna') {
-                        registra({ etichetta: 'Copertura', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'}: ${lingua === 'en' ? copInfo.labelEn : copInfo.labelIt}` });
-                      }
-                    }}
-                    title="Copertura 5e: +2 CA/TS Des (mezza), +5 CA/TS Des (tre quarti), totale"
-                  >
-                    {TIPI_COPERTURA_5E.map((c) => (
-                      <option key={c.key} value={c.key}>{lingua === 'en' ? c.labelEn : c.labelIt}</option>
-                    ))}
-                  </select>
                 </div>
                 {(!competenteInArmatura(scheda, scheda.armatura.tipo) || (scheda.armatura.scudo && !scheda.addestramento?.armature?.scudi)) && (
                   <div style={{ fontSize: 11, color: C.red, marginTop: 3, lineHeight: 1.2 }} title={t('tip.senza_comp_armatura')}>
@@ -15422,7 +15433,7 @@ export default function App() {
 
                   {/* Riga 3: Poteri personalizzati (regole homebrew del tavolo) — solo con manuale Araldi del Segreto attivo */}
                   {manualeAttivo(scheda?.manuali || manualiAttivi, 'araldi') && (
-                    <SezionePoteri scheda={scheda} aggiorna={aggiorna} lingua={lingua} manualiAttivi={manualiAttivi} registra={registra} mostraInfo={setInfo} ripristinoCampagna={!isSolaLettura && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null} />
+                    <SezionePoteri scheda={scheda} aggiorna={aggiorna} lingua={lingua} manualiAttivi={manualiAttivi} registra={registra} mostraInfo={setInfo} ripristinoCampagna={!isSolaLettura && araldiAttivo && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null} />
                   )}
                 </div>
               </Sezione>
@@ -16480,7 +16491,7 @@ export default function App() {
                                             onClick={() => spItem && setInfo({ titolo: traduciDato(o.nome) || o.nome, testo: spItem })}
                                             title={spItem ? `${o.nome}: ${spItem}` : o.nome}
                                             style={{ background: 'transparent', border: 0, padding: 0, font: 'inherit', color: C.ink, cursor: spItem ? 'help' : 'default', textAlign: 'left', textDecoration: spItem ? 'underline dotted' : 'none', textUnderlineOffset: 3, textDecorationColor: C.inkDim }}
-                                          >{traduciDato(o.nome) || o.nome}</button>
+                                          >{nomeSenzaCa(traduciDato(o.nome) || o.nome)}</button>
                                         );
                                       })()}
                                       {etichettaCaOggetto(o) && (
@@ -17862,7 +17873,6 @@ export default function App() {
                         key={cb.id}
                         data-testid={`ct-card-${cb.tipo}`}
                         style={{
-                          ...(eCombattentePgAttivo(cb, combat.combattenti) ? stileColoriPg : {}),
                           flex: '0 0 auto',
                           width: 236,
                           border: inTurno
@@ -17916,7 +17926,7 @@ export default function App() {
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 background: C.bg,
-                                border: `1.5px solid ${inTurno ? 'var(--c-gold-dark)' : C.border}`,
+                                border: `1.5px solid ${eCombattentePgAttivo(cb, combat.combattenti) ? 'var(--c-pg-gold)' : inTurno ? 'var(--c-gold-dark)' : C.border}`,
                                 borderRadius: 6,
                                 padding: '1px 4px',
                                 minWidth: 48,
@@ -17924,7 +17934,7 @@ export default function App() {
                               }}
                               title={t('ct.iniziativa')}
                             >
-                              <span style={{ fontSize: 11, fontWeight: 900, color: C.inkDim, lineHeight: 1, letterSpacing: 0.5 }}>INIZ</span>
+                              <span style={{ fontSize: 11, fontWeight: 900, color: eCombattentePgAttivo(cb, combat.combattenti) ? 'var(--c-pg-gold-dark)' : C.inkDim, lineHeight: 1, letterSpacing: 0.5 }}>INIZ</span>
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
                                 <input
                                   type="text"
@@ -17942,7 +17952,7 @@ export default function App() {
                                     textAlign: 'center',
                                     fontWeight: 900,
                                     fontSize: 14,
-                                    color: col,
+                                    color: eCombattentePgAttivo(cb, combat.combattenti) ? 'var(--c-pg-gold-dark)' : col,
                                     padding: 0,
                                     border: 'none',
                                     background: 'transparent',
@@ -18044,7 +18054,7 @@ export default function App() {
 
                             {/* Nome ed eventuale pulsante Scheda */}
                             <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 4, overflow: 'hidden' }}>
-                              <div style={{ flex: 1, minWidth: 0, fontWeight: 700, fontSize: 13, color: C.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              <div data-testid={eCombattentePgAttivo(cb, combat.combattenti) ? 'ct-nome-pg' : undefined} style={{ flex: 1, minWidth: 0, fontWeight: 700, fontSize: 13, color: eCombattentePgAttivo(cb, combat.combattenti) ? 'var(--c-pg-title)' : C.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 <Editable value={cb.nome} onChange={(v) => modCombat(cb.id, { nome: v })} width={110} />
                               </div>
                               {(() => {
@@ -18293,14 +18303,17 @@ export default function App() {
             <span
               data-testid="ct-mini-iniziativa"
               title={tr('Iniziativa di chi è di turno', 'Initiative of the creature whose turn it is')}
-              style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, background: 'var(--c-gold-dark)', color: C.onGold, borderRadius: 14, padding: '2px 10px', lineHeight: 1.2 }}
+              style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, background: eCombattentePgAttivo(combat.combattenti[combat.turno], combat.combattenti) ? 'var(--c-pg-gold-dark)' : 'var(--c-gold-dark)', color: eCombattentePgAttivo(combat.combattenti[combat.turno], combat.combattenti) ? 'var(--c-pg-on-gold)' : C.onGold, borderRadius: 14, padding: '2px 10px', lineHeight: 1.2 }}
             >
               <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', opacity: 0.85 }}>{tr('Iniz.', 'Init.')}</span>
               <span style={{ fontSize: 18, fontWeight: 900 }}>{combat.combattenti[combat.turno].iniziativa}</span>
             </span>
           )}
           <span>
-            {t('ct.round')} {combat.round} · {lingua === 'en' ? `${combat.combattenti[combat.turno]?.nome || 'PC'}'s turn` : `Turno di ${combat.combattenti[combat.turno]?.nome || 'PG'}`}
+            {t('ct.round')} {combat.round} · {lingua === 'en' ? '' : 'Turno di '}
+            <span data-testid="ct-mini-nome" style={combat.combattenti[combat.turno] && eCombattentePgAttivo(combat.combattenti[combat.turno], combat.combattenti) ? { color: 'var(--c-pg-title)' } : undefined}>
+              {lingua === 'en' ? `${combat.combattenti[combat.turno]?.nome || 'PC'}'s turn` : (combat.combattenti[combat.turno]?.nome || 'PG')}
+            </span>
           </span>
           <span style={{ fontSize: 11, opacity: 0.9 }}>▲</span>
           {/* ✕ per chiudere il combattimento senza riaprire il tracker: chiede conferma. */}

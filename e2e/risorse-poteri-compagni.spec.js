@@ -14,6 +14,20 @@ async function modificaPg(page, fn) {
   await apriScheda(page);
 }
 
+
+/** Il riquadro Poteri esiste solo col manuale Araldi (password) e parte chiuso: lo accendiamo e lo apriamo. */
+async function attivaAraldi(page) {
+  await page.evaluate(() => {
+    const m = JSON.parse(localStorage.getItem('scheda-interattiva:manuali') || '{}');
+    localStorage.setItem('scheda-interattiva:manuali', JSON.stringify({ ...m, araldi: true }));
+    const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+    const pg = r.personaggi[r.attivo];
+    pg.sezioniAperte = { ...(pg.sezioniAperte || {}), poteriRisorse: true };
+    localStorage.setItem('scheda-interattiva:v1', JSON.stringify(r));
+  });
+  await apriScheda(page);
+}
+
 test.describe('Risorse, Poteri e Compagni', () => {
   test.beforeEach(async ({ page }) => { await apriScheda(page); });
 
@@ -39,6 +53,7 @@ test.describe('Risorse, Poteri e Compagni', () => {
   });
 
   test('il riquadro Poteri resta visibile anche vuoto, senza il pulsante "Recupera dalla cronologia"', async ({ page }) => {
+    await attivaAraldi(page);
     // Copia in cronologia con i Poteri, poi il personaggio li perde: il riquadro non propone più il recupero.
     await page.evaluate(() => {
       const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
@@ -67,8 +82,9 @@ test.describe('Risorse, Poteri e Compagni', () => {
   });
 });
 
-test('senza Poteri, un tocco rimette quelli della campagna (Patrono + Araldi) e attiva il manuale', async ({ page }) => {
+test('senza Poteri, un tocco rimette quelli della campagna (Patrono + Araldi), col manuale attivo', async ({ page }) => {
   await apriScheda(page);
+  await attivaAraldi(page);
   await page.evaluate(() => {
     const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
     const pg = r.personaggi[r.attivo];
@@ -96,6 +112,7 @@ test('senza Poteri, un tocco rimette quelli della campagna (Patrono + Araldi) e 
 
 test('con il solo Debito (6/100) il ripristino rimette gli Araldi e tiene il Debito a 6 (v4.84.0)', async ({ page }) => {
   await apriScheda(page);
+  await attivaAraldi(page);
   await page.evaluate(() => {
     const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
     const pg = r.personaggi[r.attivo];
@@ -198,6 +215,7 @@ test('catalogo rapido nella sezione Compagni: Myrdhal compare per primo solo con
 
 test('se sparisce il Potere del Patrono il Debito torna da solo fra i Poteri degli Araldi (v4.103.0)', async ({ page }) => {
   await apriScheda(page);
+  await attivaAraldi(page);
   // Prima i Poteri della campagna completi, poi si toglie il Patrono (Debito 9 rimasto in risorse).
   await page.evaluate(() => {
     const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
@@ -234,4 +252,52 @@ test('Myrdhal si può solo evocare: niente Forma Selvatica né Metamorfosi (v4.1
   await expect(page.getByRole('button', { name: 'Evoca', exact: true }).last()).toBeVisible();
   await expect(page.getByTestId('bestia-forma-selvatica')).toHaveCount(0);
   await expect(page.getByTestId('bestia-metamorfosi')).toHaveCount(0);
+});
+
+test('il riquadro Poteri non c\'è senza il manuale Araldi; il manuale si accende solo con la password (v4.106.0)', async ({ page }) => {
+  await apriScheda(page);
+  // Manuale spento di base: nessun riquadro Poteri e nessun pulsante di ripristino.
+  await expect(page.getByTestId('poteri-riquadro')).toHaveCount(0);
+  await expect(page.getByTestId('ripristina-poteri-campagna')).toHaveCount(0);
+  // Menu → Manuali e fonti → Araldi: chiede la password.
+  await page.getByRole('button', { name: /^Menu: nuovo personaggio/ }).first().click();
+  await page.getByRole('button', { name: /Manuali e fonti/ }).first().click();
+  await page.getByTestId('manuale-toggle-araldi').click();
+  const campo = page.getByTestId('manuale-password-input');
+  await expect(campo).toBeVisible();
+  // Password sbagliata: errore e manuale ancora spento.
+  await campo.fill('sbagliata');
+  await campo.press('Enter');
+  await expect(page.getByTestId('manuale-password-errata')).toBeVisible();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('scheda-interattiva:manuali') || '{}').araldi)).not.toBe(true);
+  // Password giusta (senza distinguere le maiuscole): il manuale si accende.
+  await campo.fill('asdragale');
+  await campo.press('Enter');
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('scheda-interattiva:manuali') || '{}').araldi)).toBe(true);
+  await expect(page.getByTestId('manuale-toggle-araldi')).toContainText('Attivo');
+  // Spegnerlo non chiede nulla.
+  await page.getByTestId('manuale-toggle-araldi').click();
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('scheda-interattiva:manuali') || '{}').araldi)).toBe(false);
+});
+
+test('aprendo un personaggio Competenze e Risorse sono aperte; Poteri parte chiusa e poi ricorda la scelta (v4.106.0)', async ({ page }) => {
+  await apriScheda(page);
+  await page.evaluate(() => {
+    const m = JSON.parse(localStorage.getItem('scheda-interattiva:manuali') || '{}');
+    localStorage.setItem('scheda-interattiva:manuali', JSON.stringify({ ...m, araldi: true }));
+    const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+    const pg = r.personaggi[r.attivo];
+    pg.sezioniAperte = { addestramento: false, risorse: false };
+    localStorage.setItem('scheda-interattiva:v1', JSON.stringify(r));
+  });
+  await apriScheda(page);
+  const aperte = () => page.evaluate(() => { const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1')); return r.personaggi[r.attivo].sezioniAperte || {}; });
+  await expect.poll(async () => { const a = await aperte(); return `${a.addestramento}/${a.risorse}`; }).toBe('true/true');
+  // Poteri: chiusa di base (nessun valore salvato), poi apri e ricorda.
+  expect((await aperte()).poteriRisorse).toBeUndefined();
+  await expect(page.getByTestId('poteri-risorse')).toBeHidden();
+  await page.getByTestId('poteri-riquadro').locator('summary').click();
+  await expect.poll(async () => (await aperte()).poteriRisorse).toBe(true);
+  await apriScheda(page);
+  await expect(page.getByTestId('poteri-risorse')).toBeVisible();
 });

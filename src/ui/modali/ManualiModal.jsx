@@ -1,9 +1,22 @@
 // Estratto da App.jsx (finestra "ManualiModal"): riceve dall'App lo stato che usa, tutto il resto è importato.
 import { C } from '../tema.js';
 import { styles } from '../stili.js';
-import { MANUALI_INFO, manualeAttivo } from '../../data/dati5e.js';
+import { useState } from 'react';
+import { MANUALI_INFO, manualeAttivo, passwordAraldiGiusta } from '../../data/dati5e.js';
 
 export function ManualiModal({ lingua, manualiAttivi, setManualiAttivi, setMostraModalManuali }) {
+  // Il manuale della campagna (Araldi) si accende solo con la password; spegnerlo no.
+  const [chiedePassword, setChiedePassword] = useState(false);
+  const [password, setPassword] = useState('');
+  const [erratta, setErratta] = useState(false);
+  const verificaPassword = async () => {
+    if (await passwordAraldiGiusta(password)) {
+      setManualiAttivi((prev) => ({ ...prev, araldi: true }));
+      setChiedePassword(false); setPassword(''); setErratta(false);
+    } else {
+      setErratta(true);
+    }
+  };
   return (
     <div
       style={{
@@ -83,6 +96,7 @@ export function ManualiModal({ lingua, manualiAttivi, setManualiAttivi, setMostr
                   border: `1.5px solid ${attivo ? m.colore : C.border}`,
                   background: attivo ? `${m.colore}0d` : 'rgba(0,0,0,0.02)',
                   display: 'flex',
+                  flexWrap: 'wrap',
                   alignItems: 'flex-start',
                   justifyContent: 'space-between',
                   gap: 12,
@@ -109,10 +123,47 @@ export function ManualiModal({ lingua, manualiAttivi, setManualiAttivi, setMostr
                   </div>
                 </div>
 
+                {k === 'araldi' && chiedePassword && !attivo && (
+                  <form
+                    data-testid="manuale-password"
+                    onSubmit={(e) => { e.preventDefault(); verificaPassword(); }}
+                    style={{ display: 'flex', flexDirection: 'column', gap: 6, flexBasis: '100%', marginTop: 4 }}
+                  >
+                    <label style={{ fontSize: 12, color: C.inkDim }}>
+                      {lingua === 'it' ? 'Password del manuale (te la dà il Master):' : 'Sourcebook password (given by your DM):'}
+                    </label>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <input
+                        type="password"
+                        autoFocus
+                        autoComplete="off"
+                        aria-label={lingua === 'it' ? 'Password del manuale' : 'Sourcebook password'}
+                        data-testid="manuale-password-input"
+                        value={password}
+                        onChange={(e) => { setPassword(e.target.value); setErratta(false); }}
+                        style={{ ...styles.inlineInput, flex: 1, minWidth: 0, padding: '6px 10px', fontSize: 13, borderColor: erratta ? C.red : undefined }}
+                      />
+                      <button type="submit" style={{ ...styles.buttonMini, padding: '4px 12px', fontWeight: 700 }}>
+                        {lingua === 'it' ? 'Sblocca' : 'Unlock'}
+                      </button>
+                    </div>
+                    {erratta && (
+                      <div role="alert" data-testid="manuale-password-errata" style={{ fontSize: 12, color: C.red, fontWeight: 700 }}>
+                        {lingua === 'it' ? 'Password errata.' : 'Wrong password.'}
+                      </div>
+                    )}
+                  </form>
+                )}
+
                 {/* Toggle Switch */}
                 <button
                   type="button"
-                  onClick={() => setManualiAttivi((prev) => ({ ...prev, [k]: !attivo }))}
+                  data-testid={`manuale-toggle-${k}`}
+                  onClick={() => {
+                    if (k === 'araldi' && !attivo) { setChiedePassword((v) => !v); setErratta(false); return; }
+                    if (k === 'araldi') setChiedePassword(false);
+                    setManualiAttivi((prev) => ({ ...prev, [k]: !attivo }));
+                  }}
                   style={{
                     flexShrink: 0,
                     padding: '6px 12px',

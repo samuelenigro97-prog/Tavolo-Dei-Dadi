@@ -346,7 +346,7 @@ export function CompendioModal({
         tipoArmatura: a.tipo || 'leggera',
         caBase: a.base || 10,
         peso: a.peso || 5,
-        desc: `Armatura ${a.tipo || ''} (CA base ${a.base || 10}).`,
+        desc: `Armatura ${a.tipo || ''} (CA +${a.base || 10}).`,
         raw: a,
       });
     }

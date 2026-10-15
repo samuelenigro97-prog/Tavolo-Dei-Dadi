@@ -5,6 +5,23 @@
 
 export const NOVITA = [
   {
+    versione: '4.106.0',
+    voci: {
+      it: [
+        'Manuale Araldi del Segreto: si attiva solo con una password (Manuali e fonti). Senza manuale il riquadro Poteri non c\'è.',
+        'Aprendo un personaggio Competenze e Risorse di classe sono aperte; Poteri parte chiusa e poi ricorda la scelta.',
+        'Classe Armatura: Copertura sopra, poi il tipo di armatura, poi la base; tolta la CA a mano dal menu.',
+        'Combat tracker: iniziativa e nome del personaggio nel colore della sua classe. La CA degli oggetti si scrive sempre "CA +valore".',
+      ],
+      en: [
+        'Heralds of the Secret sourcebook: it turns on only with a password (Sourcebooks). Without it there is no Powers box.',
+        'Opening a character, Training and Class resources are open; Powers starts closed and then remembers your choice.',
+        'Armor Class: Cover on top, then armor type, then base; manual AC removed from the menu.',
+        'Combat tracker: initiative and the character name in the class colour. Item AC is always written "AC +value".',
+      ],
+    },
+  },
+  {
     versione: '4.105.7',
     voci: {
       it: ['Creazione personaggio: "Artefice" non compare più due volte, e solo col manuale Tasha attivo.'],

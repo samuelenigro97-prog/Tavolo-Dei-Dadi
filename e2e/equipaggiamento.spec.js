@@ -75,9 +75,10 @@ test('la CA degli oggetti compare tra parentesi e lo Scudo in Legnoferro è nel 
   const riga = (nome) => page.locator('tr.inventario-riga').filter({ has: page.locator('.oggetto-nome', { hasText: nome }) });
   await expect(riga('Scudo in Legnoferro').getByTestId('oggetto-ca')).toHaveText('(CA +2)');
   await expect(riga('Anello di Protezione').getByTestId('oggetto-ca')).toHaveText('(CA +1)');
-  await expect(riga('Armatura di cuoio +1').getByTestId('oggetto-ca')).toHaveText('(CA 12)');
-  // Il nome riporta già la CA: niente doppione.
-  await expect(riga('Corazza a Piastre in Legnoferro').getByTestId('oggetto-ca')).toHaveCount(0);
+  await expect(riga('Armatura di cuoio +1').getByTestId('oggetto-ca')).toHaveText('(CA +12)');
+  // La CA scritta a mano nel nome "(CA 14)" si legge da lì e si mostra sempre come "CA +14", senza doppione.
+  await expect(riga('Corazza a Piastre in Legnoferro').getByTestId('oggetto-ca')).toHaveText('(CA +14)');
+  await expect(riga('Corazza a Piastre in Legnoferro').locator('.oggetto-nome')).toHaveText('Corazza a Piastre in Legnoferro');
   // Oggetti senza CA: niente parentesi.
   await expect(riga('Antitossina').getByTestId('oggetto-ca')).toHaveCount(0);
   // Catalogo: cercando "legnoferro" si propone lo scudo.

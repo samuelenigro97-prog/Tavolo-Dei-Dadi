@@ -2,6 +2,29 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.106.0] – 2026-10-15
+
+### Aggiunto
+- **Il manuale Araldi del Segreto si accende solo con una password** (te la dà il Master), da
+  Menu → Manuali e fonti: il tasto chiede la password; spegnerlo no. Si confronta l'impronta
+  SHA-256 della password in minuscolo (`passwordAraldiGiusta` in `dati5e.js`), senza distinguere
+  le maiuscole: è una barriera leggera, l'app gira nel browser.
+
+### Modificato
+- **Il riquadro "Poteri" sotto le Risorse di classe esiste solo col manuale Araldi attivo**
+  (altrimenti non c'è nemmeno vuoto). Il pulsante "Ripristina i Poteri della campagna" compare solo
+  col manuale; il manuale non si accende più da solo (né all'apertura di una scheda con i poteri
+  degli Araldi, né col ripristino) e la lista ampliata si aggiunge solo col manuale attivo.
+- **Sezioni aperte**: aprendo un personaggio Competenze e Risorse di classe sono sempre aperte;
+  Poteri parte chiusa e poi ricorda l'ultima scelta.
+- **Classe Armatura**: l'ordine è Copertura (più stretta), tipo di armatura, riga "base 14 / scudo".
+  Tolta la voce "CA Manuale" dal menu del tipo di armatura (resta solo ai personaggi che già la usano).
+- **Combat tracker**: solo l'iniziativa e il nome del personaggio hanno i colori della sua classe
+  (nella scheda del tracker e nella pillola ridotta nel suo turno); il resto è sul tema base.
+- **"CA +valore" sempre così** sugli oggetti: "(CA +14)" per le armature (prima "(CA 14)"), "(CA +2)",
+  "(CA +1)"; un "(CA 14)" scritto a mano nel nome si legge da lì e si mostra uguale, e il compendio
+  dice "(CA +11)" invece di "(CA base 11)".
+
 ## [4.105.7] – 2026-10-14
 
 ### Corretto

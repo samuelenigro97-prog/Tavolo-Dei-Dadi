@@ -2389,6 +2389,21 @@ export const DEFAULT_MANUALI = {
   araldi: false,
 };
 
+/**
+ * Il manuale della campagna si accende solo con una password (la dà il Master). Qui c'è solo
+ * l'impronta SHA-256 della password in minuscolo, non la password: è una barriera leggera,
+ * non una sicurezza vera (l'app gira nel browser).
+ */
+export const IMPRONTA_PASSWORD_ARALDI = '694c33e7da3f2d9be0e34087ee4b55943dfb7d9dea86b457b0ae3f83c5a1acc6';
+
+/** La password è giusta? (senza distinguere maiuscole e spazi ai bordi) */
+export async function passwordAraldiGiusta(testo) {
+  const dati = new TextEncoder().encode(String(testo || '').trim().toLowerCase());
+  const hash = await crypto.subtle.digest('SHA-256', dati);
+  const hex = Array.from(new Uint8Array(hash)).map((b) => b.toString(16).padStart(2, '0')).join('');
+  return hex === IMPRONTA_PASSWORD_ARALDI;
+}
+
 /** Un manuale è attivo se acceso; quelli spenti di base (es. Araldi del Segreto) lo sono solo se esplicitamente true. */
 export function manualeAttivo(manuali, chiave) {
   return DEFAULT_MANUALI[chiave] === false ? manuali?.[chiave] === true : manuali?.[chiave] !== false;
