@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.108.0',
+    voci: {
+      it: ['Barra in alto a scomparsa sul computer: avvicina il cursore alla cima dello schermo per farla scendere.', 'Sfondi con più movimento e una luce morbida che scorre.', 'Tasti della barra tutti dello stesso stile; sincronizzazione e combattimento indicati da un pallino.'],
+      en: ['Auto-hiding top bar on computers: move the cursor to the top of the screen to bring it down.', 'Backgrounds with more movement and a soft drifting light.', 'Top bar buttons share one style; sync and combat are shown by a small dot.'],
+    },
+  },
+  {
     versione: '4.107.4',
     voci: {
       it: ['Import con Gemini: il Worker usa subito il modello giusto (le schede si leggono in circa 20 secondi).'],

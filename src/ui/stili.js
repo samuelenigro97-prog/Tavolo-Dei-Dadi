@@ -663,23 +663,46 @@ tbody tr:hover {
 .angolo-bl { bottom: 0; left: 0; }
 .angolo-br { bottom: 0; right: 0; }
 
-/* Sfondo vivo: un respiro lentissimo (zoom e scivolamento di pochi punti percentuali, 70 s
-   avanti e indietro) su tutto il livello dello sfondo (immagine dell'ambientazione, aure e
-   vignetta). Solo trasformazioni, quindi va sulla GPU e costa quasi nulla; il livello è
-   ingrandito di un 4% in partenza, così non scopre mai i bordi. Si ferma con "riduci
-   movimento" del sistema. */
+/* Sfondo vivo: lo sfondo (immagine dell'ambientazione, aure e vignetta) vaga piano su un
+   percorso a più tappe (zoom e scivolamento di qualche punto percentuale, 50 s avanti e
+   indietro), e sopra scorre una luce morbida, come nuvole che passano davanti al sole.
+   Solo trasformazioni e opacità, quindi va sulla GPU e costa quasi nulla. Il livello parte
+   ingrandito del 10%: ai bordi resta sempre più margine di quanto si sposti, non scopre mai
+   il fondo. Si ferma con "riduci movimento" del sistema. */
 @keyframes sfondo-respiro {
-  from { transform: translate3d(0, 0, 0) scale(1.04); }
-  to   { transform: translate3d(-1.4%, -0.9%, 0) scale(1.09); }
+  0%   { transform: translate3d(0, 0, 0) scale(1.10); }
+  25%  { transform: translate3d(-3%, -1.5%, 0) scale(1.13); }
+  50%  { transform: translate3d(-1%, 2.5%, 0) scale(1.11); }
+  75%  { transform: translate3d(2.5%, 0.5%, 0) scale(1.14); }
+  100% { transform: translate3d(1%, -2%, 0) scale(1.10); }
+}
+@keyframes sfondo-luce {
+  0%   { transform: translate3d(-18%, -8%, 0) scale(1); opacity: 0.35; }
+  50%  { transform: translate3d(14%, 6%, 0) scale(1.25); opacity: 0.9; }
+  100% { transform: translate3d(-6%, 12%, 0) scale(1.1); opacity: 0.5; }
 }
 #ambient-bg-layer {
-  animation: sfondo-respiro 70s ease-in-out infinite alternate;
+  animation: sfondo-respiro 50s ease-in-out infinite alternate;
   transform-origin: 50% 40%;
+  overflow: hidden;
+}
+#ambient-bg-layer::after {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 38% 30% at 35% 35%, rgba(255, 240, 210, 0.10), transparent 70%),
+    radial-gradient(ellipse 30% 26% at 70% 65%, rgba(255, 230, 190, 0.07), transparent 70%);
+  animation: sfondo-luce 34s ease-in-out infinite alternate;
+  will-change: transform, opacity;
 }
 @media (prefers-reduced-motion: reduce) {
   #ambient-bg-layer { animation: none; transform: none; }
+  #ambient-bg-layer::after { animation: none; display: none; }
 }
 :root[data-animazioni="statico"] #ambient-bg-layer { animation: none; }
+:root[data-animazioni="statico"] #ambient-bg-layer::after { animation: none; display: none; }
 
 /* Reattività Hover & Focus luminoso (sobrio e morbido) */
 .sezione:hover,
@@ -1756,6 +1779,70 @@ tbody tr:hover {
   .menu-iniziale h1 { font-size: 18px !important; margin-bottom: 4px !important; }
   .menu-iniziale-sfondo { padding-top: 47px; padding-bottom: 6px; }
 }
+/* Barra a scomparsa (computer col mouse): resta in vista solo una striscia con una piccola
+   maniglia; avvicinando il cursore alla cima dello schermo (o passando col Tab) la barra
+   scende con un'animazione, e risale poco dopo che il cursore se ne va. La scheda sale a
+   occupare lo spazio liberato. Su telefono e tablet resta sempre visibile. */
+.barra-zona-apertura { display: none; }
+@media (hover: hover) and (pointer: fine) and (min-width: 681px) {
+  :root[data-barra-a-scomparsa="si"] .barra-zona-apertura {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 18px;
+    z-index: 1199;
+  }
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa {
+    margin-bottom: -30px !important;
+    transform: translateY(calc(-100% + 10px));
+    transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1) 0.6s, box-shadow 0.3s ease 0.6s;
+    box-shadow: none !important;
+  }
+  :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa,
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover,
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:focus-within {
+    transform: translateY(0);
+    transition-delay: 0s;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+  }
+  /* A barra chiusa il contenuto sfuma: nella striscia resta solo la maniglia. */
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa > * {
+    opacity: 0;
+    transition: opacity 0.2s ease 0.6s;
+  }
+  :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa > *,
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover > *,
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:focus-within > * {
+    opacity: 1;
+    transition: opacity 0.25s ease 0.08s;
+  }
+  /* Maniglia: si vede solo a barra chiusa. */
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 3px;
+    width: 40px;
+    height: 3px;
+    margin-left: -20px;
+    border-radius: 3px;
+    background: var(--c-tema-bordo, var(--c-border));
+    transition: opacity 0.2s ease 0.6s;
+    pointer-events: none;
+  }
+  :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa::before,
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover::before,
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:focus-within::before {
+    opacity: 0;
+    transition-delay: 0s;
+  }
+  :root[data-barra-a-scomparsa="si"] .barra-tiro { top: 14px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa { transition: none !important; }
+}
 .barra-superiore-fissa::-webkit-scrollbar {
   display: none;
 }
@@ -2468,6 +2555,33 @@ tbody tr:hover {
 }
 .btn-header-azione:hover {
   border-color: var(--c-gold-dark);
+}
+/* Tasti della barra in alto: sempre il fondo della barra e un sottile bordo del colore del
+   bordo della barra (tema generico), qualunque stato abbiano. Gli stati (sincronizzazione,
+   combattimento in corso) sono un pallino nell'angolo; gli avvisi fanno suonare il campanello. */
+.barra-superiore-fissa .btn-header-azione {
+  background: var(--c-tema-sfondo, var(--c-panel)) !important;
+  border: 1px solid var(--c-tema-bordo, var(--c-border)) !important;
+  box-shadow: none !important;
+  color: var(--c-ink) !important;
+}
+.barra-superiore-fissa .btn-header-azione:hover {
+  border-color: color-mix(in srgb, var(--c-tema-bordo, var(--c-border)) 50%, var(--c-ink)) !important;
+}
+.barra-superiore-fissa .btn-notifiche-lampeggia { animation: none !important; }
+.barra-superiore-fissa .btn-notifiche-lampeggia .icona-campanello,
+.barra-superiore-fissa .btn-notifiche-lampeggia > span:first-child { filter: none; }
+.btn-con-stato { position: relative; }
+.btn-con-stato::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--stato-pallino, transparent);
+  pointer-events: none;
 }
 /* Il contorno di focus da tastiera della barra è neutro, non dorato: il doppio anello dorato
    sembrava un tasto "acceso" (come ⚔️ col combattimento attivo). Resta visibile per l'accessibilità. */

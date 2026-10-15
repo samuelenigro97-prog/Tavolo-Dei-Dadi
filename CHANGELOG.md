@@ -2,6 +2,23 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.108.0] – 2026-10-15
+
+### Aggiunto
+- **Barra in alto a scomparsa** (computer col mouse): resta una striscia sottile con una maniglia;
+  avvicinando il cursore alla cima dello schermo la barra scende con un'animazione e risale poco dopo
+  che il cursore se ne va (anche col Tab da tastiera si apre). La scheda sale nello spazio liberato.
+  Su telefono e tablet la barra resta sempre visibile. Test in `e2e/barra-scomparsa.spec.js`.
+
+### Modificato
+- **Sfondi più vivi**: lo sfondo vaga su un percorso a più tappe (50 s invece di 70 s, spostamenti e
+  zoom più ampi, con margine sempre sufficiente ai bordi) e sopra scorre una luce morbida. Solo
+  trasformazioni e opacità; fermo con "riduci movimento".
+- **Tasti della barra in alto**: tutti con il fondo della barra e un sottile bordo del colore del bordo
+  della barra, in ogni stato. Sincronizzazione e combattimento in corso sono un pallino colorato
+  nell'angolo del tasto; il campanello degli avvisi suona ma non lampeggia più d'oro. Su telefono anche
+  ☁️, 🎲, ⚔️ e Menu seguono lo stesso stile.
+
 ## [4.107.4] – 2026-10-15
 
 ### Corretto

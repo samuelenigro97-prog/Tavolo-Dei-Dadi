@@ -2,6 +2,12 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 
+// Barra in alto a scomparsa (solo con il mouse, vedi stili.js). Non nei browser guidati dai
+// test automatici, che cliccano i tasti della barra senza passarci sopra prima.
+if (typeof navigator !== 'undefined' && !navigator.webdriver) {
+  document.documentElement.dataset.barraAScomparsa = 'si';
+}
+
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);

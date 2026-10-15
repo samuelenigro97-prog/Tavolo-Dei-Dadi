@@ -1989,7 +1989,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.107.4';
+const APP_VERSION = '4.108.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -9664,6 +9664,8 @@ export default function App() {
           </div>
         )}
 
+        {/* Striscia invisibile in cima allo schermo: col mouse sopra fa scendere la barra a scomparsa. */}
+        <div className="barra-zona-apertura" aria-hidden="true" />
         {/* Barra superiore fissa: Desktop completa su 1 riga / Mobile super-compatta con Menu Hub */}
         <section
           className="selettore-personaggio barra-superiore-fissa"
@@ -9825,13 +9827,11 @@ export default function App() {
                         📂
                       </button>
                       <button
-                        className="btn-header-azione"
+                        className="btn-header-azione btn-con-stato"
                         style={{
                           ...btnAzione,
-                          color: statoColoreCloud,
-                          borderColor: statoColoreCloud,
-                          background: statoBgCloud,
-                          boxShadow: statoGlowCloud,
+                          // Fondo e bordo come tutti i tasti della barra: lo stato è il pallino.
+                          '--stato-pallino': statoColoreCloud,
                           display: 'inline-flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -9990,10 +9990,11 @@ export default function App() {
                       </button>
                       <button
                         data-combat-toggle="true"
-                        className="btn-header-azione"
+                        className="btn-header-azione btn-con-stato"
                         style={{
                           ...btnAzione,
-                          ...(combat.attivo ? { color: C.goldDark, borderColor: C.goldDark, background: combat.aperto ? 'rgba(201,162,39,0.22)' : 'rgba(201,162,39,0.12)', boxShadow: '0 0 8px rgba(201,162,39,0.3)' } : {}),
+                          // Combattimento in corso: pallino oro (fondo e bordo restano quelli della barra).
+                          '--stato-pallino': combat.attivo ? 'var(--c-gold)' : 'transparent',
                         }}
                         onClick={() => {
                           if (combat.attivo && combat.aperto) setCombat((c) => ({ ...c, aperto: false }));
@@ -10032,7 +10033,8 @@ export default function App() {
                         rosso = i personaggi restano solo su questo dispositivo. */}
                     <button
                       data-testid="cloud-mobile"
-                      style={{ ...btnAzione, width: 28, height: 28, minWidth: 28, maxWidth: 28, minHeight: 28, maxHeight: 28, fontSize: 13, color: statoColoreCloud, borderColor: statoColoreCloud, background: statoBgCloud, boxShadow: statoGlowCloud }}
+                      className="btn-header-azione btn-con-stato"
+                      style={{ ...btnAzione, width: 28, height: 28, minWidth: 28, maxWidth: 28, minHeight: 28, maxHeight: 28, fontSize: 13, '--stato-pallino': statoColoreCloud }}
                       onClick={() => { setCloudStatus({ text: '', type: '' }); setSyncCodiceStatus({ text: '', type: '' }); setTabBackup('online'); setMostraCloud(true); }}
                       data-in-attesa={isCloudAttivo && inAttesaSync ? 'si' : 'no'}
                       title={isCloudAttivo && inAttesaSync
@@ -10047,6 +10049,7 @@ export default function App() {
                       ☁️
                     </button>
                     <button
+                      className="btn-header-azione"
                       style={{ ...btnAzione, width: 28, height: 28, minWidth: 28, maxWidth: 28, minHeight: 28, maxHeight: 28, fontSize: 13 }}
                       onClick={() => setMostraDadiModal(true)}
                       title={t('roll.tavolo_dadi')}
@@ -10056,6 +10059,7 @@ export default function App() {
                     </button>
                     <button
                       data-combat-toggle="true"
+                      className="btn-header-azione btn-con-stato"
                       style={{
                         ...btnAzione,
                         width: 28,
@@ -10065,7 +10069,7 @@ export default function App() {
                         minHeight: 28,
                         maxHeight: 28,
                         fontSize: 13,
-                        ...(combat.attivo ? { color: C.goldDark, borderColor: C.goldDark, background: combat.aperto ? 'rgba(201,162,39,0.22)' : 'rgba(201,162,39,0.12)' } : {}),
+                        '--stato-pallino': combat.attivo ? 'var(--c-gold)' : 'transparent',
                       }}
                       onClick={() => {
                         if (combat.attivo && combat.aperto) setCombat((c) => ({ ...c, aperto: false }));
@@ -10078,6 +10082,7 @@ export default function App() {
                       ⚔️
                     </button>
                     <button
+                      className="btn-header-azione"
                       style={{
                         ...btnAzione,
                         width: 'auto',
