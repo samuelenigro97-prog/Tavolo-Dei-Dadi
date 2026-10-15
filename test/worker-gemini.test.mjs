@@ -16,7 +16,7 @@ test('Gemini: usa x-goog-api-key, manda il file e il prompt, chiede JSON a tempe
   const fetchFn = async (url, init) => { visto = { url, init }; return rispostaOk({ nome: 'Frost' }); };
   const scheda = await trascriviGemini({ GEMINI_API_KEY: 'k' }, 'QUJD', 'image/png', fetchFn);
   assert.deepEqual(scheda, { nome: 'Frost' });
-  assert.match(visto.url, /generativelanguage\.googleapis\.com\/v1beta\/models\/gemini-2\.5-flash:generateContent$/);
+  assert.match(visto.url, /generativelanguage\.googleapis\.com\/v1beta\/models\/gemini-3\.8-flash:generateContent$/);
   assert.equal(visto.init.headers['x-goog-api-key'], 'k');
   const corpo = JSON.parse(visto.init.body);
   assert.equal(corpo.contents[0].parts[0].inline_data.mime_type, 'image/png');
@@ -42,7 +42,7 @@ test('Gemini: GEMINI_MODEL ha la precedenza, e su 429/404 si passa al modello su
     return rispostaOk({ nome: 'Ok' });
   };
   const scheda = await trascriviGemini({ GEMINI_API_KEY: 'k', GEMINI_MODEL: 'gemini-x, gemini-y' }, 'QUJD', 'image/png', fetchFn);
-  assert.deepEqual(provati, ['gemini-x', 'gemini-y', 'gemini-2.5-flash']);
+  assert.deepEqual(provati, ['gemini-x', 'gemini-y', 'gemini-3.8-flash']);
   assert.deepEqual(scheda, { nome: 'Ok' });
 });
 
@@ -59,18 +59,20 @@ test('Gemini: se nessun nome noto risponde, elenca i modelli e prova i flash pi�
     if (/\/models\?/.test(url)) {
       return { ok: true, status: 200, text: async () => '', json: async () => ({ models: [
         { name: 'models/gemini-3.5-flash', supportedGenerationMethods: ['generateContent'] },
-        { name: 'models/gemini-3.8-flash', supportedGenerationMethods: ['generateContent'] },
-        { name: 'models/gemini-3.8-flash-lite', supportedGenerationMethods: ['generateContent'] },
+        { name: 'models/gemini-omni-flash-preview', supportedGenerationMethods: ['generateContent'] },
+        { name: 'models/gemini-3.9-flash', supportedGenerationMethods: ['generateContent'] },
+        { name: 'models/gemini-3.9-flash-lite', supportedGenerationMethods: ['generateContent'] },
         { name: 'models/gemini-embedding-001', supportedGenerationMethods: ['embedContent'] },
       ] }) };
     }
     const m = url.match(/models\/([^:]+):/)[1];
     provati.push(m);
-    return m === 'gemini-3.8-flash' ? rispostaOk({ nome: 'Nuovo' }) : errore(404);
+    return m === 'gemini-3.5-flash' ? rispostaOk({ nome: 'Nuovo' }) : errore(404);
   };
   const scheda = await trascriviGemini({ GEMINI_API_KEY: 'k' }, 'QUJD', 'image/png', fetchFn);
   assert.deepEqual(scheda, { nome: 'Nuovo' });
-  assert.deepEqual(provati, ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-3.8-flash']);
+  // Prima le versioni numeriche dalla più nuova, gli "omni"/preview dopo; i lite mai.
+  assert.deepEqual(provati, ['gemini-3.8-flash', 'gemini-flash-latest', 'gemini-3.9-flash', 'gemini-3.5-flash']);
 });
 
 test('Gemini: senza chiave dà un errore chiaro', async () => {

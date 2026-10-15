@@ -24,7 +24,7 @@
  *                        credito. Nota: nel piano gratuito Google può usare i contenuti per migliorare i suoi
  *                        prodotti (per una scheda di D&D non è un problema, per dati personali sì).
  *   - GEMINI_MODEL       (opzionale) uno o più modelli separati da virgola, in ordine di preferenza
- *                        (es. "gemini-2.5-flash,gemini-flash-latest"). Se non ne risponde nessuno il Worker
+ *                        (es. "gemini-3.8-flash,gemini-flash-latest"). Se non ne risponde nessuno il Worker
  *                        elenca i modelli disponibili e prova i "flash" più recenti da solo.
  *   - ANTHROPIC_API_KEY  (opzionale, fallback per PDF) la tua chiave API Anthropic.
  *                        Se manca, i PDF non sono trascrivibili, ma le immagini (JPG/PNG/WebP)
@@ -593,7 +593,8 @@ export async function trascriviGemini(env, base64, mediaType, fetchFn = fetch) {
   const base = 'https://generativelanguage.googleapis.com/v1beta';
   const intestazioni = { 'content-type': 'application/json', 'x-goog-api-key': chiave };
   const preferiti = String(env.GEMINI_MODEL || '').split(',').map((m) => m.trim()).filter(Boolean);
-  const candidati = [...preferiti, 'gemini-2.5-flash', 'gemini-flash-latest'];
+  // Predefiniti provati sulla chiave reale (ottobre 2026): gemini-2.5-flash è ritirato (404).
+  const candidati = [...preferiti, 'gemini-3.8-flash', 'gemini-flash-latest'];
   const corpo = JSON.stringify({
     contents: [{ parts: [{ inline_data: { mime_type: mediaType || 'image/jpeg', data: base64 } }, { text: PROMPT }] }],
     generationConfig: { responseMimeType: 'application/json', temperature: 0, maxOutputTokens: 16384 },
@@ -626,11 +627,14 @@ export async function trascriviGemini(env, base64, mediaType, fetchFn = fetch) {
     const r = await fetchFn(`${base}/models?pageSize=200`, { headers: intestazioni });
     if (r.ok) {
       const j = await r.json();
+      // Prima i "gemini-<versione>-flash" stabili, dal più nuovo; poi gli altri flash (omni, preview),
+      // che sul piano gratuito spesso rispondono 429.
+      const versione = (m) => { const v = /^gemini-(\d+(?:\.\d+)?)-flash$/.exec(m); return v ? Number(v[1]) : -1; };
       const flash = (j.models || [])
         .filter((m) => /flash/i.test(m.name) && !/lite|image|tts|live|audio|thinking|preview-0/i.test(m.name) && (m.supportedGenerationMethods || []).includes('generateContent'))
         .map((m) => m.name.replace(/^models\//, ''))
         .filter((m) => !visti.has(m))
-        .sort((a, b) => b.localeCompare(a, 'en', { numeric: true }));
+        .sort((a, b) => versione(b) - versione(a) || b.localeCompare(a, 'en', { numeric: true }));
       for (const m of flash.slice(0, 3)) {
         try { return await prova(m); } catch (e) { errori.push(e.message); }
       }

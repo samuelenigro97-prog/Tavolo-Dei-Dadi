@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.107.4',
+    voci: {
+      it: ['Import con Gemini: il Worker usa subito il modello giusto (le schede si leggono in circa 20 secondi).'],
+      en: ['Gemini import: the Worker picks the right model straight away (a sheet is read in about 20 seconds).'],
+    },
+  },
+  {
     versione: '4.107.3',
     voci: {
       it: ['Menu iniziale: tutti i tasti con lo stesso bordo del tema; etichette più corte (Backup, Avvisi, Manuali e fonti con il solo numero).'],

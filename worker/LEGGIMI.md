@@ -20,7 +20,7 @@ API: la chiave vive qui, nel Worker.
 
 L'ordine dei fornitori è: **Gemini** (se c'è `GEMINI_API_KEY`) → Workers AI → Ollama → Anthropic.
 Se uno fallisce si passa al successivo. Se Google cambia i nomi dei modelli il Worker li cerca da solo;
-per forzarne uno imposta `GEMINI_MODEL` (es. `gemini-2.5-flash`).
+per forzarne uno imposta `GEMINI_MODEL` (es. `gemini-3.8-flash`).
 
 ## Opzione A — Dal Sito Cloudflare (Senza Terminale, Consigliata)
 

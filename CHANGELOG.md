@@ -2,6 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.107.4] – 2026-10-15
+
+### Corretto
+- **Worker, modelli Gemini**: provato con una chiave vera, `gemini-2.5-flash` è ritirato (404) e
+  `gemini-flash-latest` a volte risponde 503; ora si parte da `gemini-3.8-flash` (una scheda letta in
+  circa 20 secondi). Se i nomi noti non rispondono, la ricerca automatica prova prima i
+  `gemini-<versione>-flash` stabili dal più nuovo e solo dopo omni/preview, che sul piano gratuito danno 429.
+
 ## [4.107.3] – 2026-10-15
 
 ### Modificato
