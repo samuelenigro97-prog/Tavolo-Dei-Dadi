@@ -1988,7 +1988,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.106.0';
+const APP_VERSION = '4.106.1';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -11561,7 +11561,8 @@ export default function App() {
                 <div style={{ marginTop: 3, width: '100%', display: 'flex', justifyContent: 'center' }}>
                   <select
                     data-testid="ca-copertura"
-                    style={{ ...styles.inlineInput, fontSize: 11, padding: '1px 3px', width: '62%', maxWidth: '100%', color: (scheda.copertura && scheda.copertura !== 'nessuna') ? C.green : C.inkDim, fontWeight: (scheda.copertura && scheda.copertura !== 'nessuna') ? 700 : 400 }}
+                    className="ca-select"
+                    style={{ ...styles.inlineInput, fontSize: 11, padding: '1px 3px', maxWidth: '100%', color: (scheda.copertura && scheda.copertura !== 'nessuna') ? C.green : C.inkDim, fontWeight: (scheda.copertura && scheda.copertura !== 'nessuna') ? 700 : 400 }}
                     value={scheda.copertura || 'nessuna'}
                     onChange={(e) => {
                       const v = e.target.value;
@@ -11580,6 +11581,8 @@ export default function App() {
                 </div>
                 <select
                   aria-label={tr('Tipo di armatura', 'Armor type')}
+                  data-testid="ca-tipo-armatura"
+                  className="ca-select"
                   style={{ ...styles.inlineInput, fontSize: 11, padding: '1px 3px', maxWidth: '100%', marginTop: 2 }}
                   value={scheda.armatura.tipo}
                   onChange={(e) => {
@@ -11598,7 +11601,7 @@ export default function App() {
                     return <option key={ta.key} value={ta.key} disabled={bloccato}>{t('armor.' + ta.key)}</option>;
                   })}
                 </select>
-                <div style={{ fontSize: 11, color: C.inkDim, display: 'flex', gap: 5, alignItems: 'center', justifyContent: 'center', marginTop: 4, flexWrap: 'wrap' }}>
+                <div data-testid="ca-riga-base" style={{ fontSize: 11, color: C.inkDim, display: 'flex', gap: '4px 16px', alignItems: 'center', justifyContent: 'center', marginTop: 5, flexWrap: 'wrap' }}>
                   {(scheda.armatura.tipo === 'leggera' || scheda.armatura.tipo === 'media' || scheda.armatura.tipo === 'pesante') && (
                     <span title={tr(`CA base dell'armatura. Esempi: ${ESEMPI_ARMATURA[scheda.armatura.tipo]}`, `Base armor AC. Examples: ${ESEMPI_ARMATURA[scheda.armatura.tipo]}`)}>base <Editable value={scheda.armatura.base} tipo="numero" width={24} onChange={(v) => aggiorna({ armatura: { ...scheda.armatura, base: Math.max(0, v) } })} /></span>
                   )}

@@ -663,6 +663,24 @@ tbody tr:hover {
 .angolo-bl { bottom: 0; left: 0; }
 .angolo-br { bottom: 0; right: 0; }
 
+/* Sfondo vivo: un respiro lentissimo (zoom e scivolamento di pochi punti percentuali, 70 s
+   avanti e indietro) su tutto il livello dello sfondo (immagine dell'ambientazione, aure e
+   vignetta). Solo trasformazioni, quindi va sulla GPU e costa quasi nulla; il livello è
+   ingrandito di un 4% in partenza, così non scopre mai i bordi. Si ferma con "riduci
+   movimento" del sistema. */
+@keyframes sfondo-respiro {
+  from { transform: translate3d(0, 0, 0) scale(1.04); }
+  to   { transform: translate3d(-1.4%, -0.9%, 0) scale(1.09); }
+}
+#ambient-bg-layer {
+  animation: sfondo-respiro 70s ease-in-out infinite alternate;
+  transform-origin: 50% 40%;
+}
+@media (prefers-reduced-motion: reduce) {
+  #ambient-bg-layer { animation: none; transform: none; }
+}
+:root[data-animazioni="statico"] #ambient-bg-layer { animation: none; }
+
 /* Reattività Hover & Focus luminoso (sobrio e morbido) */
 .sezione:hover,
 .profilo-sezione:hover {
@@ -1654,6 +1672,10 @@ tbody tr:hover {
 /* 2 riquadri vitali superiori per Difesa e Riposo (CA e Riposo) */
 .vitali-difesa { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: stretch; width: 100%; }
 .vitali-difesa > * { min-width: 0; }
+/* Copertura e tipo di armatura nel riquadro CA: stessa larghezza (88%); su telefono a tutta
+   larghezza, così il testo non si taglia. */
+.ca-select { width: 88%; }
+@media (max-width: 780px) { .ca-select { width: 100%; } }
 /* 4 riquadri vitali separati (Comp, Iniziativa, Velocità, Sfinimento / Visione, Perc. Passiva, Resistenze, Condizioni) */
 .vitali-sezioni-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 8px; align-items: stretch; width: 100%; }
 .vitali-sezioni-4 > * { min-width: 0; }

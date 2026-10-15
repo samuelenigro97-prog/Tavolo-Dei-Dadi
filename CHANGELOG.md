@@ -2,6 +2,17 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.106.1] – 2026-10-15
+
+### Aggiunto
+- **Sfondo con un leggero movimento**: un "respiro" lentissimo (zoom e scivolamento di pochi punti
+  percentuali, 70 secondi avanti e indietro) sul livello dello sfondo, solo con trasformazioni
+  (GPU, costo minimo). Si ferma con "riduci movimento" del sistema.
+
+### Modificato
+- **Classe Armatura**: il menu Copertura ha la stessa larghezza del menu del tipo di armatura
+  (88% del riquadro, a tutta larghezza sul telefono), e "base 14", scudo e "+1" sono più distanziati.
+
 ## [4.106.0] – 2026-10-15
 
 ### Aggiunto

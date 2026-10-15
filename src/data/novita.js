@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.106.1',
+    voci: {
+      it: ['Lo sfondo ha un leggero movimento lento (si ferma con "riduci movimento"). Classe Armatura: Copertura larga come il menu sotto e riga base/scudo più spaziata.'],
+      en: ['The background has a slow, gentle motion (it stops with "reduce motion"). Armor Class: Cover as wide as the menu below and a roomier base/shield row.'],
+    },
+  },
+  {
     versione: '4.106.0',
     voci: {
       it: [
