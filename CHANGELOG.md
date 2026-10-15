@@ -2,6 +2,15 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.107.3] – 2026-10-15
+
+### Modificato
+- **Menu iniziale, bordi unificati**: tutti i tasti del menu hanno il bordo del tema generico (lo stesso
+  del pannello, della barra in alto e del combat tracker). Il tasto della sincronizzazione non cambia più
+  bordo e colore del testo: lo stato (attiva, da inviare, spenta) è un pallino colorato accanto alla scritta.
+- **Etichette più corte**: "Backup e sincronizzazione" → "Backup", "Avvisi (!)" → "Avvisi",
+  "Manuali e fonti (N attivi)" → "Manuali e fonti (N)".
+
 ## [4.107.2] – 2026-10-15
 
 ### Modificato

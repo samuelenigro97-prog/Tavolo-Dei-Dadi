@@ -6,9 +6,11 @@ import { t } from '../../i18n';
 import { URL_ARCHIVIO_PG } from '../../utils/ambiente.js';
 
 /** Titoletti delle sezioni del menu: stesso stile delle etichette della barra (SISTEMA, SCHEDA, SESSIONE). */
-// Tasti del menu in griglia: tutti alti uguali, testo su due righe se serve (mai tagliato).
+// Tasti del menu in griglia: tutti alti uguali, testo su due righe se serve (mai tagliato),
+// bordo del tema generico (lo stesso del pannello, della barra in alto e del combat tracker).
+const bordoTema = '1.5px solid var(--c-tema-bordo)';
 const tastoGriglia = {
-  width: '100%', minHeight: 34, padding: '4px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+  border: bordoTema, width: '100%', minHeight: 34, padding: '4px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center',
   gap: 6, textAlign: 'center', lineHeight: 1.2, boxSizing: 'border-box',
 };
 const griglia2 = { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 6 };
@@ -17,7 +19,7 @@ const etichettaSezione = {
   color: 'color-mix(in srgb, var(--c-gold-dark) 60%, var(--c-ink))', fontFamily: 'var(--font-title)', userSelect: 'none', marginBottom: 6,
 };
 
-export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg, apriNotifiche, erroreImport, esportaBackupCompleto, generaPgCasuale, idDispositivo, isCloudAttivo, jsonRef, leggiSnapshots, lingua, manualiAttivi, mostraListaCarica, novitaNonLette, roster, scheda, setBozzaCrea, setCloudStatus, setConferma, setLingua, setMostraArchivioDm, setMostraCloud, setMostraCrea, setMostraDonazioni, setMostraListaCarica, setMostraMenu, setMostraMenuEsporta, setMostraModalManuali, setMostraNoteLegali, setMostraRipristino, setPosEsporta, setRoster, setSchedaSolaLettura, setTemaCornici, statoBgCloud, statoColoreCloud, statoGlowCloud, temaCornici }) {
+export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg, apriNotifiche, erroreImport, esportaBackupCompleto, generaPgCasuale, idDispositivo, isCloudAttivo, jsonRef, leggiSnapshots, lingua, manualiAttivi, mostraListaCarica, roster, scheda, setBozzaCrea, setCloudStatus, setConferma, setLingua, setMostraArchivioDm, setMostraCloud, setMostraCrea, setMostraDonazioni, setMostraListaCarica, setMostraMenu, setMostraMenuEsporta, setMostraModalManuali, setMostraNoteLegali, setMostraRipristino, setPosEsporta, setRoster, setSchedaSolaLettura, setTemaCornici, statoColoreCloud, statoGlowCloud, temaCornici }) {
   // `attivo` viene salvato nel roster: è quindi anche l'ultimo personaggio effettivamente usato.
   const ultimoPersonaggio = roster?.personaggi?.[roster?.attivo] || scheda;
   const apriUltimoPersonaggio = () => {
@@ -92,7 +94,7 @@ export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg
           {t('menu.nuovo_personaggio')}
         </button>
         <button
-          style={{ ...styles.button, width: '100%', marginBottom: 8 }}
+          style={{ ...styles.button, border: bordoTema, width: '100%', marginBottom: 8 }}
           onClick={() => setMostraListaCarica((v) => !v)}
         >
           {t('menu.carica_personaggio')} {mostraListaCarica ? '▴' : '▾'} ({Object.keys(roster.personaggi).length})
@@ -166,7 +168,7 @@ export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg
             style={{ ...styles.button, ...tastoGriglia }}
             onClick={() => { setMostraModalManuali(true); }}
           >
-            <span>{lingua === 'it' ? `Manuali e fonti (${Object.values(manualiAttivi).filter(Boolean).length} attivi)` : `Sourcebooks (${Object.values(manualiAttivi).filter(Boolean).length} active)`}</span>
+            <span>{lingua === 'it' ? `Manuali e fonti (${Object.values(manualiAttivi).filter(Boolean).length})` : `Sourcebooks (${Object.values(manualiAttivi).filter(Boolean).length})`}</span>
           </button>
         </div>
     
@@ -179,7 +181,7 @@ export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg
               onClick={() => { setMostraMenu(false); setTimeout(() => apriNotifiche(), 50); }}
               title={t('notifiche.titolo')}
             >
-              <span>{t('notifiche.titolo_breve')}{novitaNonLette ? ' (!)' : ''}</span>
+              <span>{t('notifiche.titolo_breve')}</span>
             </button>
             <button
               style={{ ...styles.button, ...tastoGriglia }}
@@ -205,17 +207,13 @@ export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg
               style={{
                 ...styles.button,
                 ...tastoGriglia,
-                border: `1.5px solid ${statoColoreCloud}`,
-                background: statoBgCloud,
-                color: statoColoreCloud,
-                boxShadow: statoGlowCloud,
-                transition: 'all 0.25s ease',
               }}
               onClick={() => { setMostraMenu(false); setTimeout(() => { setCloudStatus({ text: '', type: '' }); setMostraCloud(true); }, 50); }}
               title={isCloudAttivo ? (lingua === 'en' ? 'Sync is on' : 'Sincronizzazione attiva') : (lingua === 'en' ? 'Sync is off' : 'Sincronizzazione non attiva')}
             >
-              
-              <span>{lingua === 'en' ? 'Backup & sync' : 'Backup e sincronizzazione'}</span>
+              {/* Bordo uguale agli altri tasti: lo stato della sincronizzazione è il pallino. */}
+              <span aria-hidden="true" data-testid="menu-backup-stato" style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, background: statoColoreCloud, boxShadow: statoGlowCloud }} />
+              <span>Backup</span>
             </button>
           </div>
         </div>

@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.107.3',
+    voci: {
+      it: ['Menu iniziale: tutti i tasti con lo stesso bordo del tema; etichette più corte (Backup, Avvisi, Manuali e fonti con il solo numero).'],
+      en: ['Start menu: every button has the same theme border; shorter labels (Backup, Notices, Sourcebooks with just the number).'],
+    },
+  },
+  {
     versione: '4.107.2',
     voci: {
       it: ['Menu iniziale, barra in alto e combat tracker con lo stesso grigio e lo stesso bordo del tema generico.', 'Il menu iniziale sta tutto nello schermo, senza barra per scorrere.'],
