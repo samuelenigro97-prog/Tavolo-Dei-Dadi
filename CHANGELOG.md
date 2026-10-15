@@ -2,6 +2,16 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.108.1] – 2026-10-15
+
+### Modificato
+- **Barra a scomparsa più pulita**: chiudendosi, le icone spariscono prima che la barra salga (prima
+  per un attimo se ne vedevano i pezzi nella striscia). Angoli tutti arrotondati.
+- **Barra in alto e combat tracker sul fondo della scheda del PG corrente** (`--c-pg-panel`), tasti
+  della barra compresi; il bordo resta quello del tema generico. Il menu iniziale resta sul tema base.
+- **Combat tracker ridotto più corto**: "Round 1 · Vaelion" senza "Turno di"; largo al massimo quanto il
+  margine accanto alla scheda, così non le finisce sopra (il nome lungo va in ellissi).
+
 ## [4.108.0] – 2026-10-15
 
 ### Aggiunto

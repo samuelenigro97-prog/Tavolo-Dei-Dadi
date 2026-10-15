@@ -1989,7 +1989,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.108.0';
+const APP_VERSION = '4.108.1';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -9673,10 +9673,7 @@ export default function App() {
             ...styles.panel,
             // Barra in alto sul tema base dell'app (come menu e combat tracker), non sui colori della classe.
             ...stileTemaBase,
-            borderTopLeftRadius: 0,
-            borderTopRightRadius: 12,
-            borderBottomRightRadius: 0,
-            borderBottomLeftRadius: 12,
+            borderRadius: 12,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -17691,7 +17688,7 @@ export default function App() {
 
       {/* ===== Combat tracker: barra fissa in basso (stile Fantasy Grounds) ===== */}
       {combat.attivo && combat.aperto ? (
-        <div ref={combatRef} data-testid="combat-tracker" style={{ ...stileTemaBase, position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 1500, background: 'var(--c-tema-sfondo)', borderTop: '1.5px solid var(--c-tema-bordo)', boxShadow: '0 -6px 24px rgba(0,0,0,0.45)' }}>
+        <div ref={combatRef} data-testid="combat-tracker" style={{ ...stileTemaBase, position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 1500, background: 'var(--c-pg-panel, var(--c-tema-sfondo))', borderTop: '1.5px solid var(--c-tema-bordo)', boxShadow: '0 -6px 24px rgba(0,0,0,0.45)' }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', padding: '8px 12px' }}>
             {/* BARRA SUPERIORE CONTROLLI COMBAT TRACKER */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 8, paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
@@ -18311,7 +18308,9 @@ export default function App() {
           data-testid="combat-pillola"
           onClick={() => setCombat((c) => ({ ...c, aperto: true }))}
           style={{
-            // Sempre il tema base dell'app, anche quando è il turno del personaggio.
+            // Tema base dell'app per testi e tasti, sul fondo della scheda del PG corrente
+            // (come la barra in alto). Stretta quanto il margine accanto alla scheda (larga
+            // 1080 px), così non le finisce sopra; il nome lungo va in ellissi.
             ...stileTemaBase,
             position: 'fixed',
             bottom: 14,
@@ -18320,7 +18319,9 @@ export default function App() {
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            background: 'var(--c-tema-sfondo)',
+            maxWidth: 'max(300px, calc((100vw - 1080px) / 2 - 30px))',
+            boxSizing: 'border-box',
+            background: 'var(--c-pg-panel, var(--c-tema-sfondo))',
             border: '1.5px solid var(--c-tema-bordo)',
             color: 'var(--c-gold-dark)',
             padding: '7px 14px',
@@ -18340,19 +18341,19 @@ export default function App() {
             <span
               data-testid="ct-mini-iniziativa"
               title={tr('Iniziativa di chi è di turno', 'Initiative of the creature whose turn it is')}
-              style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, background: eCombattentePgAttivo(combat.combattenti[combat.turno], combat.combattenti) ? 'var(--c-pg-gold-dark)' : 'var(--c-gold-dark)', color: eCombattentePgAttivo(combat.combattenti[combat.turno], combat.combattenti) ? 'var(--c-pg-on-gold)' : C.onGold, borderRadius: 14, padding: '2px 10px', lineHeight: 1.2 }}
+              style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, background: eCombattentePgAttivo(combat.combattenti[combat.turno], combat.combattenti) ? 'var(--c-pg-gold-dark)' : 'var(--c-gold-dark)', color: eCombattentePgAttivo(combat.combattenti[combat.turno], combat.combattenti) ? 'var(--c-pg-on-gold)' : C.onGold, borderRadius: 14, padding: '2px 10px', lineHeight: 1.2, flexShrink: 0 }}
             >
               <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', opacity: 0.85 }}>{tr('Iniz.', 'Init.')}</span>
               <span style={{ fontSize: 18, fontWeight: 900 }}>{combat.combattenti[combat.turno].iniziativa}</span>
             </span>
           )}
-          <span>
-            {t('ct.round')} {combat.round} · {lingua === 'en' ? '' : 'Turno di '}
+          <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {t('ct.round')} {combat.round} ·{' '}
             <span data-testid="ct-mini-nome" style={combat.combattenti[combat.turno] && eCombattentePgAttivo(combat.combattenti[combat.turno], combat.combattenti) ? { color: 'var(--c-pg-title)' } : undefined}>
-              {lingua === 'en' ? `${combat.combattenti[combat.turno]?.nome || 'PC'}'s turn` : (combat.combattenti[combat.turno]?.nome || 'PG')}
+              {combat.combattenti[combat.turno]?.nome || (lingua === 'en' ? 'PC' : 'PG')}
             </span>
           </span>
-          <span style={{ fontSize: 11, opacity: 0.9 }}>▲</span>
+          <span style={{ fontSize: 11, opacity: 0.9, flexShrink: 0 }}>▲</span>
           {/* ✕ per chiudere il combattimento senza riaprire il tracker: chiede conferma. */}
           <button
             type="button"
@@ -18363,7 +18364,7 @@ export default function App() {
               e.stopPropagation();
               if (window.confirm(t('ct.fine_conferma'))) setCombat({ attivo: false, aperto: true, round: 1, turno: 0, combattenti: [] });
             }}
-            style={{ ...stileTastoTondo, marginLeft: 2, color: 'var(--c-red)', border: '1.5px solid var(--c-red)' }}
+            style={{ ...stileTastoTondo, marginLeft: 2, flexShrink: 0, color: 'var(--c-red)', border: '1.5px solid var(--c-red)' }}
           >
             ✕
           </button>

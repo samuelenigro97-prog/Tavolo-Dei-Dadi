@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.108.1',
+    voci: {
+      it: ['Barra in alto e combat tracker sul fondo della scheda del personaggio; la barra a scomparsa non mostra più pezzi di icone mentre si chiude.', 'Combat tracker ridotto più corto, accanto alla scheda e non sopra.'],
+      en: ['Top bar and combat tracker use the character sheet background; the auto-hiding bar no longer shows bits of icons while closing.', 'Shorter minimized combat tracker, beside the sheet instead of over it.'],
+    },
+  },
+  {
     versione: '4.108.0',
     voci: {
       it: ['Barra in alto a scomparsa sul computer: avvicina il cursore alla cima dello schermo per farla scendere.', 'Sfondi con più movimento e una luce morbida che scorre.', 'Tasti della barra tutti dello stesso stile; sincronizzazione e combattimento indicati da un pallino.'],

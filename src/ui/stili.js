@@ -1751,15 +1751,12 @@ tbody tr:hover {
   z-index: 1200 !important;
   backdrop-filter: blur(14px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
-  /* Grigio e bordo del tema generico (--c-tema-*, da stileTemaBase): gli stessi del menu
-     iniziale e del combat tracker. In tema scuro il grigio si stacca dallo sfondo della scheda. */
-  background: color-mix(in srgb, var(--c-tema-sfondo, var(--c-panel)) 96%, transparent) !important;
+  /* Fondo della scheda del PG corrente (--c-pg-panel, come il combat tracker); bordo del tema
+     generico (--c-tema-bordo, da stileTemaBase). */
+  background: color-mix(in srgb, var(--c-pg-panel, var(--c-panel)) 96%, transparent) !important;
   border: 1.5px solid var(--c-tema-bordo, var(--c-border)) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
-  border-top-left-radius: 0 !important;
-  border-top-right-radius: 12px !important;
-  border-bottom-right-radius: 0 !important;
-  border-bottom-left-radius: 12px !important;
+  border-radius: 12px !important;
   margin-top: 0 !important;
   overflow-x: auto !important;
   overflow-y: hidden !important;
@@ -1807,10 +1804,11 @@ tbody tr:hover {
     transition-delay: 0s;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
   }
-  /* A barra chiusa il contenuto sfuma: nella striscia resta solo la maniglia. */
+  /* A barra chiusa il contenuto è nascosto: nella striscia resta solo la maniglia. */
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa > * {
     opacity: 0;
-    transition: opacity 0.2s ease 0.6s;
+    /* Sparisce prima che la barra salga (0.6 s): nella striscia non restano mai icone a metà. */
+    transition: opacity 0.15s ease 0.4s;
   }
   :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa > *,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover > *,
@@ -2231,10 +2229,7 @@ tbody tr:hover {
     padding: 3px 6px !important;
     margin-bottom: 6px !important;
     overflow: hidden !important;
-    border-top-left-radius: 0 !important;
-    border-top-right-radius: 10px !important;
-    border-bottom-right-radius: 0 !important;
-    border-bottom-left-radius: 10px !important;
+    border-radius: 10px !important;
     min-height: 36px !important;
     box-sizing: border-box !important;
   }
@@ -2556,11 +2551,11 @@ tbody tr:hover {
 .btn-header-azione:hover {
   border-color: var(--c-gold-dark);
 }
-/* Tasti della barra in alto: sempre il fondo della barra e un sottile bordo del colore del
-   bordo della barra (tema generico), qualunque stato abbiano. Gli stati (sincronizzazione,
+/* Tasti della barra in alto: sempre il fondo della barra (quello della scheda del PG) e un
+   sottile bordo del colore del bordo della barra, qualunque stato abbiano. Gli stati (sincronizzazione,
    combattimento in corso) sono un pallino nell'angolo; gli avvisi fanno suonare il campanello. */
 .barra-superiore-fissa .btn-header-azione {
-  background: var(--c-tema-sfondo, var(--c-panel)) !important;
+  background: var(--c-pg-panel, var(--c-panel)) !important;
   border: 1px solid var(--c-tema-bordo, var(--c-border)) !important;
   box-shadow: none !important;
   color: var(--c-ink) !important;
