@@ -37,3 +37,41 @@ test('su telefono la barra resta sempre visibile', async ({ page }) => {
   const box = await page.locator('.barra-superiore-fissa').boundingBox();
   expect(box.y).toBeGreaterThanOrEqual(0);
 });
+
+test('mentre la barra scorre le icone non si vedono (v4.108.2)', async ({ page }) => {
+  await page.addInitScript(() => Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false }));
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await apriScheda(page);
+  await page.mouse.move(640, 500);
+  const barra = page.locator('.barra-superiore-fissa');
+  await expect.poll(async () => (await barra.boundingBox()).y + (await barra.boundingBox()).height, { timeout: 4000 }).toBeLessThan(22);
+  // Si campiona nel browser, fotogramma per fotogramma, posizione della barra e opacità del contenuto.
+  const campiona = (durata) => page.evaluate((ms) => new Promise((fine) => {
+    const b = document.querySelector('.barra-superiore-fissa');
+    const figlio = b.firstElementChild;
+    const out = [];
+    const t0 = performance.now();
+    const passo = () => {
+      const r = b.getBoundingClientRect();
+      out.push({ fondo: r.bottom, opacita: Number(getComputedStyle(figlio).opacity) });
+      if (performance.now() - t0 < ms) requestAnimationFrame(passo); else fine(out);
+    };
+    passo();
+  }), durata);
+  const altezza = (await barra.boundingBox()).height;
+  await page.mouse.move(640, 4);
+  const apertura = await campiona(900);
+  await page.mouse.move(640, 500);
+  const chiusura = await campiona(1400);
+  // La barra scorre (transizione sul transform), non scatta: lo stile in linea non deve vincere.
+  const transizione = await barra.evaluate((el) => {
+    const cs = getComputedStyle(el);
+    const prop = cs.transitionProperty.split(',').map((x) => x.trim());
+    const dur = cs.transitionDuration.split(',').map((x) => parseFloat(x));
+    return dur[prop.indexOf('transform')] || 0;
+  });
+  expect(transizione).toBeGreaterThan(0.2);
+  expect(chiusura.at(-1).fondo).toBeLessThan(22);
+  // Mentre è a metà corsa il contenuto è invisibile.
+  for (const f of [...apertura, ...chiusura].filter((x) => x.fondo < altezza - 8)) expect(f.opacita).toBeLessThan(0.05);
+});

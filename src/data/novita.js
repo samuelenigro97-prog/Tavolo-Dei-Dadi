@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.108.2',
+    voci: {
+      it: ['Barra a scomparsa: ora scorre davvero, e le icone non si vedono mai mentre si apre o si chiude.'],
+      en: ['Auto-hiding bar: it now really slides, and the icons are never visible while it opens or closes.'],
+    },
+  },
+  {
     versione: '4.108.1',
     voci: {
       it: ['Barra in alto e combat tracker sul fondo della scheda del personaggio; la barra a scomparsa non mostra più pezzi di icone mentre si chiude.', 'Combat tracker ridotto più corto, accanto alla scheda e non sopra.'],

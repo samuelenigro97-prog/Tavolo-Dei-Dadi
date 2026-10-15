@@ -2,6 +2,15 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.108.2] – 2026-10-15
+
+### Corretto
+- **Barra a scomparsa, animazione vera**: lo stile in linea della sezione (`styles.panel`) aveva una sua
+  `transition` che vinceva su quella del CSS, così la barra scattava di colpo invece di scorrere e le icone
+  restavano visibili nella striscia mentre sfumavano. Ora le transizioni della barra sono `!important`:
+  chiudendo, prima spariscono le icone e poi la barra sale; aprendo, la barra scende vuota e le icone
+  compaiono alla fine. Nuovo test che campiona l'animazione fotogramma per fotogramma.
+
 ## [4.108.1] – 2026-10-15
 
 ### Modificato

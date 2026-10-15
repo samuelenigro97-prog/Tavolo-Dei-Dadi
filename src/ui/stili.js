@@ -1794,27 +1794,30 @@ tbody tr:hover {
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa {
     margin-bottom: -30px !important;
     transform: translateY(calc(-100% + 10px));
-    transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1) 0.6s, box-shadow 0.3s ease 0.6s;
+    /* !important: lo stile in linea della sezione (styles.panel) ha già una sua transition,
+       che altrimenti vince e la barra scatta invece di scorrere. */
+    transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1) 0.6s, box-shadow 0.3s ease 0.6s !important;
     box-shadow: none !important;
   }
   :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:focus-within {
     transform: translateY(0);
-    transition-delay: 0s;
+    transition-delay: 0s !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
   }
   /* A barra chiusa il contenuto è nascosto: nella striscia resta solo la maniglia. */
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa > * {
     opacity: 0;
     /* Sparisce prima che la barra salga (0.6 s): nella striscia non restano mai icone a metà. */
-    transition: opacity 0.15s ease 0.4s;
+    transition: opacity 0.15s ease 0.4s !important;
   }
   :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa > *,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover > *,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:focus-within > * {
     opacity: 1;
-    transition: opacity 0.25s ease 0.08s;
+    /* Compare quando la barra è quasi scesa del tutto, non mentre scorre. */
+    transition: opacity 0.18s ease 0.24s !important;
   }
   /* Maniglia: si vede solo a barra chiusa. */
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa::before {
