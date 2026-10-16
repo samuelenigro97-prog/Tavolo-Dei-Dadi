@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.108.3] – 2026-10-16
+
+### Modificato
+- **Combat tracker, frecce**: aperto, il tasto per ridurlo è un ▲ al posto del "−"; ridotto, la pillola mostra
+  ▼. Come nel resto dell'app: ▲ = aperto (si chiude), ▼ = chiuso (si apre).
+
 ## [4.108.2] – 2026-10-15
 
 ### Corretto

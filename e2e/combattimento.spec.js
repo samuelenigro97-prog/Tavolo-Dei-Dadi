@@ -256,8 +256,8 @@ test('danno ad area: più bersagli, vulnerabilità e immunità lette dai tratti 
   });
   await apriScheda(page);
   await page.locator('[data-combat-toggle="true"]').filter({ hasText: 'Round' }).click();
-  // Il tasto per ridurre il tracker è un "−", non più un quadrato.
-  await expect(page.getByRole('button', { name: 'Riduci a icona' })).toHaveText('−');
+  // Il tasto per ridurre il tracker è un ▲ (aperto), come nel resto dell'app; la pillola ridotta ha ▼.
+  await expect(page.getByRole('button', { name: 'Riduci a icona' })).toHaveText('▲');
 
   await page.getByTestId('ct-area').click();
   const finestra = page.getByTestId('area-modal');

@@ -1989,7 +1989,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.108.2';
+const APP_VERSION = '4.108.3';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -17847,12 +17847,13 @@ export default function App() {
                 <button
                   type="button"
                   data-testid="ct-minimizza"
-                  style={{ ...stileTastoTondo, color: 'var(--c-gold-dark)', border: '1.5px solid var(--c-gold-dark)' }}
+                  style={{ ...stileTastoTondo, fontSize: 11, color: 'var(--c-gold-dark)', border: '1.5px solid var(--c-gold-dark)' }}
                   onClick={() => setCombat((c) => ({ ...c, aperto: false }))}
                   title={t('ct.minimizza')}
                   aria-label={t('ct.minimizza')}
                 >
-                  −
+                  {/* Come nel resto dell'app: ▲ = aperto (si chiude), ▼ = chiuso (si apre). */}
+                  ▲
                 </button>
                 <button
                   type="button"
@@ -18353,7 +18354,7 @@ export default function App() {
               {combat.combattenti[combat.turno]?.nome || (lingua === 'en' ? 'PC' : 'PG')}
             </span>
           </span>
-          <span style={{ fontSize: 11, opacity: 0.9, flexShrink: 0 }}>▲</span>
+          <span style={{ fontSize: 11, opacity: 0.9, flexShrink: 0 }}>▼</span>
           {/* ✕ per chiudere il combattimento senza riaprire il tracker: chiede conferma. */}
           <button
             type="button"

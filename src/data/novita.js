@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.108.3',
+    voci: {
+      it: ['Combat tracker: ▲ per ridurlo quando è aperto, ▼ sulla pillola quando è ridotto.'],
+      en: ['Combat tracker: ▲ to minimize it when open, ▼ on the pill when minimized.'],
+    },
+  },
+  {
     versione: '4.108.2',
     voci: {
       it: ['Barra a scomparsa: ora scorre davvero, e le icone non si vedono mai mentre si apre o si chiude.'],
