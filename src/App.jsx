@@ -3587,27 +3587,6 @@ export default function App() {
     try { localStorage.setItem('scheda-interattiva:combat', JSON.stringify(combat)); } catch { /* niente */ }
   }, [combat]);
 
-  // Minimizza il Combat Tracker quando si clicca all'esterno della barra, preservando lo stato esatto
-  useEffect(() => {
-    if (!combat.attivo || !combat.aperto) return;
-
-    function handleClickOutside(e) {
-      if (combatRef.current && combatRef.current.contains(e.target)) return;
-      if (e.target?.closest?.('[data-combat-toggle]')) return;
-      if (e.target?.closest?.('.modal-backdrop, [role="dialog"], [data-no-ct-close]')) return;
-      setCombat((c) => (c.aperto ? { ...c, aperto: false } : c));
-    }
-
-    const timer = setTimeout(() => {
-      document.addEventListener('pointerdown', handleClickOutside, true);
-    }, 80);
-
-    return () => {
-      clearTimeout(timer);
-      document.removeEventListener('pointerdown', handleClickOutside, true);
-    };
-  }, [combat.attivo, combat.aperto]);
-
   const [ctDmg, setCtDmg] = useState({}); // valore danno/cura per combattente (id → stringa)
   const [storicoAperto, setStoricoAperto] = useState(false);
   // Mappa della campagna: immagine caricata dal DM, apribile/chiudibile come il
@@ -18248,49 +18227,6 @@ export default function App() {
               );
             })()}
           </div>
-        </div>
-      ) : combat.attivo && !combat.aperto && combat.combattenti.length > 0 ? (
-        <div role="button" tabIndex={0}
-          data-combat-toggle="true"
-          onClick={() => setCombat((c) => ({ ...c, aperto: true }))}
-          style={{
-            position: 'fixed',
-            bottom: 14,
-            right: 18,
-            zIndex: 1490,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            background: 'var(--c-panel)',
-            border: '2px solid var(--c-gold-dark)',
-            color: 'var(--c-gold-dark)',
-            padding: '7px 14px',
-            borderRadius: 24,
-            boxShadow: '0 4px 18px rgba(0,0,0,0.35)',
-            cursor: 'pointer',
-            fontWeight: 800,
-            fontSize: 13,
-            letterSpacing: 0.3,
-            transition: 'all 0.2s ease',
-            userSelect: 'none',
-          }}
-          title={t('ct.apri')}
-        >
-          {/* Iniziativa di chi è di turno, in bella vista. */}
-          {combat.combattenti[combat.turno]?.iniziativa != null && combat.combattenti[combat.turno]?.iniziativa !== '' && (
-            <span
-              data-testid="ct-mini-iniziativa"
-              title={tr('Iniziativa di chi è di turno', 'Initiative of the creature whose turn it is')}
-              style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, background: 'var(--c-gold-dark)', color: C.onGold, borderRadius: 14, padding: '2px 10px', lineHeight: 1.2 }}
-            >
-              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', opacity: 0.85 }}>{tr('Iniz.', 'Init.')}</span>
-              <span style={{ fontSize: 18, fontWeight: 900 }}>{combat.combattenti[combat.turno].iniziativa}</span>
-            </span>
-          )}
-          <span>
-            {t('ct.round')} {combat.round} · {lingua === 'en' ? `${combat.combattenti[combat.turno]?.nome || 'PC'}'s turn` : `Turno di ${combat.combattenti[combat.turno]?.nome || 'PG'}`}
-          </span>
-          <span style={{ fontSize: 11, opacity: 0.9 }}>▲</span>
         </div>
       ) : null}
       <NuvolettaGlobale />
