@@ -17609,24 +17609,43 @@ export default function App() {
 
       {/* ===== Combat tracker: barra fissa in basso (stile Fantasy Grounds) ===== */}
       {combat.attivo && combat.aperto ? (
-        <div ref={combatRef} style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 1500, background: C.panel, borderTop: `2px solid var(--c-gold-dark)`, boxShadow: '0 -6px 24px rgba(0,0,0,0.45)' }}>
-          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '8px 12px' }}>
+        <div
+          ref={combatRef}
+          style={{
+            position: 'fixed',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            bottom: 0,
+            width: '100%',
+            maxWidth: 1080,
+            zIndex: 1500,
+            background: C.panel,
+            borderTop: `2px solid var(--c-gold-dark)`,
+            borderLeft: `1px solid ${C.border}`,
+            borderRight: `1px solid ${C.border}`,
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12,
+            boxShadow: '0 -6px 28px rgba(0,0,0,0.5)',
+            boxSizing: 'border-box',
+          }}
+        >
+          <div style={{ padding: '8px 12px' }}>
             {/* BARRA SUPERIORE CONTROLLI COMBAT TRACKER */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 8, paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
               {/* Gruppo 1: Round & Turno */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(214,169,15,0.18)', border: `1.5px solid ${C.goldDark}`, color: C.goldDark, padding: '3px 8px', borderRadius: 8, fontWeight: 800, fontSize: 13, letterSpacing: 0.5, whiteSpace: 'nowrap' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(214,169,15,0.18)', border: `1.5px solid ${C.goldDark}`, color: C.goldDark, padding: '0 9px', borderRadius: 6, fontWeight: 800, fontSize: 12, letterSpacing: 0.5, whiteSpace: 'nowrap', height: 26, boxSizing: 'border-box' }}>
                   {t('ct.round').toUpperCase()} {combat.round}
                 </span>
                 <button
-                  style={{ ...styles.buttonMini, padding: '4px 8px', fontSize: 12, whiteSpace: 'nowrap' }}
+                  style={{ ...styles.buttonMini, height: 26, padding: '0 8px', fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}
                   onClick={turnoPrecedente}
                   title={t('ct.prec')}
                 >
                   {t('ct.prec')}
                 </button>
                 <button
-                  style={{ ...styles.buttonMini, background: 'var(--c-gold-dark)', color: C.onGold, borderColor: 'var(--c-gold-dark)', fontWeight: 800, padding: '4px 10px', fontSize: 12, whiteSpace: 'nowrap' }}
+                  style={{ ...styles.buttonMini, height: 26, background: 'var(--c-gold-dark)', color: C.onGold, borderColor: 'var(--c-gold-dark)', fontWeight: 800, padding: '0 10px', fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}
                   onClick={prossimoTurno}
                   title={t('ct.succ')}
                 >
@@ -17671,14 +17690,14 @@ export default function App() {
                   </select>
                 ) : (
                   <button
-                    style={{ ...styles.buttonMini, background: 'rgba(46,139,87,0.1)', color: C.green, borderColor: C.green, fontWeight: 700, whiteSpace: 'nowrap' }}
+                    style={{ ...styles.buttonMini, height: 26, background: 'rgba(46,139,87,0.1)', color: C.green, borderColor: C.green, fontWeight: 700, whiteSpace: 'nowrap' }}
                     onClick={() => aggiungiCombattente('alleato')}
                   >
                     ＋ {t('ct.alleato')}
                   </button>
                 )}
                 <button
-                  style={{ ...styles.buttonMini, background: 'rgba(176,58,46,0.1)', color: C.red, borderColor: C.red, fontWeight: 700, whiteSpace: 'nowrap' }}
+                  style={{ ...styles.buttonMini, height: 26, background: 'rgba(176,58,46,0.1)', color: C.red, borderColor: C.red, fontWeight: 700, whiteSpace: 'nowrap' }}
                   onClick={() => aggiungiCombattente('nemico')}
                 >
                   ＋ {t('ct.nemico')}
@@ -17740,45 +17759,59 @@ export default function App() {
                 </select>
               </div>
 
-              {/* Gruppo 3: Strumenti & Gestione */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-                <button
-                  style={{ ...styles.buttonMini, color: C.goldDark, borderColor: C.goldDark, whiteSpace: 'nowrap', padding: '3px 8px', fontWeight: 700 }}
-                  title={lingua === 'it' ? "Tira l'iniziativa per tutti i combattenti e ordina il turno" : "Roll initiative for all combatants and order turn"}
-                  onClick={tiraIniziativeTutti}
-                >
-                  {lingua === 'it' ? 'Iniziative' : 'Initiatives'}
-                </button>
-                <button
-                  style={{ ...styles.buttonMini, whiteSpace: 'nowrap', padding: '3px 8px' }}
-                  onClick={ordinaIniziativa}
-                  title={tr('Ordina i combattenti per iniziativa decrescente', 'Sort combatants by initiative, highest first')}
-                >
-                  Ordina
-                </button>
-                <button
-                  style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, whiteSpace: 'nowrap', padding: '3px 8px' }}
-                  title={tr('Danno ad area (es. Palla di Fuoco): scegli i bersagli, anche te e i tuoi alleati, con resistenze e immunità', 'Area damage (e.g. Fireball): choose the targets, including you and your allies, with resistances and immunities')}
-                  data-testid="ct-area"
-                  onClick={() => setAreaDanno({ valore: '', tipo: 'Fuoco', magico: true, dettaglio: '', sel: {}, ts: {}, difese: {} })}
-                >
-                  Area
-                </button>
-                <button
-                  style={{ ...styles.buttonMini, padding: '3px 7px' }}
-                  onClick={() => setCombat((c) => ({ ...c, aperto: false }))}
-                  title={t('ct.minimizza')}
-                  aria-label={t('ct.minimizza')}
-                >
-                  −
-                </button>
-                <button
-                  style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '3px 7px' }}
-                  onClick={() => { if (window.confirm(t('ct.fine_conferma'))) setCombat({ attivo: false, aperto: true, round: 1, turno: 0, combattenti: [] }); }}
-                  title={t('ct.fine')}
-                >
-                  ✕
-                </button>
+              {/* Gruppo 3: Strumenti & Gestione ordinati a destra */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0, marginLeft: 'auto' }}>
+                {/* Cluster Strumenti Tattici */}
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(0,0,0,0.03)', padding: '2px 4px', borderRadius: 6, border: `1px solid ${C.border}` }}>
+                  <button
+                    style={{ ...styles.buttonMini, height: 24, color: C.goldDark, borderColor: 'rgba(201,162,39,0.3)', background: 'rgba(201,162,39,0.1)', whiteSpace: 'nowrap', padding: '0 7px', fontSize: 11, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                    title={lingua === 'it' ? "Tira l'iniziativa per tutti i combattenti e ordina il turno" : "Roll initiative for all combatants and order turn"}
+                    onClick={tiraIniziativeTutti}
+                  >
+                    <span>🎲</span>
+                    <span>{lingua === 'it' ? 'Iniziative' : 'Initiatives'}</span>
+                  </button>
+                  <button
+                    style={{ ...styles.buttonMini, height: 24, whiteSpace: 'nowrap', padding: '0 7px', fontSize: 11, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 3 }}
+                    onClick={ordinaIniziativa}
+                    title={tr('Ordina i combattenti per iniziativa decrescente', 'Sort combatants by initiative, highest first')}
+                  >
+                    <span>⇅</span>
+                    <span>Ordina</span>
+                  </button>
+                  <button
+                    style={{ ...styles.buttonMini, height: 24, color: C.red, borderColor: 'rgba(176,58,46,0.3)', background: 'rgba(176,58,46,0.08)', whiteSpace: 'nowrap', padding: '0 7px', fontSize: 11, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 3 }}
+                    title={tr('Danno ad area (es. Palla di Fuoco): scegli i bersagli, anche te e i tuoi alleati, con resistenze e immunità', 'Area damage (e.g. Fireball): choose the targets, including you and your allies, with resistances and immunities')}
+                    data-testid="ct-area"
+                    onClick={() => setAreaDanno({ valore: '', tipo: 'Fuoco', magico: true, dettaglio: '', sel: {}, ts: {}, difese: {} })}
+                  >
+                    <span>💥</span>
+                    <span>Area</span>
+                  </button>
+                </div>
+
+                {/* Divisore sottile tra strumenti di combattimento e controlli finestra */}
+                <div style={{ width: 1, height: 20, background: C.border, margin: '0 2px', opacity: 0.6 }} />
+
+                {/* Cluster Controlli Finestra */}
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                  <button
+                    style={{ ...styles.buttonMini, height: 26, width: 26, padding: 0, fontSize: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}
+                    onClick={() => setCombat((c) => ({ ...c, aperto: false }))}
+                    title={t('ct.minimizza')}
+                    aria-label={t('ct.minimizza')}
+                  >
+                    −
+                  </button>
+                  <button
+                    style={{ ...styles.buttonMini, height: 26, width: 26, padding: 0, fontSize: 13, color: C.red, borderColor: 'rgba(176,58,46,0.4)', background: 'rgba(176,58,46,0.06)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1, fontWeight: 700 }}
+                    onClick={() => { if (window.confirm(t('ct.fine_conferma'))) setCombat({ attivo: false, aperto: true, round: 1, turno: 0, combattenti: [] }); }}
+                    title={t('ct.fine')}
+                    aria-label={t('ct.fine')}
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
             </div>
 
