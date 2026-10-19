@@ -6138,7 +6138,8 @@ export default function App() {
   function esportaBackupCompleto() {
     const ids = Object.keys(roster.personaggi || {});
     if (!ids.length) return;
-    const dataStr = new Date().toISOString().slice(0, 10);
+    const d = new Date();
+    const dataStr = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
 
     // File unico di backup consolidato contenente TUTTI i personaggi
     const datiTutti = {
@@ -6153,7 +6154,7 @@ export default function App() {
     const urlRoster = URL.createObjectURL(blobRoster);
     const aRoster = document.createElement('a');
     aRoster.href = urlRoster;
-    aRoster.download = `tavolo-dei-dadi-roster-completo-${dataStr}.json`;
+    aRoster.download = `${dataStr}_TDD_ALL_v${APP_VERSION}.json`;
     aRoster.click();
     URL.revokeObjectURL(urlRoster);
     segnaBackupFatto();
@@ -7263,12 +7264,12 @@ export default function App() {
   function scaricaRosterJson(r, etichetta) {
     const ids = Object.keys(r?.personaggi || {});
     const quando = new Date();
-    const dataStr = `${quando.toISOString().slice(0, 10)}-${String(quando.getHours()).padStart(2, '0')}${String(quando.getMinutes()).padStart(2, '0')}`;
+    const dataStr = `${quando.getFullYear()}${String(quando.getMonth() + 1).padStart(2, '0')}${String(quando.getDate()).padStart(2, '0')}_${String(quando.getHours()).padStart(2, '0')}${String(quando.getMinutes()).padStart(2, '0')}`;
     const blob = new Blob([JSON.stringify({ tipo: 'tavolo-dei-dadi-roster', app: 'Tavolo dei Dadi', versione: APP_VERSION, data: quando.toISOString(), personaggi: ids.length, roster: r }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `tavolo-dei-dadi-${etichetta}-${dataStr}.json`;
+    a.download = `${dataStr}_TDD_${(etichetta || 'ROSTER').toUpperCase().replace(/[^A-Z0-9]+/g, '_')}_v${APP_VERSION}.json`;
     document.body.appendChild(a);
     a.click();
     a.remove();

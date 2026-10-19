@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.102.2] – 2026-10-20
+
+### Modificato
+- **Nome file backup roster**: il download del backup completo dei personaggi ora usa il formato ultra-compatto con data e versione `AAAAMMGG_TDD_ALL_vX.X.json` (es. `20261020_TDD_ALL_v4.102.2.json`), ideale per l'ordinamento cronologico automatico nel file manager.
+- **Velocità e movimento**: il valore della velocità è direttamente cliccabile per aprire il calcolatore di movimento e salti, con interfaccia più pulita. Semplificata la dicitura dell'Archivio delle schede.
+
 ## [4.102.1] – 2026-10-13
 
 ### Corretto
