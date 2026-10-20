@@ -28,6 +28,7 @@ import { incantesimiAraldiMancanti } from '../data/incantesimiAraldi.js';
 import { EVOCAZIONI_ARALDI } from '../data/bestiario.js';
 import { parseAzioniCompagno } from '../rules/regole.js';
 import { generaAvatarBestia } from '../ritratti.js';
+import { IconaRunica } from './IconaFantasy.jsx';
 
 const NOMI_BASE = ['Segreti', 'Debito'];
 
@@ -185,7 +186,8 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
                   color: raggiunta ? 'var(--c-araldi, #a45a2a)' : C.inkDim,
                   background: raggiunta ? 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))' : 'transparent',
                 }}>{raggiunta ? '✓ ' : ''}{s.soglia}</span>
-                <span style={{ minWidth: 0, flex: 1 }}>
+                <span style={{ minWidth: 0, flex: 1, display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                  <IconaRunica nome={s.nome} isAraldi={true} dimensione={18} />
                   <strong style={{ color: raggiunta ? C.ink : C.inkDim }}>{en ? s.nomeEn : s.nome}</strong>
                   <span style={{ color: C.inkDim }}> — {en ? s.effettoEn : s.effetto}</span>
                   {raggiunta && (

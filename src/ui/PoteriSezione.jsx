@@ -27,6 +27,7 @@ import {
 import { MODELLI_POTERI } from '../data/modelliPoteri.js';
 import { AraldiPannello } from './AraldiPannello.jsx';
 import { manualeAttivo } from '../data/dati5e.js';
+import { IconaRunica } from './IconaFantasy.jsx';
 
 function unitaBersaglio(chiave) {
   return BERSAGLI_MODIFICATORE_POTERE.find((b) => b.chiave === chiave)?.unita || '';
@@ -108,7 +109,8 @@ function PotereCard({ potere, scheda, onApri, lingua, nomiNelPannello = [] }) {
       title={lingua === 'en' ? 'Click for details, edit, delete or reorder' : 'Clicca per dettagli, modifica, eliminazione o riordino'}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <IconaRunica nome={potere.nome} isAraldi={isAraldiPotere} dimensione={22} />
           <strong style={{ fontSize: 13, color: isAraldiPotere ? 'var(--c-araldi, #a45a2a)' : C.ink }}>
             {potere.nome || (lingua === 'en' ? 'Unnamed power' : 'Potere senza nome')}
           </strong>
