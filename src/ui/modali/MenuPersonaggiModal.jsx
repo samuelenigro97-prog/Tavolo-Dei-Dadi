@@ -5,6 +5,7 @@ import { C } from '../tema.js';
 import { t } from '../../i18n';
 import { URL_ARCHIVIO_PG } from '../../utils/ambiente.js';
 import { IconaUI } from '../IconaFantasy.jsx';
+import { MANUALI_INFO, manualeAttivo } from '../../data/dati5e.js';
 
 /** Titoletti delle sezioni del menu: stesso stile delle etichette della barra (SISTEMA, SCHEDA, SESSIONE). */
 // Tasti del menu in griglia: tutti alti uguali, testo su due righe se serve (mai tagliato),
@@ -20,7 +21,8 @@ const etichettaSezione = {
   color: 'color-mix(in srgb, var(--c-gold-dark) 60%, var(--c-ink))', fontFamily: 'var(--font-title)', userSelect: 'none', marginBottom: 6,
 };
 
-export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg, apriNotifiche, erroreImport, esportaBackupCompleto, generaPgCasuale, idDispositivo, isCloudAttivo, jsonRef, leggiSnapshots, lingua, manualiAttivi, mostraListaCarica, roster, scheda, setBozzaCrea, setCloudStatus, setConferma, setLingua, setMostraArchivioDm, setMostraCloud, setMostraCrea, setMostraDonazioni, setMostraListaCarica, setMostraMenu, setMostraMenuEsporta, setMostraModalManuali, setMostraNoteLegali, setMostraRipristino, setPosEsporta, setRoster, setSchedaSolaLettura, setTemaCornici, statoColoreCloud, statoGlowCloud, temaCornici }) {
+export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg, apriNotifiche, erroreImport, esportaBackupCompleto, generaPgCasuale, idDispositivo, isCloudAttivo, jsonRef, leggiSnapshots, lingua, manualiAttivi, setManualiAttivi, mostraListaCarica, roster, scheda, setBozzaCrea, setCloudStatus, setConferma, setLingua, setMostraArchivioDm, setMostraCloud, setMostraCrea, setMostraDonazioni, setMostraListaCarica, setMostraMenu, setMostraMenuEsporta, setMostraModalManuali, setMostraNoteLegali, setMostraRipristino, setPosEsporta, setRoster, setSchedaSolaLettura, setTemaCornici, statoColoreCloud, statoGlowCloud, temaCornici }) {
+  const [mostraListaManuali, setMostraListaManuali] = useState(false);
   // `attivo` viene salvato nel roster: è quindi anche l'ultimo personaggio effettivamente usato.
   const ultimoPersonaggio = roster?.personaggi?.[roster?.attivo] || scheda;
   const apriUltimoPersonaggio = () => {
@@ -167,11 +169,111 @@ export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg
           <button style={{ ...styles.button, ...tastoGriglia }} onClick={() => generaPgCasuale()} title={t('menu.pg_casuale_tooltip')}>{t('menu.pg_casuale')}</button>
           <button
             style={{ ...styles.button, ...tastoGriglia }}
-            onClick={() => { setMostraModalManuali(true); }}
+            onClick={() => setMostraListaManuali((v) => !v)}
+            aria-expanded={mostraListaManuali}
+            title={lingua === 'it' ? 'Mostra o nascondi i manuali attivi' : 'Show or hide active sourcebooks'}
           >
-            <span>{lingua === 'it' ? `Manuali e fonti (${Object.values(manualiAttivi).filter(Boolean).length})` : `Sourcebooks (${Object.values(manualiAttivi).filter(Boolean).length})`}</span>
+            <span>{lingua === 'it' ? `Manuali e fonti ${mostraListaManuali ? '▴' : '▾'} (${Object.values(manualiAttivi).filter(Boolean).length})` : `Sourcebooks ${mostraListaManuali ? '▴' : '▾'} (${Object.values(manualiAttivi).filter(Boolean).length})`}</span>
           </button>
         </div>
+
+        {mostraListaManuali && (
+          <div
+            id="lista-manuali-fonti"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 6,
+              marginTop: 8,
+              padding: 8,
+              borderRadius: 8,
+              background: 'rgba(0,0,0,0.18)',
+              border: bordoTema,
+            }}
+          >
+            {Object.entries(MANUALI_INFO).map(([k, m]) => {
+              const attivo = manualeAttivo(manualiAttivi, k);
+              const toggleManuale = () => {
+                if (k === 'araldi' && !attivo) {
+                  setMostraModalManuali(true);
+                  return;
+                }
+                if (setManualiAttivi) {
+                  setManualiAttivi((prev) => ({ ...prev, [k]: !attivo }));
+                }
+              };
+              return (
+                <div
+                  key={k}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    padding: '6px 10px',
+                    borderRadius: 6,
+                    background: attivo ? 'color-mix(in srgb, var(--c-panel-light) 75%, transparent)' : 'transparent',
+                    border: `1px solid ${attivo ? (m.colore || 'var(--c-gold)') : 'var(--c-border)'}`,
+                    borderLeft: `4px solid ${attivo ? (m.colore || 'var(--c-gold)') : 'var(--c-border)'}`,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0, flex: 1 }}>
+                    <span style={{ fontSize: 14 }}>{m.icona}</span>
+                    <span
+                      style={{
+                        fontSize: 13,
+                        fontWeight: attivo ? 700 : 500,
+                        color: attivo ? C.ink : C.inkDim,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                      title={lingua === 'en' ? m.descrizioneEn : m.descrizione}
+                    >
+                      {lingua === 'en' ? m.nomeEn : m.nome}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={toggleManuale}
+                    style={{
+                      ...styles.buttonMini,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      padding: '2px 8px',
+                      flexShrink: 0,
+                      background: attivo ? 'rgba(46, 157, 77, 0.16)' : 'rgba(0,0,0,0.12)',
+                      color: attivo ? 'var(--c-green, #2e9d4d)' : C.inkDim,
+                      borderColor: attivo ? 'var(--c-green, #2e9d4d)' : C.border,
+                      cursor: 'pointer',
+                    }}
+                    title={attivo ? (lingua === 'en' ? 'Click to disable' : 'Clicca per disattivare') : (lingua === 'en' ? 'Click to enable' : 'Clicca per attivare')}
+                  >
+                    {attivo ? (lingua === 'en' ? 'Active' : 'Attivo') : (lingua === 'en' ? 'Off' : 'Spento')}
+                  </button>
+                </div>
+              );
+            })}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+              <button
+                type="button"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '2px 4px',
+                  color: 'var(--c-gold-dark, var(--c-gold))',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                }}
+                onClick={() => setMostraModalManuali(true)}
+              >
+                {lingua === 'en' ? 'Quick presets & details →' : 'Preset rapidi e dettagli completi →'}
+              </button>
+            </div>
+          </div>
+        )}
     
         {/* Specchio tasti header globali nello stesso identico ordine, con le stesse etichette e icone */}
         <div style={{ marginTop: 10, paddingTop: 8, borderTop: `1px solid ${C.border}` }}>
@@ -228,11 +330,6 @@ export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg
             <button style={{ ...styles.button, ...tastoGriglia }} onClick={esportaBackupCompleto} title={t('menu.esporta_tutto_tip')}>
               <span>{t('menu.esporta_tutto')}</span>
             </button>
-            {leggiSnapshots().length > 0 && (
-              <button style={{ ...styles.button, ...tastoGriglia }} onClick={() => setMostraRipristino(true)}>
-                <span>{t('menu.versioni')}</span>
-              </button>
-            )}
             {URL_ARCHIVIO_PG && (
               <button
                 style={{ ...styles.button, ...tastoGriglia }}

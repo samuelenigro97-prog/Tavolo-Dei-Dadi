@@ -2,6 +2,17 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.111.0] – 2026-10-20
+
+### Aggiunto
+- **Lista apribile a tendina dei manuali e fonti direttamente nella home**:
+  - Il pulsante `Manuali e fonti` nel menu iniziale si espande ora come una comoda lista a fisarmonica (`▴` / `▾`) con tutti i manuali di gioco (PHB 2024, PHB 2014, Tasha, Xanathar, Fizban & Mostri, Araldi del Segreto).
+  - Possibilità di attivare e disattivare i singoli manuali con un solo tocco istantaneo direttamente dall'elenco inline, con link diretto per preset rapidi e dettagli avanzati.
+
+### Rimosso
+- **Rimossa la cronologia delle versioni dalla home**:
+  - Eliminato il pulsante "Cronologia versioni" dalla sezione Backup del menu iniziale per una home ancora più pulita, essenziale e focalizzata sui personaggi e sulle azioni di gioco.
+
 ## [4.110.5] – 2026-10-20
 
 ### Ottimizzato
