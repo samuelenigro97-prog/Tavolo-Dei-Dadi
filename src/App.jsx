@@ -1990,7 +1990,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.109.2';
+const APP_VERSION = '4.109.3';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -18371,17 +18371,14 @@ export default function App() {
           fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
           fontWeight: 600,
           letterSpacing: 0.5,
-          color: 'rgba(212, 160, 23, 0.75)',
-          textShadow: '0 1px 2px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.8)',
-          background: 'rgba(10, 14, 18, 0.55)',
-          padding: '1px 6px',
+          color: '#f0c050',
+          background: '#12171f',
+          padding: '2px 6px',
           borderRadius: 4,
-          border: '1px solid rgba(212, 160, 23, 0.25)',
-          backdropFilter: 'blur(4px)',
-          WebkitBackdropFilter: 'blur(4px)',
+          border: '1px solid #7c5c16',
+          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.6)',
           userSelect: 'none',
           pointerEvents: 'none',
-          opacity: 0.82,
         }}
         aria-hidden="true"
       >
