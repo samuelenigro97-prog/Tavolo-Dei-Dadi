@@ -1797,30 +1797,29 @@ tbody tr:hover {
     will-change: transform, opacity, box-shadow;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    /* !important: lo stile in linea della sezione (styles.panel) ha già una sua transition,
-       che altrimenti vince e la barra scatta invece di scorrere. */
-    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0.25s, box-shadow 0.2s ease 0.25s !important;
+    /* Apertura e chiusura fulminee senza alcun delay artificiale */
+    transition: transform 0.14s cubic-bezier(0, 0, 0.2, 1) 0s, box-shadow 0.14s ease 0s !important;
     box-shadow: none !important;
   }
   :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:focus-within {
     transform: translateY(0);
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s, box-shadow 0.18s ease 0s !important;
+    transition: transform 0.14s cubic-bezier(0, 0, 0.2, 1) 0s, box-shadow 0.14s ease 0s !important;
     transition-delay: 0s !important;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.12) !important;
   }
   /* A barra chiusa il contenuto è nascosto: nella striscia resta solo la maniglia. */
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa > * {
     opacity: 0;
-    transition: opacity 0.12s ease 0.15s !important;
+    transition: opacity 0.1s ease 0s !important;
   }
   :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa > *,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover > *,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:focus-within > * {
     opacity: 1;
     /* Apertura istantanea senza ritardi artificiali */
-    transition: opacity 0.15s ease 0s !important;
+    transition: opacity 0.1s ease 0s !important;
   }
   /* Maniglia: si vede solo a barra chiusa. */
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa::before {
@@ -1833,7 +1832,7 @@ tbody tr:hover {
     margin-left: -20px;
     border-radius: 3px;
     background: var(--c-gold, var(--c-tema-bordo, var(--c-border)));
-    transition: opacity 0.15s ease 0.25s;
+    transition: opacity 0.1s ease 0s;
     pointer-events: none;
   }
   :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa::before,
@@ -1864,7 +1863,7 @@ tbody tr:hover {
 .combat-zona-apertura { display: none; }
 
 .combat-spacer {
-  transition: height 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: height 0.14s cubic-bezier(0, 0, 0.2, 1);
 }
 
 .combat-tracker-fisso {
@@ -1882,7 +1881,7 @@ tbody tr:hover {
   border-top: 1.5px solid var(--c-gold, #d4a017);
   border-left: 1.5px solid var(--c-gold, #d4a017);
   border-right: 1.5px solid var(--c-gold, #d4a017);
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.14s cubic-bezier(0, 0, 0.2, 1), box-shadow 0.14s ease, border-color 0.14s ease;
 }
 
 .combat-tracker-fisso.combat-aperto {
@@ -1891,12 +1890,12 @@ tbody tr:hover {
   border-left: 1.5px solid var(--c-gold, #d4a017) !important;
   border-right: 1.5px solid var(--c-gold, #d4a017) !important;
   box-shadow: 0 -10px 36px rgba(0, 0, 0, 0.65), 0 -2px 18px rgba(212, 160, 23, 0.5), inset 0 1px 0 rgba(255, 230, 150, 0.45) !important;
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease !important;
+  transition: transform 0.14s cubic-bezier(0, 0, 0.2, 1), box-shadow 0.14s ease, border-color 0.14s ease !important;
 }
 .combat-tracker-fisso.combat-aperto > * {
   opacity: 1 !important;
-  /* Nessun delay: i controlli del tracker appaiono reattivi all'istante */
-  transition: opacity 0.16s ease 0s !important;
+  /* Apertura istantanea senza ritardi */
+  transition: opacity 0.1s ease 0s !important;
 }
 .combat-tracker-fisso.combat-aperto::before {
   display: none !important;
@@ -1908,12 +1907,12 @@ tbody tr:hover {
   box-shadow: none !important;
   cursor: pointer;
   border-color: var(--c-tema-bordo, var(--c-border)) !important;
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease !important;
+  transition: transform 0.14s cubic-bezier(0, 0, 0.2, 1), box-shadow 0.14s ease, border-color 0.14s ease !important;
 }
 .combat-tracker-fisso.combat-chiuso > * {
   opacity: 0 !important;
   pointer-events: none !important;
-  transition: opacity 0.12s ease 0s !important;
+  transition: opacity 0.08s ease 0s !important;
 }
 .combat-tracker-fisso.combat-chiuso::before {
   content: '';
@@ -1926,7 +1925,7 @@ tbody tr:hover {
   border-radius: 3px;
   background: var(--c-gold, var(--c-tema-bordo, var(--c-border)));
   pointer-events: none;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.1s ease;
 }
 
 @media (hover: hover) and (pointer: fine) and (min-width: 681px) {
@@ -1943,7 +1942,7 @@ tbody tr:hover {
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:hover,
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:focus-within {
     transform: translate(-50%, 0) !important;
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s, box-shadow 0.18s ease 0s, border-color 0.18s ease 0s !important;
+    transition: transform 0.14s cubic-bezier(0, 0, 0.2, 1) 0s, box-shadow 0.14s ease 0s, border-color 0.14s ease 0s !important;
     transition-delay: 0s !important;
     border-top: 1.5px solid var(--c-gold, #d4a017) !important;
     border-left: 1.5px solid var(--c-gold, #d4a017) !important;
@@ -1955,8 +1954,8 @@ tbody tr:hover {
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:focus-within > * {
     opacity: 1 !important;
     pointer-events: auto !important;
-    /* Apertura istantanea senza ritardo 100ms */
-    transition: opacity 0.15s ease 0s !important;
+    /* Apertura istantanea senza ritardi */
+    transition: opacity 0.1s ease 0s !important;
   }
   :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-chiuso::before,
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:hover::before,
