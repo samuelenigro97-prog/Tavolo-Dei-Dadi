@@ -2,6 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.108.4] – 2026-10-20
+
+### Modificato
+- **Combat tracker a larghezza scheda**: il combat tracker aperto si allinea alla larghezza massima della scheda (1080 px), centrato a schermo con angoli superiori arrotondati.
+- **Controlli combat tracker**: ordinati con chiarezza sulla destra con cluster strumenti tattici (Iniziative, Ordina, Area) e comandi di gestione finestra.
+- **Rimozione barra/pillola ridotta in basso**: rimosso l'indicatore d'iniziativa fluttuante in basso a destra; il combat tracker si apre e si gestisce unicamente dalla sezione dedicata nella barra dei menu in alto (tasto ⚔️).
+- **Nome file backup roster**: il download del backup completo dei personaggi ora usa il formato compatto con data e versione `AAAAMMGG_TDD_ALL_vX.X.json` (es. `20261020_TDD_ALL_v4.108.4.json`).
+
 ## [4.108.3] – 2026-10-16
 
 ### Modificato

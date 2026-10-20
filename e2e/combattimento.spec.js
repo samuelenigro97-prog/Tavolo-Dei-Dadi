@@ -234,11 +234,9 @@ test('combat tracker ridotto: l\'iniziativa di chi è di turno è in bella vista
     }));
   });
   await apriScheda(page);
-  const pill = page.locator('[data-combat-toggle="true"]').filter({ hasText: 'Round' });
-  await expect(pill).toContainText('Round 2');
-  await expect(pill).toContainText('Round 2 · Vaelion');
-  await expect(pill).not.toContainText('Di turno');
-  await expect(pill.getByTestId('ct-mini-iniziativa')).toContainText('17');
+  // Quando ridotto, la mini-barra fluttuante in basso non compare: si apre solo dalla barra in alto (v4.108.4)
+  await expect(page.locator('[data-combat-toggle="true"]').filter({ hasText: 'Round' })).toHaveCount(0);
+  await expect(page.getByTestId('combat-pillola')).toHaveCount(0);
 });
 
 test('danno ad area: più bersagli, vulnerabilità e immunità lette dai tratti (v4.102.0)', async ({ page }) => {
@@ -255,8 +253,8 @@ test('danno ad area: più bersagli, vulnerabilità e immunità lette dai tratti 
     }));
   });
   await apriScheda(page);
-  await page.locator('[data-combat-toggle="true"]').filter({ hasText: 'Round' }).click();
-  // Il tasto per ridurre il tracker è un ▲ (aperto), come nel resto dell'app; la pillola ridotta ha ▼.
+  await page.locator('button[data-combat-toggle="true"]').first().click();
+  // Il tasto per ridurre il tracker è un ▲ (aperto), come nel resto dell'app.
   await expect(page.getByRole('button', { name: 'Riduci a icona' })).toHaveText('▲');
 
   await page.getByTestId('ct-area').click();
@@ -299,13 +297,13 @@ test('combat tracker ridotto: la ✕ chiude il fight solo dopo la conferma (v4.1
   });
   await apriScheda(page);
   const stato = () => page.evaluate(() => JSON.parse(localStorage.getItem('scheda-interattiva:combat')));
-  // Annullando la conferma il combattimento resta; il clic non riapre il tracker.
+  // Aprendo il tracker dal menu in alto, chiudendo dal tracker chiede conferma e chiude tutto
+  await page.locator('button[data-combat-toggle="true"]').first().click();
   page.once('dialog', (d) => d.dismiss());
-  await page.getByTestId('ct-mini-chiudi').click();
-  await expect.poll(async () => { const s = await stato(); return `${s.attivo}/${s.aperto}/${s.combattenti.length}`; }).toBe('true/false/2');
-  // Confermando si chiude e si svuota l'elenco.
+  await page.getByTestId('ct-chiudi').click();
+  await expect.poll(async () => { const s = await stato(); return `${s.attivo}/${s.combattenti.length}`; }).toBe('true/2');
   page.once('dialog', (d) => d.accept());
-  await page.getByTestId('ct-mini-chiudi').click();
+  await page.getByTestId('ct-chiudi').click();
   await expect.poll(async () => { const s = await stato(); return `${s.attivo}/${s.combattenti.length}`; }).toBe('false/0');
   await expect(page.getByTestId('combat-pillola')).toHaveCount(0);
 });

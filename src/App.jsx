@@ -1989,7 +1989,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.108.3';
+const APP_VERSION = '4.108.4';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -3619,27 +3619,6 @@ export default function App() {
   useEffect(() => {
     try { localStorage.setItem('scheda-interattiva:combat', JSON.stringify(combat)); } catch { /* niente */ }
   }, [combat]);
-
-  // Minimizza il Combat Tracker quando si clicca all'esterno della barra, preservando lo stato esatto
-  useEffect(() => {
-    if (!combat.attivo || !combat.aperto) return;
-
-    function handleClickOutside(e) {
-      if (combatRef.current && combatRef.current.contains(e.target)) return;
-      if (e.target?.closest?.('[data-combat-toggle]')) return;
-      if (e.target?.closest?.('.modal-backdrop, [role="dialog"], [data-no-ct-close]')) return;
-      setCombat((c) => (c.aperto ? { ...c, aperto: false } : c));
-    }
-
-    const timer = setTimeout(() => {
-      document.addEventListener('pointerdown', handleClickOutside, true);
-    }, 80);
-
-    return () => {
-      clearTimeout(timer);
-      document.removeEventListener('pointerdown', handleClickOutside, true);
-    };
-  }, [combat.attivo, combat.aperto]);
 
   const [ctDmg, setCtDmg] = useState({}); // valore danno/cura per combattente (id → stringa)
   const [storicoAperto, setStoricoAperto] = useState(false);
@@ -6215,7 +6194,8 @@ export default function App() {
   function esportaBackupCompleto() {
     const ids = Object.keys(roster.personaggi || {});
     if (!ids.length) return;
-    const dataStr = new Date().toISOString().slice(0, 10);
+    const d = new Date();
+    const dataStr = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
 
     // File unico di backup consolidato contenente TUTTI i personaggi
     const datiTutti = {
@@ -6230,7 +6210,7 @@ export default function App() {
     const urlRoster = URL.createObjectURL(blobRoster);
     const aRoster = document.createElement('a');
     aRoster.href = urlRoster;
-    aRoster.download = `tavolo-dei-dadi-roster-completo-${dataStr}.json`;
+    aRoster.download = `${dataStr}_TDD_ALL_v${APP_VERSION}.json`;
     aRoster.click();
     URL.revokeObjectURL(urlRoster);
     segnaBackupFatto();
@@ -7320,12 +7300,12 @@ export default function App() {
   function scaricaRosterJson(r, etichetta) {
     const ids = Object.keys(r?.personaggi || {});
     const quando = new Date();
-    const dataStr = `${quando.toISOString().slice(0, 10)}-${String(quando.getHours()).padStart(2, '0')}${String(quando.getMinutes()).padStart(2, '0')}`;
+    const dataStr = `${quando.getFullYear()}${String(quando.getMonth() + 1).padStart(2, '0')}${String(quando.getDate()).padStart(2, '0')}_${String(quando.getHours()).padStart(2, '0')}${String(quando.getMinutes()).padStart(2, '0')}`;
     const blob = new Blob([JSON.stringify({ tipo: 'tavolo-dei-dadi-roster', app: 'Tavolo dei Dadi', versione: APP_VERSION, data: quando.toISOString(), personaggi: ids.length, roster: r }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `tavolo-dei-dadi-${etichetta}-${dataStr}.json`;
+    a.download = `${dataStr}_TDD_${(etichetta || 'ROSTER').toUpperCase().replace(/[^A-Z0-9]+/g, '_')}_v${APP_VERSION}.json`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -17688,24 +17668,45 @@ export default function App() {
 
       {/* ===== Combat tracker: barra fissa in basso (stile Fantasy Grounds) ===== */}
       {combat.attivo && combat.aperto ? (
-        <div ref={combatRef} data-testid="combat-tracker" style={{ ...stileTemaBase, position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 1500, background: 'var(--c-pg-panel, var(--c-tema-sfondo))', borderTop: '1.5px solid var(--c-tema-bordo)', boxShadow: '0 -6px 24px rgba(0,0,0,0.45)' }}>
-          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '8px 12px' }}>
+        <div
+          ref={combatRef}
+          data-testid="combat-tracker"
+          style={{
+            ...stileTemaBase,
+            position: 'fixed',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            bottom: 0,
+            width: '100%',
+            maxWidth: 1080,
+            zIndex: 1500,
+            background: 'var(--c-pg-panel, var(--c-tema-sfondo))',
+            borderTop: '1.5px solid var(--c-tema-bordo)',
+            borderLeft: '1.5px solid var(--c-tema-bordo)',
+            borderRight: '1.5px solid var(--c-tema-bordo)',
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12,
+            boxShadow: '0 -6px 28px rgba(0,0,0,0.5)',
+            boxSizing: 'border-box',
+          }}
+        >
+          <div style={{ padding: '8px 12px' }}>
             {/* BARRA SUPERIORE CONTROLLI COMBAT TRACKER */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 8, paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
               {/* Gruppo 1: Round & Turno */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(214,169,15,0.18)', border: `1.5px solid ${C.goldDark}`, color: C.goldDark, padding: '3px 8px', borderRadius: 8, fontWeight: 800, fontSize: 13, letterSpacing: 0.5, whiteSpace: 'nowrap' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(214,169,15,0.18)', border: `1.5px solid ${C.goldDark}`, color: C.goldDark, padding: '0 9px', borderRadius: 6, fontWeight: 800, fontSize: 12, letterSpacing: 0.5, whiteSpace: 'nowrap', height: 26, boxSizing: 'border-box' }}>
                   {t('ct.round').toUpperCase()} {combat.round}
                 </span>
                 <button
-                  style={{ ...styles.buttonMini, padding: '4px 8px', fontSize: 12, whiteSpace: 'nowrap' }}
+                  style={{ ...styles.buttonMini, height: 26, padding: '0 8px', fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}
                   onClick={turnoPrecedente}
                   title={t('ct.prec')}
                 >
                   {t('ct.prec')}
                 </button>
                 <button
-                  style={{ ...styles.buttonMini, background: 'var(--c-gold-dark)', color: C.onGold, borderColor: 'var(--c-gold-dark)', fontWeight: 800, padding: '4px 10px', fontSize: 12, whiteSpace: 'nowrap' }}
+                  style={{ ...styles.buttonMini, height: 26, background: 'var(--c-gold-dark)', color: C.onGold, borderColor: 'var(--c-gold-dark)', fontWeight: 800, padding: '0 10px', fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}
                   onClick={prossimoTurno}
                   title={t('ct.succ')}
                 >
@@ -17750,14 +17751,14 @@ export default function App() {
                   </select>
                 ) : (
                   <button
-                    style={{ ...styles.buttonMini, background: 'rgba(46,139,87,0.1)', color: C.green, borderColor: C.green, fontWeight: 700, whiteSpace: 'nowrap' }}
+                    style={{ ...styles.buttonMini, height: 26, background: 'rgba(46,139,87,0.1)', color: C.green, borderColor: C.green, fontWeight: 700, whiteSpace: 'nowrap' }}
                     onClick={() => aggiungiCombattente('alleato')}
                   >
                     ＋ {t('ct.alleato')}
                   </button>
                 )}
                 <button
-                  style={{ ...styles.buttonMini, background: 'rgba(176,58,46,0.1)', color: C.red, borderColor: C.red, fontWeight: 700, whiteSpace: 'nowrap' }}
+                  style={{ ...styles.buttonMini, height: 26, background: 'rgba(176,58,46,0.1)', color: C.red, borderColor: C.red, fontWeight: 700, whiteSpace: 'nowrap' }}
                   onClick={() => aggiungiCombattente('nemico')}
                 >
                   ＋ {t('ct.nemico')}
@@ -17819,52 +17820,63 @@ export default function App() {
                 </select>
               </div>
 
-              {/* Gruppo 3: Strumenti & Gestione */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-                <button
-                  style={{ ...styles.buttonMini, color: C.goldDark, borderColor: C.goldDark, whiteSpace: 'nowrap', padding: '3px 8px', fontWeight: 700 }}
-                  title={lingua === 'it' ? "Tira l'iniziativa per tutti i combattenti e ordina il turno" : "Roll initiative for all combatants and order turn"}
-                  onClick={tiraIniziativeTutti}
-                >
-                  {lingua === 'it' ? 'Iniziative' : 'Initiatives'}
-                </button>
-                <button
-                  style={{ ...styles.buttonMini, whiteSpace: 'nowrap', padding: '3px 8px' }}
-                  onClick={ordinaIniziativa}
-                  title={tr('Ordina i combattenti per iniziativa decrescente', 'Sort combatants by initiative, highest first')}
-                >
-                  Ordina
-                </button>
-                <button
-                  style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, whiteSpace: 'nowrap', padding: '3px 8px' }}
-                  title={tr('Danno ad area (es. Palla di Fuoco): scegli i bersagli, anche te e i tuoi alleati, con resistenze e immunità', 'Area damage (e.g. Fireball): choose the targets, including you and your allies, with resistances and immunities')}
-                  data-testid="ct-area"
-                  onClick={() => setAreaDanno({ valore: '', tipo: 'Fuoco', magico: true, dettaglio: '', sel: {}, ts: {}, difese: {} })}
-                >
-                  Area
-                </button>
-                {/* Minimizza e chiudi: stessa forma tonda con contorno della ✕ della pillola ridotta. */}
-                <button
-                  type="button"
-                  data-testid="ct-minimizza"
-                  style={{ ...stileTastoTondo, fontSize: 11, color: 'var(--c-gold-dark)', border: '1.5px solid var(--c-gold-dark)' }}
-                  onClick={() => setCombat((c) => ({ ...c, aperto: false }))}
-                  title={t('ct.minimizza')}
-                  aria-label={t('ct.minimizza')}
-                >
-                  {/* Come nel resto dell'app: ▲ = aperto (si chiude), ▼ = chiuso (si apre). */}
-                  ▲
-                </button>
-                <button
-                  type="button"
-                  data-testid="ct-chiudi"
-                  style={{ ...stileTastoTondo, color: 'var(--c-red)', border: '1.5px solid var(--c-red)' }}
-                  onClick={() => { if (window.confirm(t('ct.fine_conferma'))) setCombat({ attivo: false, aperto: true, round: 1, turno: 0, combattenti: [] }); }}
-                  title={t('ct.fine')}
-                  aria-label={t('ct.fine')}
-                >
-                  ✕
-                </button>
+              {/* Gruppo 3: Strumenti & Gestione ordinati a destra */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0, marginLeft: 'auto' }}>
+                {/* Cluster Strumenti Tattici */}
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(0,0,0,0.03)', padding: '2px 4px', borderRadius: 6, border: '1px solid ' + C.border }}>
+                  <button
+                    style={{ ...styles.buttonMini, height: 24, color: C.goldDark, borderColor: 'rgba(201,162,39,0.3)', background: 'rgba(201,162,39,0.1)', whiteSpace: 'nowrap', padding: '0 7px', fontSize: 11, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                    title={lingua === 'it' ? "Tira l'iniziativa per tutti i combattenti e ordina il turno" : "Roll initiative for all combatants and order turn"}
+                    onClick={tiraIniziativeTutti}
+                  >
+                    <span>🎲</span>
+                    <span>{lingua === 'it' ? 'Iniziative' : 'Initiatives'}</span>
+                  </button>
+                  <button
+                    style={{ ...styles.buttonMini, height: 24, whiteSpace: 'nowrap', padding: '0 7px', fontSize: 11, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 3 }}
+                    onClick={ordinaIniziativa}
+                    title={tr('Ordina i combattenti per iniziativa decrescente', 'Sort combatants by initiative, highest first')}
+                  >
+                    <span>⇅</span>
+                    <span>Ordina</span>
+                  </button>
+                  <button
+                    style={{ ...styles.buttonMini, height: 24, color: C.red, borderColor: 'rgba(176,58,46,0.3)', background: 'rgba(176,58,46,0.08)', whiteSpace: 'nowrap', padding: '0 7px', fontSize: 11, fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 3 }}
+                    title={tr('Danno ad area (es. Palla di Fuoco): scegli i bersagli, anche te e i tuoi alleati, con resistenze e immunità', 'Area damage (e.g. Fireball): choose the targets, including you and your allies, with resistances and immunities')}
+                    data-testid="ct-area"
+                    onClick={() => setAreaDanno({ valore: '', tipo: 'Fuoco', magico: true, dettaglio: '', sel: {}, ts: {}, difese: {} })}
+                  >
+                    <span>💥</span>
+                    <span>Area</span>
+                  </button>
+                </div>
+
+                {/* Divisore sottile tra strumenti di combattimento e controlli finestra */}
+                <div style={{ width: 1, height: 20, background: C.border, margin: '0 2px', opacity: 0.6 }} />
+
+                {/* Cluster Controlli Finestra */}
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                  <button
+                    type="button"
+                    data-testid="ct-minimizza"
+                    style={{ ...stileTastoTondo, fontSize: 11, color: 'var(--c-gold-dark)', border: '1.5px solid var(--c-gold-dark)' }}
+                    onClick={() => setCombat((c) => ({ ...c, aperto: false }))}
+                    title={t('ct.minimizza')}
+                    aria-label={t('ct.minimizza')}
+                  >
+                    ▲
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="ct-chiudi"
+                    style={{ ...stileTastoTondo, color: 'var(--c-red)', border: '1.5px solid var(--c-red)' }}
+                    onClick={() => { if (window.confirm(t('ct.fine_conferma'))) setCombat({ attivo: false, aperto: true, round: 1, turno: 0, combattenti: [] }); }}
+                    title={t('ct.fine')}
+                    aria-label={t('ct.fine')}
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -18302,73 +18314,6 @@ export default function App() {
               );
             })()}
           </div>
-        </div>
-      ) : combat.attivo && !combat.aperto && combat.combattenti.length > 0 ? (
-        <div role="button" tabIndex={0}
-          data-combat-toggle="true"
-          data-testid="combat-pillola"
-          onClick={() => setCombat((c) => ({ ...c, aperto: true }))}
-          style={{
-            // Tema base dell'app per testi e tasti, sul fondo della scheda del PG corrente
-            // (come la barra in alto). Stretta quanto il margine accanto alla scheda (larga
-            // 1080 px), così non le finisce sopra; il nome lungo va in ellissi.
-            ...stileTemaBase,
-            position: 'fixed',
-            bottom: 14,
-            right: 18,
-            zIndex: 1490,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            maxWidth: 'max(300px, calc((100vw - 1080px) / 2 - 30px))',
-            boxSizing: 'border-box',
-            background: 'var(--c-pg-panel, var(--c-tema-sfondo))',
-            border: '1.5px solid var(--c-tema-bordo)',
-            color: 'var(--c-gold-dark)',
-            padding: '7px 14px',
-            borderRadius: 24,
-            boxShadow: '0 4px 18px rgba(0,0,0,0.35)',
-            cursor: 'pointer',
-            fontWeight: 800,
-            fontSize: 13,
-            letterSpacing: 0.3,
-            transition: 'all 0.2s ease',
-            userSelect: 'none',
-          }}
-          title={t('ct.apri')}
-        >
-          {/* Iniziativa di chi è di turno, in bella vista. */}
-          {combat.combattenti[combat.turno]?.iniziativa != null && combat.combattenti[combat.turno]?.iniziativa !== '' && (
-            <span
-              data-testid="ct-mini-iniziativa"
-              title={tr('Iniziativa di chi è di turno', 'Initiative of the creature whose turn it is')}
-              style={{ display: 'inline-flex', alignItems: 'baseline', gap: 4, background: eCombattentePgAttivo(combat.combattenti[combat.turno], combat.combattenti) ? 'var(--c-pg-gold-dark)' : 'var(--c-gold-dark)', color: eCombattentePgAttivo(combat.combattenti[combat.turno], combat.combattenti) ? 'var(--c-pg-on-gold)' : C.onGold, borderRadius: 14, padding: '2px 10px', lineHeight: 1.2, flexShrink: 0 }}
-            >
-              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', opacity: 0.85 }}>{tr('Iniz.', 'Init.')}</span>
-              <span style={{ fontSize: 18, fontWeight: 900 }}>{combat.combattenti[combat.turno].iniziativa}</span>
-            </span>
-          )}
-          <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {t('ct.round')} {combat.round} ·{' '}
-            <span data-testid="ct-mini-nome" style={combat.combattenti[combat.turno] && eCombattentePgAttivo(combat.combattenti[combat.turno], combat.combattenti) ? { color: 'var(--c-pg-title)' } : undefined}>
-              {combat.combattenti[combat.turno]?.nome || (lingua === 'en' ? 'PC' : 'PG')}
-            </span>
-          </span>
-          <span style={{ fontSize: 11, opacity: 0.9, flexShrink: 0 }}>▼</span>
-          {/* ✕ per chiudere il combattimento senza riaprire il tracker: chiede conferma. */}
-          <button
-            type="button"
-            data-testid="ct-mini-chiudi"
-            title={t('ct.fine')}
-            aria-label={t('ct.fine')}
-            onClick={(e) => {
-              e.stopPropagation();
-              if (window.confirm(t('ct.fine_conferma'))) setCombat({ attivo: false, aperto: true, round: 1, turno: 0, combattenti: [] });
-            }}
-            style={{ ...stileTastoTondo, marginLeft: 2, flexShrink: 0, color: 'var(--c-red)', border: '1.5px solid var(--c-red)' }}
-          >
-            ✕
-          </button>
         </div>
       ) : null}
       <NuvolettaGlobale />

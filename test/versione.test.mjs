@@ -33,3 +33,9 @@ test('le Novità in-app: versioni in ordine decrescente e nessuna oltre la versi
     assert.equal(v.voci.it.length, v.voci.en.length, `${v.versione}: voci IT/EN in numero diverso`);
   }
 });
+
+test('formato nome file backup: usa data YYYYMMDD, sigle TDD_ALL e versione app', () => {
+  const src = readFileSync('src/App.jsx', 'utf8');
+  assert.ok(src.includes('aRoster.download = `${dataStr}_TDD_ALL_v${APP_VERSION}.json`'), 'nome file backup roster non aggiornato al formato compatto');
+});
+
