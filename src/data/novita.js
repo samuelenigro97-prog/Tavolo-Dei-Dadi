@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.111.2',
+    voci: {
+      it: ['Scritta della versione in basso a destra ora copiabile con un clic/tocco, e ripristinato il deploy automatico su GitHub Pages.'],
+      en: ['Version text in the bottom right corner is now clickable/copyable with feedback, and GitHub Pages auto-deploy restored.'],
+    },
+  },
+  {
     versione: '4.111.1',
     voci: {
       it: ['La sezione Equipaggiamento della scheda è ora rinominata in Inventario.'],
