@@ -2,6 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.110.4] – 2026-10-20
+
+### Ottimizzato
+- **Rimosso bordo e sfondo arancione invasivo sulle righe degli incantesimi con poteri del Patrono / Araldi**:
+  - Le righe degli incantesimi mantengono ora la sobria eleganza standard del resto della scheda (nessun contorno né sfondo arancione/marrone che appesantisca la visuale).
+  - Il riconoscimento visivo dei poteri e incantesimi del Patrono / Araldi è affidato esclusivamente all'**icona dell'Occhio Runico Onnisciente**.
+  - **L'Occhio Runico del Patrono** è stato reso ultra-luminoso e incandescente (ambra aranciata solare brillante `#ff9f1a` / ciano etereo `#00f5ff` con glow multilivello e drop-shadow vibrante), risaltando immediatamente sul tema scuro o chiaro senza sporcare la riga.
+
 ## [4.110.3] – 2026-10-20
 
 ### Aggiunto

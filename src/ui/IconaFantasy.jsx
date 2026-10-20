@@ -287,12 +287,12 @@ const SVG_RUNIC_GLYPHS = {
       <circle cx="12" cy="12" r="3.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
     </>
   ),
-  // Sigillo dell'Occhio Onnisciente (Araldi del Segreto / Maschera / Visione)
+  // Sigillo dell'Occhio Onnisciente (Araldi del Segreto / Patrono / Maschera / Visione)
   occhio: (
     <>
-      <path d="M12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5Z" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="1.8" />
-      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+      <path d="M12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5Z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="12" cy="12" r="1.8" fill="currentColor" />
     </>
   ),
   // Sigillo di Sangue / Patto Oscuro (Nodo runico con anello di contenimento)
@@ -726,12 +726,27 @@ export function IconaRunica({
 
   const svgContent = SVG_RUNIC_GLYPHS[glyphKey] || SVG_RUNIC_GLYPHS.patto;
 
-  const coloreRunico = isAraldi ? 'var(--c-araldi, #a45a2a)' : '#00e5ff';
-  const bgRunico = isAraldi ? 'rgba(164, 90, 42, 0.14)' : 'rgba(0, 229, 255, 0.12)';
-  const borderRunico = isAraldi ? 'rgba(164, 90, 42, 0.45)' : 'rgba(0, 229, 255, 0.45)';
-  const glowShadow = isAraldi
-    ? '0 0 8px rgba(164, 90, 42, 0.4)'
-    : '0 0 10px rgba(0, 229, 255, 0.45)';
+  // L'occhio del Patrono e le rune esoteriche devono risaltare luminose e vibranti
+  let coloreRunico = '#00f5ff';
+  let bgRunico = 'rgba(0, 245, 255, 0.18)';
+  let borderRunico = 'rgba(0, 245, 255, 0.65)';
+  let glowShadow = '0 0 10px rgba(0, 245, 255, 0.65), inset 0 0 4px rgba(0, 245, 255, 0.3)';
+  let dropFilter = 'drop-shadow(0 0 4px rgba(0, 245, 255, 0.9))';
+
+  if (isAraldi || /araldi/i.test(n)) {
+    // Ambra aranciata solare brillante ed elettrizzante per gli Araldi del Segreto
+    coloreRunico = '#ff9f1a';
+    bgRunico = 'rgba(255, 159, 26, 0.18)';
+    borderRunico = 'rgba(255, 159, 26, 0.70)';
+    glowShadow = '0 0 10px rgba(255, 159, 26, 0.65), inset 0 0 4px rgba(255, 159, 26, 0.3)';
+    dropFilter = 'drop-shadow(0 0 4px rgba(255, 159, 26, 0.92))';
+  } else if (glyphKey === 'debito') {
+    coloreRunico = '#ff5252';
+    bgRunico = 'rgba(255, 82, 82, 0.18)';
+    borderRunico = 'rgba(255, 82, 82, 0.65)';
+    glowShadow = '0 0 10px rgba(255, 82, 82, 0.65), inset 0 0 4px rgba(255, 82, 82, 0.3)';
+    dropFilter = 'drop-shadow(0 0 4px rgba(255, 82, 82, 0.9))';
+  }
 
   const innerSvg = (
     <svg
@@ -742,7 +757,7 @@ export function IconaRunica({
       style={{
         display: 'block',
         color: coloreRunico,
-        filter: glow ? (isAraldi ? 'drop-shadow(0 0 3px rgba(164, 90, 42, 0.6))' : 'drop-shadow(0 0 4px rgba(0, 229, 255, 0.7))') : 'none',
+        filter: glow ? dropFilter : 'none',
       }}
       aria-hidden="true"
     >

@@ -95,8 +95,8 @@ function PotereCard({ potere, scheda, onApri, lingua, nomiNelPannello = [] }) {
     <div
       onClick={() => onApri(potere.id)}
       style={{
-        background: isAraldiPotere ? 'var(--c-araldi-bg, rgba(140, 74, 30, 0.08))' : C.panelLight,
-        border: isAraldiPotere ? '1.5px solid var(--c-araldi-border, #a45a2a)' : `1px solid ${potere.attivo ? C.border : C.inkDim}`,
+        background: C.panelLight,
+        border: `1px solid ${potere.attivo ? C.border : C.inkDim}`,
         borderRadius: 8,
         padding: '10px 12px',
         cursor: 'pointer',
@@ -111,7 +111,7 @@ function PotereCard({ potere, scheda, onApri, lingua, nomiNelPannello = [] }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <IconaRunica nome={potere.nome} isAraldi={isAraldiPotere} dimensione={22} />
-          <strong style={{ fontSize: 13, color: isAraldiPotere ? 'var(--c-araldi, #a45a2a)' : C.ink }}>
+          <strong style={{ fontSize: 13, color: C.ink }}>
             {potere.nome || (lingua === 'en' ? 'Unnamed power' : 'Potere senza nome')}
           </strong>
           {isAraldiPotere && (

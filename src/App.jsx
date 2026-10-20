@@ -1990,7 +1990,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.110.3';
+const APP_VERSION = '4.110.4';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -13420,7 +13420,7 @@ export default function App() {
                                         className="attacco-nome"
                                         onClick={apriInfoReazione}
                                         title={castBloccato ? tr('Equipaggia un focus per lanciare questo incantesimo', 'Equip a focus to cast this spell') : undefined}
-                                        style={{ background: 'transparent', border: 0, padding: 0, font: 'inherit', fontWeight: 700, color: a.tipoFonte === 'araldi' ? 'var(--c-araldi, #a45a2a)' : C.ink, cursor: 'help', textAlign: 'left', textDecoration: 'underline dotted', textUnderlineOffset: 3, textDecorationColor: a.tipoFonte === 'araldi' ? 'var(--c-araldi, #a45a2a)' : C.inkDim, minWidth: 0 }}
+                                        style={{ background: 'transparent', border: 0, padding: 0, font: 'inherit', fontWeight: 700, color: C.ink, cursor: 'help', textAlign: 'left', textDecoration: 'underline dotted', textUnderlineOffset: 3, textDecorationColor: C.inkDim, minWidth: 0 }}
                                       >{traduciDato(cleanNome) || cleanNome}</button>
                                       {a.tipoFonte === 'araldi' && (
                                         <span
@@ -14508,9 +14508,7 @@ export default function App() {
                                       ? '2px solid var(--c-green)'
                                       : (isRowUnpreparedMancante
                                         ? '1.5px dashed var(--c-green)'
-                                        : (isAraldiSpell
-                                          ? '1.5px solid var(--c-araldi-border, #a45a2a)'
-                                          : `1px ${(classePreparata && s.livello >= 1 && s.preparato === false) ? 'dashed' : 'solid'} ${C.border}`))),
+                                        : `1px ${(classePreparata && s.livello >= 1 && s.preparato === false) ? 'dashed' : 'solid'} ${C.border}`)),
                                   borderRadius: 6,
                                   padding: '4px 8px',
                                   background: isRowInEccesso
@@ -14519,18 +14517,14 @@ export default function App() {
                                       ? 'rgba(46,157,77,0.1)'
                                       : (isRowUnpreparedMancante
                                         ? 'rgba(46,157,77,0.06)'
-                                        : (isAraldiSpell
-                                          ? 'var(--c-araldi-bg, rgba(140, 74, 30, 0.10))'
-                                          : C.panelLight))),
+                                        : C.panelLight)),
                                   boxShadow: isRowInEccesso
                                     ? '0 0 10px rgba(239,68,68,0.3)'
                                     : (isRowCatalogoMancante
                                       ? '0 0 10px rgba(46,157,77,0.3)'
                                       : (isRowUnpreparedMancante
                                         ? '0 0 8px rgba(46,157,77,0.2)'
-                                        : (isAraldiSpell
-                                          ? '0 0 8px var(--c-araldi-glow, rgba(140, 74, 30, 0.20))'
-                                          : 'none'))),
+                                        : 'none')),
                                   transition: 'all 0.2s ease',
                                 }}
                               >
@@ -14544,7 +14538,7 @@ export default function App() {
                                     dimensione={22}
                                   />
                                   <button
-                                    style={{ background: 'transparent', border: 'none', color: isRowInEccesso ? C.red : (isAraldiSpell ? 'var(--c-araldi, #a45a2a)' : C.ink), fontWeight: 700, cursor: 'help', textAlign: 'left', padding: 0, fontSize: 14, lineHeight: 1.2, textDecoration: 'underline dotted', textUnderlineOffset: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
+                                    style={{ background: 'transparent', border: 'none', color: isRowInEccesso ? C.red : C.ink, fontWeight: 700, cursor: 'help', textAlign: 'left', padding: 0, fontSize: 14, lineHeight: 1.2, textDecoration: 'underline dotted', textUnderlineOffset: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
                                     onClick={() => setInfo({
                                       titolo: `${s.nome || 'Incantesimo'}${s.livello === 0 ? (en ? ' · Cantrip' : ' · Trucchetto') : (en ? ` · Level ${s.livello}` : ` · ${s.livello}° livello`)}`,
                                       iconaProps: { nome: s.nome, isSpell: true, livello: s.livello, tipoDanno: s.tipoDanno || s.dannoTipo, tipoFonte: isAraldiSpell ? 'araldi' : '', dimensione: 22 },
