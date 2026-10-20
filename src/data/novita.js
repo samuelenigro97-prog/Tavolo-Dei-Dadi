@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.111.1',
+    voci: {
+      it: ['La sezione Equipaggiamento della scheda è ora rinominata in Inventario.'],
+      en: ['The Equipment section of the sheet is now renamed to Inventory.'],
+    },
+  },
+  {
     versione: '4.111.0',
     voci: {
       it: ['Manuali e fonti ora apribili a tendina direttamente nel menu iniziale con attivazione/spegnimento rapido, e rimossa la cronologia versioni dalla home.'],

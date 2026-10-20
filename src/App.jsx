@@ -1990,7 +1990,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.111.0';
+const APP_VERSION = '4.111.1';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -7516,7 +7516,7 @@ export default function App() {
       };
     }
     if (r.tipo === 'vai_a_sezione') {
-      const nomeSez = r.sezione === 'incantesimi' ? (isEn ? 'Magic' : 'Magia') : (r.sezione === 'addestramento' ? (isEn ? 'Training' : 'Addestramento') : (r.sezione === 'equipaggiamento' ? (isEn ? 'Inventory' : 'Equipaggiamento') : r.sezione));
+      const nomeSez = r.sezione === 'incantesimi' ? (isEn ? 'Magic' : 'Magia') : (r.sezione === 'addestramento' ? (isEn ? 'Training' : 'Addestramento') : (r.sezione === 'equipaggiamento' ? (isEn ? 'Inventory' : 'Inventario') : r.sezione));
       return {
         icona: '🪄',
         campo: isEn ? `Navigate to ${nomeSez}` : `Vai a ${nomeSez}`,
@@ -16160,7 +16160,7 @@ export default function App() {
               (display:contents) così rientrano nell'unico ordine riordinabile. */}
           <div style={{ display: 'contents' }}>
 
-            {/* Equipaggiamento, aspetto — collassabili */}
+            {/* Inventario, aspetto — collassabili */}
             <Sezione titolo={t("sez.equipaggiamento")} {...propsSez('equipaggiamento')} {...apertoProps('equipaggiamento')}>
               {(() => {
                 const inv = scheda.inventario || [];
