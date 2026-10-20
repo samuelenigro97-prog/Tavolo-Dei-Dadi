@@ -1990,7 +1990,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.110.2';
+const APP_VERSION = '4.110.3';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -13306,9 +13306,11 @@ export default function App() {
                                     nome: cleanNome,
                                     tipo: a.tipo,
                                     isSpell: a.isSpell,
+                                    livello: a.livello,
+                                    tipoDanno: a.tipoDanno || a.dannoTipo,
                                     tipoFonte: a.tipoFonte,
                                     cat,
-                                    dimensione: 24,
+                                    dimensione: 22,
                                   },
                                   testo: testoNuvoletta(righe, descr) || (en ? 'No description available.' : 'Nessuna descrizione disponibile.')
                                 });
@@ -13329,6 +13331,8 @@ export default function App() {
                                             nome={cleanNome}
                                             tipo={a.tipo}
                                             isSpell={a.isSpell}
+                                            livello={a.livello}
+                                            tipoDanno={a.tipoDanno || a.dannoTipo}
                                             tipoFonte={a.tipoFonte}
                                             cat={cat}
                                             dimensione={22}
@@ -14534,6 +14538,8 @@ export default function App() {
                                   <IconaAzione
                                     nome={s.nome}
                                     isSpell={true}
+                                    livello={s.livello}
+                                    tipoDanno={s.tipoDanno || s.dannoTipo}
                                     tipoFonte={isAraldiSpell ? 'araldi' : ''}
                                     dimensione={22}
                                   />
@@ -14541,7 +14547,7 @@ export default function App() {
                                     style={{ background: 'transparent', border: 'none', color: isRowInEccesso ? C.red : (isAraldiSpell ? 'var(--c-araldi, #a45a2a)' : C.ink), fontWeight: 700, cursor: 'help', textAlign: 'left', padding: 0, fontSize: 14, lineHeight: 1.2, textDecoration: 'underline dotted', textUnderlineOffset: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
                                     onClick={() => setInfo({
                                       titolo: `${s.nome || 'Incantesimo'}${s.livello === 0 ? (en ? ' · Cantrip' : ' · Trucchetto') : (en ? ` · Level ${s.livello}` : ` · ${s.livello}° livello`)}`,
-                                      iconaProps: { nome: s.nome, isSpell: true, tipoFonte: isAraldiSpell ? 'araldi' : '', dimensione: 22 },
+                                      iconaProps: { nome: s.nome, isSpell: true, livello: s.livello, tipoDanno: s.tipoDanno || s.dannoTipo, tipoFonte: isAraldiSpell ? 'araldi' : '', dimensione: 22 },
                                       testo: testoModal || (en ? 'No description available for this spell.' : 'Nessuna descrizione disponibile per questo incantesimo.')
                                     })}
                                   >

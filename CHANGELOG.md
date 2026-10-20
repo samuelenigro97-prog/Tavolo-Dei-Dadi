@@ -2,6 +2,27 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.110.3] – 2026-10-20
+
+### Aggiunto
+- **Icone differenziate per Trucchetti e Incantesimi di livello con colorazione elementale dinamica**:
+  - **Trucchetti (livello 0)**: utilizzano icone vettoriali dedicate con silhouette a scintilla/stella a 4 punte, cristallo elementale o freccia/globo compatto.
+  - **Incantesimi di livello (1° - 9°)**: utilizzano icone vettoriali avanzate ad alta definizione (fiamme complesse, comete/meteoriti, sfere celesti solari, nubi tossiche dense, vortici psionici, sigilli arcani complessi).
+  - **Colorazione per tipo di danno ed elemento**:
+    - Fuoco: arancione brace viva (`#ff6b35`).
+    - Freddo/Gelo: ciano ghiaccio glaciale (`#00d2d3`).
+    - Fulmine: giallo saetta (`#fed330`).
+    - Tuono: azzurro d'urto atmosferico (`#45aaf2`).
+    - Acido / Veleno: verde smeraldo tossico (`#20bf6b` / `#26de81`).
+    - Necrotico: viola spettrale profondo (`#a55eea`).
+    - Radioso: oro radiante celestiale (`#f7b731`).
+    - Forza: ametista/fucsia cinetico (`#d980fa`).
+    - Psichico: corallo cremisi mentale (`#fc5c65`).
+    - Cura / Rigenerazione: verde smeraldo sacro con Cuore (`#38ef7d`).
+    - Arcano Trucchetto: azzurro cielo astrale (`#70a1ff`).
+    - Arcano Incantesimo di livello: oro dorato nobile (`#d4a017`).
+  - Integrazione automatica con il catalogo SRD `datiIncantesimo` per rilevare livello e tipo di danno su qualsiasi incantesimo, sia nella lista magie che nel pannello combattimento/azioni.
+
 ## [4.110.2] – 2026-10-20
 
 ### Ottimizzato
