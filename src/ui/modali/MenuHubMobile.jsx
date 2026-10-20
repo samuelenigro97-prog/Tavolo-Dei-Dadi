@@ -24,6 +24,7 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
       onClick={(e) => { if (e.target === e.currentTarget) setMostraMenuHubMobile(false); }}
     >
       <div
+        className="anim-modal-rapida"
         style={{
           ...styles.panel,
           maxWidth: 480,

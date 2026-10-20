@@ -1799,28 +1799,28 @@ tbody tr:hover {
     -webkit-backface-visibility: hidden;
     /* !important: lo stile in linea della sezione (styles.panel) ha già una sua transition,
        che altrimenti vince e la barra scatta invece di scorrere. */
-    transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1) 0.6s, box-shadow 0.3s ease 0.6s !important;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0.25s, box-shadow 0.2s ease 0.25s !important;
     box-shadow: none !important;
   }
   :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:focus-within {
     transform: translateY(0);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s, box-shadow 0.18s ease 0s !important;
     transition-delay: 0s !important;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.12) !important;
   }
   /* A barra chiusa il contenuto è nascosto: nella striscia resta solo la maniglia. */
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa > * {
     opacity: 0;
-    /* Sparisce prima che la barra salga (0.6 s): nella striscia non restano mai icone a metà. */
-    transition: opacity 0.15s ease 0.4s !important;
+    transition: opacity 0.12s ease 0.15s !important;
   }
   :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa > *,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover > *,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:focus-within > * {
     opacity: 1;
-    /* Compare quando la barra è quasi scesa del tutto, non mentre scorre. */
-    transition: opacity 0.18s ease 0.24s !important;
+    /* Apertura istantanea senza ritardi artificiali */
+    transition: opacity 0.15s ease 0s !important;
   }
   /* Maniglia: si vede solo a barra chiusa. */
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa::before {
@@ -1833,7 +1833,7 @@ tbody tr:hover {
     margin-left: -20px;
     border-radius: 3px;
     background: var(--c-gold, var(--c-tema-bordo, var(--c-border)));
-    transition: opacity 0.2s ease 0.6s;
+    transition: opacity 0.15s ease 0.25s;
     pointer-events: none;
   }
   :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa::before,
@@ -1863,6 +1863,10 @@ tbody tr:hover {
    Cliccando sulla maniglia o sul pulsante ⚔️ si auto-apre completamente da sotto e resta aperto. */
 .combat-zona-apertura { display: none; }
 
+.combat-spacer {
+  transition: height 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .combat-tracker-fisso {
   position: fixed;
   left: 50%;
@@ -1878,7 +1882,7 @@ tbody tr:hover {
   border-top: 1.5px solid var(--c-gold, #d4a017);
   border-left: 1.5px solid var(--c-gold, #d4a017);
   border-right: 1.5px solid var(--c-gold, #d4a017);
-  transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .combat-tracker-fisso.combat-aperto {
@@ -1887,10 +1891,12 @@ tbody tr:hover {
   border-left: 1.5px solid var(--c-gold, #d4a017) !important;
   border-right: 1.5px solid var(--c-gold, #d4a017) !important;
   box-shadow: 0 -10px 36px rgba(0, 0, 0, 0.65), 0 -2px 18px rgba(212, 160, 23, 0.5), inset 0 1px 0 rgba(255, 230, 150, 0.45) !important;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease !important;
 }
 .combat-tracker-fisso.combat-aperto > * {
   opacity: 1 !important;
-  transition: opacity 0.2s ease 0.1s !important;
+  /* Nessun delay: i controlli del tracker appaiono reattivi all'istante */
+  transition: opacity 0.16s ease 0s !important;
 }
 .combat-tracker-fisso.combat-aperto::before {
   display: none !important;
@@ -1902,12 +1908,12 @@ tbody tr:hover {
   box-shadow: none !important;
   cursor: pointer;
   border-color: var(--c-tema-bordo, var(--c-border)) !important;
-  transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease !important;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease !important;
 }
 .combat-tracker-fisso.combat-chiuso > * {
   opacity: 0 !important;
   pointer-events: none !important;
-  transition: opacity 0.15s ease !important;
+  transition: opacity 0.12s ease 0s !important;
 }
 .combat-tracker-fisso.combat-chiuso::before {
   content: '';
@@ -1920,7 +1926,7 @@ tbody tr:hover {
   border-radius: 3px;
   background: var(--c-gold, var(--c-tema-bordo, var(--c-border)));
   pointer-events: none;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.15s ease;
 }
 
 @media (hover: hover) and (pointer: fine) and (min-width: 681px) {
@@ -1937,6 +1943,7 @@ tbody tr:hover {
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:hover,
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:focus-within {
     transform: translate(-50%, 0) !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s, box-shadow 0.18s ease 0s, border-color 0.18s ease 0s !important;
     transition-delay: 0s !important;
     border-top: 1.5px solid var(--c-gold, #d4a017) !important;
     border-left: 1.5px solid var(--c-gold, #d4a017) !important;
@@ -1948,7 +1955,8 @@ tbody tr:hover {
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:focus-within > * {
     opacity: 1 !important;
     pointer-events: auto !important;
-    transition: opacity 0.2s ease 0.1s !important;
+    /* Apertura istantanea senza ritardo 100ms */
+    transition: opacity 0.15s ease 0s !important;
   }
   :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-chiuso::before,
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:hover::before,
@@ -2493,6 +2501,16 @@ tbody tr:hover {
 @keyframes nuvoletta-anim-bottom {
   from { opacity: 0; transform: translate(-50%, 15%) scale(0.95); }
   to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+/* Animazione di apertura rapida e scattante per modali e menu */
+.anim-modal-rapida {
+  animation: modal-scivola-su 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+@keyframes modal-scivola-su {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 /* Nuvoletta "Bonus dato da": tooltip INVERTITO rispetto al tema, così

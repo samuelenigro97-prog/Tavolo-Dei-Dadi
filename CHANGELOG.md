@@ -2,6 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.110.2] – 2026-10-20
+
+### Ottimizzato
+- **Apertura ultra-rapida e fluida di Combat Tracker, barra a scomparsa e menu**:
+  - Eliminato il ritardo artificiale (delay di 100ms e 240ms) sull'opacità e sull'animazione dei controlli interni del Combat Tracker e della barra superiore: ora la finestra risponde all'istante al click o all'avvicinamento del cursore.
+  - Velocizzata la transizione di salita/discesa (`transform`) da `0.38s` a uno scattante `0.20s` con curva `cubic-bezier(0.16, 1, 0.3, 1)` ad alta reattività e senza scatti.
+  - Aggiunta animazione di ingresso immediata con accelerazione hardware (`modal-scivola-su`) per il menu mobile e i pannelli a comparsa.
+
 ## [4.110.1] – 2026-10-20
 
 ### Corretto

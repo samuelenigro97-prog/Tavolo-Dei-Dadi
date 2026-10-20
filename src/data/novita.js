@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.110.2',
+    voci: {
+      it: ['Apertura ultra-rapida di Combat Tracker, menu e barre: azzerato ogni delay per una transizione istantanea e fluida.'],
+      en: ['Ultra-fast opening for Combat Tracker, menus, and bars: zero delay for instant, silky-smooth transitions.'],
+    },
+  },
+  {
     versione: '4.110.1',
     voci: {
       it: ['Dimensioni icone perfettamente uniformi (22px) in tutte le sezioni: cure con il Cuore, poteri del Patrono con l\'Occhio runico e magie per elemento.'],
