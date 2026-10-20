@@ -2,6 +2,18 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.110.1] – 2026-10-20
+
+### Corretto
+- **Uniformità dimensionale delle icone a tema (22px) in tutte le sezioni**:
+  - Standardizzata la grandezza dei badge vettoriali su `22px` (`DIMENSIONE_ICONA_SEZIONE`) in tutte le aree della scheda: Azioni, Incantesimi, Invocazioni Occulte, Poteri del Patrono, Araldi del Segreto, Inventario ed Equipaggiamento, Reazioni e Popup di dettaglio.
+  - Implementata la logica di priorità a cascata per i simboli:
+    - **Cure e ripristino PF** ricevono sempre il **Cuore** verde smeraldo vivo (sia incantesimi come *Cura Ferite*, che tratti come *Imposizione delle Mani* o pozioni).
+    - **Poteri del Patrono, Invocazioni Occulte e Araldi** ricevono l'**Occhio Runico Onnisciente** con bagliore arcano ciano/viola.
+    - **Reazioni e difese** ricevono lo **Scudo**.
+    - **Magie elementali** seguono il proprio elemento (fuoco, gelo, fulmine, radioso, necrotico, veleno).
+    - **Trucchetti generici** usano la Scintilla Arcana, mentre gli incantesimi di livello generici usano il Grimorio runico.
+
 ## [4.110.0] – 2026-10-20
 
 ### Aggiunto

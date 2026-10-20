@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.110.1',
+    voci: {
+      it: ['Dimensioni icone perfettamente uniformi (22px) in tutte le sezioni: cure con il Cuore, poteri del Patrono con l\'Occhio runico e magie per elemento.'],
+      en: ['Uniform icon badge sizing (22px) across all sections: heals with Heart, Patron powers with the Runic Eye, and spells by element.'],
+    },
+  },
+  {
     versione: '4.110.0',
     voci: {
       it: ['Addio emoji generiche: tutte le icone di popup, menu, combattimento e scheda sono ora eleganti icone fantasy vettoriali a tema.'],
