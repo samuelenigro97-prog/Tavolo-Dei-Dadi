@@ -3,7 +3,6 @@
 // - Glifi Runici (Neon Arcani con bagliore esoterico) per Poteri del Patrono, Debito e Araldi del Segreto.
 
 import React from 'react';
-import { C } from './tema.js';
 import { datiIncantesimo } from '../data/incantesimi.js';
 
 // --- GAME-ICONS.NET SVG DEFINITIONS (viewBox 0 0 24 24) ---
@@ -836,14 +835,12 @@ export function IconaOggetto({
   else if (c === 'armatura' || c === 'scudo' || /scudo|armatura|corazza|elmo/i.test(n)) chiave = 'scudo';
   else if (c === 'arma' || /spada|arco|balestra|daga|ascia|martello|lancia/i.test(n)) {
     chiave = getChiaveIcona(nome, 'arma');
-  } else {
-    chiave = 'arcano';
   }
 
   return (
     <IconaAzione
       nome={nome}
-      tipo={categoria}
+      tipo={chiave || categoria}
       dimensione={dimensione}
       stileBadge={stileBadge}
       style={style}
@@ -856,6 +853,7 @@ export function IconaOggetto({
  */
 export function rimuoviEmoji(str = '') {
   return String(str || '')
+    // eslint-disable-next-line no-misleading-character-class
     .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{1FA00}-\u{1FAFF}]/gu, '')
     .trim();
 }
