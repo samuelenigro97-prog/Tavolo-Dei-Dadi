@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.111.1] – 2026-10-20
+
+### Modificato
+- **Rinominata la sezione della scheda da "Equipaggiamento" a "Inventario"**:
+  - Aggiornata l'etichetta del titolo della sezione della scheda (`sez.equipaggiamento`) in **"Inventario"** (e **"Inventory"** per la lingua inglese), in perfetta sintonia con la struttura dati e la terminologia GDR.
+
 ## [4.111.0] – 2026-10-20
 
 ### Aggiunto
