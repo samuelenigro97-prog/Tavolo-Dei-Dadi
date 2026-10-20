@@ -1990,7 +1990,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.111.1';
+const APP_VERSION = '4.111.2';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -18427,36 +18427,57 @@ export default function App() {
       </>
       ) : null}
       <NuvolettaGlobale />
-      {/* Indicatore discreto della versione: quasi invisibile a filo sfondo senza bordo, visibile a passaggio mouse */}
-      <div
-        className="versione-watermark-discreta"
-        style={{
-          position: 'fixed',
-          bottom: 3,
-          right: 6,
-          zIndex: 1400,
-          fontSize: 9,
-          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-          fontWeight: 500,
-          letterSpacing: 0.4,
-          color: 'var(--c-ink, currentColor)',
-          opacity: 0.18,
-          background: 'transparent',
-          border: 'none',
-          boxShadow: 'none',
-          padding: 0,
-          margin: 0,
-          userSelect: 'none',
-          cursor: 'default',
-          transition: 'opacity 0.25s ease',
-        }}
-        onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.75'; }}
-        onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.18'; }}
-        aria-hidden="true"
-        title={`Tavolo dei Dadi v${APP_VERSION}`}
-      >
-        v{APP_VERSION}
-      </div>
+      {/* Indicatore discreto della versione: cliccabile per copiare la versione e aggiornare */}
+      <VersioneWatermark versione={APP_VERSION} onAggiorna={() => { if (aggiornamentoPronto) forzaAggiornamento(false); }} />
+    </div>
+  );
+}
+
+/** Indicatore discreto della versione: quasi invisibile a filo sfondo senza bordo, copiabile con un tocco. */
+function VersioneWatermark({ versione, onAggiorna }) {
+  const [hover, setHover] = useState(false);
+  const [copiato, setCopiato] = useState(false);
+
+  const copia = () => {
+    const txt = `v${versione}`;
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(txt).catch(() => {});
+    }
+    setCopiato(true);
+    setTimeout(() => setCopiato(false), 2000);
+    if (onAggiorna) onAggiorna();
+  };
+
+  return (
+    <div
+      className="versione-watermark-discreta"
+      onClick={copia}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        position: 'fixed',
+        bottom: 3,
+        right: 6,
+        zIndex: 1400,
+        fontSize: 9,
+        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+        fontWeight: 500,
+        letterSpacing: 0.4,
+        color: copiato ? 'var(--c-green, #2e9d4d)' : 'var(--c-ink, currentColor)',
+        opacity: copiato ? 0.95 : (hover ? 0.75 : 0.18),
+        background: 'transparent',
+        border: 'none',
+        boxShadow: 'none',
+        padding: 0,
+        margin: 0,
+        userSelect: 'all',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+      }}
+      title={`Tavolo dei Dadi v${versione} (clicca per copiare)`}
+      aria-label={`Versione ${versione}`}
+    >
+      {copiato ? `v${versione} (copiato!)` : `v${versione}`}
     </div>
   );
 }
