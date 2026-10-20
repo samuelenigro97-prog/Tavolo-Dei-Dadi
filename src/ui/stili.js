@@ -1788,49 +1788,52 @@ tbody tr:hover {
     top: 0;
     left: 0;
     right: 0;
-    height: 18px;
+    height: 24px;
     z-index: 1199;
   }
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa {
     margin-bottom: -30px !important;
-    transform: translateY(calc(-100% + 10px));
+    transform: translate3d(0, calc(-100% + 14px), 0) !important;
+    will-change: transform, opacity, box-shadow;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     /* !important: lo stile in linea della sezione (styles.panel) ha già una sua transition,
        che altrimenti vince e la barra scatta invece di scorrere. */
-    transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1) 0.6s, box-shadow 0.3s ease 0.6s !important;
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.45s, box-shadow 0.3s ease 0.45s !important;
     box-shadow: none !important;
   }
   :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:focus-within {
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0) !important;
     transition-delay: 0s !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.12) !important;
   }
   /* A barra chiusa il contenuto è nascosto: nella striscia resta solo la maniglia. */
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa > * {
     opacity: 0;
-    /* Sparisce prima che la barra salga (0.6 s): nella striscia non restano mai icone a metà. */
-    transition: opacity 0.15s ease 0.4s !important;
+    /* Sparisce prima che la barra salga: nella striscia non restano mai icone a metà. */
+    transition: opacity 0.18s ease 0.32s !important;
   }
   :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa > *,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover > *,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:focus-within > * {
     opacity: 1;
-    /* Compare quando la barra è quasi scesa del tutto, non mentre scorre. */
-    transition: opacity 0.18s ease 0.24s !important;
+    /* Compare in sincrono col movimento fluido. */
+    transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1) 0.05s !important;
   }
   /* Maniglia: si vede solo a barra chiusa. */
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa::before {
     content: '';
     position: absolute;
     left: 50%;
-    bottom: 3px;
-    width: 40px;
-    height: 3px;
-    margin-left: -20px;
+    bottom: 4px;
+    width: 42px;
+    height: 3.5px;
+    margin-left: -21px;
     border-radius: 3px;
-    background: var(--c-tema-bordo, var(--c-border));
-    transition: opacity 0.2s ease 0.6s;
+    background: var(--c-gold, var(--c-tema-bordo, var(--c-border)));
+    transition: opacity 0.2s ease 0.45s;
     pointer-events: none;
   }
   :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa::before,
@@ -1853,21 +1856,25 @@ tbody tr:hover {
 }
 
 /* Combat Tracker a scomparsa (computer col mouse, identico alla barra in alto):
-   Resta in vista solo una striscia con una maniglia sul bordo inferiore;
+   Resta in vista solo una striscia con una maniglia sul bordo inferiore (stessa sporgenza di quella in alto);
    avvicinando il cursore al fondo dello schermo (o passando col Tab) il tracker
-   sale con un'animazione fluida, e riscende poco dopo che il cursore se ne va. */
+   sale con un'animazione fluida ultra-reattiva a 60/120fps, e quando arriva attiva
+   un bordo dorato luminoso con aura che ne sottolinea l'attivazione. */
 .combat-zona-apertura { display: none; }
 
 .combat-tracker-fisso {
   position: fixed;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate3d(-50%, 0, 0);
   bottom: 0;
   width: 100%;
   max-width: 1080px;
   z-index: 1500;
+  will-change: transform, opacity, box-shadow;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   box-shadow: 0 -6px 28px rgba(0, 0, 0, 0.5);
-  transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.3s ease;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 @media (hover: hover) and (pointer: fine) and (min-width: 681px) {
@@ -1877,44 +1884,47 @@ tbody tr:hover {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 18px;
+    height: 24px;
     z-index: 1499;
   }
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto {
-    transform: translate(-50%, calc(100% - 10px)) !important;
-    transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1) 0.6s, box-shadow 0.3s ease 0.6s !important;
+    transform: translate3d(-50%, calc(100% - 14px), 0) !important;
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.45s, box-shadow 0.3s ease 0.45s, border-color 0.3s ease 0.45s !important;
     box-shadow: none !important;
   }
   :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-aperto,
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto:hover,
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto:focus-within {
-    transform: translate(-50%, 0) !important;
+    transform: translate3d(-50%, 0, 0) !important;
     transition-delay: 0s !important;
-    box-shadow: 0 -6px 28px rgba(0, 0, 0, 0.5) !important;
+    border-top: 1.5px solid var(--c-gold, #d4a017) !important;
+    border-left: 1.5px solid var(--c-gold, #d4a017) !important;
+    border-right: 1.5px solid var(--c-gold, #d4a017) !important;
+    box-shadow: 0 -10px 36px rgba(0, 0, 0, 0.65), 0 -2px 18px rgba(212, 160, 23, 0.5), inset 0 1px 0 rgba(255, 230, 150, 0.45) !important;
   }
   /* A tracker chiuso il contenuto è nascosto: nella striscia in basso resta solo la maniglia. */
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto > * {
     opacity: 0;
-    transition: opacity 0.15s ease 0.4s !important;
+    transition: opacity 0.18s ease 0.32s !important;
   }
   :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-aperto > *,
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto:hover > *,
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto:focus-within > * {
     opacity: 1;
-    transition: opacity 0.18s ease 0.24s !important;
+    transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1) 0.05s !important;
   }
-  /* Maniglia: si vede solo a tracker chiuso (sul bordo superiore della striscia). */
+  /* Maniglia: si vede solo a tracker chiuso (sul bordo superiore della striscia, simmetrica a quella sopra). */
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto::before {
     content: '';
     position: absolute;
     left: 50%;
-    top: 3px;
-    width: 40px;
-    height: 3px;
-    margin-left: -20px;
+    top: 4px;
+    width: 42px;
+    height: 3.5px;
+    margin-left: -21px;
     border-radius: 3px;
-    background: var(--c-tema-bordo, var(--c-border));
-    transition: opacity 0.2s ease 0.6s;
+    background: var(--c-gold, var(--c-tema-bordo, var(--c-border)));
+    transition: opacity 0.2s ease 0.45s;
     pointer-events: none;
   }
   :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-aperto::before,
@@ -1934,7 +1944,7 @@ tbody tr:hover {
 
 /* Quando è chiuso (sia su mobile che ridotto esplicitamente con ▲): resta la linguetta con maniglia */
 .combat-tracker-fisso.combat-chiuso {
-  transform: translate(-50%, calc(100% - 10px)) !important;
+  transform: translate3d(-50%, calc(100% - 14px), 0) !important;
   box-shadow: none !important;
   cursor: pointer;
 }
@@ -1946,12 +1956,12 @@ tbody tr:hover {
   content: '';
   position: absolute;
   left: 50%;
-  top: 3px;
-  width: 40px;
-  height: 3px;
-  margin-left: -20px;
+  top: 4px;
+  width: 42px;
+  height: 3.5px;
+  margin-left: -21px;
   border-radius: 3px;
-  background: var(--c-tema-bordo, var(--c-border));
+  background: var(--c-gold, var(--c-tema-bordo, var(--c-border)));
   pointer-events: none;
 }
 .barra-tiro {
