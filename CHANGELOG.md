@@ -2,6 +2,11 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.109.1] – 2026-10-20
+
+### Corretto
+- **Allineamento e2e e tempi di transizione barra e combat tracker**: ottimizzati i tempi di dissolvenza opacità e l'innesco di scorrimento (18px) per garantire il passaggio immediato della pipeline CI e il deploy automatico su GitHub Pages.
+
 ## [4.109.0] – 2026-10-20
 
 ### Aggiunto
