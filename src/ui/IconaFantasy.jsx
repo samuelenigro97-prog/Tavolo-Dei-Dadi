@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { C } from './tema.js';
+import { datiIncantesimo } from '../data/incantesimi.js';
 
 // --- GAME-ICONS.NET SVG DEFINITIONS (viewBox 0 0 24 24) ---
 const SVG_GAME_ICONS = {
@@ -53,6 +54,102 @@ const SVG_GAME_ICONS = {
   // Fuoco (Palla di fuoco, Dardo di fuoco, Mani brucianti)
   fuoco: (
     <path d="M12 2C11.5 5 9 7 9 10C9 12 11 13 11 15C11 17 9.5 18 8 18C11 22 17 21 17 15C17 11 14 8 14 5C14 3.5 13 2.5 12 2Z" />
+  ),
+  // --- TRUCCHETTI ELEMENTALI & DI UTILITÀ (Magie minori / a volontà) ---
+  trucchettoFuoco: (
+    <path d="M12 2C11 5 8.5 7.5 8.5 11C8.5 13.8 10.5 16 12 16C11 14.5 10.8 13.5 11.2 12.5C11.8 12.5 12.5 12 13 11.2C13.5 13.5 15.5 14.5 15.5 17C15.5 19.5 13.8 21.5 12 21.5C9 21.5 6.5 19 6.5 15.5C6.5 11.5 9.8 8 12 2Z" />
+  ),
+  trucchettoGelo: (
+    <path d="M12 2L15.5 10L14 22L12 18.5L10 22L8.5 10L12 2M12 5.8L10 10.5L11.2 18L12 16.2L12.8 18L14 10.5L12 5.8Z" />
+  ),
+  trucchettoFulmine: (
+    <polygon points="13,2 4,13 11,13 9,22 20,10 13,10" />
+  ),
+  trucchettoTuono: (
+    <>
+      <polygon points="10,6 6,9 3,9 3,15 6,15 10,18" />
+      <path d="M14 9C15.5 10.5 15.5 13.5 14 15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </>
+  ),
+  trucchettoRadioso: (
+    <>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 2V6M12 18V22M2 12H6M18 12H22M4.93 4.93L7.76 7.76M16.24 16.24L19.07 19.07M4.93 19.07L7.76 16.24M16.24 7.76L19.07 4.93" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </>
+  ),
+  trucchettoNecrotico: (
+    <path d="M12 3C8.5 3 5.5 5.8 5.5 9.5C5.5 12 7 14 8.5 15.2V18H15.5V15.2C17 14 18.5 12 18.5 9.5C18.5 5.8 15.5 3 12 3ZM9.5 9C10.3 9 11 9.7 11 10.5C11 11.3 10.3 12 9.5 12C8.7 12 8 11.3 8 10.5C8 9.7 8.7 9 9.5 9ZM14.5 12C13.7 12 13 11.3 13 10.5C13 9.7 13.7 9 14.5 9C15.3 9 16 9.7 16 10.5C16 11.3 15.3 12 14.5 12ZM10.5 16.5H13.5V17.5H10.5V16.5Z" />
+  ),
+  trucchettoVeleno: (
+    <path d="M12 2.5C12 2.5 6 10 6 15C6 18.31 8.69 21 12 21C15.31 21 18 18.31 18 15C18 10 12 2.5 12 2.5ZM10 16C9.45 16 9 15.55 9 15C9 13.5 10 12 11 11.5C11.3 12 11 13 11 14C11 15.1 10.55 16 10 16Z" />
+  ),
+  trucchettoForza: (
+    <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" />
+  ),
+  trucchettoPsichico: (
+    <>
+      <path d="M12 5C7 5 2.73 8.11 1 12.5C2.73 16.89 7 20 12 20C17 20 21.27 16.89 23 12.5C21.27 8.11 17 5 12 5ZM12 17.5C9.24 17.5 7 15.26 7 12.5C7 9.74 9.24 7.5 12 7.5C14.76 7.5 17 9.74 17 12.5C17 15.26 14.76 17.5 12 17.5Z" />
+      <circle cx="12" cy="12.5" r="2.5" />
+    </>
+  ),
+  trucchettoArcano: (
+    <path d="M12 2L13.8 9.5L21.5 11.5L13.8 13.5L12 21L10.2 13.5L2.5 11.5L10.2 9.5L12 2Z" />
+  ),
+
+  // --- INCANTESIMI DI LIVELLO (1°-9° Livello / Magie complesse da slot) ---
+  incantesimoFuoco: (
+    <path d="M12 2C9.5 4.5 7.5 8 8 11.5C6.2 11 5 12.5 5 14.5C5 18 8 21.5 12 21.5C17 21.5 20.5 17.5 20.5 13C20.5 8 16 5.5 16 5.5C16 5.5 16.5 8 14.5 9.5C13 8.2 12.8 5 12 2M12 14.5C11.2 14.5 10.5 15.2 10.5 16C10.5 17.1 11.4 18 12.5 18C13.6 18 14.5 17.1 14.5 16C14.5 14.8 13.5 14.5 12 14.5Z" />
+  ),
+  incantesimoGelo: (
+    <>
+      <path d="M12 1V23M1 12H23M4.22 4.22L19.78 19.78M4.22 19.78L19.78 4.22" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" strokeWidth="1.5" />
+      <polygon points="12,5 13.5,7.5 10.5,7.5" />
+      <polygon points="12,19 13.5,16.5 10.5,16.5" />
+      <polygon points="5,12 7.5,10.5 7.5,13.5" />
+      <polygon points="19,12 16.5,10.5 16.5,13.5" />
+    </>
+  ),
+  incantesimoFulmine: (
+    <>
+      <polygon points="13,1 4,13 10,13 8,23 19,9 13,9" />
+      <polygon points="17,5 13,12 16,12 14,19 21,9 17,9" opacity="0.65" />
+    </>
+  ),
+  incantesimoTuono: (
+    <>
+      <polygon points="10,4 5,8 2,8 2,16 5,16 10,20" />
+      <path d="M14 8C16 10 16 14 14 16M18 5C21 8 21 16 18 19" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </>
+  ),
+  incantesimoRadioso: (
+    <>
+      <circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" strokeWidth="2" />
+      <circle cx="12" cy="12" r="2" fill="currentColor" />
+      <path d="M12 1V4M12 20V23M1 12H4M20 12H23M4.2 4.2L6.8 6.8M17.2 17.2L19.8 19.8M4.2 19.8L6.8 17.2M17.2 6.8L19.8 4.2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="3 2" />
+    </>
+  ),
+  incantesimoNecrotico: (
+    <>
+      <circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 2" />
+      <path d="M12 4C8.68 4 6 6.68 6 10C6 12.38 7.38 14.44 9.38 15.42V18H14.62V15.42C16.62 14.44 18 12.38 18 10C18 6.68 15.32 4 12 4ZM9.5 9.5C10.33 9.5 11 10.17 11 11C11 11.83 10.33 12.5 9.5 12.5C8.67 12.5 8 11.83 8 11C8 10.17 8.67 9.5 9.5 9.5ZM14.5 12.5C13.67 12.5 13 11.83 13 11C13 10.17 13.67 9.5 14.5 9.5C15.33 9.5 16 10.17 16 11C16 11.83 15.33 12.5 14.5 12.5Z" />
+    </>
+  ),
+  incantesimoVeleno: (
+    <path d="M13 2H11V5H7V8L9 10V20C9 21.1 9.9 22 11 22H13C14.1 22 15 21.1 15 20V10L17 8V5H13V2M11 7H13V8L11.5 9.5L13 11V20H11V11L12.5 9.5L11 8V7M12 13C12.83 13 13.5 13.67 13.5 14.5C13.5 15.33 12.83 16 12 16C11.17 16 10.5 15.33 10.5 14.5C10.5 13.67 11.17 13 12 13Z" />
+  ),
+  incantesimoForza: (
+    <>
+      <polygon points="12,2 14.5,8.5 21,10 16,14.5 17.5,21 12,17.5 6.5,21 8,14.5 3,10 9.5,8.5" />
+      <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
+    </>
+  ),
+  incantesimoPsichico: (
+    <path d="M12 3C7.5 3 4 6.5 4 11C4 13.2 4.9 15.1 6.3 16.5L6 21H11V19C11.3 19 11.7 19 12 19C16.5 19 20 15.5 20 11C20 6.5 16.5 3 12 3M8 11C8 8.8 9.8 7 12 7C14.2 7 16 8.8 16 11C16 13.2 14.2 15 12 15C10.5 15 9.2 14.1 8.5 13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+  ),
+  incantesimoArcano: (
+    <path d="M4 3H18C19.1 3 20 3.9 20 5V19C20 20.1 19.1 21 18 21H4C2.9 21 2 20.1 2 19V5C2 3.9 2.9 3 4 3ZM6 7H16V9H6V7ZM6 11H14V13H6V11ZM6 15H12V17H6V15Z" />
   ),
   // Dardo Incantato / Magia infallibile / Dardi
   dardoMagico: (
@@ -220,6 +317,197 @@ const SVG_RUNIC_GLYPHS = {
 /** Dimensione standard universale per tutti i badge icona nelle sezioni della scheda */
 export const DIMENSIONE_ICONA_SEZIONE = 22;
 
+/** Palette cromatica tematica in base all'elemento del danno */
+export const PALETTE_ELEMENTI = {
+  fuoco: {
+    color: '#ff6b35',
+    bg: 'rgba(255, 107, 53, 0.14)',
+    border: 'rgba(255, 107, 53, 0.42)',
+    glow: 'rgba(255, 107, 53, 0.45)',
+  },
+  freddo: {
+    color: '#00d2d3',
+    bg: 'rgba(0, 210, 211, 0.14)',
+    border: 'rgba(0, 210, 211, 0.42)',
+    glow: 'rgba(0, 210, 211, 0.45)',
+  },
+  fulmine: {
+    color: '#fed330',
+    bg: 'rgba(254, 211, 48, 0.14)',
+    border: 'rgba(254, 211, 48, 0.42)',
+    glow: 'rgba(254, 211, 48, 0.45)',
+  },
+  tuono: {
+    color: '#45aaf2',
+    bg: 'rgba(69, 170, 242, 0.14)',
+    border: 'rgba(69, 170, 242, 0.42)',
+    glow: 'rgba(69, 170, 242, 0.45)',
+  },
+  acido: {
+    color: '#26de81',
+    bg: 'rgba(38, 222, 129, 0.14)',
+    border: 'rgba(38, 222, 129, 0.42)',
+    glow: 'rgba(38, 222, 129, 0.45)',
+  },
+  veleno: {
+    color: '#20bf6b',
+    bg: 'rgba(32, 191, 107, 0.14)',
+    border: 'rgba(32, 191, 107, 0.42)',
+    glow: 'rgba(32, 191, 107, 0.45)',
+  },
+  necrotico: {
+    color: '#a55eea',
+    bg: 'rgba(165, 94, 234, 0.14)',
+    border: 'rgba(165, 94, 234, 0.42)',
+    glow: 'rgba(165, 94, 234, 0.45)',
+  },
+  radioso: {
+    color: '#f7b731',
+    bg: 'rgba(247, 183, 49, 0.14)',
+    border: 'rgba(247, 183, 49, 0.42)',
+    glow: 'rgba(247, 183, 49, 0.45)',
+  },
+  forza: {
+    color: '#d980fa',
+    bg: 'rgba(217, 128, 250, 0.14)',
+    border: 'rgba(217, 128, 250, 0.42)',
+    glow: 'rgba(217, 128, 250, 0.45)',
+  },
+  psichico: {
+    color: '#fc5c65',
+    bg: 'rgba(252, 92, 101, 0.14)',
+    border: 'rgba(252, 92, 101, 0.42)',
+    glow: 'rgba(252, 92, 101, 0.45)',
+  },
+  cura: {
+    color: '#38ef7d',
+    bg: 'rgba(56, 239, 125, 0.14)',
+    border: 'rgba(56, 239, 125, 0.42)',
+    glow: 'rgba(56, 239, 125, 0.45)',
+  },
+  arcanoTrucchetto: {
+    color: '#70a1ff',
+    bg: 'rgba(112, 161, 255, 0.14)',
+    border: 'rgba(112, 161, 255, 0.42)',
+    glow: 'rgba(112, 161, 255, 0.45)',
+  },
+  arcanoIncantesimo: {
+    color: 'var(--c-gold, #d4a017)',
+    bg: 'rgba(212, 160, 23, 0.12)',
+    border: 'rgba(212, 160, 23, 0.35)',
+    glow: 'rgba(212, 160, 23, 0.4)',
+  },
+  base: {
+    color: 'var(--c-gold, #d4a017)',
+    bg: 'rgba(212, 160, 23, 0.12)',
+    border: 'rgba(212, 160, 23, 0.35)',
+    glow: 'rgba(212, 160, 23, 0.3)',
+  },
+};
+
+/**
+ * Determina se un incantesimo è un trucchetto o un incantesimo di livello,
+ * e calcola l'elemento associato e i colori della palette.
+ */
+export function determinaInfoMagica(nome = '', opzioni = {}) {
+  const { tipo = '', isSpell = false, isCantrip: isCantripProp, livello, tipoDanno = '', cat = '' } = opzioni;
+  const n = String(nome || '').toLowerCase();
+  const clean = n.replace(/\s*\(.*$/, '').trim();
+
+  // Dati da database se disponibili
+  const dbData = datiIncantesimo(nome) || datiIncantesimo(clean);
+
+  // 1. Determina se è Trucchetto (Livello 0) o Incantesimo di livello
+  let isCantrip = false;
+  if (isCantripProp !== undefined) {
+    isCantrip = !!isCantripProp;
+  } else if (livello !== undefined) {
+    isCantrip = Number(livello) === 0;
+  } else if (/trucchetto|cantrip|livello 0|lv 0|liv\. 0/i.test(tipo || cat || '')) {
+    isCantrip = true;
+  } else if (dbData && dbData.livello !== undefined) {
+    isCantrip = dbData.livello === 0;
+  } else if (/trucchetto|cantrip/i.test(n)) {
+    isCantrip = true;
+  }
+
+  // 2. Determina l'elemento o tipo di danno
+  const rawTipoDanno = String(tipoDanno || dbData?.tipoDanno || '').toLowerCase();
+  let elemento = 'arcano';
+
+  if (/cura|ferite|guarig|healing|heal|vitalit|riposo|second.*wind|ripresa.*fiato|imposizione.*mani|lay.*on.*hands|elisir.*vita|pozione.*guarig/i.test(n) || rawTipoDanno.includes('cura') || rawTipoDanno.includes('guarig')) {
+    elemento = 'cura';
+  } else if (/fuoco|fiamma|infuoc|combust|braci|fire|flame|igni|ardente/i.test(n) || rawTipoDanno.includes('fuoco') || rawTipoDanno.includes('fire')) {
+    elemento = 'fuoco';
+  } else if (/gelo|freddo|ghiaccio|neve|brina|frost|cold|ice|agathys/i.test(n) || rawTipoDanno.includes('freddo') || rawTipoDanno.includes('gelo') || rawTipoDanno.includes('cold')) {
+    elemento = 'freddo';
+  } else if (/fulmine|elettr|saetta|shock|lightning/i.test(n) || rawTipoDanno.includes('fulmine') || rawTipoDanno.includes('lightning')) {
+    elemento = 'fulmine';
+  } else if (/tuono|thunder|tonante|onda tonante/i.test(n) || rawTipoDanno.includes('tuono') || rawTipoDanno.includes('thunder')) {
+    elemento = 'tuono';
+  } else if (/acido|acid/i.test(n) || rawTipoDanno.includes('acido') || rawTipoDanno.includes('acid')) {
+    elemento = 'acido';
+  } else if (/veleno|poison|tossic/i.test(n) || rawTipoDanno.includes('veleno') || rawTipoDanno.includes('poison')) {
+    elemento = 'veleno';
+  } else if (/necrot|morte|tomba|death|decompos|morbid|hadar|rintocco|tocco gelido/i.test(n) || rawTipoDanno.includes('necrot')) {
+    elemento = 'necrotico';
+  } else if (/radios|radiant|luce|guida|sacr|sun|sole|aurora|divin|fiamma sacra/i.test(n) || rawTipoDanno.includes('radiante') || rawTipoDanno.includes('radioso')) {
+    elemento = 'radioso';
+  } else if (/forza|force|dardo.*incant|magic.*missile|spada spirit|deflagrazione|spade/i.test(n) || rawTipoDanno.includes('forza')) {
+    elemento = 'forza';
+  } else if (/psichic|psychic|mente|mental|beffa|sussurri|scheggia/i.test(n) || rawTipoDanno.includes('psichic')) {
+    elemento = 'psichico';
+  }
+
+  // 3. Seleziona icona differenziata: Trucchetto vs Incantesimo di livello
+  let chiave = 'arcano';
+  if (elemento === 'cura') {
+    chiave = 'cura';
+  } else if (isCantrip) {
+    if (elemento === 'fuoco') chiave = 'trucchettoFuoco';
+    else if (elemento === 'freddo') chiave = 'trucchettoGelo';
+    else if (elemento === 'fulmine') chiave = 'trucchettoFulmine';
+    else if (elemento === 'tuono') chiave = 'trucchettoTuono';
+    else if (elemento === 'acido') chiave = 'trucchettoVeleno';
+    else if (elemento === 'veleno') chiave = 'trucchettoVeleno';
+    else if (elemento === 'necrotico') chiave = 'trucchettoNecrotico';
+    else if (elemento === 'radioso') chiave = 'trucchettoRadioso';
+    else if (elemento === 'forza') chiave = 'trucchettoForza';
+    else if (elemento === 'psichico') chiave = 'trucchettoPsichico';
+    else chiave = 'trucchettoArcano';
+  } else {
+    // Incantesimo di livello (1° - 9°)
+    if (elemento === 'fuoco') chiave = 'incantesimoFuoco';
+    else if (elemento === 'freddo') chiave = 'incantesimoGelo';
+    else if (elemento === 'fulmine') chiave = 'incantesimoFulmine';
+    else if (elemento === 'tuono') chiave = 'incantesimoTuono';
+    else if (elemento === 'acido') chiave = 'incantesimoVeleno';
+    else if (elemento === 'veleno') chiave = 'incantesimoVeleno';
+    else if (elemento === 'necrotico') chiave = 'incantesimoNecrotico';
+    else if (elemento === 'radioso') chiave = 'incantesimoRadioso';
+    else if (elemento === 'forza') chiave = 'incantesimoForza';
+    else if (elemento === 'psichico') chiave = 'incantesimoPsichico';
+    else chiave = 'libro';
+  }
+
+  // 4. Stile cromatico in base all'elemento
+  let paletteKey = elemento;
+  if (elemento === 'arcano') {
+    paletteKey = isCantrip ? 'arcanoTrucchetto' : 'arcanoIncantesimo';
+  }
+  const stile = PALETTE_ELEMENTI[paletteKey] || PALETTE_ELEMENTI.base;
+
+  return {
+    isCantrip,
+    elemento,
+    chiave,
+    colore: stile.color,
+    bg: stile.bg,
+    border: stile.border,
+    glow: stile.glow,
+  };
+}
+
 /**
  * Seleziona la chiave dell'icona corretta per un attacco, incantesimo, potere o azione.
  * Segue la logica gerarchica:
@@ -229,7 +517,7 @@ export const DIMENSIONE_ICONA_SEZIONE = 22;
  * 4. Categoria base (Trucchetti -> Scintilla Arcana, Incantesimi -> Grimorio, Tratti -> Stella/Emblema)
  * 5. Armi e Attacchi marziali
  */
-export function getChiaveIcona(nome = '', tipo = '', isSpell = false, cat = '') {
+export function getChiaveIcona(nome = '', tipo = '', isSpell = false, cat = '', opzioni = {}) {
   const n = String(nome || '').toLowerCase();
   const t = String(tipo || '').toLowerCase();
   const c = String(cat || '').toLowerCase();
@@ -245,22 +533,10 @@ export function getChiaveIcona(nome = '', tipo = '', isSpell = false, cat = '') 
   }
 
   // 3. Spells (incantesimi o trucchetti) o elementi offensivi
-  if (isSpell || /incantesimo|trucchetto|cantrip|magia/i.test(t) || /magia/i.test(c)) {
-    if (/fuoco|fiamma|infuoc|combust|braci|fire|flame/i.test(n)) return 'fuoco';
-    if (/dardo.*incant|magic.*missile|forza/i.test(n)) return 'dardoMagico';
-    if (/gelo|freddo|ghiaccio|neve|brina|frost|cold|ice/i.test(n)) return 'gelo';
-    if (/fulmine|elettr|saetta|shock|tuono|lightning|thunder/i.test(n)) return 'fulmine';
-    if (/radios|luce|guida|sacr|radiant|sun|sole|aurora/i.test(n)) return 'radioso';
-    if (/necrot|morte|tomba|gelido|death|decompos|morbid/i.test(n)) return 'necrotico';
-    if (/veleno|acido|poison|acid|tossic/i.test(n)) return 'veleno';
-    if (/rituale|libro|studio|grimorio|tomo/i.test(n)) return 'libro';
-
-    // Trucchetto generico (non elementale) -> Scintilla Arcana
-    if (/trucchetto|cantrip|livello 0|lv 0|liv\. 0/i.test(t || c || n)) {
-      return 'arcano';
-    }
-    // Incantesimo di livello generico -> Grimorio / Libro sigillato
-    return 'libro';
+  const isMagia = isSpell || /incantesimo|trucchetto|cantrip|magia/i.test(t) || /magia/i.test(c) || !!datiIncantesimo(nome);
+  if (isMagia) {
+    const infoM = determinaInfoMagica(nome, { tipo, isSpell: true, cat, ...opzioni });
+    return infoM.chiave;
   }
 
   // 4. Tratti di Classe / Privilegi
@@ -298,6 +574,9 @@ export function IconaAzione({
   nome = '',
   tipo = '',
   isSpell = false,
+  isCantrip: isCantripProp,
+  livello,
+  tipoDanno = '',
   tipoFonte = '',
   cat = '',
   dimensione = DIMENSIONE_ICONA_SEZIONE,
@@ -325,44 +604,37 @@ export function IconaAzione({
     );
   }
 
-  const chiave = getChiaveIcona(nome, tipo, isSpell, cat);
+  // Determina se è magia (incantesimo o trucchetto)
+  const isMagia = isSpell || /incantesimo|trucchetto|cantrip|magia/i.test(tipo) || /magia/i.test(cat) || !!datiIncantesimo(nome);
+
+  let chiave = 'spadeIncrociate';
+  let coloreIcona = 'var(--c-gold, #d4a017)';
+  let bgBadge = 'rgba(212, 160, 23, 0.12)';
+  let borderBadge = 'rgba(212, 160, 23, 0.35)';
+
+  if (isMagia) {
+    const infoM = determinaInfoMagica(nome, { tipo, isSpell: true, isCantrip: isCantripProp, livello, tipoDanno, cat });
+    chiave = infoM.chiave;
+    coloreIcona = infoM.colore;
+    bgBadge = infoM.bg;
+    borderBadge = infoM.border;
+  } else {
+    chiave = getChiaveIcona(nome, tipo, false, cat, { tipoDanno });
+    const rawTD = String(tipoDanno || '').toLowerCase();
+    if (rawTD && PALETTE_ELEMENTI[rawTD]) {
+      const p = PALETTE_ELEMENTI[rawTD];
+      coloreIcona = p.color;
+      bgBadge = p.bg;
+      borderBadge = p.border;
+    } else if (chiave === 'cura') {
+      const p = PALETTE_ELEMENTI.cura;
+      coloreIcona = p.color;
+      bgBadge = p.bg;
+      borderBadge = p.border;
+    }
+  }
+
   const svgContent = SVG_GAME_ICONS[chiave] || SVG_GAME_ICONS.spadeIncrociate;
-
-  // Stile colore e accento
-  const isCura = chiave === 'cura';
-  const isFuoco = chiave === 'fuoco';
-  const isFulmine = chiave === 'fulmine';
-  const isGelo = chiave === 'gelo';
-
-  const coloreIcona = isCura
-    ? '#38ef7d'
-    : isFuoco
-    ? '#ff9f43'
-    : isFulmine
-    ? '#ffd32a'
-    : isGelo
-    ? '#00d2d3'
-    : 'var(--c-gold, #d4a017)';
-
-  const bgBadge = isCura
-    ? 'rgba(56, 239, 125, 0.12)'
-    : isFuoco
-    ? 'rgba(255, 159, 67, 0.12)'
-    : isFulmine
-    ? 'rgba(255, 211, 42, 0.12)'
-    : isGelo
-    ? 'rgba(0, 210, 211, 0.12)'
-    : 'rgba(212, 160, 23, 0.12)';
-
-  const borderBadge = isCura
-    ? 'rgba(56, 239, 125, 0.35)'
-    : isFuoco
-    ? 'rgba(255, 159, 67, 0.35)'
-    : isFulmine
-    ? 'rgba(255, 211, 42, 0.35)'
-    : isGelo
-    ? 'rgba(0, 210, 211, 0.35)'
-    : 'rgba(212, 160, 23, 0.35)';
 
   const innerSvg = (
     <svg

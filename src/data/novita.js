@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.110.3',
+    voci: {
+      it: ['Icone differenziate per Trucchetti e Incantesimi di livello, con colorazione ed effetti dedicati in base all\'elemento (fuoco, gelo, fulmine, necrotico, radioso, ecc.).'],
+      en: ['Differentiated icons for Cantrips and Leveled Spells, with distinct dynamic colors based on damage type (fire, cold, lightning, necrotic, radiant, etc.).'],
+    },
+  },
+  {
     versione: '4.110.2',
     voci: {
       it: ['Apertura ultra-rapida di Combat Tracker, menu e barre: azzerato ogni delay per una transizione istantanea e fluida.'],
