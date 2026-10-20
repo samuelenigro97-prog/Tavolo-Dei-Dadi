@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.111.0',
+    voci: {
+      it: ['Manuali e fonti ora apribili a tendina direttamente nel menu iniziale con attivazione/spegnimento rapido, e rimossa la cronologia versioni dalla home.'],
+      en: ['Collapsible sourcebooks accordion directly in the home menu with instant toggles, and removed version history from home.'],
+    },
+  },
+  {
     versione: '4.110.5',
     voci: {
       it: ['Watermark versione invisibile a tono con lo sfondo senza bordi, e pannello Araldi integrato nel tema della classe con pallini e rombi arancioni luminosi.'],
