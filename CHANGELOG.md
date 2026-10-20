@@ -2,6 +2,11 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.109.2] – 2026-10-20
+
+### Aggiunto
+- **Indicatore versione fluttuante in basso a destra**: badge compatto, discreto e leggibile su qualsiasi sfondo (`v4.109.2`) visibile in modo permanente nell'angolo inferiore destro dello schermo per verificare a colpo d'occhio l'allineamento della versione dell'app.
+
 ## [4.109.1] – 2026-10-20
 
 ### Corretto
