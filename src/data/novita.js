@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.109.4',
+    voci: {
+      it: ['Combat tracker: si auto-apre in automatico da sotto con il bordo luminoso quando lo clicchi, sia dalla barra in alto che dalla sezione Combattimento.'],
+      en: ['Combat tracker: automatically slides open from the bottom with radiant glow when clicked, from top bar or Combat section.'],
+    },
+  },
+  {
     versione: '4.109.3',
     voci: {
       it: ['Badge di versione: contrasto e leggibilità ottimizzati per gli standard WCAG su ogni sfondo.'],
