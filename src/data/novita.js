@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.110.0',
+    voci: {
+      it: ['Addio emoji generiche: tutte le icone di popup, menu, combattimento e scheda sono ora eleganti icone fantasy vettoriali a tema.'],
+      en: ['No more generic emojis: all popup, menu, combat, and sheet icons are now sleek themed vector fantasy icons.'],
+    },
+  },
+  {
     versione: '4.109.4',
     voci: {
       it: ['Combat tracker: si auto-apre in automatico da sotto con il bordo luminoso quando lo clicchi, sia dalla barra in alto che dalla sezione Combattimento.'],

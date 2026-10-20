@@ -4,6 +4,7 @@ import { C } from '../tema.js';
 import { t } from '../../i18n';
 import { modificatore } from '../../rules/dadi.js';
 import { punteggioCaratteristica } from '../../rules/scheda.js';
+import { IconaUI } from '../IconaFantasy.jsx';
 
 export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, combat, controlliAttivi, daNotificare, eliminaPersonaggio, lingua, mappaAperta, mappaCampagna, mappaRef, mostraPannelloAudio, scheda, setBozzaCrea, setCloudStatus, setCombat, setLevelUpBozza, setLingua, setMappaAperta, setMostraCloud, setMostraCompendio, setMostraCrea, setMostraDadiModal, setMostraDiarioModal, setMostraLevelUp, setMostraMenu, setMostraMenuEsporta, setMostraMenuHubMobile, setMostraPannelloAudio, setPosEsporta, setPosPannelloAudio, setSyncCodiceStatus, setTema, statoBgCloud, statoColoreCloud, statoGlowCloud, tema }) {
   return (
@@ -104,7 +105,7 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 setMostraMenuHubMobile(false);
               }}
             >
-              
+              <IconaUI nome="levelUp" dimensione={15} color={C.goldDark} />
               <span>{t('tip.levelup')}</span>
             </button>
     
@@ -116,7 +117,7 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 setMostraMenuHubMobile(false);
               }}
             >
-              
+              <IconaUI nome="cestino" dimensione={15} color={C.red} />
               <span>{t('tip.elimina_pg')}</span>
             </button>
           </div>
@@ -136,7 +137,7 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 setMostraMenuHubMobile(false);
               }}
             >
-              
+              <IconaUI nome="pergamena" dimensione={15} color={C.goldDark} />
               <span>{t('tip.menu_iniziale')}</span>
             </button>
     
@@ -148,7 +149,7 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 setMostraMenuHubMobile(false);
               }}
             >
-              
+              <IconaUI nome="campana" dimensione={15} color={daNotificare ? C.goldDark : C.inkDim} />
               <span>
                 {t('notifiche.titolo')}{' '}
                 {controlliAttivi.length > 0 ? `(${controlliAttivi.length})` : ''}
@@ -162,7 +163,7 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 setLingua((l) => (l === 'it' ? 'en' : 'it'));
               }}
             >
-              
+              <IconaUI nome="libro" dimensione={15} color={C.goldDark} />
               <span>{lingua === 'it' ? 'Italiano (IT)' : 'English (EN)'}</span>
             </button>
     
@@ -175,7 +176,7 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 setMostraMenuHubMobile(false);
               }}
             >
-              
+              <IconaUI nome="pergamena" dimensione={15} color={C.goldDark} />
               <span>{t('import_export.btn')}</span>
             </button>
     
@@ -204,7 +205,7 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 setMostraMenuHubMobile(false);
               }}
             >
-              
+              <IconaUI nome="nuvola" dimensione={15} color={statoColoreCloud} />
               <span>
                 {lingua === 'en' ? 'Backup & sync' : 'Backup e sincronizzazione'}
               </span>
@@ -226,7 +227,7 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 setMostraMenuHubMobile(false);
               }}
             >
-              
+              <IconaUI nome="dado" dimensione={15} color={C.goldDark} />
               <span>{t('roll.tavolo_dadi')}</span>
             </button>
     
@@ -238,7 +239,7 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 setMostraMenuHubMobile(false);
               }}
             >
-              
+              <IconaUI nome="lente" dimensione={15} color={C.goldDark} />
               <span>{t('compendio.titolo')}</span>
             </button>
     
@@ -249,7 +250,7 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 setTema(tema === 'auto' ? 'chiaro' : tema === 'chiaro' ? 'scuro' : 'auto');
               }}
             >
-              
+              <IconaUI nome={tema === 'auto' ? 'eclissi' : tema === 'chiaro' ? 'sole' : 'luna'} dimensione={15} color={C.goldDark} />
               <span>{tema === 'auto' ? 'Tema: Auto' : tema === 'chiaro' ? 'Tema: Chiaro' : 'Tema: Scuro'}</span>
             </button>
     
@@ -262,6 +263,7 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 setMostraMenuHubMobile(false);
               }}
             >
+              <IconaUI nome="audio" dimensione={15} color={C.goldDark} />
               <span>{t('luogo.tooltip')}</span>
             </button>
     
@@ -273,7 +275,7 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 setMostraMenuHubMobile(false);
               }}
             >
-              
+              <IconaUI nome="pergamena" dimensione={15} color={C.goldDark} />
               <span>{t('sez.diario')} ({(Array.isArray(scheda.diario) ? scheda.diario.length : 0)})</span>
             </button>
     
@@ -287,7 +289,7 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 setMostraMenuHubMobile(false);
               }}
             >
-              
+              <IconaUI nome="mappa" dimensione={15} color={C.goldDark} />
               <span>{mappaCampagna ? (mappaAperta ? t('mappa.chiudi') : t('mappa.apri')) : t('mappa.carica')}</span>
             </button>
     
@@ -302,7 +304,7 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 setMostraMenuHubMobile(false);
               }}
             >
-              
+              <IconaUI nome="spadeIncrociate" dimensione={15} color={C.goldDark} />
               <span>{lingua === 'en' ? 'Combat' : 'Combattimento'}</span>
             </button>
           </div>
