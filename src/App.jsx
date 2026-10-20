@@ -1990,7 +1990,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.110.0';
+const APP_VERSION = '4.110.1';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -14535,13 +14535,13 @@ export default function App() {
                                     nome={s.nome}
                                     isSpell={true}
                                     tipoFonte={isAraldiSpell ? 'araldi' : ''}
-                                    dimensione={20}
+                                    dimensione={22}
                                   />
                                   <button
                                     style={{ background: 'transparent', border: 'none', color: isRowInEccesso ? C.red : (isAraldiSpell ? 'var(--c-araldi, #a45a2a)' : C.ink), fontWeight: 700, cursor: 'help', textAlign: 'left', padding: 0, fontSize: 14, lineHeight: 1.2, textDecoration: 'underline dotted', textUnderlineOffset: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
                                     onClick={() => setInfo({
                                       titolo: `${s.nome || 'Incantesimo'}${s.livello === 0 ? (en ? ' · Cantrip' : ' · Trucchetto') : (en ? ` · Level ${s.livello}` : ` · ${s.livello}° livello`)}`,
-                                      iconaProps: { nome: s.nome, isSpell: true, tipoFonte: isAraldiSpell ? 'araldi' : '', dimensione: 24 },
+                                      iconaProps: { nome: s.nome, isSpell: true, tipoFonte: isAraldiSpell ? 'araldi' : '', dimensione: 22 },
                                       testo: testoModal || (en ? 'No description available for this spell.' : 'Nessuna descrizione disponibile per questo incantesimo.')
                                     })}
                                   >
@@ -15174,9 +15174,16 @@ export default function App() {
                                   onMouseLeave={(e) => { if (spieg) e.currentTarget.style.borderColor = C.border; }}
                                   title={spieg ? (lingua === 'en' ? 'Click for full description' : 'Clicca per la spiegazione completa') : undefined}
                                 >
-                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <strong style={{ color: C.goldDark, fontSize: 12 }}>{traduciDato(inv)}</strong>
-                                    {spieg && <span style={{ fontSize: 11, color: C.inkDim }}>info ℹ️</span>}
+                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                      <IconaRunica nome={inv} dimensione={22} stileBadge={true} />
+                                      <strong style={{ color: C.goldDark, fontSize: 12 }}>{traduciDato(inv)}</strong>
+                                    </div>
+                                    {spieg && (
+                                      <span style={{ fontSize: 11, color: C.inkDim, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                                        info <IconaUI nome="lente" dimensione={12} color={C.inkDim} />
+                                      </span>
+                                    )}
                                   </div>
                                   {spieg && (
                                     <div style={{ fontSize: 11, color: C.inkDim, lineHeight: 1.25, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
@@ -16574,7 +16581,7 @@ export default function App() {
                                   </td>
                                   <td data-label={t('inv.nome')} style={{ ...styles.td, ...((mostraEffetto || mostraUtilizzi || mostraContenuto) && senzaBordo) }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                                      <IconaOggetto nome={o.nome} categoria={o.categoria} dimensione={18} stileBadge={true} />
+                                      <IconaOggetto nome={o.nome} categoria={o.categoria} dimensione={22} stileBadge={true} />
                                       {(() => {
                                         const spItem = o.effetto || spiegaIncantesimo(o.nome) || (EFFETTI_OGGETTO.find(([id]) => id === o.effettoMeccanico)?.[lingua === 'en' ? 2 : 1]);
                                         return (
@@ -16583,7 +16590,7 @@ export default function App() {
                                             className="oggetto-nome"
                                             onClick={() => spItem && setInfo({
                                               titolo: traduciDato(o.nome) || o.nome,
-                                              iconaProps: { nome: o.nome, tipo: o.categoria || 'oggetto', dimensione: 24 },
+                                              iconaProps: { nome: o.nome, tipo: o.categoria || 'oggetto', dimensione: 22 },
                                               testo: spItem,
                                             })}
                                             title={spItem ? `${o.nome}: ${spItem}` : o.nome}

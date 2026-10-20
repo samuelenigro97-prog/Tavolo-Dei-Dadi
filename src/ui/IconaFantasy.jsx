@@ -217,32 +217,61 @@ const SVG_RUNIC_GLYPHS = {
   ),
 };
 
+/** Dimensione standard universale per tutti i badge icona nelle sezioni della scheda */
+export const DIMENSIONE_ICONA_SEZIONE = 22;
+
 /**
- * Seleziona la chiave dell'icona corretta per un attacco, incantesimo o azione.
+ * Seleziona la chiave dell'icona corretta per un attacco, incantesimo, potere o azione.
+ * Segue la logica gerarchica:
+ * 1. Cure / Guarigione / Ripristino PF (Cuore)
+ * 2. Reazioni e Difese (Scudo)
+ * 3. Elementi e Scuole Magiche (Fuoco, Gelo, Fulmine, Necrotico, Radioso, Veleno, Dardi)
+ * 4. Categoria base (Trucchetti -> Scintilla Arcana, Incantesimi -> Grimorio, Tratti -> Stella/Emblema)
+ * 5. Armi e Attacchi marziali
  */
 export function getChiaveIcona(nome = '', tipo = '', isSpell = false, cat = '') {
   const n = String(nome || '').toLowerCase();
+  const t = String(tipo || '').toLowerCase();
+  const c = String(cat || '').toLowerCase();
 
-  // 1. Spells (incantesimi o trucchetti)
-  if (isSpell) {
-    if (/fuoco|fiamma|infuoc|combust|braci/i.test(n)) return 'fuoco';
-    if (/dardo.*incant|magic.*missile/i.test(n)) return 'dardoMagico';
-    if (/gelo|freddo|ghiaccio|neve|brina|frost|cold/i.test(n)) return 'gelo';
-    if (/fulmine|elettr|saetta|shock|tuono|lightning/i.test(n)) return 'fulmine';
-    if (/cura|ferite|guarig|healp|riposo/i.test(n)) return 'cura';
-    if (/radios|luce|guida|sacr|radiant|sun|sole/i.test(n)) return 'radioso';
-    if (/necrot|morte|tomba|gelido|death|decompos/i.test(n)) return 'necrotico';
-    if (/veleno|acido|poison|acid/i.test(n)) return 'veleno';
-    if (/rituale|libro|studio|grimorio/i.test(n)) return 'libro';
-    return 'arcano';
+  // 1. Priorità Assoluta: Cure e Ripristino Vita -> Cuore
+  if (/cura|ferite|guarig|healing|heal|vitalit|riposo|second.*wind|ripresa.*fiato|imposizione.*mani|lay.*on.*hands|elisir.*vita|pozione.*guarig/i.test(n)) {
+    return 'cura';
   }
 
   // 2. Reazioni e difese
-  if (cat === 'Reazione' || /scudo|parata|schivata|difesa|reazione|intercetta/i.test(n)) {
+  if (cat === 'Reazione' || c === 'reazione' || /scudo|parata|schivata|difesa|reazione|intercetta|protezione|bastione/i.test(n)) {
     return 'scudo';
   }
 
-  // 3. Armi e attacchi
+  // 3. Spells (incantesimi o trucchetti) o elementi offensivi
+  if (isSpell || /incantesimo|trucchetto|cantrip|magia/i.test(t) || /magia/i.test(c)) {
+    if (/fuoco|fiamma|infuoc|combust|braci|fire|flame/i.test(n)) return 'fuoco';
+    if (/dardo.*incant|magic.*missile|forza/i.test(n)) return 'dardoMagico';
+    if (/gelo|freddo|ghiaccio|neve|brina|frost|cold|ice/i.test(n)) return 'gelo';
+    if (/fulmine|elettr|saetta|shock|tuono|lightning|thunder/i.test(n)) return 'fulmine';
+    if (/radios|luce|guida|sacr|radiant|sun|sole|aurora/i.test(n)) return 'radioso';
+    if (/necrot|morte|tomba|gelido|death|decompos|morbid/i.test(n)) return 'necrotico';
+    if (/veleno|acido|poison|acid|tossic/i.test(n)) return 'veleno';
+    if (/rituale|libro|studio|grimorio|tomo/i.test(n)) return 'libro';
+
+    // Trucchetto generico (non elementale) -> Scintilla Arcana
+    if (/trucchetto|cantrip|livello 0|lv 0|liv\. 0/i.test(t || c || n)) {
+      return 'arcano';
+    }
+    // Incantesimo di livello generico -> Grimorio / Libro sigillato
+    return 'libro';
+  }
+
+  // 4. Tratti di Classe / Privilegi
+  if (t === 'privilegio' || t === 'tratto' || t === 'talento' || c === 'privilegio' || c === 'tratto') {
+    if (/zampa|forma.*selvat|istinto|bestia|animale/i.test(n)) return 'bestia';
+    if (/arcano|magia|incantatore/i.test(n)) return 'arcano';
+    if (/furtiv|assassin|scassin|ladro/i.test(n)) return 'pugnale';
+    return 'stella';
+  }
+
+  // 5. Armi e attacchi marziali
   if (/spadone|spada a due mani|greatsword|claymore/i.test(n)) return 'spadone';
   if (/stocco|scimitarra|rapier|spada corta|shortsword/i.test(n)) return 'stocco';
   if (/pugnale|daga|coltello|dagger/i.test(n)) return 'pugnale';
@@ -254,7 +283,7 @@ export function getChiaveIcona(nome = '', tipo = '', isSpell = false, cat = '') 
   if (/bastone|randello|quarterstaff|club/i.test(n)) return 'bastone';
   if (/pozione|ampolla|potion/i.test(n)) return 'pozione';
 
-  // 4. Default per tipo
+  // 6. Default per tipo
   if (tipo === 'tattica' || tipo === 'manovra') return 'stocco';
   if (tipo === 'stile' || tipo === 'armatura') return 'scudo';
 
@@ -263,7 +292,7 @@ export function getChiaveIcona(nome = '', tipo = '', isSpell = false, cat = '') 
 
 /**
  * IconaAzione: Renderizza l'icona Game-Icons.net in formato SVG puro ad alta risoluzione,
- * racchiusa in un elegante micro-badge con finitura dorata/scura.
+ * racchiusa in un elegante micro-badge con finitura dorata/scura di dimensione uniforme (22px).
  */
 export function IconaAzione({
   nome = '',
@@ -271,14 +300,18 @@ export function IconaAzione({
   isSpell = false,
   tipoFonte = '',
   cat = '',
-  dimensione = 22,
+  dimensione = DIMENSIONE_ICONA_SEZIONE,
   stileBadge = true,
   glow = false,
   style = {},
   className = '',
 }) {
-  // Se è un privilegio o potere Araldi / Debito del Patrono, usa il Glifo Runico
-  if (tipoFonte === 'araldi' || /debito|patrono|araldi|maschera/i.test(nome)) {
+  // Se è un privilegio o potere Araldi / Debito / Patrono / Invocazione, usa il Glifo Runico (Occhio/Patto/Debito)
+  if (
+    tipoFonte === 'araldi' ||
+    /debito|patrono|araldi|maschera|invocaz|supplica|patto|eldritch|fattucchiere|warlock|visione|occhio|lama.*iettatrice|maledizione/i.test(nome) ||
+    /patrono|warlock|invocaz/i.test(tipo)
+  ) {
     return (
       <IconaRunica
         nome={nome}
@@ -358,6 +391,11 @@ export function IconaAzione({
           justifyContent: 'center',
           width: dimensione,
           height: dimensione,
+          minWidth: dimensione,
+          minHeight: dimensione,
+          maxWidth: dimensione,
+          maxHeight: dimensione,
+          boxSizing: 'border-box',
           color: coloreIcona,
           ...style,
         }}
@@ -376,6 +414,11 @@ export function IconaAzione({
         justifyContent: 'center',
         width: dimensione,
         height: dimensione,
+        minWidth: dimensione,
+        minHeight: dimensione,
+        maxWidth: dimensione,
+        maxHeight: dimensione,
+        boxSizing: 'border-box',
         borderRadius: 6,
         background: bgBadge,
         border: `1px solid ${borderBadge}`,
@@ -397,7 +440,7 @@ export function IconaAzione({
 export function IconaRunica({
   nome = '',
   isAraldi = false,
-  dimensione = 22,
+  dimensione = DIMENSIONE_ICONA_SEZIONE,
   stileBadge = true,
   glow = true,
   style = {},
@@ -406,7 +449,7 @@ export function IconaRunica({
   const n = String(nome || '').toLowerCase();
   let glyphKey = 'patto';
   if (/debito|sacrificio|disfacimento/i.test(n)) glyphKey = 'debito';
-  else if (/occhio|visione|segreto|maschera|araldi/i.test(n) || isAraldi) glyphKey = 'occhio';
+  else if (/occhio|visione|segreto|maschera|araldi|patrono|warlock|invocaz|supplica|patto|eldritch|lama.*iettatrice/i.test(n) || isAraldi) glyphKey = 'occhio';
   else if (/non questa volta|salvezza|resurrezione|sopravvissuto/i.test(n)) glyphKey = 'salvezza';
 
   const svgContent = SVG_RUNIC_GLYPHS[glyphKey] || SVG_RUNIC_GLYPHS.patto;
@@ -445,6 +488,11 @@ export function IconaRunica({
           justifyContent: 'center',
           width: dimensione,
           height: dimensione,
+          minWidth: dimensione,
+          minHeight: dimensione,
+          maxWidth: dimensione,
+          maxHeight: dimensione,
+          boxSizing: 'border-box',
           color: coloreRunico,
           ...style,
         }}
@@ -463,6 +511,11 @@ export function IconaRunica({
         justifyContent: 'center',
         width: dimensione,
         height: dimensione,
+        minWidth: dimensione,
+        minHeight: dimensione,
+        maxWidth: dimensione,
+        maxHeight: dimensione,
+        boxSizing: 'border-box',
         borderRadius: 6,
         background: bgRunico,
         border: `1px solid ${borderRunico}`,
@@ -483,8 +536,8 @@ export function IconaRunica({
 export function IconaOggetto({
   nome = '',
   categoria = '',
-  dimensione = 20,
-  stileBadge = false,
+  dimensione = DIMENSIONE_ICONA_SEZIONE,
+  stileBadge = true,
   style = {},
 }) {
   const n = String(nome || '').toLowerCase();
@@ -583,7 +636,7 @@ export function IconaUI({
  * IconaModalInfo: Renderizza l'icona tematica da mostrare nell'header del popup/nuvoletta
  * di dettaglio (azioni, incantesimi, oggetti, tratti) sostituendo ogni emoticon grezza.
  */
-export function IconaModalInfo({ info, dimensione = 22 }) {
+export function IconaModalInfo({ info, dimensione = DIMENSIONE_ICONA_SEZIONE }) {
   if (!info) return null;
   if (info.iconaNode) return info.iconaNode;
   if (info.iconaProps) {

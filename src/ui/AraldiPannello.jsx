@@ -187,7 +187,7 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
                   background: raggiunta ? 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))' : 'transparent',
                 }}>{raggiunta ? '✓ ' : ''}{s.soglia}</span>
                 <span style={{ minWidth: 0, flex: 1, display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                  <IconaRunica nome={s.nome} isAraldi={true} dimensione={18} />
+                  <IconaRunica nome={s.nome} isAraldi={true} dimensione={22} />
                   <strong style={{ color: raggiunta ? C.ink : C.inkDim }}>{en ? s.nomeEn : s.nome}</strong>
                   <span style={{ color: C.inkDim }}> — {en ? s.effettoEn : s.effetto}</span>
                   {raggiunta && (

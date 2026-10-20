@@ -6,6 +6,7 @@ import { C } from './tema.js';
 import { styles } from './stili.js';
 import { formattaTitoloVoce } from '../rules/scheda.js';
 import { conSegno } from '../rules/dadi.js';
+import { IconaUI } from './IconaFantasy.jsx';
 
 export const ICONE_5E = {
   // Danni / Resistenze
@@ -573,20 +574,22 @@ export function ListaQuadratini({ value, onChange, lookup, placeholder, opzioni,
               </button>
               {isMagiaSelvaggia && (
                 <button
-                  style={{ ...chip, background: C.gold, color: C.onGold, borderLeft: '1px solid rgba(0,0,0,0.1)', borderTopLeftRadius: 0, borderBottomLeftRadius: 0, paddingLeft: 6, paddingRight: 6 }}
+                  style={{ ...chip, background: C.gold, color: C.onGold, borderLeft: '1px solid rgba(0,0,0,0.1)', borderTopLeftRadius: 0, borderBottomLeftRadius: 0, paddingLeft: 6, paddingRight: 6, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                   title={tr('Tira 1d100 (Impulso di Magia Selvaggia)', 'Roll 1d100 (Wild Magic Surge)')}
                   onClick={(e) => {
                     e.stopPropagation();
                     onRoll("Impulso di Magia Selvaggia", "1d100");
                   }}
                 >
-                  🎲
+                  <IconaUI nome="dado" dimensione={14} color="currentColor" />
                 </button>
               )}
             </div>
           );
         })}
-        <button style={{ ...chip, borderStyle: 'dashed', color: C.goldDark, flexShrink: 0, fontWeight: 700 }} title={t('common.aggiungi_lista')} onClick={() => setEdit({ index: -1, valore: "" })}>➕</button>
+        <button style={{ ...chip, borderStyle: 'dashed', color: C.goldDark, flexShrink: 0, fontWeight: 700, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }} title={t('common.aggiungi_lista')} onClick={() => setEdit({ index: -1, valore: "" })}>
+          <span style={{ fontSize: 14, lineHeight: 1, fontWeight: 800 }}>+</span>
+        </button>
       </div>
       {edit && (
         <div
