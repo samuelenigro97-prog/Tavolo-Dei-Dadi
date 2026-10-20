@@ -1851,6 +1851,109 @@ tbody tr:hover {
   flex-wrap: nowrap !important;
   white-space: nowrap !important;
 }
+
+/* Combat Tracker a scomparsa (computer col mouse, identico alla barra in alto):
+   Resta in vista solo una striscia con una maniglia sul bordo inferiore;
+   avvicinando il cursore al fondo dello schermo (o passando col Tab) il tracker
+   sale con un'animazione fluida, e riscende poco dopo che il cursore se ne va. */
+.combat-zona-apertura { display: none; }
+
+.combat-tracker-fisso {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  width: 100%;
+  max-width: 1080px;
+  z-index: 1500;
+  box-shadow: 0 -6px 28px rgba(0, 0, 0, 0.5);
+  transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.3s ease;
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 681px) {
+  :root[data-barra-a-scomparsa="si"] .combat-zona-apertura {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 18px;
+    z-index: 1499;
+  }
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto {
+    transform: translate(-50%, calc(100% - 10px)) !important;
+    transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1) 0.6s, box-shadow 0.3s ease 0.6s !important;
+    box-shadow: none !important;
+  }
+  :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-aperto,
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto:hover,
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto:focus-within {
+    transform: translate(-50%, 0) !important;
+    transition-delay: 0s !important;
+    box-shadow: 0 -6px 28px rgba(0, 0, 0, 0.5) !important;
+  }
+  /* A tracker chiuso il contenuto è nascosto: nella striscia in basso resta solo la maniglia. */
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto > * {
+    opacity: 0;
+    transition: opacity 0.15s ease 0.4s !important;
+  }
+  :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-aperto > *,
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto:hover > *,
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto:focus-within > * {
+    opacity: 1;
+    transition: opacity 0.18s ease 0.24s !important;
+  }
+  /* Maniglia: si vede solo a tracker chiuso (sul bordo superiore della striscia). */
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 3px;
+    width: 40px;
+    height: 3px;
+    margin-left: -20px;
+    border-radius: 3px;
+    background: var(--c-tema-bordo, var(--c-border));
+    transition: opacity 0.2s ease 0.6s;
+    pointer-events: none;
+  }
+  :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-aperto::before,
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto:hover::before,
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto:focus-within::before {
+    opacity: 0;
+    transition-delay: 0s;
+  }
+  :root[data-barra-a-scomparsa="si"] .combat-spacer {
+    height: 20px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso { transition: none !important; }
+}
+
+/* Quando è chiuso (sia su mobile che ridotto esplicitamente con ▲): resta la linguetta con maniglia */
+.combat-tracker-fisso.combat-chiuso {
+  transform: translate(-50%, calc(100% - 10px)) !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+.combat-tracker-fisso.combat-chiuso > * {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.combat-tracker-fisso.combat-chiuso::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 3px;
+  width: 40px;
+  height: 3px;
+  margin-left: -20px;
+  border-radius: 3px;
+  background: var(--c-tema-bordo, var(--c-border));
+  pointer-events: none;
+}
 .barra-tiro {
   position: sticky !important;
   top: 48px !important;
