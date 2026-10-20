@@ -60,7 +60,7 @@ export function PeModal({ aggiorna, inputAggiungiPe, lingua, registra, scheda, s
       >
         {/* Header */}
         <div style={{ padding: '14px 18px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <strong style={{ fontSize: 15, color: C.goldDark, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <strong style={{ fontSize: 14, color: C.goldDark, display: 'flex', alignItems: 'center', gap: 6 }}>
             {lingua === 'en' ? 'Experience Points (XP Tracker)' : 'Tracciatore Punti Esperienza (PE)'}
           </strong>
           <button

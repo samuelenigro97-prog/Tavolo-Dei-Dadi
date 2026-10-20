@@ -2,6 +2,7 @@
 import { t } from '../../i18n';
 import { C } from '../tema.js';
 import { styles } from '../stili.js';
+import { BadgeTiroSalvezza } from '../componenti.jsx';
 import { conSegno } from '../../rules/dadi.js';
 import { calcolaTsConcentrazione } from '../../rules/regole.js';
 
@@ -42,9 +43,8 @@ export function ConcentrazioneModal({ aggiorna, checkConc, lingua, registra, sch
           <strong style={{ color: C.goldDark, fontSize: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
             {t('conc.auto_titolo')}
           </strong>
-          <span style={{ fontSize: 11, background: 'rgba(201,162,39,0.15)', color: C.goldDark, padding: '2px 7px', borderRadius: 6, fontWeight: 700 }}>
-            CD {checkConc.cd}
-          </span>
+          {/* TS di Costituzione: il colore della Costituzione, come il suo riquadro. */}
+          <BadgeTiroSalvezza cd={checkConc.cd} caratteristica="Costituzione" colore={C.goldDark} />
         </div>
 
         <div style={{ fontSize: 13, lineHeight: 1.45, color: C.ink, marginBottom: 10 }}>
@@ -99,7 +99,7 @@ export function ConcentrazioneModal({ aggiorna, checkConc, lingua, registra, sch
         ) : (
           <div style={{ textAlign: 'center', marginBottom: 12, padding: '10px', background: C.panelLight, borderRadius: 8, border: `1px solid ${esito.passa ? C.green : C.red}` }}>
             <div style={{ fontSize: 13, color: C.inkDim }}>
-              {esito.vantaggio !== 0 ? `2d20 [${esito.d1}, ${esito.d2}] -> [${esito.d20}]` : `d20 [${esito.d20}]`} {conSegno(bonusCon)} = <strong style={{ fontSize: 15, color: C.ink }}>{esito.tot}</strong> · CD {checkConc.cd}
+              {esito.vantaggio !== 0 ? `2d20 [${esito.d1}, ${esito.d2}] -> [${esito.d20}]` : `d20 [${esito.d20}]`} {conSegno(bonusCon)} = <strong style={{ fontSize: 14, color: C.ink }}>{esito.tot}</strong> · CD {checkConc.cd}
             </div>
             <div style={{ fontSize: 16, fontWeight: 800, marginTop: 6, color: esito.passa ? C.green : C.red }}>
               {esito.passa

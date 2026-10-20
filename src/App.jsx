@@ -6,9 +6,10 @@ import { t, tr, setLinguaAttuale, traduciDato } from "./i18n";
 import { avviaAmbiente, fermaAmbiente, setVolumeAmbiente, eseguiEffettoSonoro, precaricaSfx } from './utils/audioAmbiente';
 import { C, BASE_TEMA, PRESET_COLORI, ambientazioneCasuale } from "./ui/tema.js";
 import { styles, GLOBAL_CSS } from './ui/stili.js';
-import { Editable, Rollable, iconaTipoDanno, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
+import { Editable, Rollable, iconaTipoDanno, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, caratteristicaDaTesto, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
-import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
+import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, attaccoIncantesimoAttivo, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
+import { normalizzaTrascrizione } from './rules/importSchede.js';
 import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } from "./data/esempi.js";
 import { fixEquipaggiamentoVaelion, migrazioneRegoleVaelion, autoIdratazionePersonaggioPredefinito } from './data/migrazioniPersonaggi.js';
 import { CARATTERISTICHE, ABILITA } from './data/caratteristiche.js';
@@ -1343,7 +1344,7 @@ const INCANTESIMI_NOMI = Array.from(new Set([...NOMI_SPIEG_INC, ...Object.keys(I
 import { NOMI_CLASSI, BACKGROUND_5E, TAGLIE_5E, ALLINEAMENTI_5E, SESSO_5E, SOTTOCLASSI_5E, INCANTESIMI_CLASSE, DANNI_5E, SENSI_5E, CONDIZIONI_5E, NOMI_OGGETTI, LINGUE_5E, ARMI_5E, STRUMENTI_5E, REAZIONI_5E, AZIONI_BONUS_5E, GRUPPI_ARMI_5E, GRUPPI_STRUMENTI_5E, GRUPPI_LINGUE_5E, DEFAULT_MANUALI, manualeAttivo, SOTTOCLASSI_FONTI, talentiPerManuali, PE_PER_LIVELLO, BACKGROUND_COMPETENZE, BACKGROUND_TALENTO_ORIGINE_2024, SPECIE_5E, tabellaPrivilegiSottoclasse, CARATT_INCANTATORE, PRIORITA_CARATT, DADO_VITA_CLASSE, BACKGROUND_CARATT, TS_CLASSE, ADDESTRAMENTO_CLASSE, COMPETENZE_CLASSE, PRIVILEGI_CLASSE_L1, PRIVILEGI_CLASSE_L1_2014, ASI_LIV, SOTTOCLASSE_LIV, COMPETENZE_SPECIE, NOMI_SPECIE, NOMI_SPECIE_GENERE, COGNOMI_SPECIE, NOMI_GENERICI, SPECIE_DATI, SPECIE_DATI_2014, BONUS_CARATT_SPECIE_2014, SFINIMENTO_2014, BASE_ARMATURA_DEFAULT, ESEMPI_ARMATURA } from "./data/dati5e.js";
 import { modificatore, conSegno, tiraDado, parseEspressioneDado, facceDadoVita, esprDadiVita, gruppiDadoVita, bonusCompetenzaDaLivello, tiraDanni, tiraD20, capacitaCarico, modalitaEffettiva } from "./rules/dadi.js";
 import { risorseAutoClasse, sincronizzaRisorseClasse, trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from "./rules/regole.js";
-import { normalizzaPoteri, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda, contatoriInGioco, valoreContatore, soglieDebitoAttive } from './rules/poteri.js';
+import { normalizzaPoteri, garantisciDebitoAraldi, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda, contatoriInGioco, valoreContatore, soglieDebitoAttive } from './rules/poteri.js';
 import { PoteriRisorse } from './ui/PoteriRisorse.jsx';
 import { unisciPoteriCampagna, poteriCampagnaIncompleti } from './data/poteriCampagna.js';
 import { aggiornaTestiAraldi } from './data/modelliPoteri.js';
@@ -1373,6 +1374,7 @@ import { PeModal } from './ui/modali/PeModal.jsx';
 import { CloudModal } from './ui/modali/CloudModal.jsx';
 import { ConcentrazioneModal } from './ui/modali/ConcentrazioneModal.jsx';
 import { DannoAreaModal } from './ui/modali/DannoAreaModal.jsx';
+import { useAllineaProfilo } from './ui/useAllineaProfilo.js';
 import { BestiaDettaglioModal } from './ui/modali/BestiaDettaglioModal.jsx';
 
 /**
@@ -1764,6 +1766,33 @@ function trovaArmatura(nome) {
 function eScudo(nome) {
   return /scudo|shield/i.test(String(nome || ''));
 }
+/** "(CA 14)" già scritto nel nome di un oggetto salvato: da togliere dal nome e riscrivere come "CA +14". */
+const RE_CA_NEL_NOME = /\s*\(\s*CA\s*\+?(\d+)\s*\)/i;
+/** Nome dell'oggetto senza l'eventuale "(CA n)" scritto a mano: la CA si mostra a parte, sempre come "CA +n". */
+function nomeSenzaCa(nome) {
+  return String(nome || '').replace(RE_CA_NEL_NOME, '');
+}
+/**
+ * CA di un oggetto dell'inventario da mostrare tra parentesi accanto al nome, SEMPRE nella
+ * forma "CA +valore": "CA +14" per un'armatura, "CA +2" per uno scudo, "CA +1" per un
+ * oggetto magico che dà CA (+1/+2/+3 nel nome si somma). Un "(CA 14)" già scritto nel nome
+ * si legge da lì. '' se l'oggetto non dà CA.
+ */
+function etichettaCaOggetto(o) {
+  const nome = String(o?.nome || '');
+  const scritta = RE_CA_NEL_NOME.exec(nome);
+  if (scritta) return `CA +${scritta[1]}`;
+  if (!nome) return '';
+  const magia = /\+([123])\b/.exec(nome);
+  const bonus = magia ? Number(magia[1]) : 0;
+  if (/^(scudo|shield)\b/i.test(nome.trim())) return `CA +${2 + bonus}`;
+  const eArmatura = o?.categoria === 'Armatura' || /^(armatura|corazza|cotta|giaco|mezza armatura|cuoio)/i.test(nome.trim());
+  const arm = eArmatura ? trovaArmatura(nome) : null;
+  if (arm) return `CA +${arm.base + bonus}`;
+  if (o?.effettoMeccanico === 'classe_armatura_tiri_salvezza_1') return 'CA +1';
+  const m = /^classe_armatura_([123])$/.exec(o?.effettoMeccanico || '');
+  return m ? `CA +${m[1]}` : '';
+}
 const KIT_CLASSE = {
   barbaro:  { armi: ['Ascia bipenne'], equip: ['Ascia ×4', 'Dotazione da esploratore'], denari: 15, armatura: ARM_NESSUNA, scudo: false, strumenti: '' },
   bardo:    { armi: ['Stocco'], equip: ['Armatura di cuoio', 'Pugnale', 'Strumento musicale', 'Dotazione da intrattenitore'], denari: 19, armatura: ARM_CUOIO, scudo: false, strumenti: 'Strumenti musicali (3 a scelta)' },
@@ -1960,7 +1989,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.102.2';
+const APP_VERSION = '4.108.4';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -2005,6 +2034,10 @@ function unisciSchedeFG(lista) {
       } else if (k === 'tiriSalvezza' && cur.tiriSalvezza && base.tiriSalvezza) {
         base.tiriSalvezza = { ...base.tiriSalvezza };
         for (const tk in cur.tiriSalvezza) if (cur.tiriSalvezza[tk]) base.tiriSalvezza[tk] = true;
+      } else if ((k === 'abilitaTotali' || k === 'tiriSalvezzaTotali') && cur[k] && typeof cur[k] === 'object') {
+        // Totali letti su schermate diverse: vale il primo numero trovato per ogni voce.
+        base[k] = { ...(base[k] || {}) };
+        for (const tk in cur[k]) if (typeof cur[k][tk] === 'number' && typeof base[k][tk] !== 'number') base[k][tk] = cur[k][tk];
       } else if (k === 'caratteristiche' && cur.caratteristiche && base.caratteristiche) {
         base.caratteristiche = { ...base.caratteristiche };
         for (const ck in cur.caratteristiche) if (cur.caratteristiche[ck] && cur.caratteristiche[ck] !== 10) base.caratteristiche[ck] = cur.caratteristiche[ck];
@@ -2207,7 +2240,7 @@ function loadState() {
         // senza il campo) e ricrea le risorse "manuale" collegate ai contatori,
         // così sono presenti anche appena dopo un import/una sincronizzazione
         // da codice stanza, senza aspettare la prima modifica dalla sezione Poteri.
-        s.poteri = normalizzaPoteri(s.poteri);
+        s.poteri = normalizzaPoteri(garantisciDebitoAraldi(s.poteri, s.risorse));
         s.risorse = sincronizzaRisorsePoteri(s.poteri, s.risorse, livelloTotaleScheda(s), s.bonusCompetenza);
         s.risorse = sincronizzaRisorseClasse(s, s.versione || '2024');
         // assegna un id agli incantesimi che ne fossero privi (schede legacy),
@@ -4097,6 +4130,7 @@ export default function App() {
   const [checkConc, setCheckConc] = useState(null); // TS concentrazione automatico: { danno, cd, spell, esito }
   // Danno ad area nel Combat Tracker: { valore, tipo, magico, dettaglio, sel: {id: bool}, ts: {id: bool}, difese: {id: difesa} }
   const [areaDanno, setAreaDanno] = useState(null);
+  const refGrigliaProfilo = useAllineaProfilo();
   const [dettaglioInc, setDettaglioInc] = useState(null); // id incantesimo aperto nel sottomenu
   const [mostraMenuEsporta, setMostraMenuEsporta] = useState(false);
   const [mostraDiarioModal, setMostraDiarioModal] = useState(false);
@@ -4322,6 +4356,11 @@ export default function App() {
     set('--c-on-gold', testoSu(t.goldDark));
     // Colore della classe per angoli, bordi e controlli principali.
     set('--c-classe', t.gold);
+    // Copia con un altro nome, che il menu iniziale (tema base dell'app) non ridefinisce:
+    // serve alla card "Ultimo usato", l'unica parte del menu nei colori del personaggio.
+    set('--c-pg-gold', t.gold); set('--c-pg-gold-dark', t.goldDark); set('--c-pg-title', t.title);
+    set('--c-pg-on-gold', testoSu(t.goldDark));
+    set('--c-pg-border', t.border); set('--c-pg-panel-light', t.panelLight); set('--c-pg-panel', t.panel);
 
     const tintaClasse = accClasse ? accClasse[modo] : t.gold;
     const hexRgba = (hex, a) => {
@@ -4361,6 +4400,44 @@ export default function App() {
       // storage non disponibile: pazienza
     }
   }, [tema, sistemaScuro, oraTick, classeAttiva, presetColori, temaCornici, schedaSolaLettura]);
+  // Tema base del progetto (oro "Classica", senza la tinta della classe del PG): lo usa il
+  // menu iniziale, che è dell'app e non del personaggio. Variabili CSS ridefinite sul suo
+  // contenitore, quindi valgono solo lì dentro.
+  const stileTemaBase = useMemo(() => {
+    const t = { ...BASE_TEMA[notteAttiva ? 'scuro' : 'chiaro'] };
+    garantisciContrastoTema(t);
+    const rgba = (hex, a) => {
+      const n = parseInt(String(hex).slice(1), 16);
+      return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+    };
+    return {
+      '--c-bg': t.bg, '--c-panel': t.panel, '--c-panel-light': t.panelLight, '--c-border': t.border,
+      '--c-ink': t.ink, '--c-ink-dim': t.inkDim, '--c-gold': t.gold, '--c-gold-dark': t.goldDark,
+      '--c-red': t.red, '--c-green': t.green, '--c-title': t.title, '--c-on-gold': testoSu(t.goldDark),
+      '--c-classe': t.gold, '--c-aura-color': t.gold,
+      '--c-border-glow-min': rgba(t.gold, notteAttiva ? 0.45 : 0.30), '--c-border-glow-max': rgba(t.gold, notteAttiva ? 0.85 : 0.65),
+      '--c-aura-glow-min': rgba(t.gold, notteAttiva ? 0.14 : 0.06), '--c-aura-glow-pulse-1': rgba(t.gold, notteAttiva ? 0.36 : 0.18),
+      // Grigio e bordo del tema generico: uguali per menu iniziale, barra in alto e combat tracker.
+      '--c-tema-sfondo': `color-mix(in srgb, ${t.panelLight} 85%, ${t.ink} 15%)`,
+      '--c-tema-bordo': `color-mix(in srgb, ${t.ink} 38%, ${t.border})`,
+    };
+  }, [notteAttiva]);
+  // Classi scegliibili: l'Artefice (Tasha) solo con quel manuale attivo, mai due volte.
+  const classiDisponibili = NOMI_CLASSI.filter((n) => n !== 'Artefice' || manualiAttivi.tasha !== false);
+  // Manuale della campagna (Araldi del Segreto): acceso solo con la password, dal menu Manuali e fonti.
+  const araldiAttivo = manualeAttivo(manualiAttivi, 'araldi');
+  // Aprendo un personaggio, Competenze e Risorse di classe sono sempre aperte. Poteri parte
+  // chiusa e, da lì in poi, ricorda l'ultima scelta (come tutte le altre sezioni).
+  useEffect(() => {
+    if (!scheda || isSolaLettura) return;
+    const a = scheda.sezioniAperte || {};
+    if (a.addestramento === false || a.risorse === false) {
+      aggiorna({ sezioniAperte: { ...a, addestramento: true, risorse: true } });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roster.attivo]);
+  // Tasto tondo con contorno (minimizza e chiudi nel combat tracker, pillola ridotta compresa).
+  const stileTastoTondo = { padding: '1px 8px', borderRadius: 14, cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 700, lineHeight: 1.4, minWidth: 28, background: 'transparent' };
   const intervalRef = useRef(null);
   const jsonRef = useRef(null);
   const pdfRef = useRef(null);
@@ -4447,11 +4524,14 @@ export default function App() {
     setRoster((r) => {
       const corrente = r.personaggi[r.attivo];
       if (!corrente) return r;
-      const sincronizzate = sincronizzaRisorsePoteri(corrente.poteri, corrente.risorse, livelloTotaleScheda(corrente), corrente.bonusCompetenza);
-      if (JSON.stringify(sincronizzate) === JSON.stringify(corrente.risorse || [])) return r;
+      // Debito degli Araldi sparito (potere che lo conteneva tolto o spento): torna da solo.
+      const poteri = garantisciDebitoAraldi(corrente.poteri, corrente.risorse);
+      const poteriCambiati = poteri !== corrente.poteri;
+      const sincronizzate = sincronizzaRisorsePoteri(poteri, corrente.risorse, livelloTotaleScheda(corrente), corrente.bonusCompetenza);
+      if (!poteriCambiati && JSON.stringify(sincronizzate) === JSON.stringify(corrente.risorse || [])) return r;
       return {
         ...r,
-        personaggi: { ...r.personaggi, [r.attivo]: { ...corrente, risorse: sincronizzate } },
+        personaggi: { ...r.personaggi, [r.attivo]: { ...corrente, ...(poteriCambiati ? { poteri } : {}), risorse: sincronizzate } },
       };
     });
   }, [roster.attivo, scheda?.poteri, scheda?.livello, scheda?.multiclasse, scheda?.bonusCompetenza, isSolaLettura]);
@@ -4603,12 +4683,9 @@ export default function App() {
   useEffect(() => {
     if (!scheda || isSolaLettura || !Array.isArray(scheda.poteri)) return;
     const usaAraldi = scheda.poteri.some((p) => p?.modello === 'araldi-del-segreto');
-    if (!usaAraldi) return;
+    // Il manuale non si accende più da solo: serve la password. Senza manuale, niente da inserire.
+    if (!usaAraldi || !araldiAttivo) return;
     try {
-      if (!localStorage.getItem('scheda-interattiva:araldi-manuale-auto')) {
-        localStorage.setItem('scheda-interattiva:araldi-manuale-auto', '1');
-        if (manualiAttivi?.araldi !== true) setManualiAttivi((m) => ({ ...m, araldi: true }));
-      }
       const chiave = `scheda-interattiva:araldi-incantesimi:${roster.attivo}`;
       if (!localStorage.getItem(chiave)) {
         const nuovi = incantesimiAraldiMancanti(scheda);
@@ -4619,7 +4696,7 @@ export default function App() {
       }
     } catch { /* niente */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scheda?.poteri, scheda?.slotIncantesimo, roster.attivo]);
+  }, [scheda?.poteri, scheda?.slotIncantesimo, roster.attivo, araldiAttivo]);
 
   // Corregge definitivamente anche le schede create/importate prima
   // dell'automatismo, senza ritardare i calcoli del render corrente.
@@ -5001,7 +5078,7 @@ export default function App() {
   /** Genera un personaggio casuale ma coerente (classe/specie/background, stat, competenze, nome). */
   function generaPgCasuale() {
     const rnd = (arr) => arr[Math.floor(Math.random() * arr.length)];
-    const classe = rnd(NOMI_CLASSI);
+    const classe = rnd(classiDisponibili);
     const specie = rnd(Object.keys(SPECIE_DATI));
     const background = rnd(BACKGROUND_5E);
     const cc = competenzeClasseDi(classe);
@@ -6186,46 +6263,13 @@ export default function App() {
 
   // Snapshot automatici: rete di sicurezza contro cancellazioni/reset accidentali.
   // Sono leggeri (senza immagini) per non riempire lo spazio del browser.
-  /**
-   * Poteri di questo personaggio nella copia più recente della Cronologia versioni
-   * che ne aveva (stesso id, o stesso nome): { quando, applica } oppure null.
-   * Serve quando un caricamento online li ha tolti (es. collegando un dispositivo).
-   */
-  function recuperoPoteriDaCronologia() {
-    if (!scheda) return null;
-    // Si propone la copia più recente che ha PIÙ poteri di quelli attuali
-    // (es. una sincronizzazione ha riportato una versione con il solo Debito).
-    const quantiOra = Array.isArray(scheda.poteri) ? scheda.poteri.length : 0;
-    const idAttivo = roster?.attivo;
-    const nome = String(scheda.nome || '').trim().toLowerCase();
-    for (const snap of [...leggiSnapshots()].sort((a, b) => (b.ts || 0) - (a.ts || 0))) {
-      const pgs = snap?.roster?.personaggi || {};
-      const pg = pgs[idAttivo] || Object.values(pgs).find((x) => String(x?.nome || '').trim().toLowerCase() === nome);
-      if (Array.isArray(pg?.poteri) && pg.poteri.length > quantiOra) {
-        const quando = new Date(snap.ts || Date.now()).toLocaleString(lingua === 'en' ? 'en-GB' : 'it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-        return {
-          quando,
-          applica: () => {
-            const poteri = normalizzaPoteri(pg.poteri);
-            // Riporta anche i valori dei contatori salvati nella copia (Segreti, Debito...).
-            const risorsePrecedenti = (pg.risorse || []).filter((r) => String(r?.id || '').startsWith('potere-'));
-            const base = [...(scheda.risorse || []).filter((r) => !String(r?.id || '').startsWith('potere-')), ...risorsePrecedenti];
-            aggiorna({ poteri, risorse: sincronizzaRisorsePoteri(poteri, base, livelloTotaleScheda(scheda), scheda.bonusCompetenza) });
-            registra({ etichetta: tr('Poteri recuperati', 'Powers restored'), tipo: 'privilegio', dettaglio: tr(`Dalla cronologia del ${quando}`, `From the history of ${quando}`) });
-          },
-        };
-      }
-    }
-    return null;
-  }
-  /** Rimette i Poteri della campagna (Potere del Patrono + Araldi del Segreto) e
-   *  attiva il manuale degli Araldi se era spento. */
+  /** Rimette i Poteri della campagna (Potere del Patrono + Araldi del Segreto). Si offre solo
+   *  col manuale degli Araldi attivo (che si accende con la password). */
   function ripristinaPoteriCampagna() {
     // I contatori già presenti (es. Debito) tengono il valore attuale.
     const poteri = unisciPoteriCampagna(scheda.poteri, (p, i, c) => valoreContatore(scheda, p.id, i, c).attuali);
     const base = (scheda.risorse || []).filter((r) => !String(r?.id || '').startsWith('potere-'));
     aggiorna({ poteri, risorse: sincronizzaRisorsePoteri(poteri, base, livelloTotaleScheda(scheda), scheda.bonusCompetenza) });
-    if (manualiAttivi?.araldi !== true) setManualiAttivi((m) => ({ ...m, araldi: true }));
     registra({ etichetta: tr('Poteri della campagna ripristinati', 'Campaign powers restored'), tipo: 'privilegio', dettaglio: tr('Potere del Patrono e Araldi del Segreto', "Patron's Power and Heralds of the Secret") });
   }
   function leggiSnapshots() {
@@ -6300,23 +6344,24 @@ export default function App() {
       setPdfStato('loading');
       try {
         const trascrizioni = [];
+        const avvisiImport = []; // correzioni automatiche fatte sui dati letti dall'IA
         for (const file of imageFiles) {
           const name = file.name.toLowerCase();
           // Riconoscimento istantaneo per file di personaggi noti (es. Lyrian Faenor, Vaelion, Wendell, Elevorn, Flyora)
           if (/lyrian|faenor|mezzafaccia/i.test(name)) {
-            trascrizioni.push({ ...LYRIAN_JSON });
+            trascrizioni.push({ ...LYRIAN_JSON, __noto: true }); // scheda già nella scala dell'app: niente correzioni
             continue;
           } else if (/vaelion/i.test(name)) {
-            trascrizioni.push({ ...VAELION_JSON });
+            trascrizioni.push({ ...VAELION_JSON, __noto: true }); // scheda già nella scala dell'app: niente correzioni
             continue;
           } else if (/wendell/i.test(name)) {
-            trascrizioni.push({ ...WENDELL_JSON });
+            trascrizioni.push({ ...WENDELL_JSON, __noto: true }); // scheda già nella scala dell'app: niente correzioni
             continue;
           } else if (/elevorn/i.test(name)) {
-            trascrizioni.push({ ...ELEVORN_JSON });
+            trascrizioni.push({ ...ELEVORN_JSON, __noto: true }); // scheda già nella scala dell'app: niente correzioni
             continue;
           } else if (/flyora/i.test(name)) {
-            trascrizioni.push({ ...FLYORA_JSON });
+            trascrizioni.push({ ...FLYORA_JSON, __noto: true }); // scheda già nella scala dell'app: niente correzioni
             continue;
           }
 
@@ -6413,8 +6458,8 @@ export default function App() {
           if (!res) {
             throw lastErr || new Error(`Impossibile contattare l'endpoint IA (${endpoint})`);
           }
-          const dati = await res.json();
-          trascrizioni.push(dati);
+          const letti = await res.json();
+          trascrizioni.push(letti?.scheda && typeof letti.scheda === 'object' ? letti.scheda : letti);
         }
         if (trascrizioni.length) {
           // Raggruppa per nome PG oppure unisce tutte le schermate se appartengono allo stesso PG
@@ -6424,11 +6469,22 @@ export default function App() {
             if (!perNome[k]) perNome[k] = [];
             perNome[k].push(d);
           }
+          // Prima si uniscono le schermate dello stesso personaggio (Main + Skills...), POI si
+          // controllano le icone con i numeri: la sola tab Skills non ha i punteggi delle caratteristiche.
+          // Fuori da setRoster, che React esegue più tardi (altrimenti l'avviso non comparirebbe).
+          const fuse = {};
+          for (const k in perNome) {
+            const unita = unisciSchedeFG(perNome[k]);
+            if (perNome[k].some((d) => d?.__noto)) { fuse[k] = unita; continue; }
+            const { dati: corretta, correzioni } = normalizzaTrascrizione(unita);
+            if (correzioni.length) avvisiImport.push(`${corretta?.nome || k}:\n• ${correzioni.join('\n• ')}`);
+            fuse[k] = corretta;
+          }
           setRoster((r) => {
             const personaggi = { ...r.personaggi };
             let ultimo = r.attivo;
             for (const k in perNome) {
-              const schedaFusa = unisciSchedeFG(perNome[k]);
+              const schedaFusa = fuse[k];
               const norm = normalizeImported(forzaVersione(schedaFusa));
               const chiave = String(norm.nome || '').toLowerCase().trim();
               const idEsistente = chiave ? Object.keys(personaggi).find((id) => String(personaggi[id]?.nome || '').toLowerCase().trim() === chiave) : null;
@@ -6442,6 +6498,7 @@ export default function App() {
         }
         setPdfStato('');
         setMostraMenu(false);
+        if (avvisiImport.length) setInfo({ titolo: tr('Import: correzioni automatiche', 'Import: automatic fixes'), testo: avvisiImport.join('\n\n') });
       } catch (e) {
         setPdfStato('');
         const dove = (transcribeUrl || URL_ARCHIVIO_PG || URL_STANZE || '').trim() ? 'Controlla endpoint IA.' : 'Configura endpoint IA.';
@@ -7915,7 +7972,7 @@ export default function App() {
             style={{ position: 'fixed', inset: 0, zIndex: 3100, padding: 16, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             <div style={{ ...styles.panel, maxWidth: 480, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
-              <h2 id="conflitto-sync-titolo" style={{ ...styles.title, fontSize: 20, marginTop: 0, marginBottom: 8, color: 'var(--c-title)' }}>{t('conflitto.titolo')}</h2>
+              <h2 id="conflitto-sync-titolo" style={{ ...styles.title, fontSize: 18, marginTop: 0, marginBottom: 8, color: 'var(--c-title)' }}>{t('conflitto.titolo')}</h2>
               <p style={{ ...styles.detail, fontSize: 13, lineHeight: 1.5, marginTop: 0 }}>{t('conflitto.spiegazione')}</p>
               <div style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 12px', margin: '12px 0', background: 'rgba(0,0,0,0.03)' }}>
                 <div style={{ ...styles.detail, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>
@@ -7950,7 +8007,7 @@ export default function App() {
         );
       })()}
 
-      {mostraMenu && <MenuPersonaggiModal APP_VERSION={APP_VERSION} apriNotifiche={apriNotifiche} erroreImport={erroreImport} esportaBackupCompleto={esportaBackupCompleto} generaPgCasuale={generaPgCasuale} idDispositivo={idDispositivo} isCloudAttivo={isCloudAttivo} jsonRef={jsonRef} leggiSnapshots={leggiSnapshots} lingua={lingua} manualiAttivi={manualiAttivi} mostraListaCarica={mostraListaCarica} novitaNonLette={novitaNonLette} roster={roster} scheda={scheda} setBozzaCrea={setBozzaCrea} setCloudStatus={setCloudStatus} setConferma={setConferma} setLingua={setLingua} setMostraArchivioDm={setMostraArchivioDm} setMostraCloud={setMostraCloud} setMostraCrea={setMostraCrea} setMostraDonazioni={setMostraDonazioni} setMostraListaCarica={setMostraListaCarica} setMostraMenu={setMostraMenu} setMostraMenuEsporta={setMostraMenuEsporta} setMostraModalManuali={setMostraModalManuali} setMostraNoteLegali={setMostraNoteLegali} setMostraRipristino={setMostraRipristino} setPosEsporta={setPosEsporta} setRoster={setRoster} setSchedaSolaLettura={setSchedaSolaLettura} setTemaCornici={setTemaCornici} statoBgCloud={statoBgCloud} statoColoreCloud={statoColoreCloud} statoGlowCloud={statoGlowCloud} temaCornici={temaCornici} />}
+      {mostraMenu && <MenuPersonaggiModal APP_VERSION={APP_VERSION} stileTemaBase={stileTemaBase} coloreClassePg={(classe) => coloreClasse(classe)?.[notteAttiva ? 'scuro' : 'chiaro'] || ''} apriNotifiche={apriNotifiche} erroreImport={erroreImport} esportaBackupCompleto={esportaBackupCompleto} generaPgCasuale={generaPgCasuale} idDispositivo={idDispositivo} isCloudAttivo={isCloudAttivo} jsonRef={jsonRef} leggiSnapshots={leggiSnapshots} lingua={lingua} manualiAttivi={manualiAttivi} mostraListaCarica={mostraListaCarica} novitaNonLette={novitaNonLette} roster={roster} scheda={scheda} setBozzaCrea={setBozzaCrea} setCloudStatus={setCloudStatus} setConferma={setConferma} setLingua={setLingua} setMostraArchivioDm={setMostraArchivioDm} setMostraCloud={setMostraCloud} setMostraCrea={setMostraCrea} setMostraDonazioni={setMostraDonazioni} setMostraListaCarica={setMostraListaCarica} setMostraMenu={setMostraMenu} setMostraMenuEsporta={setMostraMenuEsporta} setMostraModalManuali={setMostraModalManuali} setMostraNoteLegali={setMostraNoteLegali} setMostraRipristino={setMostraRipristino} setPosEsporta={setPosEsporta} setRoster={setRoster} setSchedaSolaLettura={setSchedaSolaLettura} setTemaCornici={setTemaCornici} statoBgCloud={statoBgCloud} statoColoreCloud={statoColoreCloud} statoGlowCloud={statoGlowCloud} temaCornici={temaCornici} />}
 
       {mostraArchivioDm && (
         <ArchivioDm
@@ -8128,7 +8185,7 @@ export default function App() {
         const mcArray = scheda.multiclasse || [];
         const secMcObj = isSecMc ? mcArray[targetMode] : null;
 
-        const firstAvailableNewClass = NOMI_CLASSI.find((n) => n !== scheda.classe && !mcArray.some((x) => x.classe === n)) || NOMI_CLASSI[0];
+        const firstAvailableNewClass = classiDisponibili.find((n) => n !== scheda.classe && !mcArray.some((x) => x.classe === n)) || classiDisponibili[0];
         const targetClasse = isNewMc
           ? (levelUpBozza.nuovaClasseMc || firstAvailableNewClass)
           : (isSecMc ? (secMcObj?.classe || scheda.classe) : scheda.classe);
@@ -8233,7 +8290,7 @@ export default function App() {
           <div style={{ ...styles.panel, maxWidth: 500, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
             {/* INTESTAZIONE MODALE */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, paddingBottom: 10, borderBottom: `1px solid ${C.border}` }}>
-              <h1 style={{ ...styles.title, margin: 0, fontSize: 20 }}>{t('levelup.titolo')}</h1>
+              <h1 style={{ ...styles.title, margin: 0, fontSize: 18 }}>{t('levelup.titolo')}</h1>
               <span style={{ fontSize: 13, background: 'rgba(214,169,15,0.14)', border: `1px solid ${C.goldDark}`, color: C.goldDark, padding: '3px 12px', borderRadius: 14, fontWeight: 700 }}>
                 Livello {livTotVecchio} ➔ <strong>{nuovoLivello}</strong>
               </span>
@@ -8308,7 +8365,7 @@ export default function App() {
                         }}
                         style={{ ...styles.inlineInput, flex: 1, padding: '5px 8px', fontSize: 14, fontWeight: 700 }}
                       >
-                        {NOMI_CLASSI.map((n) => (
+                        {classiDisponibili.map((n) => (
                           <option key={n} value={n} disabled={n === scheda.classe || mcArray.some((x) => x.classe === n)}>{traduciDato(n)}</option>
                         ))}
                       </select>
@@ -8355,7 +8412,7 @@ export default function App() {
                   onClick={() => setLevelUpBozza((b) => ({ ...b, metodo: 'media' }))}
                 >
                   <div style={{ fontWeight: 700, fontSize: 13 }}>{t('levelup.media_fissa')}</div>
-                  <div style={{ fontSize: 20, color: C.goldDark, fontWeight: 800 }}>+{levelUpBozza.hpGainMedia != null ? levelUpBozza.hpGainMedia : avgHpGainTarget} PF</div>
+                  <div style={{ fontSize: 18, color: C.goldDark, fontWeight: 800 }}>+{levelUpBozza.hpGainMedia != null ? levelUpBozza.hpGainMedia : avgHpGainTarget} PF</div>
                   <div style={{ fontSize: 11, color: C.inkDim }}>({Math.floor(facceTargetDV / 2) + 1} {modCos !== 0 ? conSegno(modCos) : ''})</div>
                 </div>
 
@@ -8370,7 +8427,7 @@ export default function App() {
                   onClick={() => setLevelUpBozza((b) => ({ ...b, metodo: 'tiro' }))}
                 >
                   <div style={{ fontWeight: 700, fontSize: 13 }}>{t('levelup.tira_dado', { facce: facceTargetDV })}</div>
-                  <div style={{ fontSize: 20, color: C.goldDark, fontWeight: 800 }}>
+                  <div style={{ fontSize: 18, color: C.goldDark, fontWeight: 800 }}>
                     {levelUpBozza.tiroFatto > 0 ? `+${Math.max(1, levelUpBozza.tiroFatto + modCos)} PF` : '? PF'}
                   </div>
                   <div>
@@ -8735,7 +8792,7 @@ export default function App() {
             </div>
 
             <button
-              style={{ ...styles.buttonPrimary, width: '100%', marginBottom: 8, padding: '10px 14px', fontSize: 15 }}
+              style={{ ...styles.buttonPrimary, width: '100%', marginBottom: 8, padding: '10px 14px', fontSize: 14 }}
               disabled={!hpOk || !asiCompleto}
               onClick={() => {
                 const g = levelUpBozza.metodo === 'media' ? (levelUpBozza.hpGainMedia != null ? levelUpBozza.hpGainMedia : avgHpGainTarget) : Math.max(1, levelUpBozza.tiroFatto + modCos);
@@ -8836,7 +8893,7 @@ export default function App() {
 
       {mostraCrea && (() => {
         const setB = (patch) => setBozzaCrea((b) => ({ ...b, ...patch }));
-        const stileSelect = { ...styles.inlineInput, width: '100%', padding: '6px 8px', fontSize: 15 };
+        const stileSelect = { ...styles.inlineInput, width: '100%', padding: '6px 8px', fontSize: 14 };
         const bonusBg = regoleVersione === '2024' ? bonusCaratteristicheBackground(bozzaCrea.background, bozzaCrea.classe) : [];
         const bonusRazza = regoleVersione === '2014' ? bonusCaratteristicheSpecie2014(bozzaCrea.specie, bozzaCrea.classe) : {};
         return (
@@ -8912,7 +8969,7 @@ export default function App() {
               <label style={{ ...styles.detail, display: 'block', marginBottom: 3 }}>{t('crea.classe')}</label>
               <select style={{ ...stileSelect, marginBottom: 12 }} value={bozzaCrea.classe} onChange={(e) => setB({ classe: e.target.value, sottoclasse: '', competenzeClasse: [] })}>
                 <option value="">{t('crea.scegli')}</option>
-                {[...(manualiAttivi.tasha !== false ? [...NOMI_CLASSI, 'Artefice'] : NOMI_CLASSI)].sort((a, b) => a.localeCompare(b, lingua)).map((n) => <option key={n} value={n}>{formattaVoceConIcona(n)}</option>)}
+                {[...(classiDisponibili)].sort((a, b) => a.localeCompare(b, lingua)).map((n) => <option key={n} value={n}>{formattaVoceConIcona(n)}</option>)}
               </select>
 
               {/* Livello iniziale: crea subito un PG di livello alto senza fare Level Up a mano */}
@@ -8934,7 +8991,7 @@ export default function App() {
                       type="checkbox"
                       checked={!!bozzaCrea.multiclasseClasse2}
                       onChange={(e) => {
-                        const listaC = manualiAttivi.tasha !== false ? [...NOMI_CLASSI, 'Artefice'] : NOMI_CLASSI;
+                        const listaC = classiDisponibili;
                         setB({ multiclasseClasse2: e.target.checked ? (listaC.find((n) => n !== bozzaCrea.classe) || '') : '', multiclasseLivello2: 1 });
                       }}
                     />
@@ -8944,7 +9001,7 @@ export default function App() {
                     const maxLiv2 = Math.max(1, 20 - Number(bozzaCrea.livello || 1));
                     const serveSubMc2 = Number(bozzaCrea.multiclasseLivello2 || 1) >= livelloSceltaSottoclasse(bozzaCrea.multiclasseClasse2, regoleVersione);
                     const scelteSubMc2 = serveSubMc2 ? sottoclassiPerClasse(bozzaCrea.multiclasseClasse2, manualiAttivi) : [];
-                    const listaC = manualiAttivi.tasha !== false ? [...NOMI_CLASSI, 'Artefice'] : NOMI_CLASSI;
+                    const listaC = classiDisponibili;
                     return (
                       <>
                         <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
@@ -8973,7 +9030,7 @@ export default function App() {
                       type="checkbox"
                       checked={!!bozzaCrea.multiclasseClasse3}
                       onChange={(e) => {
-                        const listaC = manualiAttivi.tasha !== false ? [...NOMI_CLASSI, 'Artefice'] : NOMI_CLASSI;
+                        const listaC = classiDisponibili;
                         setB({ multiclasseClasse3: e.target.checked ? (listaC.find((n) => n !== bozzaCrea.classe && n !== bozzaCrea.multiclasseClasse2) || '') : '', multiclasseLivello3: 1 });
                       }}
                     />
@@ -8983,7 +9040,7 @@ export default function App() {
                     const maxLiv3 = Math.max(1, 20 - Number(bozzaCrea.livello || 1) - Number(bozzaCrea.multiclasseLivello2 || 1));
                     const serveSubMc3 = Number(bozzaCrea.multiclasseLivello3 || 1) >= livelloSceltaSottoclasse(bozzaCrea.multiclasseClasse3, regoleVersione);
                     const scelteSubMc3 = serveSubMc3 ? sottoclassiPerClasse(bozzaCrea.multiclasseClasse3, manualiAttivi) : [];
-                    const listaC = manualiAttivi.tasha !== false ? [...NOMI_CLASSI, 'Artefice'] : NOMI_CLASSI;
+                    const listaC = classiDisponibili;
                     return (
                       <>
                         <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
@@ -9396,7 +9453,7 @@ export default function App() {
           onClick={(e) => { if (e.target === e.currentTarget) setStanzaUi((s) => ({ ...s, aperta: false })); }}
         >
           <div style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 480, width: '100%' }}>
-            <h2 style={{ ...styles.title, fontSize: 20, margin: '0 0 6px', textAlign: 'center' }}>{t('stanze.titolo')}</h2>
+            <h2 style={{ ...styles.title, fontSize: 18, margin: '0 0 6px', textAlign: 'center' }}>{t('stanze.titolo')}</h2>
             <p style={{ ...styles.detail, fontSize: 13, margin: '0 0 14px', textAlign: 'center' }}>{t('stanze.snapshot_desc', { ore: DURATA_STANZA_ORE })}</p>
 
             <button style={{ ...styles.buttonPrimary, width: '100%' }} disabled={stanzaUi.caricamento} onClick={creaStanzaCorrente}>
@@ -9452,7 +9509,7 @@ export default function App() {
           onClick={(e) => { if (e.target === e.currentTarget) setCondivisione(null); }}
         >
           <div style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 520, width: '100%', maxHeight: '86vh', overflowY: 'auto' }}>
-            <h2 style={{ ...styles.title, fontSize: 20, margin: '0 0 4px', textAlign: 'center' }}>{t('condividi.titolo')}</h2>
+            <h2 style={{ ...styles.title, fontSize: 18, margin: '0 0 4px', textAlign: 'center' }}>{t('condividi.titolo')}</h2>
             <p style={{ ...styles.detail, textAlign: 'center', margin: '0 0 12px' }}>
               {condivisione.copiato ? t('condividi.copiato') : t('condividi.copia_a_mano')}
             </p>
@@ -9484,7 +9541,7 @@ export default function App() {
       {pgDaLink && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1011, padding: 16, background: 'rgba(0,0,0,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 460, width: '100%' }}>
-            <h2 style={{ ...styles.title, fontSize: 20, margin: '0 0 10px', textAlign: 'center' }}>{t('condividi.ricevuto')}</h2>
+            <h2 style={{ ...styles.title, fontSize: 18, margin: '0 0 10px', textAlign: 'center' }}>{t('condividi.ricevuto')}</h2>
             <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', marginBottom: 12 }}>
               <div style={{ fontWeight: 700, color: C.ink, fontSize: 16 }}>{pgDaLink.nome || t('menu.senza_nome')}</div>
               <div style={styles.detail}>
@@ -9560,7 +9617,7 @@ export default function App() {
             flexWrap: 'wrap'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-              <span style={{ fontSize: 20 }}>🔒</span>
+              <span style={{ fontSize: 18 }}>🔒</span>
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontWeight: 800, fontSize: 13, textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}>
                   {lingua === 'en' ? 'Archive: read-only sheet' : 'Archivio: scheda in sola lettura'}
@@ -9587,15 +9644,16 @@ export default function App() {
           </div>
         )}
 
+        {/* Striscia invisibile in cima allo schermo: col mouse sopra fa scendere la barra a scomparsa. */}
+        <div className="barra-zona-apertura" aria-hidden="true" />
         {/* Barra superiore fissa: Desktop completa su 1 riga / Mobile super-compatta con Menu Hub */}
         <section
           className="selettore-personaggio barra-superiore-fissa"
           style={{
             ...styles.panel,
-            borderTopLeftRadius: 0,
-            borderTopRightRadius: 12,
-            borderBottomRightRadius: 0,
-            borderBottomLeftRadius: 12,
+            // Barra in alto sul tema base dell'app (come menu e combat tracker), non sui colori della classe.
+            ...stileTemaBase,
+            borderRadius: 12,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -9615,7 +9673,7 @@ export default function App() {
               minHeight: 32,
               maxHeight: 32,
               padding: 0,
-              fontSize: 15,
+              fontSize: 14,
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -9646,15 +9704,15 @@ export default function App() {
               fontWeight: 800,
               letterSpacing: 0.6,
               textTransform: 'uppercase',
-              color: C.goldDark,
+              // Oro scurito verso l'inchiostro: leggibile sul grigio del tema generico.
+              color: 'color-mix(in srgb, var(--c-gold-dark) 60%, var(--c-ink))',
               marginRight: 6,
               userSelect: 'none',
               whiteSpace: 'nowrap',
               display: 'inline-flex',
               alignItems: 'center',
               gap: 3,
-              opacity: 0.9,
-              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+              fontFamily: 'var(--font-title)',
             };
 
             return (
@@ -9746,13 +9804,11 @@ export default function App() {
                         📂
                       </button>
                       <button
-                        className="btn-header-azione"
+                        className="btn-header-azione btn-con-stato"
                         style={{
                           ...btnAzione,
-                          color: statoColoreCloud,
-                          borderColor: statoColoreCloud,
-                          background: statoBgCloud,
-                          boxShadow: statoGlowCloud,
+                          // Fondo e bordo come tutti i tasti della barra: lo stato è il pallino.
+                          '--stato-pallino': statoColoreCloud,
                           display: 'inline-flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -9911,10 +9967,11 @@ export default function App() {
                       </button>
                       <button
                         data-combat-toggle="true"
-                        className="btn-header-azione"
+                        className="btn-header-azione btn-con-stato"
                         style={{
                           ...btnAzione,
-                          ...(combat.attivo ? { color: C.goldDark, borderColor: C.goldDark, background: combat.aperto ? 'rgba(201,162,39,0.22)' : 'rgba(201,162,39,0.12)', boxShadow: '0 0 8px rgba(201,162,39,0.3)' } : {}),
+                          // Combattimento in corso: pallino oro (fondo e bordo restano quelli della barra).
+                          '--stato-pallino': combat.attivo ? 'var(--c-gold)' : 'transparent',
                         }}
                         onClick={() => {
                           if (combat.attivo && combat.aperto) setCombat((c) => ({ ...c, aperto: false }));
@@ -9943,7 +10000,7 @@ export default function App() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, userSelect: 'none', flexShrink: 0 }}>
-                    <span style={{ fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", fontSize: 15, fontWeight: 800, color: 'var(--c-title)', letterSpacing: 0.4, whiteSpace: 'nowrap', transition: 'color 0.2s ease', display: 'inline-flex', alignItems: 'baseline', gap: 0 }}>
+                    <span style={{ fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", fontSize: 14, fontWeight: 800, color: 'var(--c-title)', letterSpacing: 0.4, whiteSpace: 'nowrap', transition: 'color 0.2s ease', display: 'inline-flex', alignItems: 'baseline', gap: 0 }}>
                       Tavolo dei Dadi
                     </span>
                   </div>
@@ -9953,7 +10010,8 @@ export default function App() {
                         rosso = i personaggi restano solo su questo dispositivo. */}
                     <button
                       data-testid="cloud-mobile"
-                      style={{ ...btnAzione, width: 28, height: 28, minWidth: 28, maxWidth: 28, minHeight: 28, maxHeight: 28, fontSize: 13, color: statoColoreCloud, borderColor: statoColoreCloud, background: statoBgCloud, boxShadow: statoGlowCloud }}
+                      className="btn-header-azione btn-con-stato"
+                      style={{ ...btnAzione, width: 28, height: 28, minWidth: 28, maxWidth: 28, minHeight: 28, maxHeight: 28, fontSize: 13, '--stato-pallino': statoColoreCloud }}
                       onClick={() => { setCloudStatus({ text: '', type: '' }); setSyncCodiceStatus({ text: '', type: '' }); setTabBackup('online'); setMostraCloud(true); }}
                       data-in-attesa={isCloudAttivo && inAttesaSync ? 'si' : 'no'}
                       title={isCloudAttivo && inAttesaSync
@@ -9968,6 +10026,7 @@ export default function App() {
                       ☁️
                     </button>
                     <button
+                      className="btn-header-azione"
                       style={{ ...btnAzione, width: 28, height: 28, minWidth: 28, maxWidth: 28, minHeight: 28, maxHeight: 28, fontSize: 13 }}
                       onClick={() => setMostraDadiModal(true)}
                       title={t('roll.tavolo_dadi')}
@@ -9977,6 +10036,7 @@ export default function App() {
                     </button>
                     <button
                       data-combat-toggle="true"
+                      className="btn-header-azione btn-con-stato"
                       style={{
                         ...btnAzione,
                         width: 28,
@@ -9986,7 +10046,7 @@ export default function App() {
                         minHeight: 28,
                         maxHeight: 28,
                         fontSize: 13,
-                        ...(combat.attivo ? { color: C.goldDark, borderColor: C.goldDark, background: combat.aperto ? 'rgba(201,162,39,0.22)' : 'rgba(201,162,39,0.12)' } : {}),
+                        '--stato-pallino': combat.attivo ? 'var(--c-gold)' : 'transparent',
                       }}
                       onClick={() => {
                         if (combat.attivo && combat.aperto) setCombat((c) => ({ ...c, aperto: false }));
@@ -9999,6 +10059,7 @@ export default function App() {
                       ⚔️
                     </button>
                     <button
+                      className="btn-header-azione"
                       style={{
                         ...btnAzione,
                         width: 'auto',
@@ -10168,7 +10229,7 @@ export default function App() {
                   <span style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>
                     {lingua === 'en' ? 'Form Hit Points' : 'Punti Ferita della Forma'}
                   </span>
-                  <span style={{ fontSize: 15, fontWeight: 800, color: C.ink }}>
+                  <span style={{ fontSize: 14, fontWeight: 800, color: C.ink }}>
                     {formaAttiva.dati.pfAttuali} / {formaAttiva.dati.pfMax} PF
                   </span>
                 </div>
@@ -10244,7 +10305,7 @@ export default function App() {
                       title={sostituita ? `Clicca per tirare Prova di ${t('attr.' + car)}: 1d20 ${conSegno(mod)}` : `Tua: non sostituita dalla forma. Clicca per tirare Prova di ${t('attr.' + car)}: 1d20 ${conSegno(mod)}`}
                     >
                       <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: C.inkDim }}>{sigla} ({sostituita ? 'Forma' : 'Tua'}) 🎲</div>
-                      <div style={{ fontSize: 15, fontWeight: 800, color: C.ink }}>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: C.ink }}>
                         {val} <span style={{ color: C.goldDark, fontSize: 13 }}>({conSegno(mod)})</span>
                       </div>
                     </div>
@@ -10297,9 +10358,7 @@ export default function App() {
                               {az.nome}
                             </span>
                             {az.cd != null && (
-                              <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 6px', background: `${coloreCategoria('tiroSalvezza', notteAttiva)}1f`, color: coloreCategoria('tiroSalvezza', notteAttiva), borderRadius: 6, border: `1px solid ${coloreCategoria('tiroSalvezza', notteAttiva)}` }}>
-                                CD {az.cd}
-                              </span>
+                              <BadgeTiroSalvezza cd={az.cd} caratteristica={caratteristicaDaTesto(az.desc || az.testoOriginale)} colore={coloreCategoria('tiroSalvezza', notteAttiva)} />
                             )}
                           </div>
                           {az.desc && (
@@ -10376,7 +10435,7 @@ export default function App() {
           )}
 
           {/* Con il ritratto ridotto, Addestramento/Risorse si prendono lo spazio libero. */}
-          <div className="profilo-griglia">
+          <div className="profilo-griglia" ref={refGrigliaProfilo}>
             {/* COLONNA SINISTRA: Ritratto + Competenze + Risorse di classe */}
             <div className="profilo-col-sinistra">
               {/* Tier 1: Ritratto */}
@@ -10444,7 +10503,7 @@ export default function App() {
                         }}
                       >
                         <span style={{
-                          fontSize: 15, lineHeight: 1,
+                          fontSize: 14, lineHeight: 1,
                           color: scheda.ispirazione ? '#f0c43f' : '#bbb',
                           textShadow: scheda.ispirazione ? '0 0 8px rgba(240, 196, 63, 0.9)' : 'none',
                         }}>
@@ -10731,19 +10790,20 @@ export default function App() {
               </div>
 
               {/* Tier 3b: Poteri (Segreti, Debito, usi dei privilegi...) separati dalle risorse di classe */}
-              <div className="risorse-tier-3 profilo-risorse-box" style={{ marginTop: 10 }}>
-                <Sezione titolo={lingua === 'en' ? 'Powers' : 'Poteri'} senzaAngoli={true} {...apertoProps('poteriRisorse')}>
+              {araldiAttivo && (
+              <div className="risorse-tier-3 profilo-risorse-box profilo-poteri-box" style={{ marginTop: 10 }} data-testid="poteri-riquadro">
+                <Sezione titolo={lingua === 'en' ? 'Powers' : 'Poteri'} senzaAngoli={true} {...apertoProps('poteriRisorse', false)}>
                   <PoteriRisorse
                     scheda={scheda}
                     aggiorna={aggiorna}
                     lingua={lingua}
                     registra={registra}
                     mostraInfo={setInfo}
-                    recupero={!isSolaLettura ? recuperoPoteriDaCronologia() : null}
-                    ripristinoCampagna={!isSolaLettura && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null}
+                    ripristinoCampagna={!isSolaLettura && araldiAttivo && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null}
                   />
                 </Sezione>
               </div>
+              )}
             </div>
 
             {/* COLONNA CENTRALE: anagrafica + riquadri vitali */}
@@ -10825,8 +10885,10 @@ export default function App() {
                 </div>
 
                 <div className="profilo-anagrafica-campi" style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {/* Riga 1: Sesso, Specie/Razza, Taglia, Allineamento */}
-                  <div className="campi-anagrafica" style={{ display: 'grid', gridTemplateColumns: 'minmax(58px, 0.65fr) minmax(100px, 1.3fr) minmax(56px, 0.6fr) minmax(110px, 1.45fr)', gap: 10, alignItems: 'end' }}>
+                  {/* Riga 1: Sesso, Specie/Razza, Taglia, Allineamento. Colonne in stili.js
+                      (.anagrafica-riga-1/2): Taglia parte dove parte Sottoclasse e, su schermo
+                      grande, Allineamento è in colonna con i PE. */}
+                  <div className="campi-anagrafica anagrafica-riga-1" style={{ display: 'grid', gap: 10, alignItems: 'end' }}>
                     <CampoModulo
                       label={t("profilo.sesso")}
                       boxClassName={String(
@@ -10904,7 +10966,7 @@ export default function App() {
                   </div>
 
                   {/* Riga 2: Background, Classe (compatta), Sottoclasse (larga), P.E. (adeguato per 6 cifre) */}
-                  <div className="campi-anagrafica" style={{ display: 'grid', gridTemplateColumns: 'minmax(94px, 0.85fr) minmax(75px, 0.85fr) minmax(140px, 1.75fr) minmax(56px, 0.65fr)', gap: 10, alignItems: 'end' }}>
+                  <div className="campi-anagrafica anagrafica-riga-2" style={{ display: 'grid', gap: 10, alignItems: 'end' }}>
                     <CampoModulo label={t("profilo.background")} boxClassName={String(scheda.background || '').length > 12 ? 'testo-compatto' : undefined}>
                       <CampoBloccato
                         valore={traduciDato(scheda.background) || t('profilo.nessuno')}
@@ -10929,7 +10991,7 @@ export default function App() {
                         aggiorna(patch);
                       })}
                     </CampoModulo>
-                    <CampoModulo label={t("profilo.pe")}>
+                    <CampoModulo label={t("profilo.pe")} className="campo-pe">
                       <div role="button" tabIndex={0}
                         onClick={() => setMostraModalPe(true)}
                         style={{
@@ -11048,7 +11110,7 @@ export default function App() {
                           style={{ background: 'transparent', border: 'none', color: C.ink, fontFamily: 'inherit', width: '100%', outline: 'none', cursor: 'pointer', fontSize: 13 }}
                         >
                           <option value="">{t('crea.scegli')}</option>
-                          {[...NOMI_CLASSI].sort((a, b) => traduciDato(a).localeCompare(traduciDato(b), lingua)).map((n) => (
+                          {[...classiDisponibili].sort((a, b) => traduciDato(a).localeCompare(traduciDato(b), lingua)).map((n) => (
                             <option key={n} value={n}>{traduciDato(n)}</option>
                           ))}
                         </select>
@@ -11128,7 +11190,7 @@ export default function App() {
 
               {/* Riga 2 — Punti Ferita e Tiri Morte (spaziature bilanciate e sezioni centrate) */}
               <div className="pm-pf profilo-pf-box">
-                <div style={{ ...styles.vitalBox, gridColumn: 'span 4', padding: '8px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', minHeight: 'auto', height: '100%', boxSizing: 'border-box' }}>
+                <div className="riquadro-pf" style={{ ...styles.vitalBox, gridColumn: 'span 4', padding: '8px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', minHeight: 'auto', height: '100%', boxSizing: 'border-box' }}>
                   {/* Sezione Superiore: Punti Ferita — perfettamente centrata nello spazio disponibile */}
                   <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2px 0' }}>
                     <div style={{ ...styles.vitalLabel, position: 'static', margin: 0, marginBottom: 6, fontSize: 12 }}>
@@ -11485,7 +11547,8 @@ export default function App() {
                     <div className="vital-box" style={{ ...styles.vitalBox }}>
                       <div style={styles.vitalLabel}>{t("vital.ca")}</div>
               <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={styles.vitalValue}>
+                {/* Il numero della CA si centra nello spazio libero fra il titolo e i controlli sotto. */}
+                <div data-testid="ca-valore" style={{ ...styles.vitalValue, flex: '1 1 auto', alignItems: 'center', alignContent: 'center', minHeight: 40 }}>
                   {scheda.armatura.tipo === 'manuale' && !scheda.armatura.scudo && !scheda.armatura.bonus && !bonusClasseArmaturaOggetti(scheda) && !bonusPotereBersaglio(scheda, 'ca') ? (
                     <Editable value={scheda.ca} tipo="numero" onChange={(v) => aggiorna({ ca: v })} width={48} />
                   ) : (
@@ -11500,8 +11563,31 @@ export default function App() {
                     </span>
                   )}
                 </div>
+                <div style={{ marginTop: 3, width: '100%', display: 'flex', justifyContent: 'center' }}>
+                  <select
+                    data-testid="ca-copertura"
+                    className="ca-select"
+                    style={{ ...styles.inlineInput, fontSize: 11, padding: '1px 3px', maxWidth: '100%', color: (scheda.copertura && scheda.copertura !== 'nessuna') ? C.green : C.inkDim, fontWeight: (scheda.copertura && scheda.copertura !== 'nessuna') ? 700 : 400 }}
+                    value={scheda.copertura || 'nessuna'}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      aggiorna({ copertura: v });
+                      const copInfo = TIPI_COPERTURA_5E.find((c) => c.key === v);
+                      if (v !== 'nessuna') {
+                        registra({ etichetta: 'Copertura', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'}: ${lingua === 'en' ? copInfo.labelEn : copInfo.labelIt}` });
+                      }
+                    }}
+                    title="Copertura 5e: +2 CA/TS Des (mezza), +5 CA/TS Des (tre quarti), totale"
+                  >
+                    {TIPI_COPERTURA_5E.map((c) => (
+                      <option key={c.key} value={c.key}>{lingua === 'en' ? c.labelEn : c.labelIt}</option>
+                    ))}
+                  </select>
+                </div>
                 <select
                   aria-label={tr('Tipo di armatura', 'Armor type')}
+                  data-testid="ca-tipo-armatura"
+                  className="ca-select"
                   style={{ ...styles.inlineInput, fontSize: 11, padding: '1px 3px', maxWidth: '100%', marginTop: 2 }}
                   value={scheda.armatura.tipo}
                   onChange={(e) => {
@@ -11514,13 +11600,13 @@ export default function App() {
                     aggiorna({ armatura: { ...scheda.armatura, tipo, base } });
                   }}
                 >
-                  {TIPI_ARMATURA.map((ta) => {
+                  {TIPI_ARMATURA.filter((ta) => ta.key !== 'manuale' || scheda.armatura.tipo === 'manuale').map((ta) => {
                     const bloccato = !competenteInArmatura(scheda, ta.key);
                     // Niente lucchetto: l'opzione resta semplicemente non selezionabile.
                     return <option key={ta.key} value={ta.key} disabled={bloccato}>{t('armor.' + ta.key)}</option>;
                   })}
                 </select>
-                <div style={{ fontSize: 11, color: C.inkDim, display: 'flex', gap: 5, alignItems: 'center', justifyContent: 'center', marginTop: 4, flexWrap: 'wrap' }}>
+                <div data-testid="ca-riga-base" style={{ fontSize: 11, color: C.inkDim, display: 'flex', gap: '4px 16px', alignItems: 'center', justifyContent: 'center', marginTop: 5, flexWrap: 'wrap' }}>
                   {(scheda.armatura.tipo === 'leggera' || scheda.armatura.tipo === 'media' || scheda.armatura.tipo === 'pesante') && (
                     <span title={tr(`CA base dell'armatura. Esempi: ${ESEMPI_ARMATURA[scheda.armatura.tipo]}`, `Base armor AC. Examples: ${ESEMPI_ARMATURA[scheda.armatura.tipo]}`)}>base <Editable value={scheda.armatura.base} tipo="numero" width={24} onChange={(v) => aggiorna({ armatura: { ...scheda.armatura, base: Math.max(0, v) } })} /></span>
                   )}
@@ -11541,27 +11627,12 @@ export default function App() {
                       </span>
                     );
                   })()}
-                  <span>+ <Editable value={scheda.armatura.bonus} tipo="numero" width={22} onChange={(v) => aggiorna({ armatura: { ...scheda.armatura, bonus: v } })} /></span>
+                  {/* Bonus CA manuale: lo danno gli oggetti (✨). Si vede solo se una scheda
+                      vecchia ne ha uno diverso da 0, così non resta nascosto nella CA. */}
+                  {Number(scheda.armatura.bonus) !== 0 && Number.isFinite(Number(scheda.armatura.bonus)) && (
+                    <span title={tr('Bonus manuale alla CA: mettilo a 0 per toglierlo', 'Manual AC bonus: set it to 0 to remove it')}>+ <Editable value={scheda.armatura.bonus} tipo="numero" width={22} onChange={(v) => aggiorna({ armatura: { ...scheda.armatura, bonus: v } })} /></span>
+                  )}
                   {bonusClasseArmaturaOggetti(scheda) > 0 && <span title={t('inv.effetto_attivo')}>✨ +{bonusClasseArmaturaOggetti(scheda)}</span>}
-                </div>
-                <div style={{ marginTop: 3, width: '100%' }}>
-                  <select
-                    style={{ ...styles.inlineInput, fontSize: 11, padding: '1px 3px', width: '100%', maxWidth: '100%', color: (scheda.copertura && scheda.copertura !== 'nessuna') ? C.green : C.inkDim, fontWeight: (scheda.copertura && scheda.copertura !== 'nessuna') ? 700 : 400 }}
-                    value={scheda.copertura || 'nessuna'}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      aggiorna({ copertura: v });
-                      const copInfo = TIPI_COPERTURA_5E.find((c) => c.key === v);
-                      if (v !== 'nessuna') {
-                        registra({ etichetta: 'Copertura', tipo: 'tattica', dettaglio: `${scheda.nome || 'PG'}: ${lingua === 'en' ? copInfo.labelEn : copInfo.labelIt}` });
-                      }
-                    }}
-                    title="Copertura 5e: +2 CA/TS Des (mezza), +5 CA/TS Des (tre quarti), totale"
-                  >
-                    {TIPI_COPERTURA_5E.map((c) => (
-                      <option key={c.key} value={c.key}>{lingua === 'en' ? c.labelEn : c.labelIt}</option>
-                    ))}
-                  </select>
                 </div>
                 {(!competenteInArmatura(scheda, scheda.armatura.tipo) || (scheda.armatura.scudo && !scheda.addestramento?.armature?.scudi)) && (
                   <div style={{ fontSize: 11, color: C.red, marginTop: 3, lineHeight: 1.2 }} title={t('tip.senza_comp_armatura')}>
@@ -11639,7 +11710,8 @@ export default function App() {
                     // Il numero mostrato è il TOTALE vero (base + Poteri, con lo Sfinimento
                     // applicato: stesso calcolo del Calcolatore Movimenti). Se differisce
                     // dalla base è in BLU, senza il piccolo "+3m" sotto; il dettaglio
-                    // resta nel tooltip. 1 click modifica sempre la velocità BASE.
+                    // resta nel tooltip. Il clic apre il Calcolatore Movimenti; la velocità
+                    // base la imposta la specie.
                     const base = Number(scheda.velocita) || 0;
                     const totale = calcolaMovimentoESalti(scheda).velBase;
                     const modificata = totale !== base;
@@ -11651,12 +11723,13 @@ export default function App() {
                     else if (sfin.velocitaDimezzata) fonti.push(lingua === 'en' ? 'Exhaustion: halved' : 'Sfinimento: dimezzata');
                     else if (sfin.penalitaVelocita) fonti.push(`−${sfin.penalitaVelocita}m (${lingua === 'en' ? 'Exhaustion' : 'Sfinimento'})`);
                     const titolo = modificata
-                      ? `${lingua === 'en' ? 'Total' : 'Totale'} ${totale}m = ${lingua === 'en' ? 'base' : 'base'} ${base}m ${fonti.join(', ')} · ${lingua === 'en' ? 'click: edit base speed' : 'clic: modifica la velocità base'}`
-                      : undefined;
+                      ? `${lingua === 'en' ? 'Total' : 'Totale'} ${totale}m = base ${base}m ${fonti.join(', ')} · ${lingua === 'en' ? 'click: movement and jumping' : 'clic: movimento e salti'}`
+                      : (lingua === 'en' ? 'Click: movement and jumping' : 'Clic: movimento e salti');
                     return (
                       <div
                         style={{ ...styles.vitalValue, cursor: 'pointer', position: 'relative' }}
                         className={modificata ? 'velocita-modificata' : undefined}
+                        data-testid="velocita-valore"
                         title={titolo}
                         onClick={() => setMostraModalMovimento(true)}
                       >
@@ -11664,15 +11737,6 @@ export default function App() {
                           {totale}
                         </span>
                         <span style={{ fontSize: 18, color: modificata ? coloreCategoria('modificato', notteAttiva) : C.inkDim, marginLeft: 2, fontWeight: 600 }}> m</span>
-                        <div style={{ position: 'absolute', top: -10, right: -12, zoom: 0.8, padding: 4 }} onClick={(e) => e.stopPropagation()}>
-                          <Editable
-                            value={base}
-                            tipo="numero"
-                            onChange={(v) => aggiorna({ velocita: v })}
-                            soloIcona
-                            title={lingua === 'en' ? 'Edit base speed' : 'Modifica velocità base'}
-                          />
-                        </div>
                       </div>
                     );
                   })()
@@ -11892,7 +11956,7 @@ export default function App() {
               const abilitaDellaCar = ABILITA.filter((a) => a.car === key);
               const sfondoCar = SFONDO_CARATTERISTICA[key];
               return (
-                <div key={key} className="blocco-car" style={{ ...styles.abilityBlock, position: 'relative', overflow: 'hidden' }}>
+                <div key={key} className={`blocco-car car-colore car-${key}`} style={{ ...styles.abilityBlock, position: 'relative', overflow: 'hidden' }}>
                   {/* Sfondo emoji opaco che rappresenta la caratteristica */}
                   {sfondoCar && (
                     <span aria-hidden className="sfondo-car-emoji">
@@ -11900,13 +11964,15 @@ export default function App() {
                     </span>
                   )}
                   <div className="blocco-car-header" style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                    <Rollable
-                      onRoll={() => lanciaD20(`Prova di ${t('attr.' + key)}`, mod, { tipoTiro: 'prova' })}
-                      style={{ ...styles.abilityMod, fontSize: 22, padding: '0 4px' }}
-                      title={`Tieni premuto e rilascia: prova di ${t('attr.' + key)}`}
+                    {/* Solo il modificatore, senza "+" e senza tiro: i TS si tirano dalla riga
+                        "Tiro salvezza", le prove dalle abilità. */}
+                    <span
+                      className="car-modificatore"
+                      style={{ ...styles.abilityMod, fontSize: 22, padding: '0 4px', cursor: 'default' }}
+                      title={tr(`Modificatore di ${t('attr.' + key)}`, `${t('attr.' + key)} modifier`)}
                     >
-                      {conSegno(mod)}
-                    </Rollable>
+                      {mod < 0 ? `−${Math.abs(mod)}` : mod}
+                    </span>
                     <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 3 }}>
                       <div role="button" tabIndex={0}
                         className="car-header-label"
@@ -11914,7 +11980,7 @@ export default function App() {
                         title={t('tip.cosa_governa')}
                         onClick={() => setInfo({ titolo: t('attr.' + key), testo: t('spieg.' + key) })}
                       >{t('attr.' + key).toUpperCase()}</div>
-                      <div style={{ flexShrink: 0, fontSize: 15, fontWeight: 'bold', color: C.goldDark, display: 'flex', alignItems: 'center' }} title={t('tip.punteggio_car')}>
+                      <div className="car-punteggio" style={{ flexShrink: 0, fontSize: 14, fontWeight: 'bold', color: C.goldDark, display: 'flex', alignItems: 'center' }} title={t('tip.punteggio_car')}>
                         <Editable
                           value={scheda.caratteristiche[key]}
                           tipo="numero"
@@ -11936,7 +12002,7 @@ export default function App() {
                                   setFontePopover((v) => (v && v.tipo === 'car' && v.key === key ? null : { tipo: 'car', key, ...posizionePopover(r, window) }));
                                 }}
                                 title={t('inv.fonte_bonus_tip')}
-                                style={{ marginLeft: 4, fontSize: 15, fontWeight: 'bold', color: C.goldDark, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                                style={{ marginLeft: 4, fontSize: 14, fontWeight: 'bold', color: C.goldDark, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                               >→ {punteggioEffettivo}</button>
                               {fontePopover?.tipo === 'car' && fontePopover.key === key && createPortal(
                                 <div
@@ -12704,7 +12770,7 @@ export default function App() {
               {/* Intestazione Combattimento & Filtri Armi / Incantesimi Offensivi */}
               <div className="sottosezione-titolo" style={{ display: 'grid', gridTemplateColumns: 'minmax(28px, 1fr) auto minmax(28px, 1fr)', alignItems: 'center', columnGap: 6, marginTop: 18, marginBottom: 8 }}>
                 <div />
-                <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 15 }}>
+                <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 14 }}>
                   {t('combat.titolo')}
                 </h3>
                 <div style={{ justifySelf: 'end', display: 'inline-flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -12800,13 +12866,13 @@ export default function App() {
                       }
                     }
                     return att;
-                  });
+                  }).filter((att) => !att.isSpell || attaccoIncantesimoAttivo(att, scheda.incantesimiLista, classePreparaIncantesimi(scheda.classe)));
 
                   const normalizzaNomeAttacco = (str) => String(str || '').replace(/^✨\s*/, '').replace(/\s*\((shillelagh|bastone incantato)\)/gi, '').trim().toLowerCase();
                   const nomiSalvati = new Set(attacchiSalvati.map((a) => normalizzaNomeAttacco(a.nome)));
 
                   const attacchiSpettro = (scheda.incantesimiLista || []).filter((s) => {
-                    if (scheda.mostraIncantesimiAttacco === false || s.nascondiAttacco) return false;
+                    if (scheda.mostraIncantesimiAttacco === false) return false;
                     // I trucchetti (livello 0) sono sempre conosciuti/preparati.
                     // Gli incantesimi di livello 1+ per le classi che preparano gli incantesimi (Druido, Chierico, Mago, Paladino, Artefice)
                     // devono essere preparati (o bonus/sempre preparati) per comparire in combattimento!
@@ -13010,7 +13076,7 @@ export default function App() {
                         {cat !== 'Azione' && (
                           <div className="sottosezione-titolo" style={{ display: 'grid', gridTemplateColumns: 'minmax(28px, 1fr) auto minmax(28px, 1fr)', alignItems: 'center', columnGap: 6, marginTop: 18, marginBottom: 8 }}>
                             <div />
-                            <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 15 }}>
+                            <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 14 }}>
                               {cat === 'Bonus' ? t('combat.azioni_bonus') : t('combat.reazioni')}
                             </h3>
                             {/* I chip della reazione vanno su una riga propria sotto il titolo:
@@ -13537,9 +13603,13 @@ export default function App() {
                                           <span>{scheda.reazioneUsata ? (lingua === 'en' ? 'Used' : 'Usata') : (lingua === 'en' ? 'Use' : 'Usa')}</span>
                                         </button>
                                       )}
-                                      {!a.isAuto && (
+                                      {/* Niente ✕ per armi e incantesimi: spariscono da soli (disequipaggi l'arma,
+                                          cambi o togli l'incantesimo). Resta solo per un attacco "orfano": non è
+                                          un incantesimo e non c'è l'oggetto in inventario (es. aggiunto dal compendio). */}
+                                      {!a.isAuto && !a.isSpell && !(scheda.inventario || []).some((x) => String(x.nome || '').toLowerCase() === String(a.nome || '').toLowerCase()) && (
                                         <button
                                           type="button"
+                                          data-testid="attacco-orfano-elimina"
                                           style={{ ...styles.buttonRiga, color: C.red, borderColor: C.red }}
                                           title={a.isSpell ? tr('Nascondi questo incantesimo dalla sezione Armi e attacchi', 'Hide this spell from Weapons and attacks') : tr('Elimina attacco', 'Delete attack')}
                                           aria-label={a.isSpell ? tr(`Nascondi ${a.nome} dagli attacchi`, `Hide ${a.nome} from attacks`) : tr(`Elimina ${a.nome}`, `Delete ${a.nome}`)}
@@ -14747,7 +14817,7 @@ export default function App() {
                           {livelliIncChiusi[0] ? '▸' : '▾'}
                         </span>
                       </div>
-                      <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 15 }}>
+                      <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 14 }}>
                         {t('spell.trucchetti')}
                       </h3>
                       <div style={{ justifySelf: 'end', display: 'inline-flex', alignItems: 'center', gap: 6 }} onClick={(e) => e.stopPropagation()}>
@@ -14779,7 +14849,7 @@ export default function App() {
                     {maxLiv >= 1 && (
                       <div className="sottosezione-titolo" style={{ display: 'grid', gridTemplateColumns: 'minmax(28px, 1fr) auto minmax(28px, 1fr)', alignItems: 'center', columnGap: 6, marginTop: 18, marginBottom: 8 }}>
                         <div />
-                        <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 15 }}>
+                        <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 14 }}>
                           {t('spell.incantesimi')}
                         </h3>
                         {/* Il conteggio "Preparati" è sceso nell'intestazione del 1° Livello qui
@@ -15246,7 +15316,7 @@ export default function App() {
                   }}>
                     {/* Card 1: Privilegi di Classe */}
                     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: 13.5, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
                         {t('priv.classe_titolo')}{scheda.classe ? ` (${traduciDato(scheda.classe)})` : ''}
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, justifyContent: 'center' }}>
@@ -15272,7 +15342,7 @@ export default function App() {
 
                     {/* Card 2: Privilegi di Sottoclasse */}
                     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: 13.5, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
                         {t('priv.sub_titolo')}{scheda.sottoclasse ? ` (${traduciDato(scheda.sottoclasse)})` : ''}
                       </div>
                       {(() => {
@@ -15344,7 +15414,7 @@ export default function App() {
                     gap: 10
                   }}>
                     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: 13.5, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
                         {t("sez.tratti_specie")}{scheda.specie ? ` (${traduciDato(scheda.specie)})` : ''}
                       </div>
                       <ListaQuadratini
@@ -15356,7 +15426,7 @@ export default function App() {
                     </div>
 
                     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: 13.5, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
                         {t("sez.talenti")}
                       </div>
                       <ListaQuadratini
@@ -15371,7 +15441,7 @@ export default function App() {
 
                   {/* Riga 3: Poteri personalizzati (regole homebrew del tavolo) — solo con manuale Araldi del Segreto attivo */}
                   {manualeAttivo(scheda?.manuali || manualiAttivi, 'araldi') && (
-                    <SezionePoteri scheda={scheda} aggiorna={aggiorna} lingua={lingua} manualiAttivi={manualiAttivi} registra={registra} mostraInfo={setInfo} ripristinoCampagna={!isSolaLettura && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null} />
+                    <SezionePoteri scheda={scheda} aggiorna={aggiorna} lingua={lingua} manualiAttivi={manualiAttivi} registra={registra} mostraInfo={setInfo} ripristinoCampagna={!isSolaLettura && araldiAttivo && poteriCampagnaIncompleti(scheda) ? ripristinaPoteriCampagna : null} />
                   )}
                 </div>
               </Sezione>
@@ -15613,10 +15683,12 @@ export default function App() {
                       <div style={{ display: 'flex', gap: 6 }}>
                         <button
                           type="button"
+                          data-testid="apri-evoca-compagno"
                           onClick={() => setMostraModalAggiungiCompagno(true)}
+                          title={lingua === 'en' ? 'Summon a companion, familiar or creature' : 'Evoca un compagno, un famiglio o una creatura'}
                           style={{ ...styles.buttonMini, fontSize: 12, padding: '3px 10px', color: C.goldDark, borderColor: C.gold, background: 'rgba(201,162,39,0.12)', fontWeight: 700 }}
                         >
-                          {lingua === 'en' ? 'Summon / Add Companion' : 'Evoca / Aggiungi Compagno'}
+                          {lingua === 'en' ? 'Summon' : 'Evoca'}
                         </button>
                       </div>
                     </div>
@@ -16340,6 +16412,10 @@ export default function App() {
                               // divisoria fra il nome e le sue righe di dettaglio, che restano
                               // "attaccate" come un unico blocco (bordo solo dopo l'ultima).
                               const mostraEffetto = effettoInventarioAperto === o.id || o.effettoMeccanico;
+                              // Oggetto magico: ha un effetto meccanico, richiede sintonia o è sintonizzato.
+                              // Sfondo blu (--c-magico) sulla riga, sulla sua riga dell'effetto e negli slot di sintonia.
+                              const eMagico = Boolean(o.effettoMeccanico || o.richiedeSintonia || isSintonizzato);
+                              const sfondoMagico = 'color-mix(in srgb, var(--c-magico) 16%, transparent)';
                               const mostraUtilizzi = o.usiMax > 0;
                               const senzaBordo = { borderBottom: 'none' };
 
@@ -16408,7 +16484,7 @@ export default function App() {
 
                               return (
                                 <Fragment key={o.id}>
-                                <tr className="inventario-riga" style={{ opacity: isEquip ? 1 : 0.92 }}>
+                                <tr className={eMagico ? 'inventario-riga inventario-magico' : 'inventario-riga'} style={{ opacity: isEquip ? 1 : 0.92, ...(eMagico ? { background: sfondoMagico } : {}) }}>
                                   <td data-label={t('inv.equip')} style={{ ...styles.td, textAlign: 'center', ...((mostraEffetto || mostraUtilizzi || mostraContenuto) && senzaBordo) }}>
                                     <input type="checkbox" checked={isEquip} onChange={(e) => toggleEquip(o, e.target.checked)} title={t('inv.equip_tooltip')} />
                                   </td>
@@ -16423,9 +16499,12 @@ export default function App() {
                                             onClick={() => spItem && setInfo({ titolo: traduciDato(o.nome) || o.nome, testo: spItem })}
                                             title={spItem ? `${o.nome}: ${spItem}` : o.nome}
                                             style={{ background: 'transparent', border: 0, padding: 0, font: 'inherit', color: C.ink, cursor: spItem ? 'help' : 'default', textAlign: 'left', textDecoration: spItem ? 'underline dotted' : 'none', textUnderlineOffset: 3, textDecorationColor: C.inkDim }}
-                                          >{traduciDato(o.nome) || o.nome}</button>
+                                          >{nomeSenzaCa(traduciDato(o.nome) || o.nome)}</button>
                                         );
                                       })()}
+                                      {etichettaCaOggetto(o) && (
+                                        <span data-testid="oggetto-ca" style={{ color: C.inkDim, fontSize: 12, whiteSpace: 'nowrap' }}>({etichettaCaOggetto(o)})</span>
+                                      )}
                                       {isContainer && (
                                         <button
                                           type="button"
@@ -16500,7 +16579,7 @@ export default function App() {
                                       aria-label={isSintonizzato ? t('inv.sintonizzato') : t('inv.non_sintonizzato')}
                                       title={isSintonizzato ? t('inv.sintonizzato') : t('inv.non_sintonizzato')}
                                       onClick={() => toggleSintonia(o)}
-                                      style={{ border: 0, background: 'transparent', padding: '1px 5px', fontSize: 20, lineHeight: 1, color: isSintonizzato ? C.goldDark : C.inkDim, cursor: 'pointer' }}
+                                      style={{ border: 0, background: 'transparent', padding: '1px 5px', fontSize: 18, lineHeight: 1, color: isSintonizzato ? C.goldDark : C.inkDim, cursor: 'pointer' }}
                                     >{isSintonizzato ? '✦' : '◇'}</button>
                                   </td>
                                   <td data-label={t('inv.peso')} style={{ ...styles.td, color: C.inkDim, whiteSpace: 'nowrap', ...((mostraEffetto || mostraUtilizzi || mostraContenuto) && senzaBordo) }}>
@@ -16721,7 +16800,7 @@ export default function App() {
                                   </tr>
                                 )}
                                 {(mostraEffetto || mostraUtilizzi) && (
-                                  <tr style={{ background: (effettoAttivo || mostraUtilizzi) ? 'rgba(201,162,39,0.08)' : 'rgba(0,0,0,0.025)' }}>
+                                  <tr className={eMagico ? 'inventario-magico' : undefined} style={{ background: eMagico ? sfondoMagico : (effettoAttivo || mostraUtilizzi) ? 'rgba(201,162,39,0.08)' : 'rgba(0,0,0,0.025)' }}>
                                     <td style={{ ...styles.td, borderTop: 'none' }} />
                                     <td colSpan={5} style={{ ...styles.td, borderTop: 'none', paddingTop: 4, paddingBottom: 6 }}>
                                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', fontSize: 12 }}>
@@ -17033,7 +17112,8 @@ export default function App() {
                               value={slots[i]}
                               onChange={(e) => setSlot(i, e.target.value)}
                               placeholder={t("equip.sintonia_ph")}
-                              style={{ ...styles.inlineInput, flex: 1, minWidth: 0, padding: '6px 10px', fontSize: 13, background: isAttivo ? 'rgba(46,157,77,0.08)' : undefined, borderColor: isAttivo ? C.green : undefined }}
+                              data-testid={`sintonia-slot-${i}`}
+                              style={{ ...styles.inlineInput, flex: 1, minWidth: 0, padding: '6px 10px', fontSize: 13, background: String(slots[i] || '').trim() ? 'color-mix(in srgb, var(--c-magico) 16%, transparent)' : undefined, borderColor: String(slots[i] || '').trim() ? 'var(--c-magico)' : (isAttivo ? C.green : undefined) }}
                             />
                           </div>
                         );
@@ -17545,7 +17625,7 @@ export default function App() {
             style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: C.panel, borderBottom: `1px solid ${C.border}` }}
             onClick={(e) => e.stopPropagation()}
           >
-            <strong style={{ color: 'var(--c-title)', fontSize: 15 }}>{t('mappa.titolo')}</strong>
+            <strong style={{ color: 'var(--c-title)', fontSize: 14 }}>{t('mappa.titolo')}</strong>
             <span style={{ flex: 1 }} />
             <button style={{ ...styles.buttonMini, ...(mappaScala === 0 ? { borderColor: C.gold, color: C.gold } : {}) }} onClick={() => setMappaScala(0)} title={t('mappa.adatta_tip')}>{t('mappa.adatta')}</button>
             <button style={styles.buttonMini} onClick={() => setMappaScala((s) => Math.max(0.5, (s === 0 ? 1 : s) - 0.5))} title={t('mappa.riduci')}>➖</button>
@@ -17590,7 +17670,9 @@ export default function App() {
       {combat.attivo && combat.aperto ? (
         <div
           ref={combatRef}
+          data-testid="combat-tracker"
           style={{
+            ...stileTemaBase,
             position: 'fixed',
             left: '50%',
             transform: 'translateX(-50%)',
@@ -17598,10 +17680,10 @@ export default function App() {
             width: '100%',
             maxWidth: 1080,
             zIndex: 1500,
-            background: C.panel,
-            borderTop: `2px solid var(--c-gold-dark)`,
-            borderLeft: `1px solid ${C.border}`,
-            borderRight: `1px solid ${C.border}`,
+            background: 'var(--c-pg-panel, var(--c-tema-sfondo))',
+            borderTop: '1.5px solid var(--c-tema-bordo)',
+            borderLeft: '1.5px solid var(--c-tema-bordo)',
+            borderRight: '1.5px solid var(--c-tema-bordo)',
             borderTopLeftRadius: 12,
             borderTopRightRadius: 12,
             boxShadow: '0 -6px 28px rgba(0,0,0,0.5)',
@@ -17741,7 +17823,7 @@ export default function App() {
               {/* Gruppo 3: Strumenti & Gestione ordinati a destra */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0, marginLeft: 'auto' }}>
                 {/* Cluster Strumenti Tattici */}
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(0,0,0,0.03)', padding: '2px 4px', borderRadius: 6, border: `1px solid ${C.border}` }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(0,0,0,0.03)', padding: '2px 4px', borderRadius: 6, border: '1px solid ' + C.border }}>
                   <button
                     style={{ ...styles.buttonMini, height: 24, color: C.goldDark, borderColor: 'rgba(201,162,39,0.3)', background: 'rgba(201,162,39,0.1)', whiteSpace: 'nowrap', padding: '0 7px', fontSize: 11, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}
                     title={lingua === 'it' ? "Tira l'iniziativa per tutti i combattenti e ordina il turno" : "Roll initiative for all combatants and order turn"}
@@ -17775,15 +17857,19 @@ export default function App() {
                 {/* Cluster Controlli Finestra */}
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
                   <button
-                    style={{ ...styles.buttonMini, height: 26, width: 26, padding: 0, fontSize: 14, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}
+                    type="button"
+                    data-testid="ct-minimizza"
+                    style={{ ...stileTastoTondo, fontSize: 11, color: 'var(--c-gold-dark)', border: '1.5px solid var(--c-gold-dark)' }}
                     onClick={() => setCombat((c) => ({ ...c, aperto: false }))}
                     title={t('ct.minimizza')}
                     aria-label={t('ct.minimizza')}
                   >
-                    −
+                    ▲
                   </button>
                   <button
-                    style={{ ...styles.buttonMini, height: 26, width: 26, padding: 0, fontSize: 13, color: C.red, borderColor: 'rgba(176,58,46,0.4)', background: 'rgba(176,58,46,0.06)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1, fontWeight: 700 }}
+                    type="button"
+                    data-testid="ct-chiudi"
+                    style={{ ...stileTastoTondo, color: 'var(--c-red)', border: '1.5px solid var(--c-red)' }}
                     onClick={() => { if (window.confirm(t('ct.fine_conferma'))) setCombat({ attivo: false, aperto: true, round: 1, turno: 0, combattenti: [] }); }}
                     title={t('ct.fine')}
                     aria-label={t('ct.fine')}
@@ -17832,6 +17918,7 @@ export default function App() {
                     return (
                       <div
                         key={cb.id}
+                        data-testid={`ct-card-${cb.tipo}`}
                         style={{
                           flex: '0 0 auto',
                           width: 236,
@@ -17886,7 +17973,7 @@ export default function App() {
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 background: C.bg,
-                                border: `1.5px solid ${inTurno ? 'var(--c-gold-dark)' : C.border}`,
+                                border: `1.5px solid ${eCombattentePgAttivo(cb, combat.combattenti) ? 'var(--c-pg-gold)' : inTurno ? 'var(--c-gold-dark)' : C.border}`,
                                 borderRadius: 6,
                                 padding: '1px 4px',
                                 minWidth: 48,
@@ -17894,7 +17981,7 @@ export default function App() {
                               }}
                               title={t('ct.iniziativa')}
                             >
-                              <span style={{ fontSize: 11, fontWeight: 900, color: C.inkDim, lineHeight: 1, letterSpacing: 0.5 }}>INIZ</span>
+                              <span style={{ fontSize: 11, fontWeight: 900, color: eCombattentePgAttivo(cb, combat.combattenti) ? 'var(--c-pg-gold-dark)' : C.inkDim, lineHeight: 1, letterSpacing: 0.5 }}>INIZ</span>
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
                                 <input
                                   type="text"
@@ -17911,8 +17998,8 @@ export default function App() {
                                     width: 26,
                                     textAlign: 'center',
                                     fontWeight: 900,
-                                    fontSize: 15,
-                                    color: col,
+                                    fontSize: 14,
+                                    color: eCombattentePgAttivo(cb, combat.combattenti) ? 'var(--c-pg-gold-dark)' : col,
                                     padding: 0,
                                     border: 'none',
                                     background: 'transparent',
@@ -18014,7 +18101,7 @@ export default function App() {
 
                             {/* Nome ed eventuale pulsante Scheda */}
                             <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 4, overflow: 'hidden' }}>
-                              <div style={{ flex: 1, minWidth: 0, fontWeight: 700, fontSize: 13, color: C.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              <div data-testid={eCombattentePgAttivo(cb, combat.combattenti) ? 'ct-nome-pg' : undefined} style={{ flex: 1, minWidth: 0, fontWeight: 700, fontSize: 13, color: eCombattentePgAttivo(cb, combat.combattenti) ? 'var(--c-pg-title)' : C.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 <Editable value={cb.nome} onChange={(v) => modCombat(cb.id, { nome: v })} width={110} />
                               </div>
                               {(() => {

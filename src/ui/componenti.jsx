@@ -312,9 +312,9 @@ export function Rollable({ onRoll, children, style, title, as: Tag = 'span' }) {
 }
 
 /** Campo in stile modulo ufficiale: valore su riga, etichetta minuscola sotto. */
-export function CampoModulo({ label, children, style, boxClassName }) {
+export function CampoModulo({ label, children, style, boxClassName, className }) {
   return (
-    <div style={style}>
+    <div className={className} style={style}>
       <div className={boxClassName ? `campo-modulo-box ${boxClassName}` : 'campo-modulo-box'} style={styles.moduloCampo}>{children}</div>
       <div className="campo-modulo-label" style={styles.moduloLabel}>{label}</div>
     </div>
@@ -611,7 +611,7 @@ export function ListaQuadratini({ value, onChange, lookup, placeholder, opzioni,
                 {listaOpzioni.length > 0 && (
                   <select
                     autoFocus
-                    style={{ ...styles.inlineInput, width: '100%', padding: '8px 10px', fontSize: 15, marginBottom: 8, boxSizing: 'border-box' }}
+                    style={{ ...styles.inlineInput, width: '100%', padding: '8px 10px', fontSize: 14, marginBottom: 8, boxSizing: 'border-box' }}
                     value={listaOpzioni.some((o) => o.nome === edit.valore) ? edit.valore : ''}
                     onChange={(e) => setEdit({ ...edit, valore: e.target.value })}
                   >
@@ -623,7 +623,7 @@ export function ListaQuadratini({ value, onChange, lookup, placeholder, opzioni,
                 )}
                 <input
                   autoFocus={listaOpzioni.length === 0}
-                  style={{ ...styles.inlineInput, width: '100%', padding: '8px 10px', fontSize: 15, boxSizing: 'border-box' }}
+                  style={{ ...styles.inlineInput, width: '100%', padding: '8px 10px', fontSize: 14, boxSizing: 'border-box' }}
                   value={edit.valore}
                   placeholder={listaOpzioni.length > 0 ? tr('…oppure scrivi un nome libero', '…or type any name') : tr('Nome della voce', 'Entry name')}
                   list={listaOpzioni.length > 0 ? listId : undefined}
@@ -639,7 +639,7 @@ export function ListaQuadratini({ value, onChange, lookup, placeholder, opzioni,
             ) : (
               // Voce ESISTENTE: il nome non si modifica. Rinominandolo si perdeva
               // la spiegazione, che viene cercata proprio in base al nome.
-              <div style={{ ...styles.inlineInput, width: '100%', padding: '8px 10px', fontSize: 15, borderColor: C.border, color: C.ink, boxSizing: 'border-box' }}>
+              <div style={{ ...styles.inlineInput, width: '100%', padding: '8px 10px', fontSize: 14, borderColor: C.border, color: C.ink, boxSizing: 'border-box' }}>
                 {edit.valore}
               </div>
             )}
@@ -681,7 +681,7 @@ export function Sezione({ id, titolo, children, aperto = true, onToggleAperto, m
         style={{ ...styles.panel, opacity: trascinando ? 0.4 : 1, ...style }}
         className={`sezione ${className}`.trim()}
       >
-        <summary className="sezione-titolo" style={{ ...styles.panelTitle, fontSize: 19, cursor: 'pointer', listStyle: 'none', marginBottom: 0, userSelect: 'none' }}>
+        <summary className="sezione-titolo" style={{ ...styles.panelTitle, fontSize: 18, cursor: 'pointer', listStyle: 'none', marginBottom: 0, userSelect: 'none' }}>
           <span className="sezione-titolo-sinistra">
             <span className="freccia">▾</span>
           </span>
@@ -811,20 +811,57 @@ export function BadgeTiroDanno({ danno, tipoDanno, critico = false, onRoll, disa
   );
 }
 
+const CHIAVI_CARATTERISTICA = [
+  ['forza', /\b(forza|for|strength|str)\b/i],
+  ['destrezza', /\b(destrezza|des|dexterity|dex)\b/i],
+  ['costituzione', /\b(costituzione|cos|constitution|con)\b/i],
+  ['intelligenza', /\b(intelligenza|int|intelligence)\b/i],
+  ['saggezza', /\b(saggezza|sag|wisdom|wis)\b/i],
+  ['carisma', /\b(carisma|car|charisma|cha)\b/i],
+];
+
+/** Chiave della caratteristica ('costituzione'...) dal nome, o da un testo come "TS Saggezza CD 20". */
+export function chiaveCaratteristica(testo) {
+  const s = String(testo || '');
+  const ts = /(?:\bTS|tiro salvezza(?: su)?|saving throw)\s+(?:di\s+)?([A-Za-zàèéìòù]+)/i.exec(s);
+  // In un testo lungo senza "TS ..." non si cerca: "con" (italiano) sembrerebbe Costituzione.
+  const cerca = ts ? ts[1] : (s.trim().length <= 20 ? s : '');
+  return (CHIAVI_CARATTERISTICA.find(([, re]) => re.test(cerca)) || [])[0] || '';
+}
+
+/** Nome della caratteristica ("Saggezza") letto da un testo come "TS Saggezza CD 20", '' se non c'è. */
+export function caratteristicaDaTesto(testo) {
+  const k = chiaveCaratteristica(testo);
+  return k ? k.charAt(0).toUpperCase() + k.slice(1) : '';
+}
+
+/** Colore della caratteristica (stesso del bordo del suo riquadro), '' se sconosciuta. */
+export function coloreCaratteristica(testo) {
+  const k = chiaveCaratteristica(testo);
+  return k ? `var(--c-car-${k})` : '';
+}
+
 /**
  * Badge "pillola" della CD di un incantesimo a TIRO SALVEZZA (Costituzione
  * · CD 17): lo tira il bersaglio, non chi lancia, quindi non è cliccabile e
  * prende il posto del tiro per colpire (che per questi incantesimi non esiste).
+ * Con la caratteristica nota prende il suo colore (lo stesso del riquadro della
+ * caratteristica), altrimenti `colore`.
  */
 export function BadgeTiroSalvezza({ cd, caratteristica, colore, title }) {
+  const colCar = coloreCaratteristica(caratteristica);
+  const col = colCar || colore;
   return (
     <span
       className="badge-tiro badge-tiro-salvezza"
+      data-caratteristica={chiaveCaratteristica(caratteristica) || undefined}
       style={{
         ...styles.buttonRiga,
-        color: colore,
-        borderColor: colore,
-        background: `${colore}1f`,
+        // Bordo nel colore pieno; il testo si avvicina all'inchiostro del tema per restare
+        // leggibile su ogni ambientazione (chiara o scura).
+        color: colCar ? `color-mix(in srgb, ${colCar} 55%, var(--c-ink))` : col,
+        borderColor: col,
+        background: `color-mix(in srgb, ${col} 12%, transparent)`,
         display: 'inline-flex',
         alignItems: 'center',
         gap: 2,

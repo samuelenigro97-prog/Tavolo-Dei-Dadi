@@ -5,6 +5,8 @@ import { styles } from '../stili.js';
 import { parseAzioneBestia, coloreCategoria } from '../../rules/scheda.js';
 import { conSegno } from '../../rules/dadi.js';
 import { calcolaPfCompagno, parseAzioniCompagno } from '../../rules/regole.js';
+import { esitoFormaSelvatica, esitoMetamorfosi } from '../../data/bestiario.js';
+import { BadgeTiroSalvezza, caratteristicaDaTesto } from '../componenti.jsx';
 
 export function BestiaDettaglioModal({ aggiorna, bestiaDettaglio, lanciaD20, lanciaDanniDiretti, lingua, notteAttiva, registra, scheda, setBestiaDettaglio }) {
   return (
@@ -116,9 +118,7 @@ export function BestiaDettaglioModal({ aggiorna, bestiaDettaglio, lanciaD20, lan
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'wrap' }}>
                       <span style={{ fontWeight: 800, color: C.ink }}>{az.nome}</span>
                       {az.cd != null && (
-                        <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 5px', background: `${coloreCategoria('tiroSalvezza', notteAttiva)}1f`, color: coloreCategoria('tiroSalvezza', notteAttiva), borderRadius: 4, border: `1px solid ${coloreCategoria('tiroSalvezza', notteAttiva)}` }}>
-                          CD {az.cd}
-                        </span>
+                        <BadgeTiroSalvezza cd={az.cd} caratteristica={caratteristicaDaTesto(az.desc || az.testoOriginale)} colore={coloreCategoria('tiroSalvezza', notteAttiva)} />
                       )}
                     </div>
                     {az.desc && (
@@ -177,8 +177,17 @@ export function BestiaDettaglioModal({ aggiorna, bestiaDettaglio, lanciaD20, lan
           const risorsaMetamorfosi = Array.isArray(scheda.risorse)
             ? scheda.risorse.find((r) => /metamorfosi|polymorph/i.test(r.nome || ''))
             : null;
-          const formaSelvaticaEsaurita = risorsaFormaSelvatica && Number(risorsaFormaSelvatica.attuali) <= 0;
-          const metamorfosiEsaurita = risorsaMetamorfosi && Number(risorsaMetamorfosi.attuali) <= 0;
+          // Solo le bestie si assumono, entro i limiti di GS (e volo/nuoto per la Forma
+          // Selvatica): le evocazioni come Myrdhal mostrano soltanto "Evoca".
+          const eDruido = (c) => /druid/i.test(String(c || ''));
+          const livelloDruido = (eDruido(scheda.classe) ? Number(scheda.livello) || 1 : 0)
+            + (scheda.multiclasse || []).filter((m) => eDruido(m.classe)).reduce((a, m) => a + (Number(m.livello) || 0), 0);
+          const sottoclasseDruido = eDruido(scheda.classe) ? scheda.sottoclasse : ((scheda.multiclasse || []).find((m) => eDruido(m.classe))?.sottoclasse || '');
+          const livelloTotale = (Number(scheda.livello) || 1) + (scheda.multiclasse || []).reduce((a, m) => a + (Number(m.livello) || 0), 0);
+          const esitoFs = esitoFormaSelvatica(bestiaDettaglio, livelloDruido, sottoclasseDruido);
+          const esitoMeta = esitoMetamorfosi(bestiaDettaglio, livelloTotale);
+          const formaSelvaticaEsaurita = (risorsaFormaSelvatica && Number(risorsaFormaSelvatica.attuali) <= 0) || (esitoFs && !esitoFs.ok);
+          const metamorfosiEsaurita = (risorsaMetamorfosi && Number(risorsaMetamorfosi.attuali) <= 0) || (esitoMeta && !esitoMeta.ok);
           return (
         <div style={{ marginTop: 14, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button
@@ -216,12 +225,13 @@ export function BestiaDettaglioModal({ aggiorna, bestiaDettaglio, lanciaD20, lan
               if (registra) registra({ etichetta: `${bestiaDettaglio.nome}`, tipo: 'evoca', dettaglio: `Evocato: ${bestiaDettaglio.nome} (${pfCalc} PF, CA ${bestiaDettaglio.ca})` });
               setBestiaDettaglio(null);
             }}
-            title={lingua === 'en' ? 'Summon / add as active ally to your sheet' : 'Evoca / aggiungi come alleato attivo sulla scheda'}
+            title={lingua === 'en' ? 'Summon it as an active ally on your sheet' : 'Evocalo come alleato attivo sulla scheda'}
           >
-            {lingua === 'en' ? 'Summon / Add' : 'Evoca / Aggiungi'}
+            {lingua === 'en' ? 'Summon' : 'Evoca'}
           </button>
-          {bestiaDettaglio.gs != null && (
+          {esitoFs && (
             <button
+              data-testid="bestia-forma-selvatica"
               disabled={formaSelvaticaEsaurita}
               style={{
                 ...styles.button, flex: 1, fontWeight: 700,
@@ -229,7 +239,7 @@ export function BestiaDettaglioModal({ aggiorna, bestiaDettaglio, lanciaD20, lan
                   ? { borderColor: C.border, color: C.inkDim, background: C.panelLight, cursor: 'not-allowed', opacity: 0.6 }
                   : { borderColor: C.green || '#3e7d32', color: C.green || '#3e7d32' }),
               }}
-              title={formaSelvaticaEsaurita ? (lingua === 'en' ? 'No Wild Shape uses left' : 'Nessun utilizzo di Forma Selvatica rimasto') : undefined}
+              title={!esitoFs.ok ? esitoFs.motivo : formaSelvaticaEsaurita ? (lingua === 'en' ? 'No Wild Shape uses left' : 'Nessun utilizzo di Forma Selvatica rimasto') : undefined}
               onClick={() => {
                 if (formaSelvaticaEsaurita) return;
                 // Scala 1 uso da Forma Bestiale / Forma Selvatica nelle risorse di classe (se presente)
@@ -271,8 +281,9 @@ export function BestiaDettaglioModal({ aggiorna, bestiaDettaglio, lanciaD20, lan
               {lingua === 'en' ? `Wild Shape (${bestiaDettaglio.pf} HP)` : `Forma Selvatica (${bestiaDettaglio.pf} PF)`}
             </button>
           )}
-          {bestiaDettaglio.gs != null && (
+          {esitoMeta && (
             <button
+              data-testid="bestia-metamorfosi"
               disabled={metamorfosiEsaurita}
               style={{
                 ...styles.button, flex: 1, fontWeight: 700,
@@ -315,7 +326,7 @@ export function BestiaDettaglioModal({ aggiorna, bestiaDettaglio, lanciaD20, lan
                 });
                 setBestiaDettaglio(null);
               }}
-              title={metamorfosiEsaurita
+              title={!esitoMeta.ok ? esitoMeta.motivo : metamorfosiEsaurita
                 ? (lingua === 'en' ? 'No Metamorphosis uses left' : 'Nessun utilizzo di Metamorfosi rimasto')
                 : (lingua === 'en' ? 'Polymorph: replaces all ability scores, including mental ones' : 'Metamorfosi: sostituisce tutte le caratteristiche, incluse quelle mentali')}
             >

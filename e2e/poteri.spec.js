@@ -13,6 +13,13 @@ async function attivaManuale(page) {
   await chiudiMenuIniziale(page);
 }
 
+/** Il riquadro Poteri sotto le Risorse parte chiuso: lo apre dal titolo (se serve). */
+async function apriRiquadroPoteri(page) {
+  const box = page.getByTestId('poteri-risorse');
+  if (!(await box.isVisible())) await page.getByTestId('poteri-riquadro').locator('summary').click();
+  await expect(box).toBeVisible();
+}
+
 test.describe('Poteri', () => {
   test('il manuale di campagna è spento di base: "Da modello" compare solo dopo averlo attivato', async ({ page }) => {
     await apriScheda(page);
@@ -244,6 +251,7 @@ test.describe('Poteri', () => {
   });
 
   test('riquadro Poteri sotto Risorse di classe: stessi contatori, separati dalle risorse di classe', async ({ page }) => {
+    await apriRiquadroPoteri(page);
     const box = page.getByTestId('poteri-risorse');
     await expect(box).toBeVisible();
     await expect(box.getByText('Debito', { exact: true })).toBeVisible();
@@ -258,6 +266,7 @@ test.describe('Poteri', () => {
   test('riquadro Poteri con gli Araldi: una perla di Inquisire spende un uso e aggiunge Debito', async ({ page }) => {
     await page.getByRole('button', { name: 'Da modello' }).click();
     await page.getByTestId('modelli-poteri').getByRole('button', { name: /Aggiungi \d+ poteri/ }).click();
+    await apriRiquadroPoteri(page);
     const box = page.getByTestId('poteri-risorse');
     const stato = () => page.evaluate(() => {
       const st = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));

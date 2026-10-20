@@ -5,6 +5,196 @@
 
 export const NOVITA = [
   {
+    versione: '4.108.3',
+    voci: {
+      it: ['Combat tracker: ▲ per ridurlo quando è aperto, ▼ sulla pillola quando è ridotto.'],
+      en: ['Combat tracker: ▲ to minimize it when open, ▼ on the pill when minimized.'],
+    },
+  },
+  {
+    versione: '4.108.2',
+    voci: {
+      it: ['Barra a scomparsa: ora scorre davvero, e le icone non si vedono mai mentre si apre o si chiude.'],
+      en: ['Auto-hiding bar: it now really slides, and the icons are never visible while it opens or closes.'],
+    },
+  },
+  {
+    versione: '4.108.1',
+    voci: {
+      it: ['Barra in alto e combat tracker sul fondo della scheda del personaggio; la barra a scomparsa non mostra più pezzi di icone mentre si chiude.', 'Combat tracker ridotto più corto, accanto alla scheda e non sopra.'],
+      en: ['Top bar and combat tracker use the character sheet background; the auto-hiding bar no longer shows bits of icons while closing.', 'Shorter minimized combat tracker, beside the sheet instead of over it.'],
+    },
+  },
+  {
+    versione: '4.108.0',
+    voci: {
+      it: ['Barra in alto a scomparsa sul computer: avvicina il cursore alla cima dello schermo per farla scendere.', 'Sfondi con più movimento e una luce morbida che scorre.', 'Tasti della barra tutti dello stesso stile; sincronizzazione e combattimento indicati da un pallino.'],
+      en: ['Auto-hiding top bar on computers: move the cursor to the top of the screen to bring it down.', 'Backgrounds with more movement and a soft drifting light.', 'Top bar buttons share one style; sync and combat are shown by a small dot.'],
+    },
+  },
+  {
+    versione: '4.107.4',
+    voci: {
+      it: ['Import con Gemini: il Worker usa subito il modello giusto (le schede si leggono in circa 20 secondi).'],
+      en: ['Gemini import: the Worker picks the right model straight away (a sheet is read in about 20 seconds).'],
+    },
+  },
+  {
+    versione: '4.107.3',
+    voci: {
+      it: ['Menu iniziale: tutti i tasti con lo stesso bordo del tema; etichette più corte (Backup, Avvisi, Manuali e fonti con il solo numero).'],
+      en: ['Start menu: every button has the same theme border; shorter labels (Backup, Notices, Sourcebooks with just the number).'],
+    },
+  },
+  {
+    versione: '4.107.2',
+    voci: {
+      it: ['Menu iniziale, barra in alto e combat tracker con lo stesso grigio e lo stesso bordo del tema generico.', 'Il menu iniziale sta tutto nello schermo, senza barra per scorrere.'],
+      en: ['Start menu, top bar and combat tracker share the same gray and border of the generic theme.', 'The start menu fits the screen, with no scrollbar.'],
+    },
+  },
+  {
+    versione: '4.107.1',
+    voci: {
+      it: ['Import schede con Google Gemini (gratis): serve solo una chiave gratuita nel Worker. Legge immagini e PDF a più pagine meglio dei modelli gratuiti di prima.'],
+      en: ['Sheet import with Google Gemini (free): only needs a free key in the Worker. It reads images and multi-page PDFs better than the free models used before.'],
+    },
+  },
+  {
+    versione: '4.107.0',
+    voci: {
+      it: [
+        'Import da PDF e immagini più affidabile: le competenze si ricavano dai totali della scheda, non dalle stelle; la Maestria non si perde più; "Fighter 1 / Ranger 6 / Rogue 3" si legge da solo. A fine import un avviso dice cosa è stato corretto.',
+        'Combat tracker: minimizza e chiudi hanno la stessa forma tonda della pillola.',
+      ],
+      en: [
+        'More reliable PDF and image import: proficiencies come from the sheet totals, not the stars; Expertise is no longer lost; "Fighter 1 / Ranger 6 / Rogue 3" is read on its own. A notice lists what was fixed.',
+        'Combat tracker: minimise and close share the pill\'s round shape.',
+      ],
+    },
+  },
+  {
+    versione: '4.106.1',
+    voci: {
+      it: ['Lo sfondo ha un leggero movimento lento (si ferma con "riduci movimento"). Classe Armatura: Copertura larga come il menu sotto e riga base/scudo più spaziata.'],
+      en: ['The background has a slow, gentle motion (it stops with "reduce motion"). Armor Class: Cover as wide as the menu below and a roomier base/shield row.'],
+    },
+  },
+  {
+    versione: '4.106.0',
+    voci: {
+      it: [
+        'Manuale Araldi del Segreto: si attiva solo con una password (Manuali e fonti). Senza manuale il riquadro Poteri non c\'è.',
+        'Aprendo un personaggio Competenze e Risorse di classe sono aperte; Poteri parte chiusa e poi ricorda la scelta.',
+        'Classe Armatura: Copertura sopra, poi il tipo di armatura, poi la base; tolta la CA a mano dal menu.',
+        'Combat tracker: iniziativa e nome del personaggio nel colore della sua classe. La CA degli oggetti si scrive sempre "CA +valore".',
+      ],
+      en: [
+        'Heralds of the Secret sourcebook: it turns on only with a password (Sourcebooks). Without it there is no Powers box.',
+        'Opening a character, Training and Class resources are open; Powers starts closed and then remembers your choice.',
+        'Armor Class: Cover on top, then armor type, then base; manual AC removed from the menu.',
+        'Combat tracker: initiative and the character name in the class colour. Item AC is always written "AC +value".',
+      ],
+    },
+  },
+  {
+    versione: '4.105.7',
+    voci: {
+      it: ['Creazione personaggio: "Artefice" non compare più due volte, e solo col manuale Tasha attivo.'],
+      en: ['Character creation: "Artificer" no longer shows twice, and only with the Tasha book on.'],
+    },
+  },
+  {
+    versione: '4.105.6',
+    voci: {
+      it: ['Classe Armatura: il numero è centrato e il menu Copertura è più stretto e centrato.'],
+      en: ['Armor Class: the number is centered and the Cover menu is narrower and centered.'],
+    },
+  },
+  {
+    versione: '4.105.5',
+    voci: {
+      it: [
+        'Combat tracker ridotto: ✕ per chiudere il combattimento (chiede conferma) e sempre sul tema base.',
+        'Attacchi: niente più ✕, spariscono da soli quando disequipaggi l\'arma o cambi gli incantesimi.',
+        'Oggetti magici con sfondo blu nell\'inventario e negli slot di sintonia.',
+        'Barra in alto grigio scuro nel tema scuro; anagrafica leggibile per intero a ogni larghezza; tolto il titolo doppio "I miei personaggi".',
+      ],
+      en: [
+        'Minimised combat tracker: ✕ to end the fight (asks for confirmation) and always on the base theme.',
+        'Attacks: no more ✕, they disappear by themselves when you unequip the weapon or change your spells.',
+        'Magic items with a blue background in the inventory and in the attunement slots.',
+        'Dark-grey top bar in the dark theme; profile fields readable in full at every width; duplicate "My characters" heading removed.',
+      ],
+    },
+  },
+  {
+    versione: '4.105.4',
+    voci: {
+      it: ['La barra in alto usa il tema base dell\'app. Il modificatore e il punteggio di ogni caratteristica hanno il colore del suo bordo.'],
+      en: ['The top bar uses the app\'s base theme. Each ability\'s modifier and score use its border colour.'],
+    },
+  },
+  {
+    versione: '4.105.3',
+    voci: {
+      it: ['Combat tracker sul tema base dell\'app: i colori della classe restano solo sulla scheda del tuo personaggio e sulla pillola nel suo turno.'],
+      en: ['Combat tracker on the app\'s base theme: class colours only stay on your character\'s card and on the pill during its turn.'],
+    },
+  },
+  {
+    versione: '4.105.2',
+    voci: {
+      it: ['Menu iniziale: ogni personaggio della lista ha il colore della sua classe.'],
+      en: ['Start menu: every character in the list has its class colour.'],
+    },
+  },
+  {
+    versione: '4.105.1',
+    voci: {
+      it: ['Menu iniziale: la card "Ultimo usato" ha i colori della classe del personaggio, il resto del menu resta sul tema base.'],
+      en: ['Start menu: the "Last used" card uses the character\'s class colours, the rest of the menu stays on the base theme.'],
+    },
+  },
+  {
+    versione: '4.105.0',
+    voci: {
+      it: ['Il menu iniziale ha il tema base dell\'app, non i colori del personaggio. Bordi delle caratteristiche più marcati e i TS (es. "Costituzione · CD 17") nel colore della loro caratteristica, anche nelle creature e nella concentrazione.'],
+      en: ['The start menu uses the app\'s base theme, not the character colours. Stronger ability borders and saves (e.g. "Constitution · DC 17") in their ability colour, in creatures and concentration too.'],
+    },
+  },
+  {
+    versione: '4.104.0',
+    voci: {
+      it: ['Caratteri uniformati in tutta l\'app: solo Cinzel per titoli ed etichette e Georgia per il testo, con poche dimensioni fisse. Menu iniziale con tutti i pulsanti uguali.'],
+      en: ['Fonts unified across the app: only Cinzel for titles and labels and Georgia for text, with a few fixed sizes. Start menu with matching buttons.'],
+    },
+  },
+  {
+    versione: '4.103.1',
+    voci: {
+      it: ['Ogni caratteristica ha il suo colore sul bordo (Forza rosso, Destrezza verde, Costituzione ocra, Intelligenza blu, Saggezza viola, Carisma rosato). Tolta la matita della velocità: la calcola l\'app. Anagrafica in colonne allineate (Razza sopra Classe, Allineamento sopra i PE). Il modificatore delle caratteristiche non ha più il "+" e non tira: i TS dalla riga Tiro salvezza.'],
+      en: ['Each ability has its own border colour (Strength red, Dexterity green, Constitution ochre, Intelligence blue, Wisdom purple, Charisma rose). The speed pencil is gone: the app calculates it. Profile fields in aligned columns (Species above Class, Alignment above XP). Ability modifiers lose the "+" and no longer roll: saves from the Saving throw row.'],
+    },
+  },
+  {
+    versione: '4.103.0',
+    voci: {
+      it: [
+        'Il Debito degli Araldi non sparisce più dai Poteri: se mancava, torna da solo con l\'ultimo valore.',
+        'Equipaggiamento: la CA tra parentesi accanto ad armature, scudi e oggetti magici; nuovo Scudo in Legnoferro nel catalogo.',
+        'Profilo: riquadri di sinistra allineati a quelli centrali, Taglia allineata a Sottoclasse, PE a filo destro, luce al passaggio del cursore anche su PF, CA e caselle. Tolti "Recupera i Poteri dalla cronologia" e il "+ 0" della CA.',
+        'Creature: Forma Selvatica e Metamorfosi solo per le bestie ammesse al tuo livello; Myrdhal e le altre evocazioni si possono solo evocare. Il tasto si chiama "Evoca".',
+      ],
+      en: [
+        'The Heralds\' Debt no longer disappears from Powers: if it was missing, it comes back by itself with its last value.',
+        'Equipment: AC in brackets next to armour, shields and magic items; new Ironwood Shield in the catalogue.',
+        'Profile: left boxes aligned with the central ones, Size aligned with Subclass, XP flush right, hover glow on HP, AC and boxes too. "Restore powers from history" and the AC "+ 0" removed.',
+        'Creatures: Wild Shape and Polymorph only for beasts allowed at your level; Myrdhal and the other summons can only be summoned. The button is now "Summon".',
+      ],
+    },
+  },
+  {
     versione: '4.102.2',
     voci: {
       it: ['Il valore della velocità è direttamente cliccabile per aprire il calcolatore di movimento e salti, con interfaccia più pulita.', 'Semplificata la dicitura dell\'Archivio delle schede.'],

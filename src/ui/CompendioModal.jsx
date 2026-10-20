@@ -346,7 +346,7 @@ export function CompendioModal({
         tipoArmatura: a.tipo || 'leggera',
         caBase: a.base || 10,
         peso: a.peso || 5,
-        desc: `Armatura ${a.tipo || ''} (CA base ${a.base || 10}).`,
+        desc: `Armatura ${a.tipo || ''} (CA +${a.base || 10}).`,
         raw: a,
       });
     }
@@ -736,7 +736,7 @@ export function CompendioModal({
                 </h3>
                 <span
                   style={{
-                    fontSize: 10.5,
+                    fontSize: 11,
                     fontWeight: 800,
                     padding: '1px 7px',
                     borderRadius: 6,
@@ -761,7 +761,7 @@ export function CompendioModal({
             style={{
               background: 'transparent',
               border: 'none',
-              fontSize: 20,
+              fontSize: 18,
               color: C.inkDim,
               cursor: 'pointer',
               padding: '4px 8px',
@@ -840,7 +840,7 @@ export function CompendioModal({
                 style={{
                   ...styles.buttonMini,
                   padding: '5px 10px',
-                  fontSize: 11.5,
+                  fontSize: 11,
                   borderRadius: 6,
                   fontWeight: categoria === cat.id ? 700 : 500,
                   background: categoria === cat.id ? C.goldDark : 'rgba(0,0,0,0.03)',
@@ -979,7 +979,7 @@ export function CompendioModal({
                 )}
 
                 {dettaglioSelezionato.tipo === 'incantesimo' && (
-                  <div style={{ fontSize: 11.5, color: C.inkDim, display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                  <div style={{ fontSize: 11, color: C.inkDim, display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
                     {dettaglioSelezionato.scuola && (
                       <span
                         style={{
@@ -1008,7 +1008,7 @@ export function CompendioModal({
               {/* Descrizione completa */}
               <div
                 style={{
-                  fontSize: 12.5,
+                  fontSize: 12,
                   lineHeight: 1.6,
                   color: C.ink,
                   whiteSpace: 'pre-wrap',

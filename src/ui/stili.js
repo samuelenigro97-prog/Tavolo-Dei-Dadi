@@ -34,7 +34,7 @@ export const styles = {
     margin: '0 auto 6px auto',
     padding: '12px 0 8px',
   },
-  title: { margin: 0, fontSize: 21, letterSpacing: 1, color: 'var(--c-title)', fontFamily: 'var(--font-title, inherit)' },
+  title: { margin: 0, fontSize: 22, letterSpacing: 1, color: 'var(--c-title)', fontFamily: 'var(--font-title, inherit)' },
   hint: { margin: '3px 0 0', color: C.inkDim, fontStyle: 'italic', fontSize: 12 },
   main: { maxWidth: 1080, margin: '0 auto' },
   panel: {
@@ -49,7 +49,7 @@ export const styles = {
   },
   panelTitle: {
     margin: '0 0 12px',
-    fontSize: 15,
+    fontSize: 16,
     color: C.title,
     textAlign: 'center',
     fontWeight: 'bold',
@@ -62,7 +62,7 @@ export const styles = {
   },
   // campo in stile modulo: valore su riga con etichetta sotto
   moduloLabel: {
-    fontSize: 9,
+    fontSize: 10,
     color: C.inkDim,
     letterSpacing: 0.7,
     textTransform: 'uppercase',
@@ -193,7 +193,7 @@ export const styles = {
     borderRadius: 8,
     color: C.onGold,
     fontFamily: 'inherit',
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: 'bold',
     cursor: 'pointer',
     boxShadow: '0 2px 6px rgba(184, 134, 11, 0.25)',
@@ -357,7 +357,7 @@ export const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: livello === 3 ? 16 : livello === 2 ? 14 : 15,
+    fontSize: livello === 3 ? 16 : 14,
     // competenza chiara a colpo d'occhio con bagliore arcano e rune cesellate:
     // oro = Maestria/Expertise (✦), azzurro = classe/razza (★), verde = competente (●), tenue = non competente (○).
     color: livello === 3 ? '#ffd700' : livello === 2 ? '#38bdf8' : livello === 1 ? '#4ade80' : C.inkDim,
@@ -441,6 +441,9 @@ export const GLOBAL_CSS = `
   --c-green: #3e7d32; --c-title: #9e2b25;
   --c-araldi: #6e3612; --c-araldi-border: #a45a2a; --c-araldi-bg: rgba(140, 74, 30, 0.10);
   --c-araldi-glow: rgba(140, 74, 30, 0.25); --c-araldi-badge: #7a3e16;
+  --c-magico: #2b64b4;
+  --c-car-forza: #a8443a; --c-car-destrezza: #4f7d3a; --c-car-costituzione: #a0702a;
+  --c-car-intelligenza: #3f6a9e; --c-car-saggezza: #7a5aa0; --c-car-carisma: #b06a74;
   --font-title: 'Cinzel', Georgia, 'Times New Roman', serif;
 }
 :root[data-tema="scuro"] {
@@ -450,6 +453,9 @@ export const GLOBAL_CSS = `
   --c-green: #7fb069; --c-title: #de8f88;
   --c-araldi: #e08b4a; --c-araldi-border: #b86b33; --c-araldi-bg: rgba(184, 107, 51, 0.16);
   --c-araldi-glow: rgba(184, 107, 51, 0.30); --c-araldi-badge: #d27d3c;
+  --c-magico: #4f86d6;
+  --c-car-forza: #d0685a; --c-car-destrezza: #86b26a; --c-car-costituzione: #d2a35a;
+  --c-car-intelligenza: #6f9fd6; --c-car-saggezza: #ab8ad6; --c-car-carisma: #d99aa0;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema="chiaro"]) {
@@ -459,6 +465,9 @@ export const GLOBAL_CSS = `
     --c-green: #7fb069; --c-title: #de8f88;
     --c-araldi: #e08b4a; --c-araldi-border: #b86b33; --c-araldi-bg: rgba(184, 107, 51, 0.16);
     --c-araldi-glow: rgba(184, 107, 51, 0.30); --c-araldi-badge: #d27d3c;
+    --c-magico: #4f86d6;
+    --c-car-forza: #d0685a; --c-car-destrezza: #86b26a; --c-car-costituzione: #d2a35a;
+    --c-car-intelligenza: #6f9fd6; --c-car-saggezza: #ab8ad6; --c-car-carisma: #d99aa0;
   }
 }
 html {
@@ -544,6 +553,10 @@ input[type="url"], input[type="tel"], input:not([type]), textarea {
   color: var(--c-ink);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
+/* Pulsanti nello stesso carattere del testo e voci delle tendine sulla scala dei
+   caratteri (il browser userebbe il suo carattere di sistema e 13,33 px). */
+button { font-family: inherit; }
+option { font-size: 13px; }
 select:hover, input:hover, textarea:hover { border-color: var(--c-gold); }
 select:focus-visible, input:focus-visible, textarea:focus-visible {
   outline: 2px solid var(--c-gold);
@@ -649,6 +662,47 @@ tbody tr:hover {
 .angolo-tr { top: 0; right: 0; }
 .angolo-bl { bottom: 0; left: 0; }
 .angolo-br { bottom: 0; right: 0; }
+
+/* Sfondo vivo: lo sfondo (immagine dell'ambientazione, aure e vignetta) vaga piano su un
+   percorso a più tappe (zoom e scivolamento di qualche punto percentuale, 50 s avanti e
+   indietro), e sopra scorre una luce morbida, come nuvole che passano davanti al sole.
+   Solo trasformazioni e opacità, quindi va sulla GPU e costa quasi nulla. Il livello parte
+   ingrandito del 10%: ai bordi resta sempre più margine di quanto si sposti, non scopre mai
+   il fondo. Si ferma con "riduci movimento" del sistema. */
+@keyframes sfondo-respiro {
+  0%   { transform: translate3d(0, 0, 0) scale(1.10); }
+  25%  { transform: translate3d(-3%, -1.5%, 0) scale(1.13); }
+  50%  { transform: translate3d(-1%, 2.5%, 0) scale(1.11); }
+  75%  { transform: translate3d(2.5%, 0.5%, 0) scale(1.14); }
+  100% { transform: translate3d(1%, -2%, 0) scale(1.10); }
+}
+@keyframes sfondo-luce {
+  0%   { transform: translate3d(-18%, -8%, 0) scale(1); opacity: 0.35; }
+  50%  { transform: translate3d(14%, 6%, 0) scale(1.25); opacity: 0.9; }
+  100% { transform: translate3d(-6%, 12%, 0) scale(1.1); opacity: 0.5; }
+}
+#ambient-bg-layer {
+  animation: sfondo-respiro 50s ease-in-out infinite alternate;
+  transform-origin: 50% 40%;
+  overflow: hidden;
+}
+#ambient-bg-layer::after {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 38% 30% at 35% 35%, rgba(255, 240, 210, 0.10), transparent 70%),
+    radial-gradient(ellipse 30% 26% at 70% 65%, rgba(255, 230, 190, 0.07), transparent 70%);
+  animation: sfondo-luce 34s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+@media (prefers-reduced-motion: reduce) {
+  #ambient-bg-layer { animation: none; transform: none; }
+  #ambient-bg-layer::after { animation: none; display: none; }
+}
+:root[data-animazioni="statico"] #ambient-bg-layer { animation: none; }
+:root[data-animazioni="statico"] #ambient-bg-layer::after { animation: none; display: none; }
 
 /* Reattività Hover & Focus luminoso (sobrio e morbido) */
 .sezione:hover,
@@ -1164,6 +1218,28 @@ tbody tr:hover {
               0 0 6px 1px var(--c-aura-glow-min, rgba(201, 162, 39, 0.08)),
               0 1px 4px rgba(0, 0, 0, 0.35) !important;
 }
+/* Ogni caratteristica ha il suo colore: Forza rosso mattone, Destrezza verde muschio,
+   Costituzione ocra, Intelligenza blu, Saggezza viola, Carisma oro rosato. Bordo da 1,5 px
+   quasi pieno a riposo, colore pieno con l'alone al passaggio del cursore. */
+.blocco-car.car-forza { --car: var(--c-car-forza); }
+.blocco-car.car-destrezza { --car: var(--c-car-destrezza); }
+.blocco-car.car-costituzione { --car: var(--c-car-costituzione); }
+.blocco-car.car-intelligenza { --car: var(--c-car-intelligenza); }
+.blocco-car.car-saggezza { --car: var(--c-car-saggezza); }
+.blocco-car.car-carisma { --car: var(--c-car-carisma); }
+/* Modificatore e punteggio (4 → 19) nel colore del bordo del riquadro, un filo scurito/schiarito
+   verso l'inchiostro del tema perché restino leggibili su ogni ambientazione. */
+.blocco-car.car-colore .car-modificatore { color: color-mix(in srgb, var(--car) 80%, var(--c-ink)) !important; }
+/* Il punteggio è piccolo (14 px): più inchiostro, per il contrasto 4,5:1 anche col Carisma rosato. */
+.blocco-car.car-colore .car-punteggio,
+.blocco-car.car-colore .car-punteggio button { color: color-mix(in srgb, var(--car) 65%, var(--c-ink)) !important; }
+.blocco-car.car-colore { border-color: color-mix(in srgb, var(--car) 85%, var(--c-border)) !important; border-width: 1.5px !important; }
+.blocco-car.car-colore:hover {
+  border-color: var(--car) !important;
+  box-shadow: 0 4px 18px -2px color-mix(in srgb, var(--car) 35%, transparent),
+              0 0 6px 1px color-mix(in srgb, var(--car) 22%, transparent),
+              0 1px 4px rgba(0, 0, 0, 0.35) !important;
+}
 /* Riquadri statistica (CA, Competenza, Iniziativa, Velocità, Sfinimento, Visione...):
    - etichetta sempre alta due righe e centrata, così i valori stanno alla stessa
      altezza in tutta la riga e i titoli lunghi ("Bonus di competenza") non
@@ -1192,6 +1268,17 @@ tbody tr:hover {
   box-shadow: 0 3px 12px -2px var(--c-aura-glow-1, rgba(60,50,30,0.04)),
               0 1px 3px rgba(0, 0, 0, 0.25) !important;
   /* un solo bordo: niente filetto interno (outline) come nelle sezioni grandi */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+/* Al passaggio del cursore si illumina come le sezioni e le caratteristiche
+   (anche il riquadro Punti Ferita, che non è un .vital-box: ha un'altra struttura). */
+.riquadro-pf { transition: border-color 0.3s ease, box-shadow 0.3s ease; }
+.vital-box:hover,
+.riquadro-pf:hover {
+  border-color: var(--c-border-glow-max, var(--c-gold)) !important;
+  box-shadow: 0 4px 18px -2px var(--c-aura-glow-pulse-1, rgba(201, 162, 39, 0.12)),
+              0 0 6px 1px var(--c-aura-glow-min, rgba(201, 162, 39, 0.08)),
+              0 1px 4px rgba(0, 0, 0, 0.35) !important;
 }
 /* Contenuto solo per tecnologie assistive (visivamente nascosto ma raggiungibile da tastiera). */
 .solo-sr {
@@ -1425,7 +1512,7 @@ tbody tr:hover {
 }
 
 .profilo-col-sinistra .sezione { margin-bottom: 0 !important; }
-.profilo-col-sinistra .sezione > summary { font-size: 11.5px !important; letter-spacing: 0.7px !important; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis; }
+.profilo-col-sinistra .sezione > summary { font-size: 11px !important; letter-spacing: 0.7px !important; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis; }
 .profilo-col-sinistra .sezione-titolo-testo,
 .competenze-tier-2 .sezione-titolo-testo,
 .risorse-tier-3 .sezione-titolo-testo,
@@ -1580,15 +1667,15 @@ tbody tr:hover {
     gap: 4px !important;
   }
   .car-header-label {
-    font-size: 11.5px !important;
+    font-size: 11px !important;
     letter-spacing: 0px !important;
   }
   .blocco-car div[role="button"] {
-    font-size: 12.5px !important;
+    font-size: 12px !important;
     gap: 5px !important;
   }
   .blocco-car .skill-nome {
-    font-size: 11.5px !important;
+    font-size: 11px !important;
   }
   /* 7. Competenze (Armature, Armi, Strumenti, Lingue) */
   .profilo-competenze-box {
@@ -1608,6 +1695,10 @@ tbody tr:hover {
 /* 2 riquadri vitali superiori per Difesa e Riposo (CA e Riposo) */
 .vitali-difesa { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-items: stretch; width: 100%; }
 .vitali-difesa > * { min-width: 0; }
+/* Copertura e tipo di armatura nel riquadro CA: stessa larghezza (88%); su telefono a tutta
+   larghezza, così il testo non si taglia. */
+.ca-select { width: 88%; }
+@media (max-width: 780px) { .ca-select { width: 100%; } }
 /* 4 riquadri vitali separati (Comp, Iniziativa, Velocità, Sfinimento / Visione, Perc. Passiva, Resistenze, Condizioni) */
 .vitali-sezioni-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 8px; align-items: stretch; width: 100%; }
 .vitali-sezioni-4 > * { min-width: 0; }
@@ -1624,11 +1715,26 @@ tbody tr:hover {
 /* i campi anagrafica (con le tendine): font uniforme, padding compatto, allineati in basso */
 .campi-anagrafica > * { min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; }
 .campi-anagrafica select { max-width: 100%; font-size: 12px !important; font-family: inherit !important; font-weight: 600 !important; color: var(--c-ink) !important; padding: 1px 13px 1px 0 !important; height: 100% !important; line-height: 1.2; background-position: right 1px center !important; background-size: 7px !important; }
-.campi-anagrafica .campo-modulo-box { padding: 0 !important; min-height: 26px !important; height: 26px; display: flex; align-items: center; overflow: hidden; font-size: 12px; font-weight: 600 !important; color: var(--c-ink) !important; font-family: inherit !important; border: none !important; background: transparent !important; box-shadow: none !important; }
+.campi-anagrafica .campo-modulo-box { padding: 0 !important; min-height: 26px !important; height: auto; display: flex; align-items: center; overflow: visible; font-size: 12px; font-weight: 600 !important; color: var(--c-ink) !important; font-family: inherit !important; border: none !important; background: transparent !important; box-shadow: none !important; }
 .campi-anagrafica .campo-modulo-box * { font-size: inherit; font-family: inherit; font-weight: 600; }
 .campi-anagrafica .campo-modulo-box > div { padding-left: 0 !important; }
 .campi-anagrafica .campo-modulo-box.testo-compatto, .campi-anagrafica .campo-modulo-box.testo-compatto * { font-size: 11px !important; letter-spacing: -0.2px; }
-.campi-anagrafica .campo-modulo-label { font-size: 11px !important; margin-top: 2px; font-weight: 700 !important; letter-spacing: 0.25px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 !important; }
+/* Anagrafica: le due righe hanno le stesse quattro colonne, quindi Sesso sta sopra
+   Background, Razza sopra Classe, Taglia sopra Sottoclasse e Allineamento sopra i PE. */
+.anagrafica-riga-1, .anagrafica-riga-2 { grid-template-columns: minmax(0, 19%) minmax(0, 25%) minmax(0, 1fr) minmax(112px, 23%); }
+/* Tablet: colonna centrale stretta, una colonna PE larga taglierebbe la Sottoclasse.
+   Si torna alle colonne proporzionate, con i PE a filo destro come Allineamento. */
+@media (max-width: 1100px) and (min-width: 781px) {
+  .anagrafica-riga-1 { grid-template-columns: 16% 26% minmax(56px, 0.6fr) minmax(110px, 1.45fr); }
+  .anagrafica-riga-2 { grid-template-columns: 22% 17% minmax(110px, 1.5fr) minmax(104px, 0.95fr); }
+  .campi-anagrafica > .campo-pe { justify-self: stretch; width: auto; }
+  .campi-anagrafica > .campo-pe .campo-modulo-box > div > div:first-child { flex-wrap: wrap; gap: 2px 4px; }
+}
+/* Etichette e valori si leggono SEMPRE per intero: se lo spazio è poco vanno a capo (e le
+   etichette si rimpiccioliscono con la larghezza del blocco), non si tagliano con "…". */
+.profilo-anagrafica-campi { container-type: inline-size; }
+.campi-anagrafica .campo-modulo-label { font-size: clamp(9px, 2.5cqw, 11px) !important; margin-top: 2px; font-weight: 700 !important; letter-spacing: 0.1px !important; white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.15; padding: 0 !important; }
+.campi-anagrafica .campo-modulo-box > div { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; overflow-wrap: anywhere; line-height: 1.2; }
 /* Sottoclasse con più classi (multiclasse): una riga per classe, l'altezza fissa
     da campo singolo taglierebbe via le righe in più. */
 .campi-anagrafica .campo-modulo-box.sottoclasse-multi { height: auto !important; align-items: flex-start !important; overflow: visible !important; padding-top: 2px !important; padding-bottom: 2px !important; }
@@ -1645,16 +1751,98 @@ tbody tr:hover {
   z-index: 1200 !important;
   backdrop-filter: blur(14px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
-  background: color-mix(in srgb, var(--c-panel) 95%, transparent) !important;
+  /* Fondo della scheda del PG corrente (--c-pg-panel, come il combat tracker); bordo del tema
+     generico (--c-tema-bordo, da stileTemaBase). */
+  background: color-mix(in srgb, var(--c-pg-panel, var(--c-panel)) 96%, transparent) !important;
+  border: 1.5px solid var(--c-tema-bordo, var(--c-border)) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
-  border-top-left-radius: 0 !important;
-  border-top-right-radius: 12px !important;
-  border-bottom-right-radius: 0 !important;
-  border-bottom-left-radius: 12px !important;
+  border-radius: 12px !important;
   margin-top: 0 !important;
   overflow-x: auto !important;
   overflow-y: hidden !important;
   scrollbar-width: none;
+}
+/* Menu iniziale: sotto la barra fissa e tutto nello schermo, senza barra di scorrimento. */
+.menu-iniziale-sfondo { padding: 58px 12px 12px; }
+.menu-iniziale::-webkit-scrollbar { display: none; }
+@media (max-width: 480px) {
+  .menu-iniziale-sfondo { padding: 50px 8px 8px; }
+  .menu-iniziale h1 { font-size: 20px !important; }
+  .menu-iniziale button, .menu-iniziale a { font-size: 13px !important; }
+}
+@media (max-height: 660px) {
+  .menu-iniziale button:not([data-testid="continua-ultimo-pg"]), .menu-iniziale a { min-height: 30px !important; padding-top: 3px !important; padding-bottom: 3px !important; }
+  .menu-iniziale { padding: 8px 10px !important; }
+  .menu-iniziale h1 { font-size: 18px !important; margin-bottom: 4px !important; }
+  .menu-iniziale-sfondo { padding-top: 47px; padding-bottom: 6px; }
+}
+/* Barra a scomparsa (computer col mouse): resta in vista solo una striscia con una piccola
+   maniglia; avvicinando il cursore alla cima dello schermo (o passando col Tab) la barra
+   scende con un'animazione, e risale poco dopo che il cursore se ne va. La scheda sale a
+   occupare lo spazio liberato. Su telefono e tablet resta sempre visibile. */
+.barra-zona-apertura { display: none; }
+@media (hover: hover) and (pointer: fine) and (min-width: 681px) {
+  :root[data-barra-a-scomparsa="si"] .barra-zona-apertura {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 18px;
+    z-index: 1199;
+  }
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa {
+    margin-bottom: -30px !important;
+    transform: translateY(calc(-100% + 10px));
+    /* !important: lo stile in linea della sezione (styles.panel) ha già una sua transition,
+       che altrimenti vince e la barra scatta invece di scorrere. */
+    transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1) 0.6s, box-shadow 0.3s ease 0.6s !important;
+    box-shadow: none !important;
+  }
+  :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa,
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover,
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:focus-within {
+    transform: translateY(0);
+    transition-delay: 0s !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+  }
+  /* A barra chiusa il contenuto è nascosto: nella striscia resta solo la maniglia. */
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa > * {
+    opacity: 0;
+    /* Sparisce prima che la barra salga (0.6 s): nella striscia non restano mai icone a metà. */
+    transition: opacity 0.15s ease 0.4s !important;
+  }
+  :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa > *,
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover > *,
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:focus-within > * {
+    opacity: 1;
+    /* Compare quando la barra è quasi scesa del tutto, non mentre scorre. */
+    transition: opacity 0.18s ease 0.24s !important;
+  }
+  /* Maniglia: si vede solo a barra chiusa. */
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 3px;
+    width: 40px;
+    height: 3px;
+    margin-left: -20px;
+    border-radius: 3px;
+    background: var(--c-tema-bordo, var(--c-border));
+    transition: opacity 0.2s ease 0.6s;
+    pointer-events: none;
+  }
+  :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa::before,
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover::before,
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:focus-within::before {
+    opacity: 0;
+    transition-delay: 0s;
+  }
+  :root[data-barra-a-scomparsa="si"] .barra-tiro { top: 14px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa { transition: none !important; }
 }
 .barra-superiore-fissa::-webkit-scrollbar {
   display: none;
@@ -2044,10 +2232,7 @@ tbody tr:hover {
     padding: 3px 6px !important;
     margin-bottom: 6px !important;
     overflow: hidden !important;
-    border-top-left-radius: 0 !important;
-    border-top-right-radius: 10px !important;
-    border-bottom-right-radius: 0 !important;
-    border-bottom-left-radius: 10px !important;
+    border-radius: 10px !important;
     min-height: 36px !important;
     box-sizing: border-box !important;
   }
@@ -2368,6 +2553,39 @@ tbody tr:hover {
 }
 .btn-header-azione:hover {
   border-color: var(--c-gold-dark);
+}
+/* Tasti della barra in alto: sempre il fondo della barra (quello della scheda del PG) e un
+   sottile bordo del colore del bordo della barra, qualunque stato abbiano. Gli stati (sincronizzazione,
+   combattimento in corso) sono un pallino nell'angolo; gli avvisi fanno suonare il campanello. */
+.barra-superiore-fissa .btn-header-azione {
+  background: var(--c-pg-panel, var(--c-panel)) !important;
+  border: 1px solid var(--c-tema-bordo, var(--c-border)) !important;
+  box-shadow: none !important;
+  color: var(--c-ink) !important;
+}
+.barra-superiore-fissa .btn-header-azione:hover {
+  border-color: color-mix(in srgb, var(--c-tema-bordo, var(--c-border)) 50%, var(--c-ink)) !important;
+}
+.barra-superiore-fissa .btn-notifiche-lampeggia { animation: none !important; }
+.barra-superiore-fissa .btn-notifiche-lampeggia .icona-campanello,
+.barra-superiore-fissa .btn-notifiche-lampeggia > span:first-child { filter: none; }
+.btn-con-stato { position: relative; }
+.btn-con-stato::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--stato-pallino, transparent);
+  pointer-events: none;
+}
+/* Il contorno di focus da tastiera della barra è neutro, non dorato: il doppio anello dorato
+   sembrava un tasto "acceso" (come ⚔️ col combattimento attivo). Resta visibile per l'accessibilità. */
+.btn-header-azione:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--c-ink) 55%, transparent);
+  outline-offset: 1px;
 }
 
 /* Bersagli touch più grandi sui dispositivi touch (pulsanti piccoli e vicini

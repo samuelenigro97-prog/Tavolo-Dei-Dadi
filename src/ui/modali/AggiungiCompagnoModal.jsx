@@ -41,8 +41,8 @@ export function AggiungiCompagnoModal({ aggiorna, cercaCompagnoText, filtroCompa
       >
         {/* Header Modale */}
         <div style={{ padding: '14px 18px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <strong style={{ fontSize: 15, color: C.goldDark }}>
-            {lingua === 'en' ? 'Summon / Add Companion or Familiar' : 'Evoca / Aggiungi Compagno o Famiglio'}
+          <strong style={{ fontSize: 14, color: C.goldDark }}>
+            {lingua === 'en' ? 'Summon a Companion or Familiar' : 'Evoca un Compagno o un Famiglio'}
           </strong>
           <button
             type="button"
@@ -216,7 +216,7 @@ export function AggiungiCompagnoModal({ aggiorna, cercaCompagnoText, filtroCompa
                         }}
                         style={{ ...styles.buttonMini, fontSize: 11, padding: '3px 8px', background: C.goldDark, color: C.onGold, fontWeight: 700, flex: 1 }}
                       >
-                        {lingua === 'en' ? 'Summon / Add' : 'Evoca / Aggiungi'}
+                        {lingua === 'en' ? 'Summon' : 'Evoca'}
                       </button>
                       <button
                         type="button"

@@ -1490,6 +1490,44 @@ export function limitiFormaSelvatica(livello, sottoclasse = '') {
   return { gsMax, nuoto: L >= 4, volo: L >= 8 };
 }
 
+/**
+ * Forma Selvatica e Metamorfosi trasformano solo in BESTIE: le creature del
+ * catalogo BESTIE non hanno né `tipo` né `categoria`. Evocazioni (Myrdhal,
+ * elementali, spiriti di Tasha anche se "Bestia"), famigli e mostri si possono
+ * solo evocare.
+ */
+export function eBestiaAssumibile(creatura) {
+  return !!creatura && creatura.gsNum != null && !creatura.tipo && !creatura.categoria;
+}
+
+/** GS leggibile ("1/4", "1/2", "1"...). */
+function gsTesto(n) {
+  return n === 0.125 ? '1/8' : n === 0.25 ? '1/4' : n === 0.5 ? '1/2' : String(n);
+}
+
+/**
+ * Si può assumere `creatura` con la Forma Selvatica? { ok, motivo }: `motivo`
+ * spiega perché no (GS troppo alto, volo/nuoto non ancora ammessi). Null se non
+ * è una bestia o il personaggio non ha la Forma Selvatica (livelloDruido < 2).
+ */
+export function esitoFormaSelvatica(creatura, livelloDruido, sottoclasse = '') {
+  if (!eBestiaAssumibile(creatura)) return null;
+  const lim = limitiFormaSelvatica(livelloDruido, sottoclasse);
+  if (!lim) return null;
+  if (creatura.gsNum > lim.gsMax) return { ok: false, motivo: `GS troppo alto: al tuo livello di druido al massimo GS ${gsTesto(lim.gsMax)}` };
+  if (creatura.velocita?.volo && !lim.volo) return { ok: false, motivo: 'Forme con velocità di volo solo dall\'8° livello di druido' };
+  if (creatura.velocita?.nuoto && !lim.nuoto) return { ok: false, motivo: 'Forme con velocità di nuoto solo dal 4° livello di druido' };
+  return { ok: true, motivo: '' };
+}
+
+/** Si può assumere `creatura` con la Metamorfosi? { ok, motivo }, null se non è una bestia. */
+export function esitoMetamorfosi(creatura, livelloTotale) {
+  if (!eBestiaAssumibile(creatura)) return null;
+  const lim = limitiMetamorfosi(livelloTotale);
+  if (creatura.gsNum > lim.gsMax) return { ok: false, motivo: `GS troppo alto: al massimo GS ${lim.gsMax} (il tuo livello)` };
+  return { ok: true, motivo: '' };
+}
+
 /** Bestie che il Druido può assumere al livello indicato, dal GS più basso al più alto. */
 export function bestieDisponibili(livello, sottoclasse = '', bestie = BESTIE) {
   const limiti = limitiFormaSelvatica(livello, sottoclasse);

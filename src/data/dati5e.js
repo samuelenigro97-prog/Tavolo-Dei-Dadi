@@ -155,6 +155,8 @@ export const PESI_OGGETTI = {
   'Armatura di cuoio': 4.5, 'Cuoio borchiato': 6, 'Armatura di pelle': 5.5, 'Corazza di scaglie': 20,
   'Corazza a strisce': 9, 'Corazza di maglia': 8, 'Cotta di maglia': 25, 'Corazza di piastre': 30,
   'Corazza a piastre da torneo': 32.5, 'Scudo': 3,
+  // Legnoferro: legno duro come il metallo, ammesso dai druidi (stessa CA dello scudo normale).
+  'Scudo in Legnoferro': 3,
   // Armi
   'Pugnale': 0.5, 'Spada corta': 1, 'Spada lunga': 1.5, 'Spadone': 3, 'Ascia': 1, 'Ascia bipenne': 3.5,
   'Mazza': 2, 'Mazzafrusto': 1, 'Martello da guerra': 1, 'Bastone ferrato': 2, 'Lancia': 1.5,
@@ -2386,6 +2388,21 @@ export const DEFAULT_MANUALI = {
   // Manuale della campagna del tavolo: spento di base, si attiva solo a mano.
   araldi: false,
 };
+
+/**
+ * Il manuale della campagna si accende solo con una password (la dà il Master). Qui c'è solo
+ * l'impronta SHA-256 della password in minuscolo, non la password: è una barriera leggera,
+ * non una sicurezza vera (l'app gira nel browser).
+ */
+export const IMPRONTA_PASSWORD_ARALDI = '694c33e7da3f2d9be0e34087ee4b55943dfb7d9dea86b457b0ae3f83c5a1acc6';
+
+/** La password è giusta? (senza distinguere maiuscole e spazi ai bordi) */
+export async function passwordAraldiGiusta(testo) {
+  const dati = new TextEncoder().encode(String(testo || '').trim().toLowerCase());
+  const hash = await crypto.subtle.digest('SHA-256', dati);
+  const hex = Array.from(new Uint8Array(hash)).map((b) => b.toString(16).padStart(2, '0')).join('');
+  return hex === IMPRONTA_PASSWORD_ARALDI;
+}
 
 /** Un manuale è attivo se acceso; quelli spenti di base (es. Araldi del Segreto) lo sono solo se esplicitamente true. */
 export function manualeAttivo(manuali, chiave) {

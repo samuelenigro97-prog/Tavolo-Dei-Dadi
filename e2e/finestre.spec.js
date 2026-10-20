@@ -39,7 +39,8 @@ test.describe('Finestre estratte', () => {
   });
 
   test('Movimento (MovimentoModal)', async ({ page }) => {
-    await page.getByText('Movimenti').first().click();
+    // Dalla 4.102.2 si apre cliccando il valore della velocità (niente più etichetta "Movimenti").
+    await page.getByTestId('velocita-valore').click();
     await expect(page.getByText(/salto|Salto|carico|Carico/i).first()).toBeVisible();
     await page.keyboard.press('Escape');
   });
@@ -58,9 +59,9 @@ test.describe('Finestre estratte', () => {
     await page.keyboard.press('Escape');
   });
 
-  test('Evoca / aggiungi compagno (AggiungiCompagnoModal)', async ({ page }) => {
-    await page.getByRole('button', { name: /Evoca \/ Aggiungi Compagno/ }).first().click();
-    await expect(page.getByText('Evoca / Aggiungi Compagno o Famiglio')).toBeVisible();
+  test('Evoca compagno (AggiungiCompagnoModal)', async ({ page }) => {
+    await page.getByTestId('apri-evoca-compagno').first().click();
+    await expect(page.getByText('Evoca un Compagno o un Famiglio')).toBeVisible();
     await page.keyboard.press('Escape');
   });
 
@@ -125,4 +126,23 @@ test.describe('Finestre estratte', () => {
       await expect(page.getByText(titolo, { exact: true })).toBeVisible();
     });
   }
+});
+
+test('creazione personaggio: "Artefice" compare una volta sola, e solo col manuale Tasha attivo (v4.105.7)', async ({ page }) => {
+  await apriScheda(page);
+  const classi = async (tasha) => {
+    await page.evaluate((v) => {
+      const m = JSON.parse(localStorage.getItem('scheda-interattiva:manuali') || '{}');
+      localStorage.setItem('scheda-interattiva:manuali', JSON.stringify({ ...m, tasha: v }));
+    }, tasha);
+    await apriScheda(page);
+    await page.getByRole('button', { name: 'Nuovo personaggio', exact: true }).first().click();
+    const sel = page.locator('select').filter({ has: page.locator('option', { hasText: 'Barbaro' }) }).first();
+    return sel.locator('option').allTextContents();
+  };
+  const con = await classi(true);
+  expect(con.filter((t) => /Artefice/.test(t))).toHaveLength(1);
+  const senza = await classi(false);
+  expect(senza.filter((t) => /Artefice/.test(t))).toHaveLength(0);
+  expect(senza.filter((t) => /Barbaro/.test(t))).toHaveLength(1);
 });

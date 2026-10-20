@@ -234,11 +234,9 @@ test('combat tracker ridotto: l\'iniziativa di chi è di turno è in bella vista
     }));
   });
   await apriScheda(page);
-  const pill = page.locator('[data-combat-toggle="true"]').filter({ hasText: 'Round' });
-  await expect(pill).toContainText('Round 2');
-  await expect(pill).toContainText('Turno di Vaelion');
-  await expect(pill).not.toContainText('Di turno');
-  await expect(pill.getByTestId('ct-mini-iniziativa')).toContainText('17');
+  // Quando ridotto, la mini-barra fluttuante in basso non compare: si apre solo dalla barra in alto (v4.108.4)
+  await expect(page.locator('[data-combat-toggle="true"]').filter({ hasText: 'Round' })).toHaveCount(0);
+  await expect(page.getByTestId('combat-pillola')).toHaveCount(0);
 });
 
 test('danno ad area: più bersagli, vulnerabilità e immunità lette dai tratti (v4.102.0)', async ({ page }) => {
@@ -255,9 +253,9 @@ test('danno ad area: più bersagli, vulnerabilità e immunità lette dai tratti 
     }));
   });
   await apriScheda(page);
-  await page.locator('[data-combat-toggle="true"]').filter({ hasText: 'Round' }).click();
-  // Il tasto per ridurre il tracker è un "−", non più un quadrato.
-  await expect(page.getByRole('button', { name: 'Riduci a icona' })).toHaveText('−');
+  await page.locator('button[data-combat-toggle="true"]').first().click();
+  // Il tasto per ridurre il tracker è un ▲ (aperto), come nel resto dell'app.
+  await expect(page.getByRole('button', { name: 'Riduci a icona' })).toHaveText('▲');
 
   await page.getByTestId('ct-area').click();
   const finestra = page.getByTestId('area-modal');
@@ -284,4 +282,50 @@ test('danno ad area: più bersagli, vulnerabilità e immunità lette dai tratti 
   await expect(finestra.getByTestId('area-anteprima-n1')).toHaveText('−0');
   await finestra.getByTestId('area-applica').click();
   await expect.poll(pf).toEqual({ n1: 3, n2: 0 });
+});
+
+test('combat tracker ridotto: la ✕ chiude il fight solo dopo la conferma (v4.105.5)', async ({ page }) => {
+  await apriScheda(page);
+  await page.evaluate(() => {
+    localStorage.setItem('scheda-interattiva:combat', JSON.stringify({
+      attivo: true, aperto: false, round: 1, turno: 0,
+      combattenti: [
+        { id: 'n1', nome: 'Goblin', tipo: 'nemico', iniziativa: 21, pfMax: 7, pfAttuali: 7, ca: 15, condizioni: [] },
+        { id: 'p1', nome: 'Vaelion', tipo: 'pg', iniziativa: 17, pfMax: 64, pfAttuali: 61, ca: 19, condizioni: [], tsMorte: { successi: 0, fallimenti: 0 } },
+      ],
+    }));
+  });
+  await apriScheda(page);
+  const stato = () => page.evaluate(() => JSON.parse(localStorage.getItem('scheda-interattiva:combat')));
+  // Aprendo il tracker dal menu in alto, chiudendo dal tracker chiede conferma e chiude tutto
+  await page.locator('button[data-combat-toggle="true"]').first().click();
+  page.once('dialog', (d) => d.dismiss());
+  await page.getByTestId('ct-chiudi').click();
+  await expect.poll(async () => { const s = await stato(); return `${s.attivo}/${s.combattenti.length}`; }).toBe('true/2');
+  page.once('dialog', (d) => d.accept());
+  await page.getByTestId('ct-chiudi').click();
+  await expect.poll(async () => { const s = await stato(); return `${s.attivo}/${s.combattenti.length}`; }).toBe('false/0');
+  await expect(page.getByTestId('combat-pillola')).toHaveCount(0);
+});
+
+test('gli attacchi non hanno la ✕: un incantesimo non più preparato sparisce da solo e torna con lui (v4.105.5)', async ({ page }) => {
+  await apriScheda(page);
+  const modifica = (js) => page.evaluate((src) => {
+    const r = JSON.parse(localStorage.getItem('scheda-interattiva:v1'));
+    // eslint-disable-next-line no-new-func
+    new Function('pg', src)(r.personaggi[r.attivo]);
+    localStorage.setItem('scheda-interattiva:v1', JSON.stringify(r));
+  }, js);
+  await expect(page.locator('tr.attacchi-riga').filter({ hasText: 'Frusta di Spine' })).toHaveCount(1);
+  // Nessun tasto per eliminare gli attacchi di armi e incantesimi.
+  await expect(page.getByRole('button', { name: /^(Elimina|Nascondi) .* (dagli attacchi)?/ }).filter({ hasText: '×' })).toHaveCount(0);
+  await expect(page.locator('tr.attacchi-riga button[aria-label^="Nascondi"], tr.attacchi-riga button[aria-label^="Elimina"]')).toHaveCount(0);
+  // Un incantesimo toglie dalla lista: l'attacco sparisce.
+  await modifica(`pg.incantesimiLista = pg.incantesimiLista.filter((x) => x.nome !== 'Frusta di Spine');`);
+  await apriScheda(page);
+  await expect(page.locator('tr.attacchi-riga').filter({ hasText: 'Frusta di Spine' })).toHaveCount(0);
+  // Se l'incantesimo torna, torna anche l'attacco.
+  await modifica(`pg.incantesimiLista.push({ id: 'ts-frusta', nome: 'Frusta di Spine', livello: 0 });`);
+  await apriScheda(page);
+  await expect(page.locator('tr.attacchi-riga').filter({ hasText: 'Frusta di Spine' })).toHaveCount(1);
 });

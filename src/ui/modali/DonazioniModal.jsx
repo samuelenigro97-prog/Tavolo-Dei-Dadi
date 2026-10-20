@@ -11,7 +11,7 @@ export function DonazioniModal({ setMostraDonazioni }) {
     >
       <div style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 460, width: '100%', maxHeight: '86vh', overflowY: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.45)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <h2 style={{ ...styles.title, fontSize: 20, margin: 0 }}>{t('donazioni.titolo')}</h2>
+          <h2 style={{ ...styles.title, fontSize: 18, margin: 0 }}>{t('donazioni.titolo')}</h2>
           <button style={styles.buttonMini} onClick={() => setMostraDonazioni(false)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
         </div>
         <p style={{ ...styles.detail, margin: '0 0 12px' }}>{t('donazioni.sottotitolo')}</p>

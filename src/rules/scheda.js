@@ -737,3 +737,19 @@ export function dannoConDifesa(danno, difesa, tsSuperato = false) {
   if (difesa === 'vulnerabile') return d * 2;
   return d;
 }
+
+/**
+ * Un attacco salvato di un INCANTESIMO è ancora valido? Segue la lista incantesimi:
+ * compare solo se l'incantesimo c'è ed è preparato (trucchetti, sempre preparati, bonus,
+ * o classi che non preparano). Se cambi gli incantesimi, l'attacco sparisce da solo e
+ * torna se l'incantesimo torna. Con la lista vuota (scheda importata senza lista) non si
+ * nasconde nulla. Le armi non passano di qui: spariscono già al disequipaggiamento.
+ */
+export function attaccoIncantesimoAttivo(att, incantesimiLista, preparaIncantesimi) {
+  const lista = Array.isArray(incantesimiLista) ? incantesimiLista : [];
+  if (!lista.length) return true;
+  const pulito = String(att?.nome || '').replace(/^✨\s*/, '').replace(/\s*\((shillelagh|bastone incantato)\)/gi, '').trim().toLowerCase();
+  const voce = lista.find((x) => String(x?.nome || '').trim().toLowerCase() === pulito);
+  if (!voce) return false;
+  return voce.livello === 0 || Boolean(voce.preparato || voce.semprePreparato || voce.bonus) || !preparaIncantesimi;
+}

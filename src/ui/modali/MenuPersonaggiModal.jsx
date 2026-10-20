@@ -6,12 +6,20 @@ import { t } from '../../i18n';
 import { URL_ARCHIVIO_PG } from '../../utils/ambiente.js';
 
 /** Titoletti delle sezioni del menu: stesso stile delle etichette della barra (SISTEMA, SCHEDA, SESSIONE). */
+// Tasti del menu in griglia: tutti alti uguali, testo su due righe se serve (mai tagliato),
+// bordo del tema generico (lo stesso del pannello, della barra in alto e del combat tracker).
+const bordoTema = '1.5px solid var(--c-tema-bordo)';
+const tastoGriglia = {
+  border: bordoTema, width: '100%', minHeight: 34, padding: '4px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+  gap: 6, textAlign: 'center', lineHeight: 1.2, boxSizing: 'border-box',
+};
+const griglia2 = { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 6 };
 const etichettaSezione = {
-  fontSize: 11, fontWeight: 800, letterSpacing: 0.6, textTransform: 'uppercase', color: C.goldDark,
-  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', opacity: 0.9, userSelect: 'none', marginBottom: 8,
+  fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase',
+  color: 'color-mix(in srgb, var(--c-gold-dark) 60%, var(--c-ink))', fontFamily: 'var(--font-title)', userSelect: 'none', marginBottom: 6,
 };
 
-export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, esportaBackupCompleto, generaPgCasuale, idDispositivo, isCloudAttivo, jsonRef, leggiSnapshots, lingua, manualiAttivi, mostraListaCarica, novitaNonLette, roster, scheda, setBozzaCrea, setCloudStatus, setConferma, setLingua, setMostraArchivioDm, setMostraCloud, setMostraCrea, setMostraDonazioni, setMostraListaCarica, setMostraMenu, setMostraMenuEsporta, setMostraModalManuali, setMostraNoteLegali, setMostraRipristino, setPosEsporta, setRoster, setSchedaSolaLettura, setTemaCornici, statoBgCloud, statoColoreCloud, statoGlowCloud, temaCornici }) {
+export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg, apriNotifiche, erroreImport, esportaBackupCompleto, generaPgCasuale, idDispositivo, isCloudAttivo, jsonRef, leggiSnapshots, lingua, manualiAttivi, mostraListaCarica, roster, scheda, setBozzaCrea, setCloudStatus, setConferma, setLingua, setMostraArchivioDm, setMostraCloud, setMostraCrea, setMostraDonazioni, setMostraListaCarica, setMostraMenu, setMostraMenuEsporta, setMostraModalManuali, setMostraNoteLegali, setMostraRipristino, setPosEsporta, setRoster, setSchedaSolaLettura, setTemaCornici, statoColoreCloud, statoGlowCloud, temaCornici }) {
   // `attivo` viene salvato nel roster: è quindi anche l'ultimo personaggio effettivamente usato.
   const ultimoPersonaggio = roster?.personaggi?.[roster?.attivo] || scheda;
   const apriUltimoPersonaggio = () => {
@@ -23,8 +31,12 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
   };
   return (
     <div
+      className="menu-iniziale-sfondo"
       style={{
-        position: 'fixed', inset: 0, zIndex: 1000, padding: 16,
+        // Tema base del progetto, non quello del personaggio corrente.
+        // Spazio in alto (in stili.js) per non finire sotto la barra fissa.
+        ...stileTemaBase,
+        position: 'fixed', inset: 0, zIndex: 1000,
         background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)', display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}
       onClick={(e) => { if (e.target === e.currentTarget) setMostraMenu(false); }}
@@ -32,14 +44,18 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
       {/* Il menu si stacca dalla scheda dietro: sfondo scurito e sfocato, pannello più chiaro (scuro) o più caldo (chiaro), bordo ben visibile. */}
       <div
         data-testid="menu-iniziale"
+        className="menu-iniziale"
         style={{
-          ...styles.panel, maxWidth: 460, width: '100%', maxHeight: '85vh', overflowY: 'auto',
-          background: 'color-mix(in srgb, var(--c-panel-light) 85%, var(--c-ink) 15%)',
-          border: '1.5px solid color-mix(in srgb, var(--c-ink) 38%, var(--c-border))',
+          // Pensato per stare tutto nello schermo: niente barra di scorrimento (resta lo
+          // scorrimento col dito solo se si apre una lista lunga di personaggi).
+          ...styles.panel, maxWidth: 460, width: '100%', maxHeight: '100%', overflowY: 'auto', scrollbarWidth: 'none', marginBottom: 0,
+          // Grigio e bordo del tema generico (gli stessi della barra in alto e del combat tracker).
+          background: 'var(--c-tema-sfondo)',
+          border: '1.5px solid var(--c-tema-bordo)',
           boxShadow: '0 14px 44px rgba(0,0,0,0.75), 0 0 0 1px rgba(0,0,0,0.45)',
         }}
       >
-        <h1 style={{ ...styles.title, textAlign: 'center', marginBottom: 12, fontSize: 24, fontWeight: 800, color: 'var(--c-title)' }}>
+        <h1 style={{ ...styles.title, textAlign: 'center', marginBottom: 8, fontSize: 24, fontWeight: 800, color: 'var(--c-title)' }}>
           Tavolo dei Dadi<span className="app-version">v{APP_VERSION}</span>
         </h1>
 
@@ -50,50 +66,64 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
             aria-label={t('menu.continua_ultimo', { nome: ultimoPersonaggio.nome || t('menu.senza_nome') })}
             onClick={apriUltimoPersonaggio}
             style={{
-              width: '100%', marginBottom: 10, padding: 10, borderRadius: 10, cursor: 'pointer',
+              width: '100%', marginBottom: 8, padding: 8, borderRadius: 10, cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left', fontFamily: 'inherit',
-              color: C.ink, background: 'color-mix(in srgb, var(--c-gold) 13%, var(--c-panel-light))',
-              border: '1.5px solid var(--c-gold)', boxShadow: '0 5px 16px color-mix(in srgb, var(--c-gold) 19%, transparent)',
+              // Colori della classe del personaggio (--c-pg-*), non quelli base del menu.
+              color: C.ink, background: 'color-mix(in srgb, var(--c-pg-gold, var(--c-gold)) 16%, var(--c-panel-light))',
+              border: '1.5px solid var(--c-pg-gold, var(--c-gold))', boxShadow: '0 5px 16px color-mix(in srgb, var(--c-pg-gold, var(--c-gold)) 24%, transparent)',
             }}
           >
-            <span style={{ width: 44, height: 44, flexShrink: 0, overflow: 'hidden', display: 'grid', placeItems: 'center', borderRadius: 8, border: '1px solid var(--c-gold)', background: 'var(--c-panel)', color: 'var(--c-title)', fontSize: 21, fontWeight: 800 }}>
+            <span style={{ width: 40, height: 40, flexShrink: 0, overflow: 'hidden', display: 'grid', placeItems: 'center', borderRadius: 8, border: '1px solid var(--c-pg-gold, var(--c-gold))', background: 'var(--c-panel)', color: 'var(--c-pg-title, var(--c-title))', fontSize: 22, fontWeight: 800 }}>
               {typeof ultimoPersonaggio.ritratto === 'string' && ultimoPersonaggio.ritratto ? (
                 <img src={ultimoPersonaggio.ritratto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (ultimoPersonaggio.nome || '?').trim().slice(0, 1).toUpperCase()}
             </span>
             <span style={{ minWidth: 0, display: 'flex', flex: 1, flexDirection: 'column', gap: 2 }}>
-              <span style={{ fontSize: 11, lineHeight: 1.1, color: C.inkDim, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{t('menu.ultimo_usato')}</span>
+              <span style={{ ...etichettaSezione, color: 'var(--c-pg-gold-dark, var(--c-gold-dark))', marginBottom: 0, lineHeight: 1.1 }}>{t('menu.ultimo_usato')}</span>
               <strong style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 16 }}>{ultimoPersonaggio.nome || t('menu.senza_nome')}</strong>
               <span style={{ color: C.inkDim, fontSize: 13 }}>{ultimoPersonaggio.classe || '—'} · {t('profilo.livello')} {ultimoPersonaggio.livello || 1}</span>
             </span>
-            <span style={{ color: 'var(--c-gold-dark)', fontSize: 13, fontWeight: 800, whiteSpace: 'nowrap' }}>{t('menu.riprendi')}</span>
+            <span style={{ color: 'var(--c-pg-gold-dark, var(--c-gold-dark))', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}>{t('menu.riprendi')}</span>
           </button>
         )}
 
         <button
-          style={{ ...styles.buttonPrimary, width: '100%', marginBottom: 10 }}
+          style={{ ...styles.buttonPrimary, width: '100%', marginBottom: 8 }}
           onClick={() => { setBozzaCrea({ nome: '', sesso: '', classe: '', sottoclasse: '', specie: '', background: '', livello: 1, metodo: 'auto', pool: null, assegna: {}, competenzeClasse: [], competenzeSpecie: [], maestria: [], talentoOrigine: '', asiTalenti: {}, multiclasseClasse2: '', multiclasseLivello2: 1, sottoclasseMc2: '', multiclasseClasse3: '', multiclasseLivello3: 1, sottoclasseMc3: '', dotazione: 'pacchetto' }); setMostraMenu(false); setMostraCrea(true); }}
         >
           {t('menu.nuovo_personaggio')}
         </button>
         <button
-          style={{ ...styles.button, width: '100%', marginBottom: 8 }}
+          style={{ ...styles.button, border: bordoTema, width: '100%', marginBottom: 8 }}
           onClick={() => setMostraListaCarica((v) => !v)}
         >
           {t('menu.carica_personaggio')} {mostraListaCarica ? '▴' : '▾'} ({Object.keys(roster.personaggi).length})
         </button>
         {mostraListaCarica && (
           <>
-            <div id="lista-carica-pg" style={{ ...styles.detail, marginBottom: 6, fontWeight: 'bold' }}>{t('menu.carica_personaggio')}</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
-              {Object.entries(roster.personaggi).map(([id, p]) => (
+            <div id="lista-carica-pg" style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+              {Object.entries(roster.personaggi).map(([id, p]) => {
+                // Ogni personaggio nel colore della sua classe: barra a sinistra, fondo appena tinto,
+                // nome della classe leggibile (il colore si avvicina all'inchiostro del tema).
+                const col = coloreClassePg?.(p.classe) || '';
+                return (
                 <div key={id} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                   <button
-                    style={{ ...styles.button, flex: 1, display: 'flex', justifyContent: 'space-between', gap: 10, textAlign: 'left' }}
+                    data-testid="menu-pg-riga"
+                    data-colore-classe={col || undefined}
+                    style={{
+                      ...styles.button, flex: 1, display: 'flex', justifyContent: 'space-between', gap: 10, textAlign: 'left',
+                      ...(col ? {
+                        borderLeft: `5px solid ${col}`,
+                        borderColor: `color-mix(in srgb, ${col} 55%, var(--c-border))`,
+                        borderLeftColor: col,
+                        background: `color-mix(in srgb, ${col} 12%, var(--c-panel-light))`,
+                      } : {}),
+                    }}
                     onClick={() => { setSchedaSolaLettura(null); setRoster((r) => ({ ...r, attivo: id })); setMostraMenu(false); }}
                   >
                     <span>{p.nome || t('menu.senza_nome')}</span>
-                    <span style={styles.detail}>{p.classe ? `${p.classe}` : '—'}</span>
+                    <span style={{ ...styles.detail, ...(col ? { color: `color-mix(in srgb, ${col} 65%, var(--c-ink))`, fontWeight: 700 } : {}) }}>{p.classe ? `${p.classe}` : '—'}</span>
                   </button>
                   <button
                     style={{ ...styles.buttonDanger, padding: '4px 10px', fontSize: 13, flexShrink: 0 }}
@@ -124,42 +154,44 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
                     🗑️
                   </button>
                 </div>
-              ))}
+                );
+              })}
               {Object.keys(roster.personaggi).length === 0 && (
                 <span style={styles.detail}>{t('menu.nessun_personaggio')}</span>
               )}
             </div>
           </>
         )}
-        <button style={{ ...styles.button, width: '100%', marginBottom: 8 }} onClick={() => generaPgCasuale()} title={t('menu.pg_casuale_tooltip')}>{t('menu.pg_casuale')}</button>
-        <button
-          style={{ ...styles.button, width: '100%', marginBottom: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontWeight: 700, color: C.goldDark, borderColor: C.goldDark }}
-          onClick={() => { setMostraModalManuali(true); }}
-        >
-          
-          <span>{lingua === 'it' ? `Manuali e fonti (${Object.values(manualiAttivi).filter(Boolean).length} attivi)` : `Sourcebooks (${Object.values(manualiAttivi).filter(Boolean).length} active)`}</span>
-        </button>
+        <div style={griglia2}>
+          <button style={{ ...styles.button, ...tastoGriglia }} onClick={() => generaPgCasuale()} title={t('menu.pg_casuale_tooltip')}>{t('menu.pg_casuale')}</button>
+          <button
+            style={{ ...styles.button, ...tastoGriglia }}
+            onClick={() => { setMostraModalManuali(true); }}
+          >
+            <span>{lingua === 'it' ? `Manuali e fonti (${Object.values(manualiAttivi).filter(Boolean).length})` : `Sourcebooks (${Object.values(manualiAttivi).filter(Boolean).length})`}</span>
+          </button>
+        </div>
     
         {/* Specchio tasti header globali nello stesso identico ordine, con le stesse etichette e icone */}
-        <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px solid ${C.border}` }}>
+        <div style={{ marginTop: 10, paddingTop: 8, borderTop: `1px solid ${C.border}` }}>
           <div style={etichettaSezione}>{lingua === 'en' ? 'Quick actions' : 'Azioni rapide'}</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
+          <div style={griglia2}>
             <button
-              style={{ ...styles.button, width: '100%', minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              style={{ ...styles.button, ...tastoGriglia }}
               onClick={() => { setMostraMenu(false); setTimeout(() => apriNotifiche(), 50); }}
               title={t('notifiche.titolo')}
             >
-              <span>{t('notifiche.titolo_breve')}{novitaNonLette ? ' (!)' : ''}</span>
+              <span>{t('notifiche.titolo_breve')}</span>
             </button>
             <button
-              style={{ ...styles.button, width: '100%', minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              style={{ ...styles.button, ...tastoGriglia }}
               onClick={() => setLingua((l) => (l === 'it' ? 'en' : 'it'))}
               title={t('tooltip.lingua')}
             >
               <span>{t('common.lingua')}</span>
             </button>
             <button
-              style={{ ...styles.button, width: '100%', minHeight: 38, gridColumn: 'span 2', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              style={{ ...styles.button, ...tastoGriglia }}
               onClick={() => {
                 setMostraMenu(false);
                 setTimeout(() => {
@@ -174,46 +206,35 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
             <button
               style={{
                 ...styles.button,
-                width: '100%',
-                minHeight: 38,
-                gridColumn: 'span 2',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                border: `1.5px solid ${statoColoreCloud}`,
-                background: statoBgCloud,
-                color: statoColoreCloud,
-                fontWeight: 700,
-                boxShadow: statoGlowCloud,
-                transition: 'all 0.25s ease',
+                ...tastoGriglia,
               }}
               onClick={() => { setMostraMenu(false); setTimeout(() => { setCloudStatus({ text: '', type: '' }); setMostraCloud(true); }, 50); }}
               title={isCloudAttivo ? (lingua === 'en' ? 'Sync is on' : 'Sincronizzazione attiva') : (lingua === 'en' ? 'Sync is off' : 'Sincronizzazione non attiva')}
             >
-              
-              <span>{lingua === 'en' ? 'Backup & sync' : 'Backup e sincronizzazione'}</span>
+              {/* Bordo uguale agli altri tasti: lo stato della sincronizzazione è il pallino. */}
+              <span aria-hidden="true" data-testid="menu-backup-stato" style={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, background: statoColoreCloud, boxShadow: statoGlowCloud }} />
+              <span>Backup</span>
             </button>
           </div>
         </div>
     
-        <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${C.border}` }}>
+        <div style={{ marginTop: 10, paddingTop: 8, borderTop: `1px solid ${C.border}` }}>
           <div style={etichettaSezione}>{t('menu.sezione_backup')}</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 8 }}>
-            <button style={{ ...styles.button, width: '100%', minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }} onClick={() => jsonRef.current?.click()} title={t('menu.ripristina_tip')}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(118px, 1fr))', gap: 6 }}>
+            <button style={{ ...styles.button, ...tastoGriglia }} onClick={() => jsonRef.current?.click()} title={t('menu.ripristina_tip')}>
               <span>{t('menu.ripristina')}</span>
             </button>
-            <button style={{ ...styles.button, width: '100%', minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }} onClick={esportaBackupCompleto} title={t('menu.esporta_tutto_tip')}>
+            <button style={{ ...styles.button, ...tastoGriglia }} onClick={esportaBackupCompleto} title={t('menu.esporta_tutto_tip')}>
               <span>{t('menu.esporta_tutto')}</span>
             </button>
             {leggiSnapshots().length > 0 && (
-              <button style={{ ...styles.button, width: '100%', minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }} onClick={() => setMostraRipristino(true)}>
+              <button style={{ ...styles.button, ...tastoGriglia }} onClick={() => setMostraRipristino(true)}>
                 <span>{t('menu.versioni')}</span>
               </button>
             )}
             {URL_ARCHIVIO_PG && (
               <button
-                style={{ ...styles.button, width: '100%', minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+                style={{ ...styles.button, ...tastoGriglia }}
                 onClick={() => { setMostraArchivioDm(true); }}
                 title={t('menu.archivio_dm_tip')}
               >
@@ -223,18 +244,18 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
           </div>
         </div>
 
-        <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${C.border}` }}>
+        <div style={{ marginTop: 10, paddingTop: 8, borderTop: `1px solid ${C.border}` }}>
           <div style={etichettaSezione}>{lingua === 'en' ? 'About' : 'Informazioni'}</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 6 }}>
             <button
-              style={{ ...styles.button, width: '100%', height: 38, minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0 6px', fontSize: 13, boxSizing: 'border-box' }}
+              style={{ ...styles.button, ...tastoGriglia, padding: '0 6px' }}
               onClick={() => { setMostraMenu(false); setMostraNoteLegali(true); }}
               title={t('legali.titolo')}
             >
               <span>{t('menu.note_legali')}</span>
             </button>
             <button
-              style={{ ...styles.button, width: '100%', height: 38, minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0 6px', fontSize: 13, boxSizing: 'border-box' }}
+              style={{ ...styles.button, ...tastoGriglia, padding: '0 6px' }}
               onClick={() => { setMostraMenu(false); setMostraDonazioni(true); }}
               title={t('donazioni.titolo')}
             >
@@ -244,7 +265,7 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
               href="https://github.com/samuelenigro97-prog/Tavolo-Dei-Dadi"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ ...styles.button, textDecoration: 'none', width: '100%', height: 38, minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0 6px', fontSize: 13, boxSizing: 'border-box' }}
+              style={{ ...styles.button, textDecoration: 'none', ...tastoGriglia, padding: '0 6px' }}
               title={t('menu.github_tip')}
             >
               <span>{t('menu.github')}</span>
@@ -252,7 +273,7 @@ export function MenuPersonaggiModal({ APP_VERSION, apriNotifiche, erroreImport, 
           </div>
         </div>
     
-        <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${C.border}`, display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: 11, color: C.muted }}>
+        <div style={{ marginTop: 10, paddingTop: 8, borderTop: `1px solid ${C.border}`, display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: 11, color: C.muted }}>
           <a
             href="https://dnd.wizards.com/resources/systems-reference-document"
             target="_blank"

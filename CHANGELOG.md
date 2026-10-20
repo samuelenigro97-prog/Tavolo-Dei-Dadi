@@ -2,11 +2,324 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
-## [4.102.2] – 2026-10-20
+## [4.108.4] – 2026-10-20
 
 ### Modificato
-- **Nome file backup roster**: il download del backup completo dei personaggi ora usa il formato ultra-compatto con data e versione `AAAAMMGG_TDD_ALL_vX.X.json` (es. `20261020_TDD_ALL_v4.102.2.json`), ideale per l'ordinamento cronologico automatico nel file manager.
-- **Velocità e movimento**: il valore della velocità è direttamente cliccabile per aprire il calcolatore di movimento e salti, con interfaccia più pulita. Semplificata la dicitura dell'Archivio delle schede.
+- **Combat tracker a larghezza scheda**: il combat tracker aperto si allinea alla larghezza massima della scheda (1080 px), centrato a schermo con angoli superiori arrotondati.
+- **Controlli combat tracker**: ordinati con chiarezza sulla destra con cluster strumenti tattici (Iniziative, Ordina, Area) e comandi di gestione finestra.
+- **Rimozione barra/pillola ridotta in basso**: rimosso l'indicatore d'iniziativa fluttuante in basso a destra; il combat tracker si apre e si gestisce unicamente dalla sezione dedicata nella barra dei menu in alto (tasto ⚔️).
+- **Nome file backup roster**: il download del backup completo dei personaggi ora usa il formato compatto con data e versione `AAAAMMGG_TDD_ALL_vX.X.json` (es. `20261020_TDD_ALL_v4.108.4.json`).
+
+## [4.108.3] – 2026-10-16
+
+### Modificato
+- **Combat tracker, frecce**: aperto, il tasto per ridurlo è un ▲ al posto del "−"; ridotto, la pillola mostra
+  ▼. Come nel resto dell'app: ▲ = aperto (si chiude), ▼ = chiuso (si apre).
+
+## [4.108.2] – 2026-10-15
+
+### Corretto
+- **Barra a scomparsa, animazione vera**: lo stile in linea della sezione (`styles.panel`) aveva una sua
+  `transition` che vinceva su quella del CSS, così la barra scattava di colpo invece di scorrere e le icone
+  restavano visibili nella striscia mentre sfumavano. Ora le transizioni della barra sono `!important`:
+  chiudendo, prima spariscono le icone e poi la barra sale; aprendo, la barra scende vuota e le icone
+  compaiono alla fine. Nuovo test che campiona l'animazione fotogramma per fotogramma.
+
+## [4.108.1] – 2026-10-15
+
+### Modificato
+- **Barra a scomparsa più pulita**: chiudendosi, le icone spariscono prima che la barra salga (prima
+  per un attimo se ne vedevano i pezzi nella striscia). Angoli tutti arrotondati.
+- **Barra in alto e combat tracker sul fondo della scheda del PG corrente** (`--c-pg-panel`), tasti
+  della barra compresi; il bordo resta quello del tema generico. Il menu iniziale resta sul tema base.
+- **Combat tracker ridotto più corto**: "Round 1 · Vaelion" senza "Turno di"; largo al massimo quanto il
+  margine accanto alla scheda, così non le finisce sopra (il nome lungo va in ellissi).
+
+## [4.108.0] – 2026-10-15
+
+### Aggiunto
+- **Barra in alto a scomparsa** (computer col mouse): resta una striscia sottile con una maniglia;
+  avvicinando il cursore alla cima dello schermo la barra scende con un'animazione e risale poco dopo
+  che il cursore se ne va (anche col Tab da tastiera si apre). La scheda sale nello spazio liberato.
+  Su telefono e tablet la barra resta sempre visibile. Test in `e2e/barra-scomparsa.spec.js`.
+
+### Modificato
+- **Sfondi più vivi**: lo sfondo vaga su un percorso a più tappe (50 s invece di 70 s, spostamenti e
+  zoom più ampi, con margine sempre sufficiente ai bordi) e sopra scorre una luce morbida. Solo
+  trasformazioni e opacità; fermo con "riduci movimento".
+- **Tasti della barra in alto**: tutti con il fondo della barra e un sottile bordo del colore del bordo
+  della barra, in ogni stato. Sincronizzazione e combattimento in corso sono un pallino colorato
+  nell'angolo del tasto; il campanello degli avvisi suona ma non lampeggia più d'oro. Su telefono anche
+  ☁️, 🎲, ⚔️ e Menu seguono lo stesso stile.
+
+## [4.107.4] – 2026-10-15
+
+### Corretto
+- **Worker, modelli Gemini**: provato con una chiave vera, `gemini-2.5-flash` è ritirato (404) e
+  `gemini-flash-latest` a volte risponde 503; ora si parte da `gemini-3.8-flash` (una scheda letta in
+  circa 20 secondi). Se i nomi noti non rispondono, la ricerca automatica prova prima i
+  `gemini-<versione>-flash` stabili dal più nuovo e solo dopo omni/preview, che sul piano gratuito danno 429.
+
+## [4.107.3] – 2026-10-15
+
+### Modificato
+- **Menu iniziale, bordi unificati**: tutti i tasti del menu hanno il bordo del tema generico (lo stesso
+  del pannello, della barra in alto e del combat tracker). Il tasto della sincronizzazione non cambia più
+  bordo e colore del testo: lo stato (attiva, da inviare, spenta) è un pallino colorato accanto alla scritta.
+- **Etichette più corte**: "Backup e sincronizzazione" → "Backup", "Avvisi (!)" → "Avvisi",
+  "Manuali e fonti (N attivi)" → "Manuali e fonti (N)".
+
+## [4.107.2] – 2026-10-15
+
+### Modificato
+- **Tema generico unico**: menu iniziale, barra in alto e combat tracker (aperto e ridotto) usano lo
+  stesso grigio e lo stesso bordo, quelli del menu iniziale (`--c-tema-sfondo`, `--c-tema-bordo` in
+  `stileTemaBase`). Tolto il grigio a parte della barra in tema scuro e il bordo oro del tracker.
+- **Menu iniziale tutto nello schermo**: niente barra di scorrimento; tasti affiancati (Personaggio
+  casuale e Manuali, Importa ed esporta e Backup, Dati e backup su una riga), spaziature più strette,
+  il pannello parte sotto la barra fissa (prima su telefono la barra copriva il titolo). Sugli schermi
+  bassi i tasti si stringono ancora un po'.
+
+## [4.107.1] – 2026-10-15
+
+### Aggiunto
+- **Import con Google Gemini, gratis**: il Worker ora usa come primo fornitore Gemini (piano gratuito di
+  AI Studio, solo una chiave `GEMINI_API_KEY`, nessuna carta), che legge immagini e PDF a più pagine in una
+  richiesta sola ed è molto più preciso dei modelli gratuiti di Workers AI sulle icone e sulle tabelle.
+  Cascata di modelli (`GEMINI_MODEL` o predefiniti), passaggio al successivo su 404/429, e se nessun nome
+  noto risponde il Worker elenca i modelli e prova i "flash" più recenti da solo (`trascriviGemini`,
+  `estraiJsonScheda`, test con `fetch` finto). Ordine: Gemini → Workers AI → Ollama → Anthropic.
+  Va ripubblicato il Worker; istruzioni in `worker/LEGGIMI.md`.
+
+## [4.107.0] – 2026-10-15
+
+### Corretto
+- **Import da PDF/immagini: la Maestria andava persa.** Il Worker scrive la Maestria come "2", ma nell'app
+  il 2 è solo un marcatore d'origine (vale ×1) e la Maestria è il 3 (×2): le doppie competenze (es. Inganno
+  +8 e Furtività +13 di Elevorn) arrivavano come competenze semplici. Ora si converte.
+
+### Aggiunto
+- **Le icone si controllano con i numeri** (`src/rules/importSchede.js`): il Worker ora legge anche i totali
+  stampati sulla scheda (`abilitaTotali`, `tiriSalvezzaTotali`) e l'app ricava da sola chi è competente
+  (totale − modificatore = 0, competenza o il doppio) senza fidarsi di stelle e cerchietti. Senza totali, se
+  quasi tutte le abilità risultano accese si azzerano (errore sulle stelle) e valgono le competenze del
+  background. A fine import un avviso elenca cosa è stato corretto.
+- **Unione delle schermate prima del controllo**: Main + Skills dello stesso personaggio si uniscono e solo
+  dopo si verificano i totali (la tab Skills da sola non ha i punteggi); i totali di schermate diverse si
+  fondono.
+- **"Fighter 1 / Ranger 6 / Rogue 3"** e le diciture italiane tipo "Spadaccino 4 / Warlock 1" (sottoclasse al
+  posto della classe → Ladro, Spadaccino) si leggono in classe, livello e multiclasse.
+- **Prompt del Worker**: regola "numeri prima delle icone", niente 10 o livello 1 inventati su schermate
+  parziali, guida per la scheda cartacea italiana a 4 pagine. **Per usarlo va ripubblicato il Worker**
+  (`cd worker && npx wrangler deploy`); le correzioni dell'app funzionano anche col Worker vecchio.
+
+### Modificato
+- **Combat tracker**: "−" (minimizza) e "✕" (chiudi) hanno la stessa forma tonda con contorno della ✕
+  della pillola ridotta.
+
+## [4.106.1] – 2026-10-15
+
+### Aggiunto
+- **Sfondo con un leggero movimento**: un "respiro" lentissimo (zoom e scivolamento di pochi punti
+  percentuali, 70 secondi avanti e indietro) sul livello dello sfondo, solo con trasformazioni
+  (GPU, costo minimo). Si ferma con "riduci movimento" del sistema.
+
+### Modificato
+- **Classe Armatura**: il menu Copertura ha la stessa larghezza del menu del tipo di armatura
+  (88% del riquadro, a tutta larghezza sul telefono), e "base 14", scudo e "+1" sono più distanziati.
+
+## [4.106.0] – 2026-10-15
+
+### Aggiunto
+- **Il manuale Araldi del Segreto si accende solo con una password** (te la dà il Master), da
+  Menu → Manuali e fonti: il tasto chiede la password; spegnerlo no. Si confronta l'impronta
+  SHA-256 della password in minuscolo (`passwordAraldiGiusta` in `dati5e.js`), senza distinguere
+  le maiuscole: è una barriera leggera, l'app gira nel browser.
+
+### Modificato
+- **Il riquadro "Poteri" sotto le Risorse di classe esiste solo col manuale Araldi attivo**
+  (altrimenti non c'è nemmeno vuoto). Il pulsante "Ripristina i Poteri della campagna" compare solo
+  col manuale; il manuale non si accende più da solo (né all'apertura di una scheda con i poteri
+  degli Araldi, né col ripristino) e la lista ampliata si aggiunge solo col manuale attivo.
+- **Sezioni aperte**: aprendo un personaggio Competenze e Risorse di classe sono sempre aperte;
+  Poteri parte chiusa e poi ricorda l'ultima scelta.
+- **Classe Armatura**: l'ordine è Copertura (più stretta), tipo di armatura, riga "base 14 / scudo".
+  Tolta la voce "CA Manuale" dal menu del tipo di armatura (resta solo ai personaggi che già la usano).
+- **Combat tracker**: solo l'iniziativa e il nome del personaggio hanno i colori della sua classe
+  (nella scheda del tracker e nella pillola ridotta nel suo turno); il resto è sul tema base.
+- **"CA +valore" sempre così** sugli oggetti: "(CA +14)" per le armature (prima "(CA 14)"), "(CA +2)",
+  "(CA +1)"; un "(CA 14)" scritto a mano nel nome si legge da lì e si mostra uguale, e il compendio
+  dice "(CA +11)" invece di "(CA base 11)".
+
+## [4.105.7] – 2026-10-14
+
+### Corretto
+- **"Artefice" compariva due volte** nella scelta della classe in creazione del personaggio:
+  era già nell'elenco base (`NOMI_CLASSI`) e il codice lo aggiungeva ancora col manuale Tasha.
+  Ora un solo elenco (`classiDisponibili`): l'Artefice c'è una volta sola e solo col manuale
+  Tasha attivo (prima, con Tasha spento, compariva lo stesso). Vale anche per multiclasse,
+  Level Up e "Personaggio casuale".
+
+## [4.105.6] – 2026-10-14
+
+### Modificato
+- **Riquadro Classe Armatura**: il numero della CA è centrato nello spazio libero fra il titolo e i
+  controlli sotto, e il menu "Copertura" è più stretto (78%) e centrato.
+
+## [4.105.5] – 2026-10-14
+
+### Aggiunto
+- **✕ sulla pillola del combat tracker ridotto** per chiudere il combattimento, con la stessa
+  conferma del tracker aperto; il clic non riapre il tracker.
+- **Sfondo blu per gli oggetti magici** (token `--c-magico`): sulla riga dell'inventario, sulla
+  sua riga dell'effetto e negli slot di "Oggetti magici sintonizzati". È magico un oggetto con un
+  effetto meccanico, che richiede sintonia o che è sintonizzato.
+
+### Modificato
+- **Barra in alto grigio scuro** nel tema scuro (non più nera), così si stacca dallo sfondo
+  della scheda.
+- **Anagrafica sempre leggibile per intero**: etichette (BACKGROUND, ALLINEAMENTO...) e valori
+  (Sottoclasse, Classe...) vanno a capo invece di tagliarsi con "…"; le etichette si
+  rimpiccioliscono con la larghezza (container query); la colonna di Allineamento è più larga e
+  su tablet il blocco PE non esce più dal bordo. Misurato da 390 a 1920 px con i testi più lunghi.
+- **Contorno di focus dei tasti della barra neutro** (grigio) invece che dorato: l'anello dorato
+  dopo una conferma o un tasto da tastiera sembrava un tasto "acceso" (es. giorno/notte).
+- **Menu iniziale**: tolto il secondo titolo "I miei personaggi" sopra la lista.
+- **Pillola del combat tracker sempre sul tema base**, anche quando è il turno del personaggio.
+- **Niente più ✕ per eliminare gli attacchi** di armi e incantesimi: spariscono da soli. L'arma
+  se disequipaggi o togli l'oggetto (già così); l'incantesimo se lo togli dalla lista o non è più
+  preparato, e torna se l'incantesimo torna (`attaccoIncantesimoAttivo`). Gli incantesimi che
+  prima si "nascondevano" a mano tornano visibili. La ✕ resta solo per un attacco "orfano" (non è
+  un incantesimo e non c'è l'oggetto in inventario, es. aggiunto dal compendio).
+
+## [4.105.4] – 2026-10-14
+
+### Modificato
+- **Barra in alto sul tema base dell'app**, come il menu e il combat tracker, non coi colori
+  della classe del personaggio.
+- **Modificatore e punteggio delle caratteristiche nel colore del loro bordo** (il "4" di
+  Forza e il "4 → 19", il "2" di Destrezza...), leggermente avvicinati all'inchiostro del tema
+  per restare leggibili su ogni ambientazione.
+
+## [4.105.3] – 2026-10-14
+
+### Modificato
+- **Combat tracker sul tema base dell'app**, non sui colori della classe: lo stesso tema del
+  menu iniziale (`stileTemaBase`). Prendono i colori della classe solo i riferimenti al
+  personaggio: la sua scheda nel tracker e la pillola ridotta quando è il suo turno
+  (`stileColoriPg`, dalle variabili `--c-pg-*`). Nemici, alleati e le pillole del loro turno
+  restano sul tema base.
+
+## [4.105.2] – 2026-10-14
+
+### Modificato
+- **Lista dei personaggi nel menu nei colori della classe**: ogni riga ha la barra a sinistra,
+  il fondo appena tinto e il nome della classe nel colore della sua classe (verde Druido,
+  rosa Bardo, viola Stregone, arancio Guerriero, blu Mago...), leggibile su tema chiaro e scuro.
+
+## [4.105.1] – 2026-10-14
+
+### Modificato
+- **Card "Ultimo usato" del menu nei colori della classe** del personaggio (verde per il
+  Druido, arancio per il Guerriero...): è l'unica parte del menu che li usa, il resto resta
+  sul tema base. La scheda esporta i colori della classe in variabili `--c-pg-*` che il tema
+  base del menu non ridefinisce.
+
+## [4.105.0] – 2026-10-14
+
+### Modificato
+- **Menu iniziale col tema base del progetto** (oro "Classica"), non coi colori della classe
+  del personaggio corrente: le variabili del tema vengono ridefinite sul contenitore del
+  menu (`stileTemaBase` in `App.jsx`, da `BASE_TEMA`).
+- **Bordi delle caratteristiche più forti**: 1,5 px, colore quasi pieno anche a riposo.
+- **TS nel colore della caratteristica**: i badge "Costituzione · CD 17" (incantesimi e
+  attacchi), le CD delle azioni delle creature ("Saggezza · CD 20", lette da "TS Saggezza")
+  e la CD del TS di concentrazione (Costituzione) prendono il colore del riquadro della
+  caratteristica (`chiaveCaratteristica`, `caratteristicaDaTesto`, `coloreCaratteristica` in
+  `componenti.jsx`).
+
+## [4.104.0] – 2026-10-14
+
+### Modificato
+- **Caratteri uniformati in tutto il progetto**:
+  - due famiglie sole: Cinzel per titoli ed etichette, Georgia per il testo. Le etichette
+    della barra (SISTEMA, SCHEDA, SESSIONE) e dei titoletti del menu non sono più in
+    monospace; le schermate d'errore non usano più il carattere di sistema; pulsanti e voci
+    delle tendine ereditano Georgia. Il monospace resta solo nei codici di sincronizzazione e
+    delle stanze, dove serve a distinguere 0 da O;
+  - una scala di dimensioni: 10 · 11 · 12 · 13 · 14 · 16 · 18 · 22 px, più i numeri grandi
+    (CA, PF, dadi). I valori fuori scala (9; 10,5; 11,5; 12,5; 13,5; 15; 19; 20; 21) sono
+    stati portati al gradino più vicino; le voci delle tendine a 13 px invece dei 13,33 del
+    browser;
+  - menu iniziale: tutti i pulsanti con la stessa dimensione e lo stesso peso, solo "Nuovo
+    personaggio" in evidenza; "Ultimo usato" con lo stesso titoletto delle sezioni.
+
+## [4.103.1] – 2026-10-14
+
+### Aggiunto
+- **Un colore per ogni caratteristica** sul bordo del riquadro: Forza rosso mattone,
+  Destrezza verde muschio, Costituzione ocra, Intelligenza blu, Saggezza viola, Carisma oro
+  rosato (token `--c-car-*`, tema chiaro e scuro). A riposo il bordo è smorzato, al
+  passaggio del cursore si accende con l'alone dello stesso colore.
+
+### Modificato
+- **Anagrafica in quattro colonne uguali** (schermi da 1100 px in su): le colonne passano in
+  `stili.js` (`.anagrafica-riga-1/2`) e sono le stesse nelle due righe, quindi Sesso sta
+  sopra Background, Razza sopra Classe, Taglia sopra Sottoclasse e Allineamento sopra i PE.
+  Su tablet restano le colonne proporzionate (quelle uguali taglierebbero Sottoclasse e
+  Allineamento).
+- **Modificatore della caratteristica senza "+" e senza tiro**: il numero grande accanto a
+  Forza, Destrezza... è solo da leggere; i TS si tirano dalla riga "Tiro salvezza", le prove
+  dalle abilità.
+
+### Rimosso
+- La matita accanto alla velocità: la velocità la calcola l'app (specie, Poteri,
+  sfinimento) e non si modifica a mano. Il clic sul valore apre movimento e salti.
+
+## [4.103.0] – 2026-10-14
+
+### Aggiunto
+- **CA tra parentesi accanto agli oggetti** dell'equipaggiamento: "(CA 14)" per le armature,
+  "(CA +2)" per gli scudi, "(CA +1)" per gli oggetti magici che danno CA; un +1/+2/+3 nel
+  nome si somma (`etichettaCaOggetto`). Se il nome la riporta già non si ripete.
+- **Scudo in Legnoferro** nel catalogo degli oggetti (3 kg, CA +2).
+- **Colonne del Profilo allineate** (`src/ui/useAllineaProfilo.js`): Competenze finisce con
+  Punti Ferita, Risorse di classe con CA/Riposo, Poteri con l'ultima fila dei riquadri. Si
+  allunga il riquadro più corto; quello centrale solo di pochi pixel, così aprendo una sezione
+  a sinistra la colonna centrale non viene stirata. Su mobile non cambia nulla.
+- **Luce al passaggio del cursore** anche su Punti Ferita, CA, Riposo e le caselle sotto, come
+  già per le sezioni e le caratteristiche.
+
+### Corretto
+- **Debito sparito dai Poteri**: il contatore Debito degli Araldi del Segreto stava solo nel
+  "Potere del Patrono"; se quel potere mancava o era spento il Debito non compariva più, e il
+  pulsante di ripristino restava nascosto perché gli Araldi c'erano. Ora torna da solo nel
+  potere "Segreti e Debito" con l'ultimo valore noto (`garantisciDebitoAraldi`).
+- **Taglia allineata a Sottoclasse** nell'anagrafica: le prime due colonne delle due righe
+  sommano alla stessa larghezza.
+- **Solo le bestie si assumono**: nella scheda di una creatura i tasti Forma Selvatica e
+  Metamorfosi compaiono solo per le bestie del catalogo (non per evocazioni come Myrdhal,
+  elementali, spiriti, famigli o mostri) e restano spenti, con il motivo, oltre i limiti:
+  GS del livello da druido e volo/nuoto per la Forma Selvatica (`esitoFormaSelvatica`),
+  GS fino al livello per la Metamorfosi (`esitoMetamorfosi`). La Forma Selvatica compare
+  solo a chi ha livelli da druido.
+- Test e2e della finestra Movimento: si apre dal valore della velocità (4.102.2).
+
+### Modificato
+- "Evoca / Aggiungi" diventa **"Evoca"** (scheda creatura, catalogo e sezione Compagni).
+- **PE a filo del bordo destro**, come la tendina di Allineamento sopra (desktop).
+
+### Rimosso
+- Il pulsante "Recupera i Poteri dalla cronologia" nel riquadro Poteri (la Cronologia
+  versioni resta nel menu).
+- Il "+ 0" del bonus CA manuale accanto allo scudo: la CA extra la danno gli oggetti (✨).
+  Resta visibile solo se una scheda vecchia ha un valore diverso da 0.
+
+## [4.102.2] – 2026-10-14
+
+### Modificato
+- Velocità cliccabile per aprire il calcolatore di movimento, senza l'etichetta "Movimenti".
+- "Archivio del Master" si chiama ora "Archivio".
 
 ## [4.102.1] – 2026-10-13
 

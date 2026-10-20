@@ -557,7 +557,7 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
           aria-expanded={!chiusa}
           onClick={alternaChiusa}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternaChiusa(); } }}
-          style={{ fontSize: 13.5, fontWeight: 700, color: C.goldDark, letterSpacing: 0.3, textAlign: 'center', cursor: 'pointer', userSelect: 'none' }}
+          style={{ fontSize: 13, fontWeight: 700, color: C.goldDark, letterSpacing: 0.3, textAlign: 'center', cursor: 'pointer', userSelect: 'none' }}
           title={chiusa
             ? (lingua === 'en' ? 'Click to expand the Powers' : 'Clicca per espandere i Poteri')
             : (lingua === 'en' ? 'Click to collapse the Powers. For rules invented at the table (not in the official books): pacts, blessings, curses, magic items with custom effects...' : 'Clicca per rimpicciolire i Poteri. Per le regole inventate al tavolo (non nei manuali ufficiali): patti, benedizioni, maledizioni, oggetti magici con effetti custom...')}

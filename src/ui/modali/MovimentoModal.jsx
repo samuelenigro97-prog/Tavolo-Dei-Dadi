@@ -40,7 +40,7 @@ export function MovimentoModal({ lingua, scheda, setMostraModalMovimento }) {
       >
         {/* Header */}
         <div style={{ padding: '14px 18px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <strong style={{ fontSize: 15, color: C.goldDark }}>
+          <strong style={{ fontSize: 14, color: C.goldDark }}>
             {lingua === 'en' ? `Movement, jumping and carrying (${(scheda?.versione || '2024') === '2024' ? '5.5' : '5e'})` : `Movimento, salti e capacità fisiche (${(scheda?.versione || '2024') === '2024' ? '5.5' : '5e'})`}
           </strong>
           <button
