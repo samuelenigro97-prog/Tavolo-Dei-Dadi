@@ -2,6 +2,16 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.111.2] – 2026-10-20
+
+### Risolto
+- **Risolto blocco deploy GitHub Pages in CI**:
+  - Corretto avviso ESLint `no-misleading-character-class` e ripulite variabili in `IconaFantasy.jsx` che causavano il fallimento del job di linting in GitHub Actions CI, sbloccando così l'esecuzione del workflow di deploy automatico su GitHub Pages.
+
+### Modificato
+- **Scritta della versione copiabile con un tocco**:
+  - La scritta della versione in basso a destra è ora selezionabile (`user-select: all`) e cliccabile/toccabile per copiare all'istante `v4.111.2` negli appunti, con feedback visivo temporaneo `(copiato!)` in verde e controllo immediato per forzare l'aggiornamento.
+
 ## [4.111.1] – 2026-10-20
 
 ### Modificato
