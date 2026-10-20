@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.112.0',
+    voci: {
+      it: [
+        'Scala tipografica unificata (sezioni a 16px, sottocategorie a 12px maiuscoletto, nomi a 13px grassetto) e icone uniformi a 22px in tutta la scheda.',
+        'Apertura e chiusura del Combat Tracker e delle barre a scomparsa istantanee senza delay.',
+      ],
+      en: [
+        'Unified typography scale (sections 16px, subcategories 12px uppercase, item names 13px bold) and 22px uniform icons across all sheet sections.',
+        'Instantaneous Combat Tracker and drawer slide-in with zero delay.',
+      ],
+    },
+  },
+  {
     versione: '4.111.2',
     voci: {
       it: ['Scritta della versione in basso a destra ora copiabile con un clic/tocco, e ripristinato il deploy automatico su GitHub Pages.'],
