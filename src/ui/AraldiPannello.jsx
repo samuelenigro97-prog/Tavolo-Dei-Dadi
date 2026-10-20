@@ -26,19 +26,19 @@ import {
 } from '../data/modelliPoteri.js';
 import { incantesimiAraldiMancanti } from '../data/incantesimiAraldi.js';
 import { EVOCAZIONI_ARALDI } from '../data/bestiario.js';
-import { parseAzioniCompagno } from '../rules/regole.js';
+import { parseAzioniCompagno, coloreClasse } from '../rules/regole.js';
 import { generaAvatarBestia } from '../ritratti.js';
 import { IconaRunica } from './IconaFantasy.jsx';
 
 const NOMI_BASE = ['Segreti', 'Debito'];
 
-const scatola = { border: '1px solid var(--c-araldi-border, #a45a2a)', borderRadius: 8, padding: '8px 10px', background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.08))' };
-const etichetta = { fontSize: 11, fontWeight: 700, color: 'var(--c-araldi, #a45a2a)', textTransform: 'uppercase', letterSpacing: 0.5 };
+const scatola = { border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 10px', background: C.panelLight };
+const etichetta = { fontSize: 11, fontWeight: 700, color: 'var(--c-gold, #d4a017)', textTransform: 'uppercase', letterSpacing: 0.5 };
 
-function Contatore({ titolo, valore, max, onMeno, onPiu, onImposta, sotto, suggerimento, children }) {
+function Contatore({ titolo, valore, max, onMeno, onPiu, onImposta, sotto, suggerimento, coloreTitolo, children }) {
   return (
     <div style={{ ...scatola, flex: '1 1 200px', minWidth: 160, textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 4 }} title={suggerimento}>
-      <div style={etichetta}>{titolo}</div>
+      <div style={{ ...etichetta, color: coloreTitolo || etichetta.color }}>{titolo}</div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
         <button type="button" style={{ ...styles.buttonMini, padding: '2px 10px', fontSize: 14 }} onClick={onMeno} disabled={valore <= 0} aria-label={`${titolo} −1`}>−</button>
         <span style={{ fontSize: 26, fontWeight: 800, color: C.ink, minWidth: 34, fontVariantNumeric: 'tabular-nums', display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
@@ -117,11 +117,15 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
   const baseBarra = precedente ? precedente.soglia : 0;
   const percentuale = prossima ? Math.max(0, Math.min(100, ((valDebito - baseBarra) / (prossima.soglia - baseBarra)) * 100)) : 100;
 
+  const cClasse = coloreClasse(scheda?.classe);
+  const coloreClasseTema = cClasse?.scuro || 'var(--c-gold, #d4a017)';
+
   return (
     <div data-testid="araldi-pannello" style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 10 }}>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <Contatore
           titolo={en ? 'Secrets' : 'Segreti'}
+          coloreTitolo={coloreClasseTema}
           valore={valSegreti}
           max={segreti.max}
           sotto={en ? 'Max twice your proficiency bonus' : 'Massimo: il doppio della competenza'}
@@ -131,15 +135,31 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
           onImposta={imposta('Segreti', valSegreti)}
         >
           {segreti.max > 0 && segreti.max <= 12 && (
-            <div style={{ display: 'flex', gap: 4, justifyContent: 'center', flexWrap: 'wrap' }} aria-hidden>
-              {Array.from({ length: segreti.max }, (_, i) => (
-                <span key={i} style={{ width: 10, height: 10, borderRadius: 2, transform: 'rotate(45deg)', border: '1.5px solid var(--c-araldi, #a45a2a)', background: i < valSegreti ? 'var(--c-araldi, #a45a2a)' : 'transparent' }} />
-              ))}
+            <div style={{ display: 'flex', gap: 5, justifyContent: 'center', flexWrap: 'wrap', marginTop: 3 }} aria-hidden>
+              {Array.from({ length: segreti.max }, (_, i) => {
+                const attivo = i < valSegreti;
+                return (
+                  <span
+                    key={i}
+                    style={{
+                      width: 10,
+                      height: 10,
+                      borderRadius: 2,
+                      transform: 'rotate(45deg)',
+                      border: attivo ? '1.5px solid #ff9f1a' : '1.5px solid rgba(255, 159, 26, 0.45)',
+                      background: attivo ? '#ff9f1a' : 'transparent',
+                      boxShadow: attivo ? '0 0 6px rgba(255, 159, 26, 0.65)' : 'none',
+                      transition: 'all 0.15s ease',
+                    }}
+                  />
+                );
+              })}
             </div>
           )}
         </Contatore>
         <Contatore
           titolo={en ? 'Debt' : 'Debito'}
+          coloreTitolo={coloreClasseTema}
           valore={valDebito}
           sotto={prossima
             ? (en ? `Next: ${prossima.soglia} · ${prossima.nomeEn} (${prossima.soglia - valDebito} to go)` : `Prossima: ${prossima.soglia} · ${prossima.nome} (mancano ${prossima.soglia - valDebito})`)
@@ -155,15 +175,15 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
             aria-valuemax={prossima ? prossima.soglia : valDebito}
             aria-valuenow={valDebito}
             aria-label={en ? 'Progress to the next Debt threshold' : 'Avanzamento verso la prossima soglia del Debito'}
-            style={{ height: 6, borderRadius: 3, background: C.border, overflow: 'hidden', margin: '2px 8px 0' }}
+            style={{ height: 6, borderRadius: 3, background: C.border, overflow: 'hidden', margin: '4px 8px 0' }}
           >
-            <div style={{ width: `${percentuale}%`, height: '100%', background: 'var(--c-araldi, #a45a2a)', transition: 'width 0.25s ease' }} />
+            <div style={{ width: `${percentuale}%`, height: '100%', background: 'linear-gradient(90deg, #ff9f1a, #ff6b35)', boxShadow: '0 0 6px rgba(255, 159, 26, 0.45)', transition: 'width 0.25s ease' }} />
           </div>
         </Contatore>
       </div>
 
       <div style={scatola}>
-        <div style={{ ...etichetta, marginBottom: 6 }}>{en ? 'Debt thresholds' : 'Soglie del Debito'}</div>
+        <div style={{ ...etichetta, color: coloreClasseTema, marginBottom: 6 }}>{en ? 'Debt thresholds' : 'Soglie del Debito'}</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {SOGLIE_DEBITO_ARALDI.map((s) => {
             const raggiunta = valDebito >= s.soglia;
@@ -178,13 +198,14 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
                 key={s.soglia}
                 data-testid={`soglia-${s.soglia}`}
                 data-raggiunta={raggiunta ? 'si' : 'no'}
-                style={{ display: 'flex', gap: 8, alignItems: 'baseline', fontSize: 12, opacity: raggiunta || eProssima ? 1 : 0.55, flexWrap: 'wrap' }}
+                style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, opacity: raggiunta || eProssima ? 1 : 0.55, flexWrap: 'wrap' }}
               >
                 <span style={{
-                  flexShrink: 0, minWidth: 42, textAlign: 'center', fontWeight: 800, padding: '1px 6px', borderRadius: 4,
-                  border: `1px ${raggiunta ? 'solid' : 'dashed'} ${raggiunta ? 'var(--c-araldi, #a45a2a)' : C.border}`,
-                  color: raggiunta ? 'var(--c-araldi, #a45a2a)' : C.inkDim,
-                  background: raggiunta ? 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))' : 'transparent',
+                  flexShrink: 0, minWidth: 42, textAlign: 'center', fontWeight: 800, padding: '2px 6px', borderRadius: 4,
+                  border: `1px ${raggiunta ? 'solid' : 'dashed'} ${raggiunta ? '#ff9f1a' : C.border}`,
+                  color: raggiunta ? '#ff9f1a' : C.inkDim,
+                  background: raggiunta ? 'rgba(255, 159, 26, 0.14)' : 'transparent',
+                  boxShadow: raggiunta ? '0 0 6px rgba(255, 159, 26, 0.25)' : 'none',
                 }}>{raggiunta ? '✓ ' : ''}{s.soglia}</span>
                 <span style={{ minWidth: 0, flex: 1, display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                   <IconaRunica nome={s.nome} isAraldi={true} dimensione={22} />
@@ -195,11 +216,12 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
                       marginLeft: 6,
                       fontSize: 10,
                       fontWeight: 700,
-                      padding: '1px 6px',
+                      padding: '2px 6px',
                       borderRadius: 4,
-                      background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.16))',
-                      color: 'var(--c-araldi, #a45a2a)',
-                      border: '1px solid var(--c-araldi-border, #a45a2a)',
+                      background: 'rgba(255, 159, 26, 0.14)',
+                      color: '#ff9f1a',
+                      border: '1px solid rgba(255, 159, 26, 0.55)',
+                      boxShadow: '0 0 6px rgba(255, 159, 26, 0.2)',
                       whiteSpace: 'nowrap',
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -216,7 +238,7 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
       </div>
 
       <div style={scatola}>
-        <div style={{ ...etichetta, marginBottom: 6 }}>{en ? 'Spend Secrets' : 'Spendere i Segreti'}</div>
+        <div style={{ ...etichetta, color: coloreClasseTema, marginBottom: 6 }}>{en ? 'Spend Secrets' : 'Spendere i Segreti'}</div>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
           {spesa(1, en ? 'Open' : 'Aprire', en ? 'Open a seal: the DM guarantees the information is true and useful.' : 'Rompi il sigillo: il DM garantisce che l\'informazione sia vera e utile.')}
           {spesa(1, en ? 'Lever' : 'Leva', en ? 'Use the Secret against its source: an automatic Charisma success (max DC 20).' : 'Usi il Segreto contro la sua fonte: prova di Carisma con successo automatico (CD massima 20).')}
@@ -293,7 +315,7 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
             <button
               type="button"
               data-testid="aggiungi-incantesimi-araldi"
-              style={{ ...styles.buttonMini, fontWeight: 700, color: 'var(--c-araldi, #a45a2a)', borderColor: 'var(--c-araldi-border, #a45a2a)', background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))' }}
+              style={{ ...styles.buttonMini, fontWeight: 700, color: '#ff9f1a', borderColor: 'rgba(255, 159, 26, 0.6)', background: 'rgba(255, 159, 26, 0.12)' }}
               onClick={aggiungiIncanti}
               title={en ? 'Adds the handbook\'s expanded spell list (levels 1-5) to the known spells.' : 'Aggiunge agli incantesimi conosciuti la lista ampliata del manuale (cerchi 1-5).'}
             >
@@ -312,12 +334,12 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
 
       {privilegi.length > 0 && (
         <div style={scatola} data-testid="araldi-privilegi">
-          <div style={{ ...etichetta, textAlign: 'center', marginBottom: 4 }}>{en ? 'Features overview' : 'Panoramica dei privilegi'}</div>
+          <div style={{ ...etichetta, color: coloreClasseTema, textAlign: 'center', marginBottom: 6 }}>{en ? 'Features overview' : 'Panoramica dei privilegi'}</div>
           {gruppiPerLivello.map(({ livelloMin, lista }) => {
             const futuro = !potereSbloccato(lista[0], livello);
             return (
               <div key={livelloMin} style={{ display: 'flex', gap: 10, padding: '8px 0', borderBottom: `1px solid ${C.border}`, opacity: futuro ? 0.5 : 1 }}>
-                <div style={{ flexShrink: 0, width: 62, fontWeight: 'bold', color: futuro ? C.inkDim : 'var(--c-araldi, #a45a2a)' }}>
+                <div style={{ flexShrink: 0, width: 62, fontWeight: 'bold', color: futuro ? C.inkDim : coloreClasseTema }}>
                   {en ? 'Lvl' : 'Liv.'} {livelloMin}
                 </div>
                 <div style={{ flex: 1, minWidth: 0, fontSize: 13, display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -367,7 +389,17 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
                                     title={disponibile
                                       ? (debitoUso ? (en ? `Use it (+${debitoUso} Debt)` : `Usalo (+${debitoUso} Debito)`) : (en ? 'Use it' : 'Usalo'))
                                       : (en ? 'Spent: click to restore' : 'Speso: clicca per ripristinarlo')}
-                                    style={{ width: 16, height: 16, padding: 0, borderRadius: '50%', cursor: 'pointer', border: '2px solid var(--c-araldi, #a45a2a)', background: disponibile ? 'var(--c-araldi, #a45a2a)' : 'transparent', transition: 'all 0.15s ease' }}
+                                    style={{
+                                      width: 16,
+                                      height: 16,
+                                      padding: 0,
+                                      borderRadius: '50%',
+                                      cursor: 'pointer',
+                                      border: disponibile ? '2px solid #ff9f1a' : '2px solid rgba(255, 159, 26, 0.45)',
+                                      background: disponibile ? '#ff9f1a' : 'transparent',
+                                      boxShadow: disponibile ? '0 0 6px rgba(255, 159, 26, 0.65)' : 'none',
+                                      transition: 'all 0.15s ease',
+                                    }}
                                   />
                                 );
                               })}

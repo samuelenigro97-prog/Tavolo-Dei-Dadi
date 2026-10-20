@@ -1990,7 +1990,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.110.4';
+const APP_VERSION = '4.110.5';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -18427,28 +18427,33 @@ export default function App() {
       </>
       ) : null}
       <NuvolettaGlobale />
-      {/* Indicatore discreto della versione sempre visibile in basso a destra dello schermo */}
+      {/* Indicatore discreto della versione: quasi invisibile a filo sfondo senza bordo, visibile a passaggio mouse */}
       <div
-        className="versione-badge-fluttuante"
+        className="versione-watermark-discreta"
         style={{
           position: 'fixed',
-          bottom: 4,
-          right: 8,
+          bottom: 3,
+          right: 6,
           zIndex: 1400,
-          fontSize: 10,
+          fontSize: 9,
           fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-          fontWeight: 600,
-          letterSpacing: 0.5,
-          color: '#f0c050',
-          background: '#12171f',
-          padding: '2px 6px',
-          borderRadius: 4,
-          border: '1px solid #7c5c16',
-          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.6)',
+          fontWeight: 500,
+          letterSpacing: 0.4,
+          color: 'var(--c-ink, currentColor)',
+          opacity: 0.18,
+          background: 'transparent',
+          border: 'none',
+          boxShadow: 'none',
+          padding: 0,
+          margin: 0,
           userSelect: 'none',
-          pointerEvents: 'none',
+          cursor: 'default',
+          transition: 'opacity 0.25s ease',
         }}
+        onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.75'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.18'; }}
         aria-hidden="true"
+        title={`Tavolo dei Dadi v${APP_VERSION}`}
       >
         v{APP_VERSION}
       </div>

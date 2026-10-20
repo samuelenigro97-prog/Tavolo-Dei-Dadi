@@ -2,6 +2,13 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.110.5] – 2026-10-20
+
+### Ottimizzato
+- **Indicatore versione invisibile ad atmosfera intatta & Riconfigurazione Araldi**:
+  - **Watermark versione in basso a destra**: eliminato il bordo e lo sfondo a scatola; il testo si adatta ora in modo quasi trasparente (`opacity: 0.18`) e si fonde perfettamente su qualunque sfondo (foresta, pergamena, caverna, temi scuri o chiari) senza distrarre dall'atmosfera di gioco; al passaggio del cursore torna temporaneamente a piena leggibilità.
+  - **Pannello Araldi del Segreto nel tema della classe**: rimosse le cornici marroni opache; le scatole e le intestazioni adottano lo stile nativo della classe e della scheda, mentre l'arancione ambra luminoso (`#ff9f1a` con glow) valorizza selettivamente i rombi dei Segreti, la barra del Debito, le perle/pallini d'uso dei privilegi e i badge di soglia.
+
 ## [4.110.4] – 2026-10-20
 
 ### Ottimizzato
