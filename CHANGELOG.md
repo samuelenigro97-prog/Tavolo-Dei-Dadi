@@ -2,6 +2,13 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.108.6] – 2026-10-20
+
+### Modificato
+- **Sporgenza simmetrica combat tracker e barra in alto**: a riposo la maniglia del combat tracker sul fondo sporge esattamente di 14 px come quella superiore, con maniglia orizzontale dorata simmetrica e perfettamente centrata.
+- **Bordo di attivazione combat tracker**: all'apertura il combat tracker attiva un bordo dorato radioso con aura e bagliore superiore (`box-shadow` e riflesso interno 3D) che ne sottolinea visivamente l'entrata in combattimento.
+- **Fluidità massima a 60/120 fps**: transizioni con curva a molla naturale `cubic-bezier(0.16, 1, 0.3, 1)`, accelerazione hardware GPU (`translate3d`, `will-change`), dissolvenza del contenuto sincronizzata al movimento e zone di innesco mouse allargate a 24 px per un'apertura istantanea e senza esitazioni.
+
 ## [4.108.5] – 2026-10-20
 
 ### Aggiunto
