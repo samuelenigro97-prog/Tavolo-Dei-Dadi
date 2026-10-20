@@ -5,7 +5,7 @@
 
 export const NOVITA = [
   {
-    versione: '4.109.0',
+    versione: '4.109.1',
     voci: {
       it: ['Icone fantasy (formula ibrida): armi, attacchi, incantesimi e inventario con icone vettoriali Game-Icons ad alta definizione; poteri del patrono, debiti e araldi con glifi runici e bagliore arcano.'],
       en: ['Fantasy icons (hybrid system): weapons, attacks, spells and inventory with crisp Game-Icons vector badges; patron powers, debts and araldi with runic arcane glyphs and neon glow.'],
