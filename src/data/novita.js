@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.110.4',
+    voci: {
+      it: ['Righe incantesimi pulite e sobrie: eliminato il bordo arancione invasivo per i poteri del Patrono, risalta ora solo l\'Occhio Runico luminoso e brillante.'],
+      en: ['Clean and sleek spell rows: removed invasive orange borders for Patron spells, highlighting only the glowing, vibrant Runic Eye icon.'],
+    },
+  },
+  {
     versione: '4.110.3',
     voci: {
       it: ['Icone differenziate per Trucchetti e Incantesimi di livello, con colorazione ed effetti dedicati in base all\'elemento (fuoco, gelo, fulmine, necrotico, radioso, ecc.).'],
