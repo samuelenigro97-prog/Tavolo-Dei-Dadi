@@ -1990,7 +1990,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.111.2';
+const APP_VERSION = '4.112.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -12805,7 +12805,7 @@ export default function App() {
                     )}
                   </button>
                 </div>
-                <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 14 }}>
+                <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6 }}>
                   {t('combat.titolo')}
                 </h3>
                 <div style={{ justifySelf: 'end', display: 'inline-flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -13111,7 +13111,7 @@ export default function App() {
                         {cat !== 'Azione' && (
                           <div className="sottosezione-titolo" style={{ display: 'grid', gridTemplateColumns: 'minmax(28px, 1fr) auto minmax(28px, 1fr)', alignItems: 'center', columnGap: 6, marginTop: 18, marginBottom: 8 }}>
                             <div />
-                            <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 14 }}>
+                            <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6 }}>
                               {cat === 'Bonus' ? t('combat.azioni_bonus') : t('combat.reazioni')}
                             </h3>
                             {/* I chip della reazione vanno su una riga propria sotto il titolo:
@@ -13420,7 +13420,7 @@ export default function App() {
                                         className="attacco-nome"
                                         onClick={apriInfoReazione}
                                         title={castBloccato ? tr('Equipaggia un focus per lanciare questo incantesimo', 'Equip a focus to cast this spell') : undefined}
-                                        style={{ background: 'transparent', border: 0, padding: 0, font: 'inherit', fontWeight: 700, color: C.ink, cursor: 'help', textAlign: 'left', textDecoration: 'underline dotted', textUnderlineOffset: 3, textDecorationColor: C.inkDim, minWidth: 0 }}
+                                        style={{ background: 'transparent', border: 0, padding: 0, fontSize: 13, fontWeight: 700, color: C.ink, cursor: 'help', textAlign: 'left', textDecoration: 'underline dotted', textUnderlineOffset: 3, textDecorationColor: C.inkDim, minWidth: 0 }}
                                       >{traduciDato(cleanNome) || cleanNome}</button>
                                       {a.tipoFonte === 'araldi' && (
                                         <span
@@ -14327,7 +14327,7 @@ export default function App() {
                             {/* Il "pulsante" è solo l'etichetta: i bollini degli slot accanto sono pulsanti a sé (niente interattivi annidati). */}
                             <span role="button" tabIndex={0} aria-expanded={!chiuso} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                               <span style={{ color: C.goldDark, fontSize: 13, fontWeight: 800 }}>{chiuso ? '▸' : '▾'}</span>
-                              <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 0.3, color: C.ink }}>
+                              <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.6, color: C.ink, textTransform: 'uppercase' }}>
                                 {t('spell.n_livello', { n: liv })}
                               </span>
                             </span>
@@ -14538,7 +14538,7 @@ export default function App() {
                                     dimensione={22}
                                   />
                                   <button
-                                    style={{ background: 'transparent', border: 'none', color: isRowInEccesso ? C.red : C.ink, fontWeight: 700, cursor: 'help', textAlign: 'left', padding: 0, fontSize: 14, lineHeight: 1.2, textDecoration: 'underline dotted', textUnderlineOffset: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
+                                    style={{ background: 'transparent', border: 'none', color: isRowInEccesso ? C.red : C.ink, fontWeight: 700, cursor: 'help', textAlign: 'left', padding: 0, fontSize: 13, lineHeight: 1.2, textDecoration: 'underline dotted', textUnderlineOffset: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
                                     onClick={() => setInfo({
                                       titolo: `${s.nome || 'Incantesimo'}${s.livello === 0 ? (en ? ' · Cantrip' : ' · Trucchetto') : (en ? ` · Level ${s.livello}` : ` · ${s.livello}° livello`)}`,
                                       iconaProps: { nome: s.nome, isSpell: true, livello: s.livello, tipoDanno: s.tipoDanno || s.dannoTipo, tipoFonte: isAraldiSpell ? 'araldi' : '', dimensione: 22 },
@@ -14892,7 +14892,7 @@ export default function App() {
                           {livelliIncChiusi[0] ? '▸' : '▾'}
                         </span>
                       </div>
-                      <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 14 }}>
+                      <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6 }}>
                         {t('spell.trucchetti')}
                       </h3>
                       <div style={{ justifySelf: 'end', display: 'inline-flex', alignItems: 'center', gap: 6 }} onClick={(e) => e.stopPropagation()}>
@@ -14924,7 +14924,7 @@ export default function App() {
                     {maxLiv >= 1 && (
                       <div className="sottosezione-titolo" style={{ display: 'grid', gridTemplateColumns: 'minmax(28px, 1fr) auto minmax(28px, 1fr)', alignItems: 'center', columnGap: 6, marginTop: 18, marginBottom: 8 }}>
                         <div />
-                        <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 14 }}>
+                        <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6 }}>
                           {t('spell.incantesimi')}
                         </h3>
                         {/* Il conteggio "Preparati" è sceso nell'intestazione del 1° Livello qui
@@ -15177,7 +15177,7 @@ export default function App() {
                                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                                       <IconaRunica nome={inv} dimensione={22} stileBadge={true} />
-                                      <strong style={{ color: C.goldDark, fontSize: 12 }}>{traduciDato(inv)}</strong>
+                                      <strong style={{ color: C.goldDark, fontSize: 13, fontWeight: 700 }}>{traduciDato(inv)}</strong>
                                     </div>
                                     {spieg && (
                                       <span style={{ fontSize: 11, color: C.inkDim, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
@@ -15398,7 +15398,7 @@ export default function App() {
                   }}>
                     {/* Card 1: Privilegi di Classe */}
                     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.6, textTransform: 'uppercase', textAlign: 'center' }}>
                         {t('priv.classe_titolo')}{scheda.classe ? ` (${traduciDato(scheda.classe)})` : ''}
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, justifyContent: 'center' }}>
@@ -15424,7 +15424,7 @@ export default function App() {
 
                     {/* Card 2: Privilegi di Sottoclasse */}
                     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.6, textTransform: 'uppercase', textAlign: 'center' }}>
                         {t('priv.sub_titolo')}{scheda.sottoclasse ? ` (${traduciDato(scheda.sottoclasse)})` : ''}
                       </div>
                       {(() => {
@@ -15496,7 +15496,7 @@ export default function App() {
                     gap: 10
                   }}>
                     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.6, textTransform: 'uppercase', textAlign: 'center' }}>
                         {t("sez.tratti_specie")}{scheda.specie ? ` (${traduciDato(scheda.specie)})` : ''}
                       </div>
                       <ListaQuadratini
@@ -15508,7 +15508,7 @@ export default function App() {
                     </div>
 
                     <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.3, textAlign: 'center' }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: C.goldDark, marginBottom: 8, letterSpacing: 0.6, textTransform: 'uppercase', textAlign: 'center' }}>
                         {t("sez.talenti")}
                       </div>
                       <ListaQuadratini
@@ -16585,7 +16585,7 @@ export default function App() {
                                       {(() => {
                                         const spItem = o.effetto || spiegaIncantesimo(o.nome) || (EFFETTI_OGGETTO.find(([id]) => id === o.effettoMeccanico)?.[lingua === 'en' ? 2 : 1]);
                                         return (
-                                          <button
+                                            <button
                                             type="button"
                                             className="oggetto-nome"
                                             onClick={() => spItem && setInfo({
@@ -16594,7 +16594,7 @@ export default function App() {
                                               testo: spItem,
                                             })}
                                             title={spItem ? `${o.nome}: ${spItem}` : o.nome}
-                                            style={{ background: 'transparent', border: 0, padding: 0, font: 'inherit', color: C.ink, cursor: spItem ? 'help' : 'default', textAlign: 'left', textDecoration: spItem ? 'underline dotted' : 'none', textUnderlineOffset: 3, textDecorationColor: C.inkDim }}
+                                            style={{ background: 'transparent', border: 0, padding: 0, fontSize: 13, fontWeight: 700, color: C.ink, cursor: spItem ? 'help' : 'default', textAlign: 'left', textDecoration: spItem ? 'underline dotted' : 'none', textUnderlineOffset: 3, textDecorationColor: C.inkDim }}
                                           >{nomeSenzaCa(traduciDato(o.nome) || o.nome)}</button>
                                         );
                                       })()}
@@ -17196,7 +17196,7 @@ export default function App() {
                 return (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, alignItems: 'stretch', marginTop: 24, paddingTop: 16, borderTop: `1px solid ${C.border}` }}>
                     <div style={{ background: C.panelLight, padding: '12px 14px', borderRadius: 8, border: `1px solid ${C.border}`, display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ ...styles.panelTitle, marginBottom: 8 }}>{t("equip.sintonia")}</div>
+                      <div style={{ ...styles.panelTitle, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>{t("equip.sintonia")}</div>
                       {[0, 1, 2].map((i) => {
                         const isAttivo = attunatiEquipaggiati.some((n) => {
                           const a = String(n).toLowerCase().trim();
@@ -17219,7 +17219,7 @@ export default function App() {
                     </div>
                     
                     <div style={{ background: C.panelLight, padding: '12px 14px', borderRadius: 8, border: `1px solid ${C.border}`, display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ ...styles.panelTitle, marginBottom: 8 }}>{t('monete.titolo')}</div>
+                      <div style={{ ...styles.panelTitle, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8 }}>{t('monete.titolo')}</div>
                       {(() => {
                         const d = scheda.denari || {};
                         const totMo = ((d.mr || 0) / 100) + ((d.ma || 0) / 10) + ((d.me || 0) / 2) + (d.mo || 0) + ((d.mp || 0) * 10);

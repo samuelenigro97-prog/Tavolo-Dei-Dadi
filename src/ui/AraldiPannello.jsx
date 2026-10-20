@@ -33,7 +33,7 @@ import { IconaRunica } from './IconaFantasy.jsx';
 const NOMI_BASE = ['Segreti', 'Debito'];
 
 const scatola = { border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 10px', background: C.panelLight };
-const etichetta = { fontSize: 11, fontWeight: 700, color: 'var(--c-gold, #d4a017)', textTransform: 'uppercase', letterSpacing: 0.5 };
+const etichetta = { fontSize: 12, fontWeight: 700, color: 'var(--c-gold, #d4a017)', textTransform: 'uppercase', letterSpacing: 0.6 };
 
 function Contatore({ titolo, valore, max, onMeno, onPiu, onImposta, sotto, suggerimento, coloreTitolo, children }) {
   return (
@@ -209,7 +209,7 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
                 }}>{raggiunta ? '✓ ' : ''}{s.soglia}</span>
                 <span style={{ minWidth: 0, flex: 1, display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                   <IconaRunica nome={s.nome} isAraldi={true} dimensione={22} />
-                  <strong style={{ color: raggiunta ? C.ink : C.inkDim }}>{en ? s.nomeEn : s.nome}</strong>
+                  <strong style={{ color: raggiunta ? C.ink : C.inkDim, fontSize: 13, fontWeight: 700 }}>{en ? s.nomeEn : s.nome}</strong>
                   <span style={{ color: C.inkDim }}> — {en ? s.effettoEn : s.effetto}</span>
                   {raggiunta && (
                     <span style={{
@@ -366,7 +366,7 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
                             tabIndex={0}
                             title={p.descrizione}
                             onClick={() => (onInfo ? onInfo({ titolo: nomeBreve, testo: p.descrizione }) : setAperti((x) => ({ ...x, [p.id]: !x[p.id] })))}
-                            style={{ cursor: 'help', textDecoration: 'underline dotted', textUnderlineOffset: 3, fontWeight: 600 }}
+                            style={{ cursor: 'help', textDecoration: 'underline dotted', textUnderlineOffset: 3, fontWeight: 700, fontSize: 13 }}
                           >{nomeBreve}</span>
                           {onModifica && (
                             <button type="button" style={{ background: 'none', border: 0, padding: '0 0 0 8px', color: C.inkDim, cursor: 'pointer', fontSize: 11 }} onClick={() => onModifica(p.id)} title={en ? 'Edit' : 'Modifica'}>✎</button>

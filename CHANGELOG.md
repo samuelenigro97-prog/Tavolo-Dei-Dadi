@@ -2,6 +2,18 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.112.0] – 2026-10-20
+
+### Aggiunto & Ottimizzato
+- **Scala tipografica unificata per tutta la scheda**:
+  - **Intestazioni sezioni principali**: allineate a `16px` con font classico pergamena (`Cinzel` / `var(--font-title)`).
+  - **Sottocategorie e gruppi**: unificate a `12px` in maiuscoletto/uppercase con contrasto e colore tema (Trucchetti, Incantesimi, Cerchi, Azioni, Azioni Bonus, Reazioni, Privilegi di Classe/Sottoclasse, Tratti di Specie, Talenti, Sintonia, Monete, Soglie e Poteri).
+  - **Nomi degli elementi**: unificati a `13px` in grassetto pieno (`700`) per incantesimi, armi/attacchi, oggetti dell'inventario, invocazioni e privilegi.
+- **Icone e simboli a dimensione uniforme in tutte le sezioni**:
+  - Tutti i badge grafici tematici (`IconaAzione`, `IconaOggetto`, `IconaRunica`, `IconaFantasy`) uniformati a `22px` con padding e contenitori allineati in ogni riga della scheda.
+- **Apertura e transizione ultra-rapida di Combat Tracker e barre a scomparsa**:
+  - Eliminato ogni delay artificiale (rimossi i 250ms di ritardo transizione) e velocizzata l'animazione di scorrimento su/giù a `0.14s cubic-bezier(0, 0, 0.2, 1)`, rendendo l'apertura e chiusura del Combat Tracker e delle barre fisse istantanee e scattanti.
+
 ## [4.111.2] – 2026-10-20
 
 ### Risolto

@@ -684,7 +684,7 @@ export function Sezione({ id, titolo, children, aperto = true, onToggleAperto, m
         style={{ ...styles.panel, opacity: trascinando ? 0.4 : 1, ...style }}
         className={`sezione ${className}`.trim()}
       >
-        <summary className="sezione-titolo" style={{ ...styles.panelTitle, fontSize: 18, cursor: 'pointer', listStyle: 'none', marginBottom: 0, userSelect: 'none' }}>
+        <summary className="sezione-titolo" style={{ ...styles.panelTitle, fontSize: 16, cursor: 'pointer', listStyle: 'none', marginBottom: 0, userSelect: 'none' }}>
           <span className="sezione-titolo-sinistra">
             <span className="freccia">▾</span>
           </span>

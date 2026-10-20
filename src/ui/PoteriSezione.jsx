@@ -75,7 +75,7 @@ const chipStile = {
 };
 
 const etichettaGruppo = {
-  fontSize: 11, fontWeight: 700, color: C.inkDim, textTransform: 'uppercase', letterSpacing: 0.8,
+  fontSize: 12, fontWeight: 700, color: C.inkDim, textTransform: 'uppercase', letterSpacing: 0.6,
   display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6,
 };
 
