@@ -8,6 +8,7 @@ import { C, BASE_TEMA, PRESET_COLORI, ambientazioneCasuale } from "./ui/tema.js"
 import { styles, GLOBAL_CSS } from './ui/stili.js';
 import { Editable, Rollable, iconaTipoDanno, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, caratteristicaDaTesto, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
+import { IconaAzione, IconaRunica, IconaOggetto } from './ui/IconaFantasy.jsx';
 import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, attaccoIncantesimoAttivo, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
 import { normalizzaTrascrizione } from './rules/importSchede.js';
 import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } from "./data/esempi.js";
@@ -1989,7 +1990,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.108.6';
+const APP_VERSION = '4.109.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -13283,66 +13284,93 @@ export default function App() {
                                       {a.isSpell || cat === 'Reazione' || a.tipoFonte === 'araldi' ? (
                                         <button
                                           type="button"
-                                          style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 16, cursor: 'help', display: 'inline-block', width: 22, textAlign: 'center' }}
+                                          style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'help', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24, flexShrink: 0 }}
                                           aria-label={tr(`Dettagli di ${cleanNome}`, `${cleanNome} details`)}
                                           onClick={apriInfoReazione}
-                                        >{iconaReazione}</button>
-                                      ) : (
-                                        <select
-                                          value=""
-                                          title={cat === 'Bonus' ? "Scegli un'azione bonus o incantesimo bonus" : t('tip.scegli_arma')}
-                                          onChange={(e) => {
-                                            const v = e.target.value;
-                                            if (!v) return;
-                                            if (cat === 'Bonus') {
-                                              const b = AZIONI_BONUS_5E.find((x) => x.nome === v);
-                                              if (b) {
-                                                const desc = b.note || spiegaIncantesimo(b.nome) || spiegaPrivilegio(b.nome) || '';
-                                                aggiornaAttacco({ nome: b.nome, bonus: 0, danno: b.danno || '', tipoDanno: b.tipoDanno || '', note: desc });
-                                              }
-                                            } else {
-                                              const arma = ARMI_5E.find((w) => w.nome === v);
-                                              if (arma) {
-                                                const vecchioNome = a.nome;
-                                                const nuovoAttacco = attaccoDaArma(arma, scheda);
-                                                const inv = scheda.inventario || [];
-                                                const esisteNuovo = inv.some((x) => x.nome.toLowerCase() === arma.nome.toLowerCase());
-                                                let newInv;
-                                                if (esisteNuovo) {
-                                                  newInv = inv.map((x) => {
-                                                    if (x.nome.toLowerCase() === arma.nome.toLowerCase()) return { ...x, equip: true };
-                                                    if (x.nome.toLowerCase() === vecchioNome.toLowerCase()) return { ...x, equip: false };
-                                                    return x;
-                                                  });
-                                                } else {
-                                                  newInv = [
-                                                    ...inv.map((x) => (x.nome.toLowerCase() === vecchioNome.toLowerCase() ? { ...x, equip: false } : x)),
-                                                    completaUtilizziOggetto({ id: `inv-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`, nome: arma.nome, qta: 1, peso: pesoStimato(arma.nome), equip: true, categoria: 'Arma' })
-                                                  ];
-                                                }
-                                                aggiorna({
-                                                  attacchi: scheda.attacchi.map((x) => (x.id === a.id ? { ...x, ...nuovoAttacco } : x)),
-                                                  inventario: newInv,
-                                                });
-                                              }
-                                            }
-                                          }}
-                                          style={{ ...styles.inlineInput, appearance: 'none', width: 22, height: 22, padding: 0, textAlign: 'center', cursor: 'pointer', flexShrink: 0 }}
                                         >
-                                          <option value="">{cat === 'Bonus' ? '⚡' : '⚔️'}</option>
-                                          {cat === 'Bonus' ? (
-                                            <>
-                                              <optgroup label={lingua === 'en' ? 'Bonus actions and weapons' : 'Azioni bonus e armi'}>
-                                                {AZIONI_BONUS_5E.filter((x) => x.tipo === 'combattimento' || x.tipo === 'talento' || x.tipo === 'privilegio').map((b) => <option key={b.nome} value={b.nome} title={b.note || spiegaPrivilegio(b.nome)}>{traduciDato(b.nome)}</option>)}
-                                              </optgroup>
-                                              <optgroup label={lingua === 'en' ? 'Bonus Action Spells' : 'Incantesimi Azione Bonus'}>
-                                                {AZIONI_BONUS_5E.filter((x) => x.tipo === 'incantesimo').map((b) => <option key={b.nome} value={b.nome} title={b.note || spiegaIncantesimo(b.nome)}>{traduciDato(b.nome)}</option>)}
-                                              </optgroup>
-                                            </>
-                                          ) : (
-                                            [...ARMI_5E].sort((a, b) => traduciDato(a.nome).localeCompare(traduciDato(b.nome), lingua)).map((w) => <option key={w.nome} value={w.nome}>{traduciDato(w.nome)}</option>)
-                                          )}
-                                        </select>
+                                          <IconaAzione
+                                            nome={cleanNome}
+                                            tipo={a.tipo}
+                                            isSpell={a.isSpell}
+                                            tipoFonte={a.tipoFonte}
+                                            cat={cat}
+                                            dimensione={22}
+                                          />
+                                        </button>
+                                      ) : (
+                                        <div style={{ position: 'relative', width: 24, height: 24, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                          <IconaAzione
+                                            nome={cleanNome}
+                                            tipo={a.tipo}
+                                            isSpell={false}
+                                            cat={cat}
+                                            dimensione={22}
+                                          />
+                                          <select
+                                            value=""
+                                            title={cat === 'Bonus' ? "Scegli un'azione bonus o incantesimo bonus" : t('tip.scegli_arma')}
+                                            onChange={(e) => {
+                                              const v = e.target.value;
+                                              if (!v) return;
+                                              if (cat === 'Bonus') {
+                                                const b = AZIONI_BONUS_5E.find((x) => x.nome === v);
+                                                if (b) {
+                                                  const desc = b.note || spiegaIncantesimo(b.nome) || spiegaPrivilegio(b.nome) || '';
+                                                  aggiornaAttacco({ nome: b.nome, bonus: 0, danno: b.danno || '', tipoDanno: b.tipoDanno || '', note: desc });
+                                                }
+                                              } else {
+                                                const arma = ARMI_5E.find((w) => w.nome === v);
+                                                if (arma) {
+                                                  const vecchioNome = a.nome;
+                                                  const nuovoAttacco = attaccoDaArma(arma, scheda);
+                                                  const inv = scheda.inventario || [];
+                                                  const esisteNuovo = inv.some((x) => x.nome.toLowerCase() === arma.nome.toLowerCase());
+                                                  let newInv;
+                                                  if (esisteNuovo) {
+                                                    newInv = inv.map((x) => {
+                                                      if (x.nome.toLowerCase() === arma.nome.toLowerCase()) return { ...x, equip: true };
+                                                      if (x.nome.toLowerCase() === vecchioNome.toLowerCase()) return { ...x, equip: false };
+                                                      return x;
+                                                    });
+                                                  } else {
+                                                    newInv = [
+                                                      ...inv.map((x) => (x.nome.toLowerCase() === vecchioNome.toLowerCase() ? { ...x, equip: false } : x)),
+                                                      completaUtilizziOggetto({ id: `inv-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`, nome: arma.nome, qta: 1, peso: pesoStimato(arma.nome), equip: true, categoria: 'Arma' })
+                                                    ];
+                                                  }
+                                                  aggiorna({
+                                                    attacchi: scheda.attacchi.map((x) => (x.id === a.id ? { ...x, ...nuovoAttacco } : x)),
+                                                    inventario: newInv,
+                                                  });
+                                                }
+                                              }
+                                            }}
+                                            style={{
+                                              position: 'absolute',
+                                              inset: 0,
+                                              opacity: 0,
+                                              width: '100%',
+                                              height: '100%',
+                                              cursor: 'pointer',
+                                              margin: 0,
+                                              padding: 0,
+                                            }}
+                                          >
+                                            <option value="">{cleanNome}</option>
+                                            {cat === 'Bonus' ? (
+                                              <>
+                                                <optgroup label={lingua === 'en' ? 'Bonus actions and weapons' : 'Azioni bonus e armi'}>
+                                                  {AZIONI_BONUS_5E.filter((x) => x.tipo === 'combattimento' || x.tipo === 'talento' || x.tipo === 'privilegio').map((b) => <option key={b.nome} value={b.nome} title={b.note || spiegaPrivilegio(b.nome)}>{traduciDato(b.nome)}</option>)}
+                                                </optgroup>
+                                                <optgroup label={lingua === 'en' ? 'Bonus Action Spells' : 'Incantesimi Azione Bonus'}>
+                                                  {AZIONI_BONUS_5E.filter((x) => x.tipo === 'incantesimo').map((b) => <option key={b.nome} value={b.nome} title={b.note || spiegaIncantesimo(b.nome)}>{traduciDato(b.nome)}</option>)}
+                                                </optgroup>
+                                              </>
+                                            ) : (
+                                              [...ARMI_5E].sort((a, b) => traduciDato(a.nome).localeCompare(traduciDato(b.nome), lingua)).map((w) => <option key={w.nome} value={w.nome}>{traduciDato(w.nome)}</option>)
+                                            )}
+                                          </select>
+                                        </div>
                                       )}
                                       {/* Il nome lo decide il sistema (arma, incantesimo, privilegio): non si
                                           rinomina. Un tocco apre la nuvoletta con le informazioni essenziali. */}
@@ -14465,7 +14493,13 @@ export default function App() {
                                   transition: 'all 0.2s ease',
                                 }}
                               >
-                                <div className="spell-row" style={{ display: 'flex', flexWrap: 'nowrap', alignItems: 'center', gap: 4 }}>
+                                <div className="spell-row" style={{ display: 'flex', flexWrap: 'nowrap', alignItems: 'center', gap: 6 }}>
+                                  <IconaAzione
+                                    nome={s.nome}
+                                    isSpell={true}
+                                    tipoFonte={isAraldiSpell ? 'araldi' : ''}
+                                    dimensione={20}
+                                  />
                                   <button
                                     style={{ background: 'transparent', border: 'none', color: isRowInEccesso ? C.red : (isAraldiSpell ? 'var(--c-araldi, #a45a2a)' : C.ink), fontWeight: 700, cursor: 'help', textAlign: 'left', padding: 0, fontSize: 14, lineHeight: 1.2, textDecoration: 'underline dotted', textUnderlineOffset: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
                                     onClick={() => setInfo({ titolo: `${s.nome || 'Incantesimo'}${s.livello === 0 ? (en ? ' · Cantrip' : ' · Trucchetto') : (en ? ` · Level ${s.livello}` : ` · ${s.livello}° livello`)}`, testo: testoModal || (en ? 'No description available for this spell.' : 'Nessuna descrizione disponibile per questo incantesimo.') })}
@@ -16490,6 +16524,7 @@ export default function App() {
                                   </td>
                                   <td data-label={t('inv.nome')} style={{ ...styles.td, ...((mostraEffetto || mostraUtilizzi || mostraContenuto) && senzaBordo) }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                                      <IconaOggetto nome={o.nome} categoria={o.categoria} dimensione={18} stileBadge={true} />
                                       {(() => {
                                         const spItem = o.effetto || spiegaIncantesimo(o.nome) || (EFFETTI_OGGETTO.find(([id]) => id === o.effettoMeccanico)?.[lingua === 'en' ? 2 : 1]);
                                         return (

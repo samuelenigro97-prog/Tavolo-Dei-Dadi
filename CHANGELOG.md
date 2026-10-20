@@ -2,6 +2,15 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.109.0] – 2026-10-20
+
+### Aggiunto
+- **Formula ibrida per le icone fantasy (Game-Icons.net + Glifi Runici)**:
+  - **Armi, Attacchi e Azioni di Combattimento**: icone vettoriali Game-Icons.net in micro-badge ad altissima definizione per tutte le tipologie di armi (spadone a due mani, stocco, pugnale, ascia da guerra, martello, lancia, balestra, arco, bastone, armi ad asta e spade incrociate). Il tocco/clic sull'icona apre istantaneamente il selettore per cambiare arma o consultare i dettagli.
+  - **Incantesimi e Trucchetti**: silhouette Game-Icons.net coordinate per elemento e scuola (palla di fuoco, dardi incantati, gelo, fulmine, cura/sacro, necrotico, veleno, arcano e grimorio) presenti sia nella sezione combattimento che nel catalogo degli incantesimi.
+  - **Oggetti e Inventario**: icone chiare in stile Game-Icons per pozioni, pergamene, armature, armi e manufatti magici.
+  - **Glifi Runici (Neon Arcani)**: sigilli cosmici ed esoterici per la sezione *Poteri / Debito del Patrono / Araldi del Segreto* (Runa del Disfacimento, Sigillo dell'Occhio Onnisciente, Patto di Sangue e Salvezza Arcana) con bagliore neon ciano/viola che risalta l'aura aliena e misteriosa dei poteri occulti.
+
 ## [4.108.6] – 2026-10-20
 
 ### Modificato
