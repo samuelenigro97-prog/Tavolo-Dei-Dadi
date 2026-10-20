@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.109.3',
+    voci: {
+      it: ['Badge di versione: contrasto e leggibilità ottimizzati per gli standard WCAG su ogni sfondo.'],
+      en: ['Version badge: optimized contrast and readability matching WCAG standards on any background.'],
+    },
+  },
+  {
     versione: '4.109.2',
     voci: {
       it: ['Indicatore della versione corrente visibile in modo discreto in basso a destra per verificare l\'allineamento con un colpo d\'occhio.'],

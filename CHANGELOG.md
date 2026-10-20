@@ -2,6 +2,11 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.109.3] – 2026-10-20
+
+### Corretto
+- **Contrasto badge versione per accessibilità WCAG AA/AAA**: fondo solido ad alto contrasto (`#12171f`), testo oro chiaro (`#f0c050`) e bordo definito (`#7c5c16`) con contrasto superiore a 10:1 su qualsiasi ambientazione (chiara e scura), garantendo il passaggio istantaneo dei test di accessibilità axe-core in CI.
+
 ## [4.109.2] – 2026-10-20
 
 ### Aggiunto
