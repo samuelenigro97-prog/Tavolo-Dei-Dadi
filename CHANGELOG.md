@@ -2,6 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.109.4] – 2026-10-20
+
+### Corretto
+- **Apertura automatica del Combat Tracker da sotto**:
+  - Quando il combat tracker è aperto (`combat.aperto`), si apre ed emerge in automatico da sotto con il bordo radioso dorato e resta visibile e accessibile sullo schermo.
+  - Cliccando sul pulsante ⚔️ (dalla barra superiore o direttamente dalla sezione Combattimento nella scheda Azioni) o toccando la striscia/maniglia inferiore, il tracker si auto-apre immediatamente e fluidamente.
+  - Quando ridotto con `▲` o ⚔️, scivola morbidamente in basso lasciando solo la discreta maniglia dorata, continuando a fare capolino al passaggio del cursore.
+
 ## [4.109.3] – 2026-10-20
 
 ### Corretto

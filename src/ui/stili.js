@@ -1856,10 +1856,11 @@ tbody tr:hover {
 }
 
 /* Combat Tracker a scomparsa (computer col mouse, identico alla barra in alto):
-   Resta in vista solo una striscia con una maniglia sul bordo inferiore (stessa sporgenza di quella in alto);
-   avvicinando il cursore al fondo dello schermo (o passando col Tab) il tracker
-   sale con un'animazione fluida ultra-reattiva a 60/120fps, e quando arriva attiva
-   un bordo dorato luminoso con aura che ne sottolinea l'attivazione. */
+   Quando APERTO (combat-aperto): compare ed è completamente visibile sul fondo
+   con bordo dorato radioso, aura luminosa e piena reattività;
+   Quando RIDOTTO/CHIUSO (combat-chiuso): resta in vista solo la striscia con maniglia (10px / 14px),
+   e avvicinando il cursore o passando col Tab fa capolino e sale in modo fluido;
+   Cliccando sulla maniglia o sul pulsante ⚔️ si auto-apre completamente da sotto e resta aperto. */
 .combat-zona-apertura { display: none; }
 
 .combat-tracker-fisso {
@@ -1873,73 +1874,26 @@ tbody tr:hover {
   will-change: transform, opacity, box-shadow;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  box-shadow: 0 -6px 28px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 -10px 36px rgba(0, 0, 0, 0.65), 0 -2px 18px rgba(212, 160, 23, 0.5), inset 0 1px 0 rgba(255, 230, 150, 0.45);
+  border-top: 1.5px solid var(--c-gold, #d4a017);
+  border-left: 1.5px solid var(--c-gold, #d4a017);
+  border-right: 1.5px solid var(--c-gold, #d4a017);
   transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-@media (hover: hover) and (pointer: fine) and (min-width: 681px) {
-  :root[data-barra-a-scomparsa="si"] .combat-zona-apertura {
-    display: block;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 18px;
-    z-index: 1499;
-  }
-  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto {
-    transform: translate(-50%, calc(100% - 10px)) !important;
-    transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1) 0.6s, box-shadow 0.3s ease 0.6s, border-color 0.3s ease 0.6s !important;
-    box-shadow: none !important;
-  }
-  :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-aperto,
-  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto:hover,
-  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto:focus-within {
-    transform: translate(-50%, 0) !important;
-    transition-delay: 0s !important;
-    border-top: 1.5px solid var(--c-gold, #d4a017) !important;
-    border-left: 1.5px solid var(--c-gold, #d4a017) !important;
-    border-right: 1.5px solid var(--c-gold, #d4a017) !important;
-    box-shadow: 0 -10px 36px rgba(0, 0, 0, 0.65), 0 -2px 18px rgba(212, 160, 23, 0.5), inset 0 1px 0 rgba(255, 230, 150, 0.45) !important;
-  }
-  /* A tracker chiuso il contenuto è nascosto: nella striscia in basso resta solo la maniglia. */
-  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto > * {
-    opacity: 0;
-    transition: opacity 0.15s ease 0.4s !important;
-  }
-  :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-aperto > *,
-  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto:hover > *,
-  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto:focus-within > * {
-    opacity: 1;
-    transition: opacity 0.18s ease 0.24s !important;
-  }
-  /* Maniglia: si vede solo a tracker chiuso (sul bordo superiore della striscia, simmetrica a quella sopra). */
-  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 3px;
-    width: 40px;
-    height: 3px;
-    margin-left: -20px;
-    border-radius: 3px;
-    background: var(--c-gold, var(--c-tema-bordo, var(--c-border)));
-    transition: opacity 0.2s ease 0.6s;
-    pointer-events: none;
-  }
-  :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-aperto::before,
-  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto:hover::before,
-  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-aperto:focus-within::before {
-    opacity: 0;
-    transition-delay: 0s;
-  }
-  :root[data-barra-a-scomparsa="si"] .combat-spacer {
-    height: 20px !important;
-  }
+.combat-tracker-fisso.combat-aperto {
+  transform: translate(-50%, 0) !important;
+  border-top: 1.5px solid var(--c-gold, #d4a017) !important;
+  border-left: 1.5px solid var(--c-gold, #d4a017) !important;
+  border-right: 1.5px solid var(--c-gold, #d4a017) !important;
+  box-shadow: 0 -10px 36px rgba(0, 0, 0, 0.65), 0 -2px 18px rgba(212, 160, 23, 0.5), inset 0 1px 0 rgba(255, 230, 150, 0.45) !important;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso { transition: none !important; }
+.combat-tracker-fisso.combat-aperto > * {
+  opacity: 1 !important;
+  transition: opacity 0.2s ease 0.1s !important;
+}
+.combat-tracker-fisso.combat-aperto::before {
+  display: none !important;
 }
 
 /* Quando è chiuso (sia su mobile che ridotto esplicitamente con ▲): resta la linguetta con maniglia */
@@ -1947,10 +1901,13 @@ tbody tr:hover {
   transform: translate3d(-50%, calc(100% - 14px), 0) !important;
   box-shadow: none !important;
   cursor: pointer;
+  border-color: var(--c-tema-bordo, var(--c-border)) !important;
+  transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease !important;
 }
 .combat-tracker-fisso.combat-chiuso > * {
   opacity: 0 !important;
   pointer-events: none !important;
+  transition: opacity 0.15s ease !important;
 }
 .combat-tracker-fisso.combat-chiuso::before {
   content: '';
@@ -1963,6 +1920,45 @@ tbody tr:hover {
   border-radius: 3px;
   background: var(--c-gold, var(--c-tema-bordo, var(--c-border)));
   pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 681px) {
+  :root[data-barra-a-scomparsa="si"] .combat-zona-apertura {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 18px;
+    z-index: 1499;
+  }
+  :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-chiuso,
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:hover,
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:focus-within {
+    transform: translate(-50%, 0) !important;
+    transition-delay: 0s !important;
+    border-top: 1.5px solid var(--c-gold, #d4a017) !important;
+    border-left: 1.5px solid var(--c-gold, #d4a017) !important;
+    border-right: 1.5px solid var(--c-gold, #d4a017) !important;
+    box-shadow: 0 -10px 36px rgba(0, 0, 0, 0.65), 0 -2px 18px rgba(212, 160, 23, 0.5), inset 0 1px 0 rgba(255, 230, 150, 0.45) !important;
+  }
+  :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-chiuso > *,
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:hover > *,
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:focus-within > * {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transition: opacity 0.2s ease 0.1s !important;
+  }
+  :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-chiuso::before,
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:hover::before,
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:focus-within::before {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso { transition: none !important; }
 }
 .barra-tiro {
   position: sticky !important;

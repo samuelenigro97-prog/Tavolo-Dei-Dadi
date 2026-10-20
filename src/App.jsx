@@ -1990,7 +1990,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.109.3';
+const APP_VERSION = '4.109.4';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -12770,7 +12770,36 @@ export default function App() {
 
               {/* Intestazione Combattimento & Filtri Armi / Incantesimi Offensivi */}
               <div className="sottosezione-titolo" style={{ display: 'grid', gridTemplateColumns: 'minmax(28px, 1fr) auto minmax(28px, 1fr)', alignItems: 'center', columnGap: 6, marginTop: 18, marginBottom: 8 }}>
-                <div />
+                <div style={{ justifySelf: 'start' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (combat.attivo && combat.aperto) setCombat((c) => ({ ...c, aperto: false }));
+                      else if (combat.combattenti.length) setCombat((c) => ({ ...c, attivo: true, aperto: true }));
+                      else aggiungiPgAlCombat();
+                    }}
+                    style={{
+                      ...styles.buttonMini,
+                      fontSize: 11,
+                      padding: '2px 8px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      background: combat.attivo ? 'rgba(212, 160, 23, 0.18)' : 'transparent',
+                      borderColor: combat.attivo ? 'var(--c-gold, #d4a017)' : C.border,
+                      color: combat.attivo ? 'var(--c-gold-dark, #b8860b)' : C.inkDim,
+                      fontWeight: combat.attivo ? 700 : 500,
+                      cursor: 'pointer',
+                    }}
+                    title={combat.attivo && combat.aperto ? t('ct.minimizza') : t('ct.apri')}
+                  >
+                    <span>⚔️</span>
+                    <span>Combat Tracker</span>
+                    {combat.attivo && (
+                      <span style={{ fontSize: 9, opacity: 0.8 }}>{combat.aperto ? '▼' : '▲'}</span>
+                    )}
+                  </button>
+                </div>
                 <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 14 }}>
                   {t('combat.titolo')}
                 </h3>
@@ -17534,7 +17563,7 @@ export default function App() {
           <a href="https://game-icons.net" target="_blank" rel="noreferrer" style={{ color: C.inkDim }}>game-icons.net</a>{' '}
           (CC BY 3.0).
         </footer>
-        <div className="combat-spacer" style={{ height: combat.attivo && combat.aperto ? 220 : 0 }} />
+        <div className="combat-spacer" style={{ height: combat.attivo && combat.aperto ? 260 : (combat.attivo ? 20 : 0) }} />
       </main>
 
       {/* ===== Modale Menu Hub per Mobile (Tutti gli strumenti in ordine e comodamente cliccabili) ===== */}
@@ -17901,7 +17930,10 @@ export default function App() {
                     type="button"
                     data-testid="ct-minimizza"
                     style={{ ...stileTastoTondo, fontSize: 11, color: 'var(--c-gold-dark)', border: '1.5px solid var(--c-gold-dark)' }}
-                    onClick={() => setCombat((c) => ({ ...c, aperto: false }))}
+                    onClick={(e) => {
+                      e.currentTarget.blur();
+                      setCombat((c) => ({ ...c, aperto: false }));
+                    }}
                     title={t('ct.minimizza')}
                     aria-label={t('ct.minimizza')}
                   >
