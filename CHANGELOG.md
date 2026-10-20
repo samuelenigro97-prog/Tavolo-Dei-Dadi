@@ -2,6 +2,11 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.108.5] – 2026-10-20
+
+### Aggiunto
+- **Combat tracker a scomparsa (stile barra in alto)**: quando il combattimento è attivo (`combat.attivo`), il tracker in basso adotta la stessa elegante meccanica a scomparsa della barra superiore. A riposo resta visibile solo una discreta striscia con la maniglia centrata sul bordo inferiore; avvicinando il cursore (o passando il mouse/Tab sul fondo), il tracker scorre fluidamente verso l'alto ed è subito pronto per azioni, turni e danni. Quando il cursore si allontana, scivola morbidamente indietro liberando la visuale della scheda.
+
 ## [4.108.4] – 2026-10-20
 
 ### Modificato

@@ -1989,7 +1989,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.108.4';
+const APP_VERSION = '4.108.5';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -17499,7 +17499,7 @@ export default function App() {
           <a href="https://game-icons.net" target="_blank" rel="noreferrer" style={{ color: C.inkDim }}>game-icons.net</a>{' '}
           (CC BY 3.0).
         </footer>
-        <div style={{ height: combat.attivo && combat.aperto ? 220 : 0 }} />
+        <div className="combat-spacer" style={{ height: combat.attivo && combat.aperto ? 220 : 0 }} />
       </main>
 
       {/* ===== Modale Menu Hub per Mobile (Tutti gli strumenti in ordine e comodamente cliccabili) ===== */}
@@ -17666,30 +17666,36 @@ export default function App() {
         </div>
       )}
 
-      {/* ===== Combat tracker: barra fissa in basso (stile Fantasy Grounds) ===== */}
-      {combat.attivo && combat.aperto ? (
-        <div
-          ref={combatRef}
-          data-testid="combat-tracker"
-          style={{
-            ...stileTemaBase,
-            position: 'fixed',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            bottom: 0,
-            width: '100%',
-            maxWidth: 1080,
-            zIndex: 1500,
-            background: 'var(--c-pg-panel, var(--c-tema-sfondo))',
-            borderTop: '1.5px solid var(--c-tema-bordo)',
-            borderLeft: '1.5px solid var(--c-tema-bordo)',
-            borderRight: '1.5px solid var(--c-tema-bordo)',
-            borderTopLeftRadius: 12,
-            borderTopRightRadius: 12,
-            boxShadow: '0 -6px 28px rgba(0,0,0,0.5)',
-            boxSizing: 'border-box',
-          }}
-        >
+      {/* ===== Combat tracker: barra fissa in basso a scomparsa (stile Fantasy Grounds) ===== */}
+      {combat.attivo ? (
+        <>
+          <div className="combat-zona-apertura" aria-hidden="true" />
+          <div
+            ref={combatRef}
+            data-testid="combat-tracker"
+            className={`combat-tracker-fisso ${combat.aperto ? 'combat-aperto' : 'combat-chiuso'}`}
+            onClick={() => {
+              if (!combat.aperto) {
+                setCombat((c) => ({ ...c, aperto: true }));
+              }
+            }}
+            style={{
+              ...stileTemaBase,
+              position: 'fixed',
+              left: '50%',
+              bottom: 0,
+              width: '100%',
+              maxWidth: 1080,
+              zIndex: 1500,
+              background: 'var(--c-pg-panel, var(--c-tema-sfondo))',
+              borderTop: '1.5px solid var(--c-tema-bordo)',
+              borderLeft: '1.5px solid var(--c-tema-bordo)',
+              borderRight: '1.5px solid var(--c-tema-bordo)',
+              borderTopLeftRadius: 12,
+              borderTopRightRadius: 12,
+              boxSizing: 'border-box',
+            }}
+          >
           <div style={{ padding: '8px 12px' }}>
             {/* BARRA SUPERIORE CONTROLLI COMBAT TRACKER */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 8, paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
@@ -18315,6 +18321,7 @@ export default function App() {
             })()}
           </div>
         </div>
+      </>
       ) : null}
       <NuvolettaGlobale />
     </div>
