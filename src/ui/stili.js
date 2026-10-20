@@ -2035,26 +2035,21 @@ tbody tr:hover {
   opacity: 0.18 !important;
   filter: grayscale(15%) !important;
 }
-.sfondo-car-emoji {
+.sfondo-car-svg {
   position: absolute;
-  right: 2px;
-  bottom: -4px;
-  font-size: 66px;
-  line-height: 1;
+  right: -4px;
+  bottom: -6px;
   pointer-events: none;
   user-select: none;
   transform: rotate(-8deg);
-  opacity: 0.22;
-  filter: grayscale(10%);
-  transition: opacity 0.2s ease, filter 0.2s ease;
+  opacity: 0.14;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
-[data-tema="chiaro"] .sfondo-car-emoji {
-  opacity: 0.30 !important;
-  filter: grayscale(0%) saturate(1.15) !important;
+[data-tema="chiaro"] .sfondo-car-svg {
+  opacity: 0.16 !important;
 }
-[data-tema="scuro"] .sfondo-car-emoji {
-  opacity: 0.18 !important;
-  filter: grayscale(15%) !important;
+[data-tema="scuro"] .sfondo-car-svg {
+  opacity: 0.12 !important;
 }
 /* Tutti i tasti su UNA riga sotto il titolo: i gruppi si sciolgono con
    display:contents, così i bottoni sono figli diretti della riga. */

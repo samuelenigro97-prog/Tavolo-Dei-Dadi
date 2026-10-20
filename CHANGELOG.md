@@ -2,6 +2,16 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.110.0] – 2026-10-20
+
+### Aggiunto
+- **Sostituzione completa emoji con icone fantasy vettoriali (Game-Icons / SVG a tema)**:
+  - Eliminazione di tutte le emoji generiche di sistema nei popup di dettaglio azioni/incantesimi (es. Morsa del Gelo, reazioni, magie), sostituite da icone SVG a tema scalabili con colori coerenti (es. ciano per gelo, oro per sacro, cremisi per fuoco/sangue).
+  - Nuove icone vettoriali RPG per la barra superiore e mobile hub (`IconaUI` per dado d20, livello, cestino, cerca, pergamena, tema, mappa, spade incrociate, cloud).
+  - Combat Tracker completamente vettoriale: token iniziativa (`dado`), area (`esplosione`), pedine combattenti (`mago`, `bestia`, `teschio`), ferite e tiri salvezza contro morte (`teschio`), punti ferita temporanei (`scudo`).
+  - Filigrana caratteristiche nei blocchi scheda rigenerata con glifi vettoriali eleganti al posto delle emoji giganti.
+  - Pulizia automatica residuale `rimuoviEmoji` per titoli e descrizioni per garantire la totale assenza di emoji native anche su testi storici o personalizzati.
+
 ## [4.109.4] – 2026-10-20
 
 ### Corretto

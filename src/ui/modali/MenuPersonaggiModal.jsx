@@ -4,6 +4,7 @@ import { styles } from '../stili.js';
 import { C } from '../tema.js';
 import { t } from '../../i18n';
 import { URL_ARCHIVIO_PG } from '../../utils/ambiente.js';
+import { IconaUI } from '../IconaFantasy.jsx';
 
 /** Titoletti delle sezioni del menu: stesso stile delle etichette della barra (SISTEMA, SCHEDA, SESSIONE). */
 // Tasti del menu in griglia: tutti alti uguali, testo su due righe se serve (mai tagliato),
@@ -151,7 +152,7 @@ export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg
                       },
                     })}
                   >
-                    🗑️
+                    <IconaUI nome="cestino" dimensione={13} color={C.red} />
                   </button>
                 </div>
                 );

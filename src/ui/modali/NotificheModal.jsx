@@ -3,6 +3,7 @@ import { C } from '../tema.js';
 import { t, tr } from '../../i18n';
 import { styles } from '../stili.js';
 import { novitaRecenti } from '../../data/novita.js';
+import { IconaUI } from '../IconaFantasy.jsx';
 
 export function NotificheModal({ APP_VERSION, aggiorna, avvisoBackup, controlliAttivi, correggiTuttiControlli, eseguiCorrezione, esportaBackupCompleto, lingua, nuvolettaCorrezioni, posNotifiche, rimandaBackup, scheda, setMostraNotifiche, setNuvolettaCorrezioni }) {
   return (
@@ -53,8 +54,8 @@ export function NotificheModal({ APP_VERSION, aggiorna, avvisoBackup, controlliA
               <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                 {nuvolettaCorrezioni.voci.map((v, idx) => (
                   <div key={idx} style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 6, padding: '6px 8px', fontSize: 11 }}>
-                    <div style={{ fontWeight: 700, color: C.ink, marginBottom: 3, display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <span>{v.icona}</span>
+                    <div style={{ fontWeight: 700, color: C.ink, marginBottom: 3, display: 'flex', alignItems: 'center', gap: 5 }}>
+                      {v.iconaUI ? <IconaUI nome={v.iconaUI} dimensione={13} color={C.goldDark} /> : (v.icona ? <span>{v.icona}</span> : null)}
                       <span>{v.campo}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, flexWrap: 'wrap' }}>
@@ -114,8 +115,9 @@ export function NotificheModal({ APP_VERSION, aggiorna, avvisoBackup, controlliA
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {controlliAttivi.map((r) => (
                         <div key={r.id} style={{ display: 'flex', flexDirection: 'column', gap: 5, background: C.panel, border: `1px solid ${C.border}`, borderRadius: 6, padding: '7px 9px' }}>
-                          <div style={{ fontSize: 12, color: C.ink, lineHeight: 1.4 }}>
-                            {r.gravita === 'certo' ? '🔴' : '🟡'} {r.testo}
+                          <div style={{ fontSize: 12, color: C.ink, lineHeight: 1.4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ width: 8, height: 8, borderRadius: '50%', background: r.gravita === 'certo' ? C.red : C.goldDark, flexShrink: 0 }} />
+                            <span>{r.testo}</span>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, marginTop: 2, paddingTop: 4, borderTop: `1px solid ${C.border}`, opacity: 0.95 }}>
                             {r.correggibile && (

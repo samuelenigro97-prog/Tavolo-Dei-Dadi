@@ -8,7 +8,7 @@ import { C, BASE_TEMA, PRESET_COLORI, ambientazioneCasuale } from "./ui/tema.js"
 import { styles, GLOBAL_CSS } from './ui/stili.js';
 import { Editable, Rollable, iconaTipoDanno, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, caratteristicaDaTesto, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
-import { IconaAzione, IconaRunica, IconaOggetto } from './ui/IconaFantasy.jsx';
+import { IconaAzione, IconaRunica, IconaOggetto, IconaUI, rimuoviEmoji, IconaModalInfo } from './ui/IconaFantasy.jsx';
 import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, attaccoIncantesimoAttivo, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
 import { normalizzaTrascrizione } from './rules/importSchede.js';
 import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } from "./data/esempi.js";
@@ -49,12 +49,12 @@ async function fetchConTimeout(url, opzioni = {}, timeoutMs = 8000) {
 }
 
 const SFONDO_CARATTERISTICA = {
-  forza:        { symbol: '⚔️', label: 'Forza' },
-  destrezza:    { symbol: '🏹', label: 'Destrezza' },
-  costituzione: { symbol: '🛡️', label: 'Costituzione' },
-  intelligenza: { symbol: '📚', label: 'Intelligenza' },
-  saggezza:     { symbol: '🔮', label: 'Saggezza' },
-  carisma:      { symbol: '🎭', label: 'Carisma' },
+  forza:        { iconaUI: 'spadone', label: 'Forza' },
+  destrezza:    { iconaUI: 'arco', label: 'Destrezza' },
+  costituzione: { iconaUI: 'scudo', label: 'Costituzione' },
+  intelligenza: { iconaUI: 'libro', label: 'Intelligenza' },
+  saggezza:     { iconaUI: 'arcano', label: 'Saggezza' },
+  carisma:      { iconaUI: 'stella', label: 'Carisma' },
 };
 
 
@@ -1990,7 +1990,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.109.4';
+const APP_VERSION = '4.110.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -7450,7 +7450,7 @@ export default function App() {
       const valPrima = conSegno(mod);
       const valDopo = conSegno(mod + comp);
       return {
-        icona: '🛡️',
+        iconaUI: 'scudo',
         campo: isEn ? `Tiro Salvezza: ${nomeCar}` : `Tiro Salvezza: ${nomeCar}`,
         prima: isEn ? `Not proficient (${valPrima})` : `Non competente (${valPrima})`,
         dopo: isEn ? `Proficient (${valDopo})` : `Competente (${valDopo})`,
@@ -7464,7 +7464,7 @@ export default function App() {
       const txtPrima = livPrima === 0 ? (isEn ? 'Not proficient' : 'Non competente') : (livPrima === 1 ? (isEn ? 'Proficient' : 'Competente') : (isEn ? 'Expertise' : 'Maestria'));
       const txtDopo = livDopo === 1 ? (isEn ? 'Proficient' : 'Competente') : (isEn ? 'Expertise' : 'Maestria');
       return {
-        icona: '🎯',
+        iconaUI: 'stocco',
         campo: isEn ? `Skill: ${nomeAb}` : `Abilità: ${nomeAb}`,
         prima: txtPrima,
         dopo: txtDopo,
@@ -7476,7 +7476,7 @@ export default function App() {
       const livPrima = pg.abilita?.[r.targetKey] || 0;
       const txtPrima = livPrima === 1 ? (isEn ? 'Proficient' : 'Competente') : (livPrima === 2 ? (isEn ? 'Expertise' : 'Maestria') : '1');
       return {
-        icona: '✂️',
+        iconaUI: 'cestino',
         campo: isEn ? `Skill: ${nomeAb}` : `Abilità: ${nomeAb}`,
         prima: txtPrima,
         dopo: isEn ? 'Removed (0)' : 'Rimossa (0)',
@@ -7488,7 +7488,7 @@ export default function App() {
       const dopo = conSegno(r.targetVal);
       const liv = pg.livello || 1;
       return {
-        icona: '✨',
+        iconaUI: 'arcano',
         campo: isEn ? `Proficiency Bonus (Level ${liv})` : `Bonus Competenza (Livello ${liv})`,
         prima: prima,
         dopo: dopo,
@@ -7497,7 +7497,7 @@ export default function App() {
     }
     if (r.tipo === 'budget_abilita') {
       return {
-        icona: '⚖️',
+        iconaUI: 'pergamena',
         campo: isEn ? 'Skill Budget' : 'Budget Abilità',
         prima: isEn ? 'Exceeded allowed skills' : 'Superate le abilità concesse',
         dopo: isEn ? `Aligned to max budget (${r.budget || 4})` : `Riallineato al budget massimo (${r.budget || 4})`,
@@ -7508,7 +7508,7 @@ export default function App() {
       const nomeAttesa = CARATTERISTICHE.find((c) => c.key === r.targetVal)?.label || r.targetVal;
       const nomeAttuale = CARATTERISTICHE.find((c) => c.key === pg.incantatore?.caratteristica)?.label || pg.incantatore?.caratteristica || '—';
       return {
-        icona: '🔮',
+        iconaUI: 'mago',
         campo: isEn ? 'Spellcasting Ability' : 'Caratteristica Incantatore',
         prima: nomeAttuale,
         dopo: nomeAttesa,
@@ -7696,14 +7696,19 @@ export default function App() {
             style={{ ...styles.panel, maxWidth: 360, width: '100%', position: 'relative', boxShadow: '0 12px 35px rgba(0,0,0,0.4)', borderTop: `2px solid ${C.goldDark}` }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <strong style={{ color: C.goldDark, fontSize: 16 }}>{info.titolo}</strong>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
+                <IconaModalInfo info={info} dimensione={22} />
+                <strong style={{ color: C.goldDark, fontSize: 16, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {rimuoviEmoji(info.titolo)}
+                </strong>
+              </div>
               <button style={styles.buttonMini} onClick={() => setInfo(null)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
             </div>
             <div 
               style={{ fontSize: 14, lineHeight: 1.5, color: C.ink, whiteSpace: 'pre-wrap', maxHeight: '70vh', overflowY: 'auto' }}
             >
-              {String(info.testo || '').replace(/\*\*([^*]+)\*\*/g, '$1')}
+              {rimuoviEmoji(String(info.testo || '')).replace(/\*\*([^*]+)\*\*/g, '$1')}
             </div>
           </div>
         </div>
@@ -9882,7 +9887,7 @@ export default function App() {
                           setMostraLevelUp(true);
                         }}
                       >
-                        🆙
+                        <IconaUI nome="levelUp" dimensione={14} color="currentColor" />
                       </button>
                       <button
                         className="btn-header-azione"
@@ -9891,7 +9896,7 @@ export default function App() {
                         title={t('tip.elimina_pg')}
                         aria-label={t('tip.elimina_pg')}
                       >
-                        🗑
+                        <IconaUI nome="cestino" dimensione={14} color="currentColor" />
                       </button>
                       <button
                         className="btn-header-azione"
@@ -9904,7 +9909,7 @@ export default function App() {
                         title={t('roll.tavolo_dadi')}
                         aria-label={t('roll.tavolo_dadi')}
                       >
-                        🎲
+                        <IconaUI nome="dado" dimensione={14} color="currentColor" />
                       </button>
                       <button
                         className="btn-header-azione"
@@ -9917,7 +9922,7 @@ export default function App() {
                         title={`${t('compendio.titolo')} (Cmd+K)`}
                         aria-label={`${t('compendio.titolo')} (Cmd+K)`}
                       >
-                        🔍
+                        <IconaUI nome="lente" dimensione={14} color="currentColor" />
                       </button>
                     </div>
 
@@ -9935,7 +9940,7 @@ export default function App() {
                         aria-label={t('tooltip.tema')}
                         onClick={() => setTema(tema === 'auto' ? 'chiaro' : tema === 'chiaro' ? 'scuro' : 'auto')}
                       >
-                        {tema === 'auto' ? '🌗' : tema === 'chiaro' ? '☀️' : '🌙'}
+                        <IconaUI nome={tema === 'auto' ? 'eclissi' : tema === 'chiaro' ? 'sole' : 'luna'} dimensione={14} color="currentColor" />
                       </button>
                       <button
                         ref={ambientazioneBtnRef}
@@ -9954,7 +9959,7 @@ export default function App() {
                         title={`${t('sez.diario')} (${(Array.isArray(scheda.diario) ? scheda.diario.length : 0)})`}
                         aria-label={t('sez.diario')}
                       >
-                        📜
+                        <IconaUI nome="pergamena" dimensione={14} color="currentColor" />
                       </button>
 
                       <button
@@ -9964,7 +9969,7 @@ export default function App() {
                         title={mappaCampagna ? (mappaAperta ? t('mappa.chiudi') : t('mappa.apri')) : t('mappa.carica')}
                         aria-label={mappaCampagna ? (mappaAperta ? t('mappa.chiudi') : t('mappa.apri')) : t('mappa.carica')}
                       >
-                        🗺️
+                        <IconaUI nome="mappa" dimensione={14} color="currentColor" />
                       </button>
                       <button
                         data-combat-toggle="true"
@@ -9982,7 +9987,7 @@ export default function App() {
                         title={(combat.attivo && combat.aperto ? t('ct.minimizza') : t('ct.apri')) + (combat.combattenti.length ? ` (${combat.combattenti.length})` : '')}
                         aria-label={t('aria.combat_tracker')}
                       >
-                        ⚔️
+                        <IconaUI nome="spadeIncrociate" dimensione={14} color="currentColor" />
                       </button>
                     </div>
                   </div>
@@ -10024,7 +10029,7 @@ export default function App() {
                           : (lingua === 'en' ? 'Sync is off: characters stay on this device only' : 'Sincronizzazione non attiva: i personaggi restano solo su questo dispositivo')}
                       aria-label={t('aria.sync')}
                     >
-                      ☁️
+                      <IconaUI nome="nuvola" dimensione={14} color="currentColor" />
                     </button>
                     <button
                       className="btn-header-azione"
@@ -10033,7 +10038,7 @@ export default function App() {
                       title={t('roll.tavolo_dadi')}
                       aria-label={t('roll.tavolo_dadi')}
                     >
-                      🎲
+                      <IconaUI nome="dado" dimensione={14} color="currentColor" />
                     </button>
                     <button
                       data-combat-toggle="true"
@@ -10057,7 +10062,7 @@ export default function App() {
                       title={combat.attivo && combat.aperto ? t('ct.minimizza') : t('ct.apri')}
                       aria-label={combat.attivo && combat.aperto ? t('ct.minimizza') : t('ct.apri')}
                     >
-                      ⚔️
+                      <IconaUI nome="spadeIncrociate" dimensione={14} color="currentColor" />
                     </button>
                     <button
                       className="btn-header-azione"
@@ -11901,7 +11906,7 @@ export default function App() {
                             whiteSpace: 'nowrap',
                           }}
                         >
-                          <span style={{ color: col.text, fontWeight: 700 }}>{ico} {traduciDato(c)}</span>
+                          <span style={{ color: col.text, fontWeight: 700 }}>{traduciDato(c)}</span>
                           <button
                             type="button"
                             style={{ background: 'transparent', border: 'none', color: C.red, cursor: 'pointer', padding: 0, fontSize: 13, lineHeight: 1, fontWeight: 'bold' }}
@@ -11929,7 +11934,7 @@ export default function App() {
                       }}
                       title={t('common.aggiungi_lista')}
                     >
-                      ➕
+                      ＋
                       <select
                         value=""
                         onChange={(e) => { if (e.target.value) aggiorna({ condizioni: [...scheda.condizioni, e.target.value] }); }}
@@ -11937,7 +11942,7 @@ export default function App() {
                       >
                         <option value="">{t('common.aggiungi')}…</option>
                         {CONDIZIONI_5E.filter((c) => !scheda.condizioni.includes(c)).sort((a, b) => traduciDato(a).localeCompare(traduciDato(b), lingua)).map((c) => (
-                          <option key={c} value={c}>{ICONE_CONDIZIONI[c] || '⚠️'} {traduciDato(c)}</option>
+                          <option key={c} value={c}>{traduciDato(c)}</option>
                         ))}
                       </select>
                     </label>
@@ -11958,10 +11963,10 @@ export default function App() {
               const sfondoCar = SFONDO_CARATTERISTICA[key];
               return (
                 <div key={key} className={`blocco-car car-colore car-${key}`} style={{ ...styles.abilityBlock, position: 'relative', overflow: 'hidden' }}>
-                  {/* Sfondo emoji opaco che rappresenta la caratteristica */}
+                  {/* Sfondo SVG opaco vettoriale che rappresenta la caratteristica */}
                   {sfondoCar && (
-                    <span aria-hidden className="sfondo-car-emoji">
-                      {sfondoCar.symbol}
+                    <span aria-hidden className="sfondo-car-svg" style={{ position: 'absolute', right: -4, bottom: -6, opacity: 0.12, pointerEvents: 'none', userSelect: 'none', transform: 'rotate(-8deg)', color: `var(--c-car-${key}, var(--c-gold))` }}>
+                      <IconaUI nome={sfondoCar.iconaUI} dimensione={68} />
                     </span>
                   )}
                   <div className="blocco-car-header" style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
@@ -12793,7 +12798,7 @@ export default function App() {
                     }}
                     title={combat.attivo && combat.aperto ? t('ct.minimizza') : t('ct.apri')}
                   >
-                    <span>⚔️</span>
+                    <IconaUI nome="spadeIncrociate" dimensione={13} color={combat.attivo ? 'var(--c-gold, #d4a017)' : 'currentColor'} />
                     <span>Combat Tracker</span>
                     {combat.attivo && (
                       <span style={{ fontSize: 9, opacity: 0.8 }}>{combat.aperto ? '▼' : '▲'}</span>
@@ -13268,14 +13273,6 @@ export default function App() {
                               // con "Maestria: …" su un PG 5.0 non diventa un chip.
                               const categorieNota = categorieNotaTutte.filter((c) => c.categoria !== 'gittata' && !(a.isTS && c.categoria === 'tiroSalvezza') && !(versione === '2014' && /^maestria\s*:/i.test(String(c.testo || ''))));
                               const isTrucchetto = (spellInLista && spellInLista.livello === 0) || (spSpell && spSpell.livello === 0) || a.livello === 0;
-                              const iconaReazione = a.tipoFonte === 'araldi' ? '📜'
-                                : a.isSpell ? (isTrucchetto ? '✨' : '📖')
-                                : (a.tipo === 'tattica' || a.tipo === 'attacco') ? '⚔️'
-                                : a.tipo === 'stile' ? '🛡️'
-                                : a.tipo === 'talento' ? '⭐'
-                                : a.tipo === 'manovra' ? '🎯'
-                                : a.tipo === 'specie' ? '🧬'
-                                : '⚡';
                               const tipoAzione = cat === 'Azione' ? tr('1 Azione', '1 Action') : cat === 'Bonus' ? tr('Azione Bonus', 'Bonus Action') : tr('Reazione', 'Reaction');
                               const tempoLabel = tipoAzione;
                               const distanza = gittataAttacco(a, spellInLista, armaDb)
@@ -13303,7 +13300,18 @@ export default function App() {
                                 if (a.aDueMani !== undefined && isVersatile) righe.push(`${en ? 'Grip' : 'Impugnatura'}: ${a.aDueMani ? (en ? 'two hands' : 'a due mani') : (en ? 'one hand' : 'a una mano')}`);
                                 for (const c of categorieNota) righe.push(c.etichetta ? `${c.etichetta}: ${c.testo}` : c.testo);
                                 const descr = (a.innescoIt || a.effettoIt) ? '' : (spiegazioneEffetto || (categorieNotaTutte.length ? '' : a.note) || '');
-                                setInfo({ titolo: `${iconaReazione} ${cleanNome}`, testo: testoNuvoletta(righe, descr) || (en ? 'No description available.' : 'Nessuna descrizione disponibile.') });
+                                setInfo({
+                                  titolo: cleanNome,
+                                  iconaProps: {
+                                    nome: cleanNome,
+                                    tipo: a.tipo,
+                                    isSpell: a.isSpell,
+                                    tipoFonte: a.tipoFonte,
+                                    cat,
+                                    dimensione: 24,
+                                  },
+                                  testo: testoNuvoletta(righe, descr) || (en ? 'No description available.' : 'Nessuna descrizione disponibile.')
+                                });
                               };
 
                               return (
@@ -13488,7 +13496,7 @@ export default function App() {
                                               ? (lingua === 'en' ? `Two-Handed Grip (${dado2M}): Click to switch to One-Handed (${dado1M})` : `Impugnatura a 2 Mani (${dado2M}): Clicca per passare a 1 Mano (${dado1M})`)
                                               : (lingua === 'en' ? `One-Handed Grip (${dado1M}): Click to switch to Two-Handed (${dado2M})` : `Impugnatura a 1 Mano (${dado1M}): Clicca per passare a 2 Mani (${dado2M})`)}
                                           >
-                                            {a.aDueMani ? `🙌 2M` : `✋ 1M`}
+                                            {a.aDueMani ? '2M' : '1M'}
                                           </button>
                                         )}
                                       </div>
@@ -14531,7 +14539,11 @@ export default function App() {
                                   />
                                   <button
                                     style={{ background: 'transparent', border: 'none', color: isRowInEccesso ? C.red : (isAraldiSpell ? 'var(--c-araldi, #a45a2a)' : C.ink), fontWeight: 700, cursor: 'help', textAlign: 'left', padding: 0, fontSize: 14, lineHeight: 1.2, textDecoration: 'underline dotted', textUnderlineOffset: 3, whiteSpace: 'nowrap', flexShrink: 0 }}
-                                    onClick={() => setInfo({ titolo: `${s.nome || 'Incantesimo'}${s.livello === 0 ? (en ? ' · Cantrip' : ' · Trucchetto') : (en ? ` · Level ${s.livello}` : ` · ${s.livello}° livello`)}`, testo: testoModal || (en ? 'No description available for this spell.' : 'Nessuna descrizione disponibile per questo incantesimo.') })}
+                                    onClick={() => setInfo({
+                                      titolo: `${s.nome || 'Incantesimo'}${s.livello === 0 ? (en ? ' · Cantrip' : ' · Trucchetto') : (en ? ` · Level ${s.livello}` : ` · ${s.livello}° livello`)}`,
+                                      iconaProps: { nome: s.nome, isSpell: true, tipoFonte: isAraldiSpell ? 'araldi' : '', dimensione: 24 },
+                                      testo: testoModal || (en ? 'No description available for this spell.' : 'Nessuna descrizione disponibile per questo incantesimo.')
+                                    })}
                                   >
                                     {s.nome || t('menu.senza_nome')}
                                   </button>
@@ -16320,7 +16332,7 @@ export default function App() {
                           type="text"
                           value={filtroInventario}
                           onChange={(e) => setFiltroInventario(e.target.value)}
-                          placeholder={tr('🔍 Cerca nell\'inventario...', '🔍 Search the inventory...')}
+                          placeholder={tr('Cerca nell\'inventario...', 'Search the inventory...')}
                           style={{ ...styles.inlineInput, flex: 1, minWidth: 120, padding: '5px 8px', fontSize: 13 }}
                         />
                         {filtroInventario && (
@@ -16331,10 +16343,10 @@ export default function App() {
                       {/* Segmented View Tabs: Tutti vs Equipaggiato vs Zaino */}
                       <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexWrap: 'wrap' }}>
                         {[
-                          ['tutti', '📍 ' + (lingua === 'en' ? 'All' : 'Tutti')],
-                          ['equip', '🛡️ ' + (lingua === 'en' ? 'Equipped' : 'Indossati')],
-                          ['zaino', '🎒 ' + (lingua === 'en' ? 'Backpack' : 'Zaino')],
-                        ].map(([k, label]) => (
+                          ['tutti', lingua === 'en' ? 'All' : 'Tutti', null],
+                          ['equip', lingua === 'en' ? 'Equipped' : 'Indossati', 'scudo'],
+                          ['zaino', lingua === 'en' ? 'Backpack' : 'Zaino', 'zaino'],
+                        ].map(([k, label, iconaNome]) => (
                           <button
                             key={k}
                             type="button"
@@ -16344,13 +16356,17 @@ export default function App() {
                               fontSize: 11,
                               padding: '4px 9px',
                               borderRadius: 8,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 4,
                               borderColor: filtroVistaInventario === k ? C.goldDark : C.border,
                               background: filtroVistaInventario === k ? 'rgba(200,140,20,0.18)' : C.panel,
                               color: filtroVistaInventario === k ? C.goldDark : C.ink,
                               fontWeight: filtroVistaInventario === k ? 700 : 500,
                             }}
                           >
-                            {label}
+                            {iconaNome && <IconaUI nome={iconaNome} dimensione={12} color="currentColor" />}
+                            <span>{label}</span>
                           </button>
                         ))}
                       </div>
@@ -16360,12 +16376,12 @@ export default function App() {
                       {/* Barra Filtri Categoria Rapidi */}
                       <div style={{ display: 'flex', gap: 5, overflowX: 'auto', alignItems: 'center' }}>
                         {[
-                          ['tutti', '🗂️ ' + (lingua === 'en' ? 'All Types' : 'Tutti i tipi')],
-                          ['armi_armature', '⚔️ ' + (lingua === 'en' ? 'Weapons and armor' : 'Armi e armature')],
-                          ['pozioni', '🧪 ' + (lingua === 'en' ? 'Potions' : 'Pozioni')],
-                          ['magici', '✨ ' + (lingua === 'en' ? 'Magic' : 'Magici')],
-                          ['attrezzi', '🔧 ' + (lingua === 'en' ? 'Tools' : 'Attrezzi')],
-                        ].map(([k, label]) => (
+                          ['tutti', lingua === 'en' ? 'All Types' : 'Tutti i tipi', null],
+                          ['armi_armature', lingua === 'en' ? 'Weapons and armor' : 'Armi e armature', 'spadeIncrociate'],
+                          ['pozioni', lingua === 'en' ? 'Potions' : 'Pozioni', 'pozione'],
+                          ['magici', lingua === 'en' ? 'Magic' : 'Magici', 'arcano'],
+                          ['attrezzi', lingua === 'en' ? 'Tools' : 'Attrezzi', 'attrezzi'],
+                        ].map(([k, label, iconaNome]) => (
                           <button
                             key={k}
                             type="button"
@@ -16373,22 +16389,26 @@ export default function App() {
                             style={{
                               ...styles.buttonMini,
                               fontSize: 11,
-                              padding: '3px 8px',
-                              whiteSpace: 'nowrap',
-                              borderRadius: 12,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 4,
+                              padding: '4px 9px',
+                              borderRadius: 8,
                               borderColor: filtroCatInventario === k ? C.goldDark : C.border,
-                              background: filtroCatInventario === k ? 'rgba(200,140,20,0.18)' : 'transparent',
-                              color: filtroCatInventario === k ? C.goldDark : C.inkDim,
+                              background: filtroCatInventario === k ? 'rgba(200,140,20,0.18)' : C.panel,
+                              color: filtroCatInventario === k ? C.goldDark : C.ink,
                               fontWeight: filtroCatInventario === k ? 700 : 500,
+                              whiteSpace: 'nowrap',
                             }}
                           >
-                            {label}
+                            {iconaNome && <IconaUI nome={iconaNome} dimensione={12} color="currentColor" />}
+                            <span>{label}</span>
                           </button>
                         ))}
                       </div>
 
                       <button
-                        style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, fontSize: 11, padding: '4px 7px' }}
+                        style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, fontSize: 11, padding: '4px 7px', display: 'inline-flex', alignItems: 'center', gap: 4 }}
                         title={t('inv.pulisci_esauriti_tip')}
                         onClick={() => {
                           if (window.confirm(t('inv.pulisci_conferma'))) {
@@ -16396,7 +16416,8 @@ export default function App() {
                           }
                         }}
                       >
-                        🗑️
+                        <IconaUI nome="cestino" dimensione={13} color={C.red} />
+                        <span>{lingua === 'en' ? 'Clean empty' : 'Pulisci esauriti'}</span>
                       </button>
                     </div>
                     {/* Suggerimenti rapidi di aggiunta dal compendio se si cerca un oggetto non presente */}
@@ -16560,7 +16581,11 @@ export default function App() {
                                           <button
                                             type="button"
                                             className="oggetto-nome"
-                                            onClick={() => spItem && setInfo({ titolo: traduciDato(o.nome) || o.nome, testo: spItem })}
+                                            onClick={() => spItem && setInfo({
+                                              titolo: traduciDato(o.nome) || o.nome,
+                                              iconaProps: { nome: o.nome, tipo: o.categoria || 'oggetto', dimensione: 24 },
+                                              testo: spItem,
+                                            })}
                                             title={spItem ? `${o.nome}: ${spItem}` : o.nome}
                                             style={{ background: 'transparent', border: 0, padding: 0, font: 'inherit', color: C.ink, cursor: spItem ? 'help' : 'default', textAlign: 'left', textDecoration: spItem ? 'underline dotted' : 'none', textUnderlineOffset: 3, textDecorationColor: C.inkDim }}
                                           >{nomeSenzaCa(traduciDato(o.nome) || o.nome)}</button>
@@ -16703,12 +16728,12 @@ export default function App() {
                                                 }
                                               }
                                             }}
-                                          >🎒</button>{' '}
+                                          ><IconaUI nome="zaino" dimensione={12} color="currentColor" /></button>{' '}
                                           <button
                                             style={{ ...styles.buttonMini, color: effettoAttivo ? C.goldDark : C.inkDim, borderColor: effettoAttivo ? C.goldDark : C.border, background: effettoAttivo ? 'rgba(201,162,39,0.12)' : undefined }}
                                             title={t('inv.gestisci_effetti')}
                                             onClick={() => setEffettoInventarioAperto((id) => id === o.id ? null : o.id)}
-                                          >✨</button>{' '}
+                                          ><IconaUI nome="arcano" dimensione={12} color="currentColor" /></button>{' '}
                                           <button
                                             style={{ ...styles.buttonMini, color: (o.usiMax > 0) ? C.goldDark : C.inkDim, borderColor: (o.usiMax > 0) ? C.goldDark : C.border, background: (o.usiMax > 0) ? 'rgba(201,162,39,0.12)' : undefined }}
                                             title={t('inv.gestisci_utilizzi')}
@@ -16722,7 +16747,7 @@ export default function App() {
                                                 modInv(o.id, { usi: defUsi, usiMax: defMax, ricarica: noto ? noto.ricarica : 'manuale', effetto: noto ? noto.effetto : '' });
                                               }
                                             }}
-                                          >⚡</button>{' '}
+                                          ><IconaUI nome="fulmine" dimensione={12} color="currentColor" /></button>{' '}
                                         </>
                                       );
                                     })()}
@@ -16735,7 +16760,7 @@ export default function App() {
                                         onConferma: () => eliminaItem(o),
                                       })}
                                     >
-                                      🗑
+                                      <IconaUI nome="cestino" dimensione={12} color={C.red} />
                                     </button>
                                   </td>
                                 </tr>
@@ -16811,7 +16836,9 @@ export default function App() {
                                                   }}
                                                 >
                                                   <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0, flex: 1 }}>
-                                                    <span style={{ fontSize: 13 }}>{sub.icona || '📦'}</span>
+                                                    <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+                                                      <IconaUI nome="zaino" dimensione={13} color={C.goldDark} />
+                                                    </span>
                                                     <span style={{ fontWeight: 600, color: C.ink, fontSize: 12 }} title={sub.nome}>
                                                       {sub.nome}
                                                     </span>
@@ -17899,7 +17926,7 @@ export default function App() {
                     title={lingua === 'it' ? "Tira l'iniziativa per tutti i combattenti e ordina il turno" : "Roll initiative for all combatants and order turn"}
                     onClick={tiraIniziativeTutti}
                   >
-                    <span>🎲</span>
+                    <IconaUI nome="dado" dimensione={13} color="currentColor" />
                     <span>{lingua === 'it' ? 'Iniziative' : 'Initiatives'}</span>
                   </button>
                   <button
@@ -17916,7 +17943,7 @@ export default function App() {
                     data-testid="ct-area"
                     onClick={() => setAreaDanno({ valore: '', tipo: 'Fuoco', magico: true, dettaglio: '', sel: {}, ts: {}, difese: {} })}
                   >
-                    <span>💥</span>
+                    <IconaUI nome="arcano" dimensione={13} color={C.red} />
                     <span>Area</span>
                   </button>
                 </div>
@@ -18105,7 +18132,7 @@ export default function App() {
                                     });
                                   }}
                                 >
-                                  🎲
+                                  <IconaUI nome="dado" dimensione={13} color="currentColor" />
                                 </button>
                               </div>
                             </div>
@@ -18167,7 +18194,7 @@ export default function App() {
                                   }}
                                   title={cb.nome}
                                 >
-                                  {cb.tipo === 'pg' ? '🧙' : cb.tipo === 'alleato' ? '🐾' : '💀'}
+                                  <IconaUI nome={cb.tipo === 'pg' ? 'mago' : cb.tipo === 'alleato' ? 'bestia' : 'teschio'} dimensione={14} color={cb.tipo === 'nemico' ? C.red : C.goldDark} />
                                 </div>
                               );
                             })()}
@@ -18258,7 +18285,9 @@ export default function App() {
                                     }}
                                     title={tr('PF temporanei attivi (clicca per modificare o × per rimuovere)', 'Temporary HP active (click to edit or × to remove)')}
                                   >
-                                    <span>🛡️+</span>
+                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+                                      <IconaUI nome="scudo" dimensione={12} color="#2b75cb" />+
+                                    </span>
                                     <Editable
                                       value={cb.pfTemp}
                                       tipo="numero"
@@ -18345,7 +18374,7 @@ export default function App() {
                           {/* TS Morte (se a 0 PF o PG) */}
                           {(morto || cb.tipo === 'pg') && (
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 11, background: 'rgba(0,0,0,0.02)', padding: '2px 4px', borderRadius: 4 }} title={t('vital.ts_morte')}>
-                              <span style={{ color: C.inkDim, fontSize: 11 }}>💀</span>
+                              <span style={{ display: 'inline-flex', alignItems: 'center' }}><IconaUI nome="teschio" dimensione={12} color={C.inkDim} /></span>
                               {[1, 2, 3].map((i) => (
                                 <span role="button" tabIndex={0} key={`s${i}`} style={styles.pip((cb.tsMorte?.successi || 0) >= i, C.green)} onClick={() => modCombat(cb.id, { tsMorte: { ...cb.tsMorte, successi: (cb.tsMorte?.successi || 0) >= i ? i - 1 : i } })} />
                               ))}

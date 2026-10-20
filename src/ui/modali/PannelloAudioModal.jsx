@@ -4,6 +4,7 @@ import { iconaAmbientazione, ORDINE_AMBIENTAZIONI } from '../../utils/ambiente.j
 import { t, tr } from '../../i18n';
 import { styles } from '../stili.js';
 import { fermaAmbiente, sbloccaAudio, avviaAmbiente, eseguiEffettoSonoro } from '../../utils/audioAmbiente';
+import { IconaUI } from '../IconaFantasy.jsx';
 
 export function PannelloAudioModal({ ambienteAudio, audioAvviatoDaGestoRef, effettiSonoriAttivi, lingua, notteAttiva, posPannelloAudio, presetColori, setAmbienteAudio, setEffettiSonoriAttivi, setMostraPannelloAudio, setPresetColori, setSottofondoAttivo, setVolumeAudio, setVolumeEffetti, sottofondoAttivo, urlCustomAudio, volumeAudio, volumeEffetti }) {
   return (
@@ -158,10 +159,10 @@ export function PannelloAudioModal({ ambienteAudio, audioAvviatoDaGestoRef, effe
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4 }}>
           {[
-            { id: 'arma', icona: '⚔️', label: 'Spada' },
-            { id: 'arco', icona: '🏹', label: 'Arco' },
-            { id: 'magia', icona: '✨', label: 'Magia' },
-            { id: 'cura', icona: '💚', label: 'Cura' },
+            { id: 'arma', iconaUI: 'spadeIncrociate', label: 'Spada', color: C.goldDark },
+            { id: 'arco', iconaUI: 'arco', label: 'Arco', color: C.goldDark },
+            { id: 'magia', iconaUI: 'arcano', label: 'Magia', color: '#00d2d3' },
+            { id: 'cura', iconaUI: 'cura', label: 'Cura', color: '#38ef7d' },
           ].map((sfx) => (
             <button
               key={sfx.id}
@@ -179,11 +180,11 @@ export function PannelloAudioModal({ ambienteAudio, audioAvviatoDaGestoRef, effe
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: 2,
+                gap: 3,
                 background: C.panelLight,
               }}
             >
-              <span style={{ fontSize: 13 }}>{sfx.icona}</span>
+              <IconaUI nome={sfx.iconaUI} dimensione={16} color={sfx.color} />
               <span style={{ fontSize: 11, whiteSpace: 'nowrap' }}>{sfx.label}</span>
             </button>
           ))}

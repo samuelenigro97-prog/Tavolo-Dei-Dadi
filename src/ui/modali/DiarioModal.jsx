@@ -3,6 +3,7 @@ import { t, tr } from '../../i18n';
 import { C } from '../tema.js';
 import { styles } from '../stili.js';
 import { AreaTesto } from '../componenti.jsx';
+import { IconaUI } from '../IconaFantasy.jsx';
 
 export function DiarioModal({ aggiorna, filtroDiario, lingua, scheda, setConferma, setFiltroDiario, setMostraDiarioModal, setVociDiarioChiuse, vociDiarioChiuse }) {
   return (
@@ -192,7 +193,9 @@ export function DiarioModal({ aggiorna, filtroDiario, lingua, scheda, setConferm
 
               {diario.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '36px 16px', background: 'rgba(0,0,0,0.02)', borderRadius: 10, border: `1px dashed ${C.border}`, margin: '12px 0' }}>
-                  <div style={{ fontSize: 38, marginBottom: 10, opacity: 0.85 }}>📜</div>
+                  <div style={{ marginBottom: 12, opacity: 0.85, display: 'flex', justifyContent: 'center' }}>
+                    <IconaUI nome="pergamena" dimensione={42} color={C.goldDark} />
+                  </div>
                   <div style={{ fontWeight: 700, fontSize: 14, color: C.ink, marginBottom: 6 }}>
                     {lingua === 'en' ? 'Your Adventurer’s Journal is Empty' : 'Il Diario del tuo Avventuriero è Vuoto'}
                   </div>
@@ -287,11 +290,11 @@ export function DiarioModal({ aggiorna, filtroDiario, lingua, scheda, setConferm
                           <button
                             type="button"
                             className="no-stampa"
-                            style={{ ...styles.buttonMini, padding: '3px 7px', fontSize: 12 }}
+                            style={{ ...styles.buttonMini, padding: '3px 7px', fontSize: 12, display: 'inline-flex', alignItems: 'center' }}
                             title={tr('Copia testo di questa sessione', 'Copy the text of this session')}
                             onClick={() => copiaVoce(v)}
                           >
-                            📋
+                            <IconaUI nome="pergamena" dimensione={13} color="currentColor" />
                           </button>
                           <button
                             type="button"

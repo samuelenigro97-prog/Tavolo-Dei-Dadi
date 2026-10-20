@@ -5,6 +5,7 @@ import { styles } from '../stili.js';
 import { REAZIONI_5E } from '../../data/dati5e.js';
 import { trovaReazioniDisponibili } from '../../rules/regole.js';
 import { idUnico } from '../../utils/idUnici.js';
+import { IconaAzione } from '../IconaFantasy.jsx';
 
 export function ReazioniModal({ aggiorna, lingua, registra, scheda, setInfo, setMostraModalReazioni, suoniEffOn, versione, volumeEffetti }) {
   const reazioniDisponibili = trovaReazioniDisponibili(scheda, versione);
@@ -18,7 +19,13 @@ export function ReazioniModal({ aggiorna, lingua, registra, scheda, setInfo, set
     setMostraModalReazioni(false);
     setInfo({
       titolo: `${r.nome}`,
-      testo: `${lingua === 'en' ? 'Trigger' : 'Innesco'}: ${lingua === 'en' ? r.innescoEn : r.innescoIt}\n\n🛡️ ${lingua === 'en' ? 'Effect' : 'Effetto'}: ${lingua === 'en' ? r.effettoEn : r.effettoIt}`,
+      iconaProps: {
+        nome: r.nome,
+        tipo: r.tipo,
+        isSpell: r.tipo === 'incantesimo',
+        cat: 'Reazione',
+      },
+      testo: `${lingua === 'en' ? 'Trigger' : 'Innesco'}: ${lingua === 'en' ? r.innescoEn : r.innescoIt}\n\n${lingua === 'en' ? 'Effect' : 'Effetto'}: ${lingua === 'en' ? r.effettoEn : r.effettoIt}`,
     });
   };
 
@@ -133,7 +140,7 @@ export function ReazioniModal({ aggiorna, lingua, registra, scheda, setInfo, set
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 14 }}>{r.tipo === 'incantesimo' ? '📖' : r.tipo === 'privilegio' ? '🛡️' : r.tipo === 'talento' ? '⭐' : '⚔️'}</span>
+                    <IconaAzione nome={r.nome} tipo={r.tipo} isSpell={r.tipo === 'incantesimo'} cat="Reazione" dimensione={22} />
                     <strong style={{ fontSize: 13, color: C.ink }}>{r.nome}</strong>
                     <span style={{ fontSize: 11, textTransform: 'uppercase', padding: '1px 5px', borderRadius: 4, background: 'rgba(0,0,0,0.06)', color: C.inkDim, fontWeight: 700 }}>
                       {r.tipo}
