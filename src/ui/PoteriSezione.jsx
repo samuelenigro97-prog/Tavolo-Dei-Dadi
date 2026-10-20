@@ -608,14 +608,14 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
       )}
 
       {!chiusa && pannelloAraldi && (
-        <div style={{ ...etichettaGruppo, marginTop: 2, color: 'var(--c-araldi, #a45a2a)', fontWeight: 800 }}>{lingua === 'en' ? 'Heralds of the Secret' : 'Araldi del Segreto'}</div>
+        <div style={{ ...etichettaGruppo, marginTop: 2, fontWeight: 800 }}>{lingua === 'en' ? 'Heralds of the Secret' : 'Araldi del Segreto'}</div>
       )}
       {!chiusa && pannelloAraldi && (
         <AraldiPannello scheda={scheda} aggiorna={aggiorna} lingua={lingua} registra={registra} onModifica={setPotereApertoId} onInfo={mostraInfo} />
       )}
 
       {!chiusa && ripristinoCampagna && (poteriInLista.length > 0 || pannelloAraldi) && (
-        <button type="button" data-testid="ripristina-poteri-campagna-sezione" style={{ ...styles.buttonMini, fontWeight: 700, color: 'var(--c-araldi, #a45a2a)', borderColor: 'var(--c-araldi-border, #a45a2a)', background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.10))', alignSelf: 'center', marginBottom: 8 }} onClick={ripristinoCampagna}>
+        <button type="button" data-testid="ripristina-poteri-campagna-sezione" style={{ ...styles.buttonMini, fontWeight: 700, color: '#ff9f1a', borderColor: 'rgba(255, 159, 26, 0.6)', background: 'rgba(255, 159, 26, 0.10)', alignSelf: 'center', marginBottom: 8 }} onClick={ripristinoCampagna}>
           {lingua === 'en' ? 'Restore the missing campaign powers (Heralds of the Secret)' : 'Ripristina i Poteri della campagna mancanti (Araldi del Segreto)'}
         </button>
       )}
@@ -623,7 +623,7 @@ export function SezionePoteri({ scheda, aggiorna, lingua = 'it', manualiAttivi =
         <div style={{ ...styles.detail, fontSize: 12, textAlign: 'center', padding: '10px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
           {lingua === 'en' ? 'No custom powers yet.' : 'Nessun potere personalizzato per ora.'}
           {ripristinoCampagna && (
-            <button type="button" data-testid="ripristina-poteri-campagna-sezione" style={{ ...styles.buttonMini, fontWeight: 700, color: 'var(--c-araldi, #a45a2a)', borderColor: 'var(--c-araldi-border, #a45a2a)', background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.10))' }} onClick={ripristinoCampagna}>
+            <button type="button" data-testid="ripristina-poteri-campagna-sezione" style={{ ...styles.buttonMini, fontWeight: 700, color: '#ff9f1a', borderColor: 'rgba(255, 159, 26, 0.6)', background: 'rgba(255, 159, 26, 0.10)' }} onClick={ripristinoCampagna}>
               {lingua === 'en' ? 'Restore the campaign powers (Heralds of the Secret)' : 'Ripristina i Poteri della campagna (Araldi del Segreto)'}
             </button>
           )}

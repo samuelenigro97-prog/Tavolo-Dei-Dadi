@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.110.5',
+    voci: {
+      it: ['Watermark versione invisibile a tono con lo sfondo senza bordi, e pannello Araldi integrato nel tema della classe con pallini e rombi arancioni luminosi.'],
+      en: ['Frameless stealth version watermark blending seamlessly into backgrounds, plus Heralds panel aligned with class theme and glowing orange pips.'],
+    },
+  },
+  {
     versione: '4.110.4',
     voci: {
       it: ['Righe incantesimi pulite e sobrie: eliminato il bordo arancione invasivo per i poteri del Patrono, risalta ora solo l\'Occhio Runico luminoso e brillante.'],
