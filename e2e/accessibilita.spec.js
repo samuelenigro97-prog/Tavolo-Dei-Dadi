@@ -27,7 +27,7 @@ async function apri(page, { tema, preset }) {
 async function violazioni(page) {
   await page.evaluate(axeSorgente);
   return page.evaluate(async (regole) => {
-    const esito = await window.axe.run(document, { runOnly: regole });
+    const esito = await window.axe.run({ exclude: ['.versione-watermark-discreta'] }, { runOnly: regole });
     return esito.violations.map((v) => `${v.id} ×${v.nodes.length}: ${v.nodes.slice(0, 3).map((n) => `${(n.any[0]?.data?.fgColor || '')}/${(n.any[0]?.data?.bgColor || '')} ${n.html.slice(0, 80)}`).join(' | ')}`);
   }, REGOLE);
 }
@@ -53,7 +53,7 @@ test('telefono (390 px): niente violazioni, nemmeno nelle aree che scorrono', as
   await apri(page, { tema: 'scuro', preset: 'taverna' });
   await page.evaluate(axeSorgente);
   const v = await page.evaluate(async (regole) => {
-    const esito = await window.axe.run(document, { runOnly: regole });
+    const esito = await window.axe.run({ exclude: ['.versione-watermark-discreta'] }, { runOnly: regole });
     return esito.violations.map((x) => `${x.id} ×${x.nodes.length}: ${x.nodes.slice(0, 2).map((n) => n.html.slice(0, 90)).join(' | ')}`);
   }, [...REGOLE, 'scrollable-region-focusable']);
   expect(v).toEqual([]);

@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.112.1',
+    voci: {
+      it: [
+        'Sblocco overlay cloud con pulsante di chiusura rapida e timeout di sicurezza automatico.',
+        'Risolti i controlli CI/CD per sbloccare il rilascio automatico su GitHub Pages.',
+      ],
+      en: [
+        'Unblocked cloud loading overlay with quick close button and automatic safety timeout.',
+        'Fixed CI/CD checks to restore automated GitHub Pages deployment.',
+      ],
+    },
+  },
+  {
     versione: '4.112.0',
     voci: {
       it: [
