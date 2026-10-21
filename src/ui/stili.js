@@ -1751,10 +1751,10 @@ tbody tr:hover {
   z-index: 1200 !important;
   backdrop-filter: blur(14px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
-  /* Fondo della scheda del PG corrente (--c-pg-panel, come il combat tracker); bordo del tema
-     generico (--c-tema-bordo, da stileTemaBase). */
-  background: color-mix(in srgb, var(--c-pg-panel, var(--c-panel)) 96%, transparent) !important;
-  border: 1.5px solid var(--c-tema-bordo, var(--c-border)) !important;
+  /* Tema del personaggio: fondo e bordo dai colori della sua classe (--c-bordo-barra, qui sotto),
+     gli stessi del combat tracker. Il menu iniziale invece resta sul tema generico. */
+  background: color-mix(in srgb, var(--c-panel) 96%, transparent) !important;
+  border: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
   border-radius: 12px !important;
   margin-top: 0 !important;
@@ -1780,6 +1780,7 @@ tbody tr:hover {
    maniglia; avvicinando il cursore alla cima dello schermo (o passando col Tab) la barra
    scende con un'animazione, e risale poco dopo che il cursore se ne va. La scheda sale a
    occupare lo spazio liberato. Su telefono e tablet resta sempre visibile. */
+:root { --c-bordo-barra: color-mix(in srgb, var(--c-ink) 38%, var(--c-border)); }
 .barra-zona-apertura { display: none; }
 @media (hover: hover) and (pointer: fine) and (min-width: 681px) {
   :root[data-barra-a-scomparsa="si"] .barra-zona-apertura {
@@ -1831,7 +1832,7 @@ tbody tr:hover {
     height: 3px;
     margin-left: -20px;
     border-radius: 3px;
-    background: var(--c-gold, var(--c-tema-bordo, var(--c-border)));
+    background: var(--c-gold, var(--c-bordo-barra, var(--c-border)));
     transition: opacity 0.1s ease 0s;
     pointer-events: none;
   }
@@ -1871,7 +1872,8 @@ tbody tr:hover {
   left: 50%;
   transform: translate(-50%, 0);
   bottom: 0;
-  width: 100%;
+  /* Larghezza come la barra in alto (la pagina ha 14 px di margine per lato) */
+  width: calc(100% - 28px);
   max-width: 1080px;
   z-index: 1500;
   will-change: transform, opacity, box-shadow;
@@ -1906,7 +1908,7 @@ tbody tr:hover {
   transform: translate3d(-50%, calc(100% - 14px), 0) !important;
   box-shadow: none !important;
   cursor: pointer;
-  border-color: var(--c-tema-bordo, var(--c-border)) !important;
+  border-color: var(--c-bordo-barra, var(--c-border)) !important;
   transition: transform 0.14s cubic-bezier(0, 0, 0.2, 1), box-shadow 0.14s ease, border-color 0.14s ease !important;
 }
 .combat-tracker-fisso.combat-chiuso > * {
@@ -1923,7 +1925,7 @@ tbody tr:hover {
   height: 3.5px;
   margin-left: -21px;
   border-radius: 3px;
-  background: var(--c-gold, var(--c-tema-bordo, var(--c-border)));
+  background: var(--c-gold, var(--c-bordo-barra, var(--c-border)));
   pointer-events: none;
   transition: opacity 0.1s ease;
 }
@@ -2679,13 +2681,13 @@ tbody tr:hover {
    sottile bordo del colore del bordo della barra, qualunque stato abbiano. Gli stati (sincronizzazione,
    combattimento in corso) sono un pallino nell'angolo; gli avvisi fanno suonare il campanello. */
 .barra-superiore-fissa .btn-header-azione {
-  background: var(--c-pg-panel, var(--c-panel)) !important;
-  border: 1px solid var(--c-tema-bordo, var(--c-border)) !important;
+  background: var(--c-panel) !important;
+  border: 1px solid var(--c-bordo-barra, var(--c-border)) !important;
   box-shadow: none !important;
   color: var(--c-ink) !important;
 }
 .barra-superiore-fissa .btn-header-azione:hover {
-  border-color: color-mix(in srgb, var(--c-tema-bordo, var(--c-border)) 50%, var(--c-ink)) !important;
+  border-color: color-mix(in srgb, var(--c-bordo-barra, var(--c-border)) 50%, var(--c-ink)) !important;
 }
 .barra-superiore-fissa .btn-notifiche-lampeggia { animation: none !important; }
 .barra-superiore-fissa .btn-notifiche-lampeggia .icona-campanello,

@@ -254,8 +254,8 @@ test('danno ad area: più bersagli, vulnerabilità e immunità lette dai tratti 
   });
   await apriScheda(page);
   await page.locator('button[data-combat-toggle="true"]').first().click();
-  // Il tasto per ridurre il tracker è un ▲ (aperto), come nel resto dell'app.
-  await expect(page.getByRole('button', { name: 'Riduci a icona' })).toHaveText('▲');
+  // Dalla 4.112.3 il tracker non ha più il tasto ▲ per ridurlo: si riduce con il tasto ⚔️ della barra.
+  await expect(page.getByTestId('ct-minimizza')).toHaveCount(0);
 
   await page.getByTestId('ct-area').click();
   const finestra = page.getByTestId('area-modal');

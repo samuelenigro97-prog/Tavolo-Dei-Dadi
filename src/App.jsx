@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.112.2';
+const APP_VERSION = '4.112.3';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -9698,8 +9698,7 @@ export default function App() {
           className="selettore-personaggio barra-superiore-fissa"
           style={{
             ...styles.panel,
-            // Barra in alto sul tema base dell'app (come menu e combat tracker), non sui colori della classe.
-            ...stileTemaBase,
+            // Barra in alto sul tema del personaggio (colori della sua classe): niente tema generico.
             borderRadius: 12,
             display: 'flex',
             alignItems: 'center',
@@ -10160,8 +10159,8 @@ export default function App() {
                     <div style={{ fontSize: 28, fontWeight: 'bold', display: 'flex', alignItems: 'baseline', gap: 8 }}>
                       {tiro.naturale} {tiro.bonus !== 0 && `${conSegno(tiro.bonus)} `}= <strong>{tiro.totale}</strong>
                     </div>
-                    <div style={styles.detail}>
-                      {tiro.dadi.length > 1 && ` · ${tiro.modalita} [${tiro.dadi.join(', ')}] → ${tiro.naturale}`}
+                    <div style={{ ...styles.detail, marginTop: 5 }}>
+                      {tiro.dadi.length > 1 && `${tiro.modalita} (${tiro.dadi.join(', ')}) → ${tiro.naturale}`}
                     </div>
                     {tiro.naturale === 20 && <span style={styles.badge(C.goldDark)}>CRITICO! 20 naturale</span>}
                     {tiro.naturale === 1 && <span style={styles.badge(C.red)}>💀 1 naturale</span>}
@@ -17824,17 +17823,17 @@ export default function App() {
               }
             }}
             style={{
-              ...stileTemaBase,
+              // Tema del personaggio (colori della sua classe), non il generico.
               position: 'fixed',
               left: '50%',
               bottom: 0,
-              width: '100%',
+              width: 'calc(100% - 28px)', // come la barra in alto (14 px di margine per lato)
               maxWidth: 1080,
               zIndex: 1500,
-              background: 'var(--c-pg-panel, var(--c-tema-sfondo))',
-              borderTop: '1.5px solid var(--c-tema-bordo)',
-              borderLeft: '1.5px solid var(--c-tema-bordo)',
-              borderRight: '1.5px solid var(--c-tema-bordo)',
+              background: 'var(--c-panel)',
+              borderTop: '1.5px solid var(--c-bordo-barra)',
+              borderLeft: '1.5px solid var(--c-bordo-barra)',
+              borderRight: '1.5px solid var(--c-bordo-barra)',
               borderTopLeftRadius: 12,
               borderTopRightRadius: 12,
               boxSizing: 'border-box',
@@ -18006,19 +18005,6 @@ export default function App() {
 
                 {/* Cluster Controlli Finestra */}
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-                  <button
-                    type="button"
-                    data-testid="ct-minimizza"
-                    style={{ ...stileTastoTondo, fontSize: 11, color: 'var(--c-gold-dark)', border: '1.5px solid var(--c-gold-dark)' }}
-                    onClick={(e) => {
-                      e.currentTarget.blur();
-                      setCombat((c) => ({ ...c, aperto: false }));
-                    }}
-                    title={t('ct.minimizza')}
-                    aria-label={t('ct.minimizza')}
-                  >
-                    ▲
-                  </button>
                   <button
                     type="button"
                     data-testid="ct-chiudi"

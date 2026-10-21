@@ -2,6 +2,22 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.112.3] – 2026-10-21
+
+### Modificato
+- **Tema del personaggio al posto del generico** per barra in alto e combat tracker: fondo e bordo seguono i
+  colori della classe del PG aperto (`--c-bordo-barra`). Il menu iniziale resta sul tema generico.
+- **Stessa larghezza da ridotti**: il combat tracker ha ora la larghezza della barra in alto (prima, sotto
+  i 1100 px di finestra, era 8 px più largo).
+- **Combat tracker**: tolto il tasto ▲ per ridurlo (si riduce con ⚔️ nella barra).
+- **Tiro con vantaggio/svantaggio**: tolto il punto iniziale, dadi tra parentesi tonde — `vantaggio (13, 11) → 13` —
+  e riga un po' più in basso.
+
+- **Menu iniziale**: "Ripristina backup" → "Ripristina" ed "Esporta backup" → "Esporta".
+
+### Corretto
+- Il test dell'animazione della barra a scomparsa non dipende più dal fotogramma (era instabile in CI).
+
 ## [4.112.2] – 2026-10-21
 
 ### Modificato

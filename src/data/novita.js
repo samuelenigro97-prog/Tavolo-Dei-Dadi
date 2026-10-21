@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.112.3',
+    voci: {
+      it: ['Barra in alto e combat tracker con i colori del personaggio, non più il tema generico.', 'Combat tracker ridotto largo come la barra; tolto il tasto ▲.', 'Tiro con vantaggio: dadi tra parentesi tonde e senza il punto iniziale.', 'Menu iniziale: "Ripristina" ed "Esporta".'],
+      en: ['Top bar and combat tracker use the character colors instead of the generic theme.', 'Minimized combat tracker as wide as the bar; the ▲ button is gone.', 'Advantage rolls: dice in round brackets, no leading dot.', 'Start menu: "Restore" and "Export".'],
+    },
+  },
+  {
     versione: '4.112.2',
     voci: {
       it: ['"I miei personaggi" è l\'ultima voce del menu a tendina del personaggio; tolto il pulsante dal menu iniziale.'],
