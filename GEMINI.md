@@ -8,7 +8,7 @@
 - Il testo di introduzione/conversazione ordinario deve rimanere all'esterno del blocco per garantire un netto contrasto visivo.
 
 <!-- ci-verde:start -->
-## Regola d'oro: il sito si aggiorna solo se la CI è verde
+## Regola d'oro (vale per qualsiasi IA e per chiunque modifichi il codice): il sito si aggiorna solo se la CI è verde
 
 Il deploy su GitHub Pages parte **solo dopo una CI verde** su `main`. Se la CI è rossa, ogni push viene
 scartato in silenzio e online resta l'ultima versione che l'aveva superata (è già successo: dalla 4.110.0 alla
