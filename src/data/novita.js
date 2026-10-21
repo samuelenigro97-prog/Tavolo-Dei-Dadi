@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.112.2',
+    voci: {
+      it: ['"I miei personaggi" è l\'ultima voce del menu a tendina del personaggio; tolto il pulsante dal menu iniziale.'],
+      en: ['"My characters" is now the last entry of the character dropdown; the button is gone from the start menu.'],
+    },
+  },
+  {
     versione: '4.112.1',
     voci: {
       it: [

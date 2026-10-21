@@ -1,22 +1,23 @@
-// Sezione Equipaggiamento: filtri in una riga, le due "Tutti" (vista/tipo)
-// hanno icone diverse per non sembrare duplicate.
+// Sezione Inventario (già Equipaggiamento): filtri in una riga, vista e tipo come gruppi distinti.
 import { test, expect } from '@playwright/test';
 import { apriScheda, scrollaA } from './helpers.js';
 
-test.describe('Equipaggiamento', () => {
+test.describe('Inventario', () => {
   test.beforeEach(async ({ page }) => {
     await apriScheda(page);
-    await scrollaA(page, 'h3', 'Equipaggiamento');
+    await scrollaA(page, 'h3', 'Inventario');
   });
 
-  test('la vista (Indossati/Zaino) e il tipo (Armi/Pozioni...) hanno bottoni "Tutti" con icone diverse', async ({ page }) => {
-    await expect(page.getByRole('button', { name: '📍 Tutti' })).toBeVisible();
-    await expect(page.getByRole('button', { name: /🗂️ Tutti i tipi/ })).toBeVisible();
+  test('la vista (Tutti/Indossati/Zaino) e il tipo (Tutti i tipi/Armi/Pozioni...) hanno due gruppi di filtri distinti', async ({ page }) => {
+    await expect(page.getByRole('button', { name: 'Indossati', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Zaino', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Tutti i tipi', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Pozioni', exact: true })).toBeVisible();
   });
 
   test('tutti i filtri e la ricerca stanno sulla stessa riga', async ({ page }) => {
     const ricerca = page.getByPlaceholder(/Cerca nell'inventario/);
-    const tutti = page.getByRole('button', { name: '📍 Tutti' });
+    const tutti = page.getByRole('button', { name: 'Indossati', exact: true });
     const [rRicerca, rTutti] = await Promise.all([ricerca.boundingBox(), tutti.boundingBox()]);
     expect(rRicerca).not.toBeNull();
     expect(rTutti).not.toBeNull();
@@ -27,26 +28,31 @@ test.describe('Equipaggiamento', () => {
   test('un oggetto senza contenitore/effetto/utilizzi attivi mostra solo "⋯" e cestino, non 4 icone', async ({ page }) => {
     const riga = page.locator('tr.inventario-riga').filter({ hasText: 'Antitossina' });
     await expect(riga.getByRole('button', { name: '⋯' })).toBeVisible();
-    await expect(riga.getByText('🎒')).toHaveCount(0);
-    await expect(riga.getByText('✨')).toHaveCount(0);
+    // Icone vettoriali (non più emoji): si riconoscono dal titolo.
+    const contenitore = riga.getByTitle('Inserisci sotto-oggetti (rendi contenitore)');
+    const effetti = riga.getByTitle('Configura gli effetti dell’oggetto');
+    await expect(contenitore).toHaveCount(0);
+    await expect(effetti).toHaveCount(0);
 
     await riga.getByRole('button', { name: '⋯' }).click();
-    await expect(riga.getByText('🎒')).toBeVisible();
-    await expect(riga.getByText('✨')).toBeVisible();
-    await expect(riga.getByText('⚡')).toBeVisible();
+    await expect(contenitore).toBeVisible();
+    await expect(effetti).toBeVisible();
+    await expect(riga.getByTitle('Elimina')).toBeVisible();
   });
 
   test('anche un oggetto con un effetto attivo apre e chiude le icone dal "⋯" (v4.98.0)', async ({ page }) => {
     const riga = page.locator('tr.inventario-riga').filter({ hasText: 'Perla del Potere' });
     const altro = riga.getByRole('button', { name: '⋯' });
     await expect(altro).toBeVisible();
-    await expect(riga.getByText('🎒')).toHaveCount(0);
+    const contenitore = riga.getByTitle('Inserisci sotto-oggetti (rendi contenitore)');
+    const effetti = riga.getByTitle('Configura gli effetti dell’oggetto');
+    await expect(contenitore).toHaveCount(0);
     await altro.click();
-    await expect(riga.getByText('🎒')).toBeVisible();
-    await expect(riga.getByText('✨')).toBeVisible();
-    await expect(riga.getByText('⚡')).toBeVisible();
+    await expect(contenitore).toBeVisible();
+    await expect(effetti).toBeVisible();
+    await expect(riga.getByTitle('Elimina')).toBeVisible();
     await altro.click();
-    await expect(riga.getByText('🎒')).toHaveCount(0);
+    await expect(contenitore).toHaveCount(0);
   });
 
   test('il tasto ✎ rinomina l\'oggetto (v4.98.0)', async ({ page }) => {

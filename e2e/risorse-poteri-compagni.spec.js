@@ -262,6 +262,8 @@ test('il riquadro Poteri non c\'è senza il manuale Araldi; il manuale si accend
   // Menu → Manuali e fonti → Araldi: chiede la password.
   await page.getByRole('button', { name: /^Menu: nuovo personaggio/ }).first().click();
   await page.getByRole('button', { name: /Manuali e fonti/ }).first().click();
+  // L'elenco nel menu iniziale non basta per accenderlo: da "Spento" si apre la finestra dei manuali.
+  await page.locator('#lista-manuali-fonti > div').filter({ hasText: /Araldi/ }).getByRole('button').first().click();
   await page.getByTestId('manuale-toggle-araldi').click();
   const campo = page.getByTestId('manuale-password-input');
   await expect(campo).toBeVisible();

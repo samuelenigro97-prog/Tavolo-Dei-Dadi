@@ -2,6 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.112.2] – 2026-10-21
+
+### Modificato
+- **"I miei personaggi" nel menu a tendina del personaggio**: l'ultima voce del menu a tendina in cima alla
+  scheda ("I miei personaggi…") apre il menu iniziale con l'elenco dei personaggi (colore di classe e
+  cestino per eliminarli). Nel menu iniziale è sparito il pulsante "I miei personaggi ▾": dalla 🏠 il
+  menu si apre senza elenco. Scegliere la voce non cambia il personaggio attivo.
+
 ## [4.112.1] – 2026-10-21
 
 ### Risolto

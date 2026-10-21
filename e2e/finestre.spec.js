@@ -145,3 +145,24 @@ test('creazione personaggio: "Artefice" compare una volta sola, e solo col manua
   expect(senza.filter((t) => /Artefice/.test(t))).toHaveLength(0);
   expect(senza.filter((t) => /Barbaro/.test(t))).toHaveLength(1);
 });
+
+test('"I miei personaggi" è l\'ultima voce del menu a tendina del personaggio e apre l\'elenco; il menu iniziale non ha più il pulsante (v4.112.2)', async ({ page }) => {
+  await apriScheda(page);
+  const tendina = page.getByLabel('Personaggio attivo');
+  const voci = await tendina.locator('option').allTextContents();
+  expect(voci.at(-1)).toBe('I miei personaggi…');
+  const prima = await tendina.inputValue();
+  await tendina.selectOption({ label: 'I miei personaggi…' });
+  const menu = page.getByTestId('menu-iniziale');
+  await expect(menu).toBeVisible();
+  await expect(menu.locator('#lista-carica-pg')).toBeVisible();
+  await expect(menu.getByTestId('menu-pg-riga').first()).toBeVisible();
+  // Il personaggio attivo non cambia.
+  await page.keyboard.press('Escape');
+  await expect(tendina).toHaveValue(prima);
+  // Dalla 🏠 il menu si apre senza elenco e senza il vecchio pulsante.
+  await page.locator('.btn-header-azione').first().click();
+  await expect(menu).toBeVisible();
+  await expect(menu.locator('#lista-carica-pg')).toHaveCount(0);
+  await expect(menu.getByRole('button', { name: /^I miei personaggi/ })).toHaveCount(0);
+});

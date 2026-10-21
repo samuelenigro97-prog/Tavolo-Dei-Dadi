@@ -96,14 +96,11 @@ export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg
         >
           {t('menu.nuovo_personaggio')}
         </button>
-        <button
-          style={{ ...styles.button, border: bordoTema, width: '100%', marginBottom: 8 }}
-          onClick={() => setMostraListaCarica((v) => !v)}
-        >
-          {t('menu.carica_personaggio')} {mostraListaCarica ? '▴' : '▾'} ({Object.keys(roster.personaggi).length})
-        </button>
+        {/* Niente più pulsante "I miei personaggi" nel menu: l'elenco (con i cestini) si apre dall'ultima
+            voce del menu a tendina del personaggio, in cima alla scheda. */}
         {mostraListaCarica && (
           <>
+            <div style={etichettaSezione}>{t('menu.carica_personaggio')} ({Object.keys(roster.personaggi).length})</div>
             <div id="lista-carica-pg" style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
               {Object.entries(roster.personaggi).map(([id, p]) => {
                 // Ogni personaggio nel colore della sua classe: barra a sinistra, fondo appena tinto,

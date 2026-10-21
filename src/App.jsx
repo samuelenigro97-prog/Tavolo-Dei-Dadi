@@ -34,6 +34,9 @@ import { CompendioModal } from './ui/CompendioModal.jsx';
 
 // Tema chiaro "foglio di carta": bianco, inchiostro scuro, accenti sobri.
 
+/** Valore dell'ultima voce del menu a tendina del personaggio ("I miei personaggi…"). */
+const VOCE_I_MIEI_PERSONAGGI = '__i-miei-personaggi__';
+
 /** Numero valido o fallback (helper condiviso: usato da loader e dal Level Up). */
 function num(v, fallback) { return Number.isFinite(Number(v)) ? Number(v) : fallback; }
 
@@ -1990,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.112.1';
+const APP_VERSION = '4.112.2';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -3725,6 +3728,9 @@ export default function App() {
   const [mostraSceltaVersione, setMostraSceltaVersione] = useState(false);
   const [importPending, setImportPending] = useState(null); // { files, tipo: 'json'|'pdf' }
   const [mostraListaCarica, setMostraListaCarica] = useState(false);
+  // L'elenco dei personaggi nel menu si vede solo se aperto dall'ultima voce del menu a tendina
+  // del personaggio; chiuso il menu si azzera, così dalla 🏠 si riapre senza elenco.
+  useEffect(() => { if (!mostraMenu) setMostraListaCarica(false); }, [mostraMenu]);
   const [versioneImportScelta, setVersioneImportScelta] = useState(null);
   const [mostraCrea, setMostraCrea] = useState(false); // schermata di creazione guidata
   const [mostraNoteLegali, setMostraNoteLegali] = useState(false);
@@ -10892,13 +10898,18 @@ export default function App() {
                         aria-label={tr('Personaggio attivo', 'Active character')}
                         style={{ ...styles.inlineInput, flex: 1, minWidth: 0, fontSize: 16, fontWeight: 'bold', fontFamily: "var(--font-title, Georgia, 'Times New Roman', serif)", color: 'var(--c-title)', padding: '4px 74px 4px 0', textOverflow: 'ellipsis', background: 'transparent', position: 'relative', zIndex: 2, border: 'none', height: '100%' }}
                         value={roster.attivo}
-                        onChange={(e) => { setSchedaSolaLettura(null); setRoster((r) => ({ ...r, attivo: e.target.value })); }}
+                        onChange={(e) => {
+                          // Ultima voce: apre il menu iniziale con l'elenco dei personaggi (e i cestini).
+                          if (e.target.value === VOCE_I_MIEI_PERSONAGGI) { setMostraListaCarica(true); setMostraMenu(true); return; }
+                          setSchedaSolaLettura(null); setRoster((r) => ({ ...r, attivo: e.target.value }));
+                        }}
                       >
                         {Object.entries(roster.personaggi).map(([id, p]) => (
                           <option key={id} value={id}>
                             {formattaNomePg(p.nome) || t('menu.senza_nome')}
                           </option>
                         ))}
+                        <option value={VOCE_I_MIEI_PERSONAGGI}>{t('menu.carica_personaggio')}…</option>
                       </select>
                     </div>
                   )}
