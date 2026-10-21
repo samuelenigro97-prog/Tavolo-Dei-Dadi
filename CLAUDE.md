@@ -258,6 +258,9 @@ chiede esplicitamente, è un progetto a parte rispetto alle modifiche alla PWA.
   interno — spesso serve `.last()`, a volte un `.filter().filter()` in più
   se un discendente più interno ripete lo stesso testo.
 - **Lint**: `npm run lint` (ESLint, `eslint-plugin-react`/`react-hooks`).
+- **Tutto in un comando**: `npm run verifica` rifà in locale gli stessi passaggi della CI (lint, unitari,
+  build, smoke, e2e, test sulla build). Va verde **prima di ogni push**: con la CI rossa il sito non si aggiorna
+  (vedi la "Regola d'oro" in `AGENTS.md`).
 - **CI**: `.github/workflows/ci.yml` esegue lint, unitari, build, smoke test
   (`test/smoke.mjs`) ed e2e su ogni PR verso `main` e ogni push su `main`.
   `deploy.yml` pubblica su Pages solo dopo una CI verde su `main` (trigger

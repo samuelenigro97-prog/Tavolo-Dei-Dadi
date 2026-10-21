@@ -7,6 +7,27 @@
   > - Inserire qui tutti i dettagli, numeri, modifiche e conclusioni.
 - Il testo di introduzione/conversazione ordinario deve rimanere all'esterno del blocco per garantire un netto contrasto visivo.
 
+<!-- ci-verde:start -->
+## Regola d'oro: il sito si aggiorna solo se la CI è verde
+
+Il deploy su GitHub Pages parte **solo dopo una CI verde** su `main`. Se la CI è rossa, ogni push viene
+scartato in silenzio e online resta l'ultima versione che l'aveva superata (è già successo: dalla 4.110.0 alla
+4.112.2 il sito è rimasto fermo alla 4.109.4 perché i test e2e erano rotti). Quindi:
+
+1. **Prima di ogni push, `npm run verifica` deve finire verde** (lint, unitari, build, smoke, e2e, test sulla
+   build di produzione; circa 15 minuti). Se non puoi lanciarlo tutto, almeno `npm run build`, `npm run lint` e
+   `npm test`, e dillo all'utente: non spacciare per "fatto" ciò che non hai provato.
+2. **Se cambi qualcosa che l'utente vede** (testi dei pulsanti, nomi delle sezioni, emoji sostituite da icone,
+   struttura dei menu, tempi delle animazioni), **aggiorna nello stesso commit i test che lo citano**:
+   `grep -rn "testo vecchio" e2e test`. Sono quasi sempre questi i test che si rompono.
+3. **Mai test che dipendono dal tempo** (`waitForTimeout`, confronti fotogramma per fotogramma, ritardi di
+   animazione): usa `expect.poll` o attendi lo stato finale. Un test instabile blocca il sito.
+4. **Dopo il push controlla la CI**: deve diventare verde e il job "Deploy su GitHub Pages" deve finire con
+   successo. Se è rossa, **correggila subito**, prima di aggiungere altre funzioni.
+5. Ricorda versione + `CHANGELOG.md` + `src/data/novita.js`: `test/versione.test.mjs` fallisce se la voce del
+   CHANGELOG manca o non combacia con `APP_VERSION`.
+<!-- ci-verde:end -->
+
 <!-- ponytail:start -->
 <!-- Source: https://github.com/DietrichGebert/ponytail/blob/43b759ffded10870c32c5faa153ac1f112a61b71/AGENTS.md, copied verbatim. MIT License, Copyright (c) 2026 DietrichGebert. -->
 # Ponytail, lazy senior dev mode
