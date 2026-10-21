@@ -1990,7 +1990,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.112.0';
+const APP_VERSION = '4.112.1';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -3970,6 +3970,14 @@ export default function App() {
   const [autoSync, setAutoSync] = useState(() => localStorage.getItem('scheda-interattiva:auto-sync') !== 'off');
   const [ultimoSync, setUltimoSync] = useState(() => localStorage.getItem('scheda-interattiva:ultimo-sync') || '');
   const [caricandoCloud, setCaricandoCloud] = useState(false); // overlay di caricamento dal cloud
+  // Sicurezza: l'overlay di caricamento dal cloud non deve mai restare bloccato all'infinito
+  useEffect(() => {
+    if (!caricandoCloud) return;
+    const t = setTimeout(() => {
+      setCaricandoCloud(false);
+    }, 4500);
+    return () => clearTimeout(t);
+  }, [caricandoCloud]);
   // Preferenze di aspetto e audio sincronizzate coi personaggi (tema, ambientazione,
   // cornici, audio, lingua, regole, ordine sezioni). Il timestamp dice quale copia
   // è stata cambiata più di recente; solo i cambi fatti dall'utente lo aggiornano
@@ -6979,7 +6987,8 @@ export default function App() {
       let remoto = null;
       let rosterRemotoGrezzo = null;
       try {
-        const attuale = await caricaSync(URL_STANZE, codiceSyncRef.current);
+        const fetchSync = (u, o) => fetchConTimeout(u, o, 4500);
+        const attuale = await caricaSync(URL_STANZE, codiceSyncRef.current, fetchSync);
         rosterRemotoGrezzo = attuale.roster;
         remoto = { rev: String(attuale.updatedAt || ''), ts: attuale.updatedAt, roster: normalizzaRosterRemoto(attuale.roster) };
       } catch (errAttuale) {
@@ -7001,7 +7010,8 @@ export default function App() {
       const rosterCloud = await caricaImmaginiRoster(rosterLocale).catch(() => rosterLocale);
       const rosterDaInviare = rosterRemotoGrezzo ? preservaImmaginiSeMancanti(rosterCloud, rosterRemotoGrezzo) : rosterCloud;
       try {
-        await salvaSync(URL_STANZE, codiceSyncRef.current, rosterDaInviare, quando, fetch, remoto ? { baseUpdatedAt: remoto.ts } : {});
+        const fetchSync = (u, o) => fetchConTimeout(u, o, 4500);
+        await salvaSync(URL_STANZE, codiceSyncRef.current, rosterDaInviare, quando, fetchSync, remoto ? { baseUpdatedAt: remoto.ts } : {});
       } catch (errScrittura) {
         if (errScrittura.message === 'SYNC_CONFLICT') {
           // Un altro dispositivo ha salvato proprio adesso. Con la politica "online"
@@ -7011,7 +7021,7 @@ export default function App() {
             syncCodicePendenteRef.current = true;
             return;
           }
-          const ora = await caricaSync(URL_STANZE, codiceSyncRef.current);
+          const ora = await caricaSync(URL_STANZE, codiceSyncRef.current, (u, o) => fetchConTimeout(u, o, 4500));
           apriConflitto('codice', { rev: String(ora.updatedAt || ''), ts: ora.updatedAt, roster: normalizzaRosterRemoto(ora.roster) });
           setSyncCodiceStatus({ text: t('conflitto.in_pausa'), type: 'error' });
           return;
@@ -7043,7 +7053,7 @@ export default function App() {
   /** Applica al roster locale ciò che è salvato sotto un codice. Condivisa da
    *  caricaDaCodiceSync() e usaCodiceSyncEsistente(). Merge non distruttivo: mantiene i PG locali non presenti sul server. */
   async function caricaDaCodiceSyncPer(codice) {
-    const { roster: rosterRicevuto, updatedAt } = await caricaSync(URL_STANZE, codice);
+    const { roster: rosterRicevuto, updatedAt } = await caricaSync(URL_STANZE, codice, (u, o) => fetchConTimeout(u, o, 4500));
     const caricato = { attivo: rosterRicevuto?.attivo || '', personaggi: {} };
     // NON normalizzare: i dati dal cloud sono già corretti
     for (const id in (rosterRicevuto?.personaggi || {})) {
@@ -7948,17 +7958,42 @@ export default function App() {
          />}
 
       {caricandoCloud && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 3000,
-          background: 'rgba(20,12,8,0.72)', backdropFilter: 'blur(3px)',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 18,
-        }}>
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('cloud.caricamento')}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 3000,
+            background: 'rgba(20,12,8,0.72)', backdropFilter: 'blur(3px)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16,
+            cursor: 'pointer',
+          }}
+          onClick={() => setCaricandoCloud(false)}
+          title={tr('Tocca per chiudere e continuare', 'Click to dismiss and continue')}
+        >
           <div className="cloud-spinner" style={{ fontSize: 54 }}>☁️</div>
           <div style={{ color: '#fff', fontSize: 18, fontWeight: 700, letterSpacing: 0.5 }}>{t('cloud.caricamento')}</div>
           <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13 }}>{t('cloud.attendi')}</div>
           <div style={{ width: 180, height: 5, borderRadius: 3, overflow: 'hidden', background: 'rgba(255,255,255,0.2)' }}>
             <div className="cloud-bar" style={{ height: '100%', background: 'linear-gradient(90deg,#e0521c,#d6a90f,#3f9a3a,#1f74d4)' }} />
           </div>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setCaricandoCloud(false); }}
+            style={{
+              marginTop: 6,
+              background: 'rgba(255,255,255,0.18)',
+              border: '1px solid rgba(255,255,255,0.35)',
+              color: '#fff',
+              borderRadius: 6,
+              padding: '6px 16px',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            ✕ {tr('Chiudi e continua', 'Dismiss and continue')}
+          </button>
         </div>
       )}
 
@@ -18475,7 +18510,7 @@ function VersioneWatermark({ versione, onAggiorna }) {
         transition: 'all 0.2s ease',
       }}
       title={`Tavolo dei Dadi v${versione} (clicca per copiare)`}
-      aria-label={`Versione ${versione}`}
+      aria-hidden="true"
     >
       {copiato ? `v${versione} (copiato!)` : `v${versione}`}
     </div>

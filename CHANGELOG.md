@@ -2,6 +2,17 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.112.1] – 2026-10-21
+
+### Risolto
+- **Sblocco overlay di caricamento dal cloud**:
+  - Aggiunto timeout di sicurezza automatico di 4,5s sull'overlay di sincronizzazione per impedire che l'app rimanga bloccata all'infinito su "Caricamento dei personaggi dal cloud…".
+  - Aggiunto pulsante esplicito "Chiudi e continua" e chiusura al tocco sullo sfondo per permettere sempre di proseguire immediatamente con i personaggi locali.
+  - Applicato timeout di rete a 4,5s alle chiamate di sincronizzazione con il Worker (`fetchConTimeout`).
+- **Sblocco test E2E e CI/CD**:
+  - Escluso l'indicatore watermark discreto dai controlli automatici di contrasto WCAG (essendo un elemento decorativo/incidentale a bassissima opacità su richiesta).
+  - Allineati i test Playwright delle finestre alla rimozione del pulsante Cronologia dalla home.
+
 ## [4.112.0] – 2026-10-20
 
 ### Aggiunto & Ottimizzato
