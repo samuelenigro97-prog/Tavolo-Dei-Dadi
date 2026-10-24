@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.113.3';
+const APP_VERSION = '4.113.4';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -18537,12 +18537,12 @@ export default function App() {
       ) : null}
       <NuvolettaGlobale />
       {/* Indicatore discreto della versione: cliccabile per copiare la versione e aggiornare */}
-      <VersioneWatermark versione={APP_VERSION} onAggiorna={() => { if (aggiornamentoPronto) forzaAggiornamento(false); }} />
+      <VersioneWatermark versione={APP_VERSION} onAggiorna={() => { if (aggiornamentoPronto) { forzaAggiornamento(false); } else if (typeof navigator !== 'undefined' && navigator.serviceWorker) { navigator.serviceWorker.getRegistration().then((r) => r?.update()); } }} />
     </div>
   );
 }
 
-/** Indicatore discreto della versione: quasi invisibile a filo sfondo senza bordo, copiabile con un tocco. */
+/** Indicatore discreto della versione: posizionato a filo sfondo, leggibile e copiabile con un tocco. */
 function VersioneWatermark({ versione, onAggiorna }) {
   const [hover, setHover] = useState(false);
   const [copiato, setCopiato] = useState(false);
@@ -18565,25 +18565,27 @@ function VersioneWatermark({ versione, onAggiorna }) {
       onMouseLeave={() => setHover(false)}
       style={{
         position: 'fixed',
-        bottom: 3,
-        right: 6,
+        bottom: 4,
+        right: 8,
         zIndex: 1400,
-        fontSize: 9,
+        fontSize: 10,
         fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-        fontWeight: 500,
-        letterSpacing: 0.4,
+        fontWeight: 600,
+        letterSpacing: 0.5,
         color: copiato ? 'var(--c-green, #2e9d4d)' : 'var(--c-ink, currentColor)',
-        opacity: copiato ? 0.95 : (hover ? 0.75 : 0.18),
-        background: 'transparent',
+        opacity: copiato ? 1 : (hover ? 0.9 : 0.42),
+        background: 'rgba(0,0,0,0.18)',
+        backdropFilter: 'blur(2px)',
+        padding: '1px 5px',
+        borderRadius: 4,
         border: 'none',
         boxShadow: 'none',
-        padding: 0,
         margin: 0,
         userSelect: 'all',
         cursor: 'pointer',
         transition: 'all 0.2s ease',
       }}
-      title={`Tavolo dei Dadi v${versione} (clicca per copiare)`}
+      title={`Tavolo dei Dadi v${versione} (clicca per copiare e verificare aggiornamenti)`}
       aria-hidden="true"
     >
       {copiato ? `v${versione} (copiato!)` : `v${versione}`}

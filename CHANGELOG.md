@@ -2,6 +2,11 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.113.4] – 2026-10-24
+
+### Modificato
+- **Indicatore versione (Watermark in basso a destra)**: incrementata leggermente la visibilità (dimensione 10px, opacità 0.42, sfondo semitrasparente discreto) per garantire leggibilità su sfondi chiari e scuri senza disturbare. Aggiunto controllo aggiornamenti al tocco.
+
 ## [4.113.3] – 2026-10-24
 
 ### Corretto
