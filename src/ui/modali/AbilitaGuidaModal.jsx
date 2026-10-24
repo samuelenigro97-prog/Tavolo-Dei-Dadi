@@ -2,7 +2,7 @@
 import { t, tr } from '../../i18n';
 import { C } from '../tema.js';
 import { styles } from '../stili.js';
-import { bonusAbilita, trovaVantaggioAbilita } from '../../rules/scheda.js';
+import { bonusAbilita, trovaVantaggioAbilita, trovaSvantaggioAbilita } from '../../rules/scheda.js';
 import { CARATTERISTICHE } from '../../data/caratteristiche.js';
 import { conSegno, tiraDado } from '../../rules/dadi.js';
 import { dettagliAbilita } from '../../rules/regole.js';
@@ -14,6 +14,8 @@ export function AbilitaGuidaModal({ conAnimazione, lingua, modalAbilitaGuida, re
   const liv = scheda.abilita?.[modalAbilitaGuida] || 0;
   const carAbbr = (CARATTERISTICHE.find((c) => c.key === infoAb.car)?.abbr || infoAb.car).toUpperCase();
   const vantaggioInfo = trovaVantaggioAbilita(scheda, modalAbilitaGuida);
+  const svantaggioInfo = trovaSvantaggioAbilita(scheda, modalAbilitaGuida);
+  const siAnnullano = Boolean(vantaggioInfo && svantaggioInfo);
 
   const eseguiTiro = (vantaggio = 0) => {
     setModalAbilitaGuida(null);
@@ -104,8 +106,40 @@ export function AbilitaGuidaModal({ conAnimazione, lingua, modalAbilitaGuida, re
           </div>
         </div>
 
-        {/* Banner Vantaggio Rilevato */}
-        {vantaggioInfo && (
+        {/* Banner Vantaggio / Svantaggio / Elisione Rilevati */}
+        {siAnnullano ? (
+          <div
+            style={{
+              padding: '8px 16px',
+              background: 'rgba(100,100,100,0.12)',
+              borderBottom: `1px solid ${C.border}`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              fontSize: 12,
+              color: C.ink,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                padding: '1px 5px',
+                borderRadius: 4,
+                background: C.inkDim,
+                color: '#fff',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              ⚖ Tiro Normale
+            </span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {lingua === 'en'
+                ? `Advantage (${vantaggioInfo.fonte}) and Disadvantage (${svantaggioInfo.fonte}) cancel each other out`
+                : `Vantaggio (${vantaggioInfo.fonte}) e Svantaggio (${svantaggioInfo.fonte}) si annullano a vicenda`}
+            </span>
+          </div>
+        ) : vantaggioInfo ? (
           <div
             style={{
               padding: '8px 16px',
@@ -135,14 +169,54 @@ export function AbilitaGuidaModal({ conAnimazione, lingua, modalAbilitaGuida, re
               <strong>{vantaggioInfo.fonte}</strong> — {vantaggioInfo.dettaglio}
             </span>
           </div>
-        )}
+        ) : svantaggioInfo ? (
+          <div
+            style={{
+              padding: '8px 16px',
+              background: 'rgba(231,76,60,0.12)',
+              borderBottom: '1px solid rgba(231,76,60,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              fontSize: 12,
+              color: C.ink,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                padding: '1px 5px',
+                borderRadius: 4,
+                background: C.red,
+                color: '#fff',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              ▼ Svantaggio
+            </span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <strong>{svantaggioInfo.fonte}</strong> — {svantaggioInfo.dettaglio}
+            </span>
+          </div>
+        ) : null}
 
         {/* Pulsanti di Tiro Rapido */}
         <div style={{ padding: '12px 18px', background: C.panelLight, borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
           <button
             type="button"
             onClick={() => eseguiTiro(0)}
-            style={{ ...styles.buttonMini, fontSize: 12, fontWeight: 700, padding: '5px 12px', background: 'rgba(201,162,39,0.15)', borderColor: C.gold, color: C.goldDark }}
+            style={{
+              ...styles.buttonMini,
+              fontSize: 12,
+              fontWeight: 700,
+              padding: '5px 12px',
+              background: siAnnullano ? 'rgba(201,162,39,0.30)' : 'rgba(201,162,39,0.15)',
+              borderColor: C.gold,
+              borderWidth: siAnnullano ? 2 : 1,
+              color: C.goldDark,
+              boxShadow: siAnnullano ? '0 0 8px rgba(201,162,39,0.4)' : 'none',
+            }}
           >
             {lingua === 'en' ? 'Normal Roll' : 'Tiro Normale'} ({conSegno(bonus)})
           </button>
@@ -154,23 +228,35 @@ export function AbilitaGuidaModal({ conAnimazione, lingua, modalAbilitaGuida, re
               fontSize: 12,
               fontWeight: 700,
               padding: '5px 12px',
-              background: vantaggioInfo ? 'rgba(46,157,77,0.25)' : 'rgba(46,157,77,0.15)',
+              background: (vantaggioInfo && !siAnnullano) ? 'rgba(46,157,77,0.25)' : 'rgba(46,157,77,0.15)',
               borderColor: C.green,
-              borderWidth: vantaggioInfo ? 2 : 1,
+              borderWidth: (vantaggioInfo && !siAnnullano) ? 2 : 1,
               color: C.green,
-              boxShadow: vantaggioInfo ? '0 0 8px rgba(46,157,77,0.35)' : 'none',
+              boxShadow: (vantaggioInfo && !siAnnullano) ? '0 0 8px rgba(46,157,77,0.35)' : 'none',
             }}
           >
             {lingua === 'en'
-              ? (vantaggioInfo ? `Advantage (▲ ${vantaggioInfo.fonte})` : 'Advantage')
-              : (vantaggioInfo ? `Con Vantaggio (▲ ${vantaggioInfo.fonte})` : 'Con Vantaggio')}
+              ? ((vantaggioInfo && !siAnnullano) ? `Advantage (▲ ${vantaggioInfo.fonte})` : 'Advantage')
+              : ((vantaggioInfo && !siAnnullano) ? `Con Vantaggio (▲ ${vantaggioInfo.fonte})` : 'Con Vantaggio')}
           </button>
           <button
             type="button"
             onClick={() => eseguiTiro(-1)}
-            style={{ ...styles.buttonMini, fontSize: 12, fontWeight: 700, padding: '5px 12px', background: 'rgba(239,68,68,0.12)', borderColor: C.red, color: C.red }}
+            style={{
+              ...styles.buttonMini,
+              fontSize: 12,
+              fontWeight: 700,
+              padding: '5px 12px',
+              background: (svantaggioInfo && !siAnnullano) ? 'rgba(239,68,68,0.22)' : 'rgba(239,68,68,0.12)',
+              borderColor: C.red,
+              borderWidth: (svantaggioInfo && !siAnnullano) ? 2 : 1,
+              color: C.red,
+              boxShadow: (svantaggioInfo && !siAnnullano) ? '0 0 8px rgba(239,68,68,0.35)' : 'none',
+            }}
           >
-            {lingua === 'en' ? 'Disadvantage' : 'Con Svantaggio'}
+            {lingua === 'en'
+              ? ((svantaggioInfo && !siAnnullano) ? `Disadvantage (▼ ${svantaggioInfo.fonte})` : 'Disadvantage')
+              : ((svantaggioInfo && !siAnnullano) ? `Con Svantaggio (▼ ${svantaggioInfo.fonte})` : 'Con Svantaggio')}
           </button>
         </div>
 

@@ -2,6 +2,21 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.0] – 2026-10-25
+
+### Aggiunto
+- **Ira Barbarica e Azione di Schivata Integrate**:
+  - `trovaVantaggioAbilita` e `trovaVantaggioTiroSalvezza` rilevano `scheda.inIra`: conferiscono automaticamente vantaggio ad Atletica (prove di Forza) e ai Tiri Salvezza su Forza (purché non si indossi armatura pesante).
+  - Rilevata l'azione di Schivata attiva (`tatticaAttiva === 'schivata'`), che conferisce il badge `💨 Vant. Schivata` sui Tiri Salvezza di Destrezza.
+- **Condizioni Attive nei Tiri per Colpire e Tiri Salvezza**:
+  - `trovaVantaggioAttacco` e `trovaSvantaggioAttacco`: vantaggio automatico ai tiri per colpire per la condizione *Invisibile*; svantaggio automatico per *Avvelenato*, *Spaventato*, *Prono*, *Accecato*, *Trattenuto* o armatura indossata senza competenza.
+  - `trovaSvantaggioTiroSalvezza`: svantaggio su TS Destrezza per la condizione *Trattenuto*, e svantaggio su TS Forza/Destrezza per mancata competenza in armatura.
+- **Oggetti Magici Equipaggiati nell'Inventario**:
+  - Scansione di `scheda.inventario` per oggetti equipaggiati: riconosciuti nativamente *Stivali Elfici* / *Mantello Elfico* (vantaggio a Furtività), *Occhi dell'Aquila* (vantaggio a Percezione), *Guanti del Nuotare e Scalare* (Atletica), e qualsiasi oggetto con indicazione esplicita di vantaggio nelle note.
+- **Rifinitura Modali Guida Abilità e Concentrazione**:
+  - `AbilitaGuidaModal`: integrato banner rosso di svantaggio, banner neutro per elisione 5e (*Vantaggio + Svantaggio = Tiro Normale*), ed evidenziazione del bottone "Con Svantaggio".
+  - `ConcentrazioneModal`: corretto il calcolo del TS di concentrazione tenendo conto di penalità e svantaggi da sfinimento (2014/2024) e rilevamento vantaggio.
+
 ## [4.117.0] – 2026-10-24
 
 ### Aggiunto

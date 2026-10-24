@@ -3,29 +3,37 @@ import { t } from '../../i18n';
 import { C } from '../tema.js';
 import { styles } from '../stili.js';
 import { BadgeTiroSalvezza } from '../componenti.jsx';
-import { conSegno } from '../../rules/dadi.js';
+import { conSegno, modalitaEffettiva } from '../../rules/dadi.js';
 import { calcolaTsConcentrazione } from '../../rules/regole.js';
+import { effettiSfinimento, trovaVantaggioTiroSalvezza } from '../../rules/scheda.js';
 
 export function ConcentrazioneModal({ aggiorna, checkConc, lingua, registra, scheda, setCheckConc }) {
   const tsInfo = calcolaTsConcentrazione(scheda, checkConc.danno);
-  const bonusCon = tsInfo.bonus;
+  const sfin = effettiSfinimento(scheda);
+  const penSfin = sfin ? sfin.penalitaD20 : 0;
+  const bonusCon = tsInfo.bonus - penSfin;
   const esito = checkConc.esito;
+  const vTsCos = trovaVantaggioTiroSalvezza(scheda, 'costituzione');
+  const haVantConc = Boolean(tsInfo.haIncantatoreDaGuerra || vTsCos?.condizionale === 'magia');
 
   const eseguiTiroConc = (vantaggio = 0) => {
+    const modBase = vantaggio === 1 ? 'vantaggio' : vantaggio === -1 ? 'svantaggio' : 'normale';
+    const modUsata = modalitaEffettiva(modBase, sfin.svantaggioAttacchiSalvezza);
+
     const d1 = Math.floor(Math.random() * 20) + 1;
     const d2 = Math.floor(Math.random() * 20) + 1;
-    const d20 = vantaggio === 1 ? Math.max(d1, d2) : vantaggio === -1 ? Math.min(d1, d2) : d1;
+    const d20 = modUsata === 'vantaggio' ? Math.max(d1, d2) : modUsata === 'svantaggio' ? Math.min(d1, d2) : d1;
     const tot = d20 + bonusCon;
     const passa = d20 === 20 ? true : d20 === 1 ? false : tot >= checkConc.cd;
-    const etichVant = vantaggio === 1 ? ' (Vantaggio)' : vantaggio === -1 ? ' (Svantaggio)' : '';
-    const dettDadi = vantaggio !== 0 ? `2d20 [${d1}, ${d2}] -> [${d20}] ${conSegno(bonusCon)}` : `d20 [${d20}] ${conSegno(bonusCon)}`;
+    const etichVant = modUsata === 'vantaggio' ? ' (Vantaggio)' : modUsata === 'svantaggio' ? ' (Svantaggio)' : '';
+    const dettDadi = modUsata !== 'normale' ? `2d20 [${d1}, ${d2}] -> [${d20}] ${conSegno(bonusCon)}` : `d20 [${d20}] ${conSegno(bonusCon)}`;
 
     registra({
       etichetta: `${t('conc.ts')}${etichVant}`,
       tipo: 'd20',
       naturale: d20,
       totale: tot,
-      dettaglio: `${dettDadi} = ${tot} · CD ${checkConc.cd} (${checkConc.spell}) → ${passa ? 'Mantenuta' : 'Persa'}`,
+      dettaglio: `${dettDadi} = ${tot} · CD ${checkConc.cd} (${checkConc.spell})${penSfin ? ` · sfin. −${penSfin}` : ''} → ${passa ? 'Mantenuta' : 'Persa'}`,
       critico: d20 === 20,
       fumble: d20 === 1,
     });
@@ -33,7 +41,7 @@ export function ConcentrazioneModal({ aggiorna, checkConc, lingua, registra, sch
     if (!passa) {
       aggiorna({ concentrazione: '' });
     }
-    setCheckConc({ ...checkConc, esito: { d20, tot, passa, d1, d2, vantaggio } });
+    setCheckConc({ ...checkConc, esito: { d20, tot, passa, d1, d2, vantaggio: modUsata === 'vantaggio' ? 1 : modUsata === 'svantaggio' ? -1 : 0 } });
   };
 
   return (
@@ -57,9 +65,9 @@ export function ConcentrazioneModal({ aggiorna, checkConc, lingua, registra, sch
           </div>
         </div>
 
-        {tsInfo.haIncantatoreDaGuerra && !esito && (
+        {haVantConc && !esito && (
           <div style={{ fontSize: 12, background: 'rgba(46,157,77,0.12)', border: '1px solid var(--c-green)', borderRadius: 6, padding: '5px 8px', marginBottom: 10, color: C.green, fontWeight: 600 }}>
-            <strong>{lingua === 'en' ? 'War Caster / Eldritch Mind' : 'Incantatore da Guerra / Mente Occulta'}</strong>: {lingua === 'en' ? 'You have Advantage on concentration saves!' : 'Hai Vantaggio sui TS di concentrazione!'}
+            <strong>{lingua === 'en' ? 'War Caster / Eldritch Mind / Advantage' : 'Incantatore da Guerra / Mente Occulta / Vantaggio'}</strong>: {lingua === 'en' ? 'You have Advantage on concentration saves!' : 'Hai Vantaggio sui TS di concentrazione!'}
           </div>
         )}
 
@@ -71,13 +79,13 @@ export function ConcentrazioneModal({ aggiorna, checkConc, lingua, registra, sch
                 ...styles.button,
                 width: '100%',
                 fontWeight: 700,
-                background: tsInfo.haIncantatoreDaGuerra ? 'rgba(46,157,77,0.15)' : 'rgba(201,162,39,0.18)',
-                borderColor: tsInfo.haIncantatoreDaGuerra ? C.green : C.gold,
-                color: tsInfo.haIncantatoreDaGuerra ? C.green : C.goldDark,
+                background: haVantConc ? 'rgba(46,157,77,0.15)' : 'rgba(201,162,39,0.18)',
+                borderColor: haVantConc ? C.green : C.gold,
+                color: haVantConc ? C.green : C.goldDark,
               }}
-              onClick={() => eseguiTiroConc(tsInfo.haIncantatoreDaGuerra ? 1 : 0)}
+              onClick={() => eseguiTiroConc(haVantConc ? 1 : 0)}
             >
-              {tsInfo.haIncantatoreDaGuerra ? (lingua === 'en' ? 'Roll with Advantage' : 'Tira con Vantaggio') : t('conc.ts')} ({conSegno(bonusCon)})
+              {haVantConc ? (lingua === 'en' ? 'Roll with Advantage' : 'Tira con Vantaggio') : t('conc.ts')} ({conSegno(bonusCon)})
             </button>
             <div style={{ display: 'flex', gap: 6 }}>
               <button

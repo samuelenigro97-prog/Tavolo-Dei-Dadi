@@ -5,6 +5,23 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.0',
+    voci: {
+      it: [
+        'Ira Barbarica e Schivata collegate: vantaggio automatico su prove di Forza, Atletica e TS Forza in Ira, e vantaggio su TS Destrezza con l\'azione di Schivata.',
+        'Condizioni Attive in Attacco e TS: vantaggio con Invisibile, svantaggio con Avvelenato, Spaventato, Prono, Accecato, Trattenuto, e svantaggio su TS Destrezza da Trattenuto.',
+        'Oggetti Magici Equipaggiati: riconoscimento automatico di Stivali/Mantello Elfico (Furtività), Occhi dell\'Aquila (Percezione) e note oggetto.',
+        'Guida Abilità e Concentrazione: modali aggiornate con banner di svantaggio, elisione 5e, e tiro TS concentrazione corretto con sfinimento e Incantatore da Guerra.',
+      ],
+      en: [
+        'Barbarian Rage & Dodge wired: automatic advantage on Strength checks, Athletics and Strength saves during Rage, and advantage on Dex saves with Dodge.',
+        'Active Conditions on Attacks & Saves: advantage when Invisible, disadvantage when Poisoned, Frightened, Prone, Blinded, Restrained, and Dex save disadvantage from Restrained.',
+        'Equipped Magic Items: automatic detection of Boots/Cloak of Elvenkind (Stealth), Eyes of the Eagle (Perception) and item notes.',
+        'Skill Guide & Concentration: modals updated with disadvantage banner, 5e cancellation, and concentration save accounting for exhaustion and War Caster.',
+      ],
+    },
+  },
+  {
     versione: '4.117.0',
     voci: {
       it: [
