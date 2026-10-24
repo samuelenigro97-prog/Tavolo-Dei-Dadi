@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.116.0',
+    voci: {
+      it: [
+        'Vantaggio Automatico Abilità e Forme: rilevamento automatico del vantaggio alle prove di abilità e tiri salvezza concesso da tratti di Forma Selvatica/Metamorfosi (es. Vista acuta, Udito/Olfatto acuto, Mimetismo), debito Araldi, poteri o privilegi di classe.',
+        'Tiro con Vantaggio Immediato: badge "▲ Vant." contestuale nell\'elenco abilità con tooltip della fonte, forzatura automatica del tiro a 2d20 prendendo il più alto, ed evidenziazione guidata nella finestra dettagli abilità.',
+      ],
+      en: [
+        'Automatic Advantage for Skills & Forms: automatic detection of advantage on skill checks and saving throws from Wild Shape/Polymorph traits (e.g. Keen Sight, Keen Hearing/Smell, Mimicry), Araldi debt, active powers, or class features.',
+        'Instant Advantage Roll: contextual "▲ Vant." badge in skill list with source tooltip, automatic 2d20 keep highest roll enforcement, and guided highlight in skill details modal.',
+      ],
+    },
+  },
+  {
     versione: '4.115.3',
     voci: {
       it: [

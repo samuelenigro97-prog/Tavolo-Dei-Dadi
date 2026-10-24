@@ -2,6 +2,18 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.116.0] – 2026-10-24
+
+### Aggiunto
+- **Automazione Vantaggi Abilità e Tiri Salvezza**: implementate funzioni pure `trovaVantaggioAbilita` e `trovaVantaggioTiroSalvezza` in `src/rules/scheda.js` che intercettano e applicano in automatico il vantaggio derivante da:
+  - Tratti di bestie e creature in Forma Selvatica o Metamorfosi (es. *Vista acuta* dell'Aquila gigante per Percezione, *Udito e olfatto acuti* del Lupo, *Mimetismo subacqueo* del Polpo per Furtività, *Piedi saldi*, *Resistenza alla magia*).
+  - Privilegi legati a soglie di Debito della campagna Araldi del Segreto (*Voce nell'Ombra* a Debito 5 per Intuizione, *Occhio Risvegliato* a Debito 15 per Percezione e Indagare, *Coraggio* a Debito 35 per TS Saggezza contro spaventato).
+  - Poteri attivi e privilegi/tratti di classe o razza (*Percezione del Pericolo*, *Ascendenza Fatata*, *Resistenza Nanica*, *Astuzia Gnomesca*).
+- **Badge e Tiro Rapido Forzato a Vantaggio**:
+  - Mostrato il badge `▲ Vant.` colorato dinamicamente a seconda dell'origine (verde per tratti bestiali di forma attiva, bronzo per debito Araldi, oro per poteri e tratti) con tooltip esplicativo della fonte e della condizione.
+  - Al lancio del dado della prova, la modalità viene impostata automaticamente su vantaggio (2d20 prendendo il massimo).
+  - Nella finestra guida all'abilità (`AbilitaGuidaModal`), compare un banner riassuntivo del vantaggio attivo e il pulsante "Con Vantaggio" riceve risalto cromatico prioritario.
+
 ## [4.115.3] – 2026-10-24
 
 ### Rimosso
