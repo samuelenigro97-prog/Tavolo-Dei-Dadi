@@ -1347,7 +1347,7 @@ import { INCANTESIMI_DB, ALIAS_INCANTESIMI, datiIncantesimo, valoreIncantesimoPe
 const INCANTESIMI_NOMI = Array.from(new Set([...NOMI_SPIEG_INC, ...Object.keys(INCANTESIMI_DB)])).sort((a, b) => a.localeCompare(b, 'it'));
 import { NOMI_CLASSI, BACKGROUND_5E, TAGLIE_5E, ALLINEAMENTI_5E, SESSO_5E, SOTTOCLASSI_5E, INCANTESIMI_CLASSE, DANNI_5E, SENSI_5E, CONDIZIONI_5E, NOMI_OGGETTI, LINGUE_5E, ARMI_5E, STRUMENTI_5E, REAZIONI_5E, AZIONI_BONUS_5E, GRUPPI_ARMI_5E, GRUPPI_STRUMENTI_5E, GRUPPI_LINGUE_5E, DEFAULT_MANUALI, manualeAttivo, SOTTOCLASSI_FONTI, talentiPerManuali, PE_PER_LIVELLO, BACKGROUND_COMPETENZE, BACKGROUND_TALENTO_ORIGINE_2024, SPECIE_5E, tabellaPrivilegiSottoclasse, CARATT_INCANTATORE, PRIORITA_CARATT, DADO_VITA_CLASSE, BACKGROUND_CARATT, TS_CLASSE, ADDESTRAMENTO_CLASSE, COMPETENZE_CLASSE, PRIVILEGI_CLASSE_L1, PRIVILEGI_CLASSE_L1_2014, ASI_LIV, SOTTOCLASSE_LIV, COMPETENZE_SPECIE, NOMI_SPECIE, NOMI_SPECIE_GENERE, COGNOMI_SPECIE, NOMI_GENERICI, SPECIE_DATI, SPECIE_DATI_2014, BONUS_CARATT_SPECIE_2014, SFINIMENTO_2014, BASE_ARMATURA_DEFAULT, ESEMPI_ARMATURA } from "./data/dati5e.js";
 import { modificatore, conSegno, tiraDado, parseEspressioneDado, facceDadoVita, esprDadiVita, gruppiDadoVita, bonusCompetenzaDaLivello, tiraDanni, tiraD20, capacitaCarico, modalitaEffettiva } from "./rules/dadi.js";
-import { risorseAutoClasse, sincronizzaRisorseClasse, trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from "./rules/regole.js";
+import { risorseAutoClasse, sincronizzaRisorseClasse, trucchettiMax, incantesimiMaxAuto, sottoclasseLivPer, chiaveClasse, privilegiClasseLivello, privilegiClasseFinoA, asiAlLivello, slotDaClasseLivello, slotMulticlasse, coloreClasse, dettagliIncantesimo, classificaIncantesimoCombattimento, scalaDannoTrucchetto, incantesimiInizialiPerLivello, classePreparaIncantesimi, caratteristicaIncantatoreEffettiva, pesoStimato, pesoArmatura, determinaIconaOggetto, eContenitore, ottieniContenutoItem, sottoclasseTerzoIncantatore, incantesimiTerzoCasterLivello, listeIncantesimiTerzoCaster, controlliScheda, risorseDopoRiposo, COSTO_SLOT_IN_PUNTI, LIVELLI_CONVERTIBILI, puntiVersoSlot, slotVersoPunti, MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, dettagliProgressioneLivello, maxInvocazioniWarlock, maxInfusioniNote, maxOggettiInfusi, calcolaPfCompagno, parseAzioniCompagno, dettagliEsperienza, analizzaPozione, calcolaMovimentoESalti, trovaReazioniDisponibili, calcolaTurnoCombattimento, calcolaTsConcentrazione, calcolaAttaccoFurtivo, calcolaIraBarbarica, calcolaPunizioneDivina, calcolaIspirazioneBardica, livelloDiClasse, categoriaDaTempoLancio, tempoLancioIncantesimo, gittataAttacco, categoriaAttaccoSalvato, isRandelloIncantato, caratteristicaTiroSalvezzaIncantesimo, dannoTrucchettoScalato, dannoBaseTrucchetto, dannoCuraConModificatore } from "./rules/regole.js";
 import { normalizzaPoteri, garantisciDebitoAraldi, sincronizzaRisorsePoteri, bonusPotereBersaglio, modificatoriPoteriAttivi, livelloTotaleScheda, contatoriInGioco, valoreContatore, soglieDebitoAttive } from './rules/poteri.js';
 import { PoteriRisorse } from './ui/PoteriRisorse.jsx';
 import { unisciPoteriCampagna, poteriCampagnaIncompleti } from './data/poteriCampagna.js';
@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.113.4';
+const APP_VERSION = '4.114.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -3758,6 +3758,7 @@ export default function App() {
   const [mostraModalRitrattoBestia, setMostraModalRitrattoBestia] = useState(false);
   const [urlRitrattoBestiaInput, setUrlRitrattoBestiaInput] = useState('');
   const [tabTrasformazione, setTabTrasformazione] = useState(null); // null (popup chiuso) | 'animale' | 'metamorfosi'
+  const [mostraInfoRegoleForma, setMostraInfoRegoleForma] = useState(false); // pannello spiegazioni e regole ufficiali PHB 5e / 5e.tools per la forma selvatica
   const [azioniAltreAperte, setAzioniAltreAperte] = useState(false); // pannello "Altre opzioni" (Tattiche/Copertura/Poteri) nella sezione Azioni
   const [mostraModalAggiungiCompagno, setMostraModalAggiungiCompagno] = useState(false);
   const [filtroCompagnoCat, setFiltroCompagnoCat] = useState('tutti');
@@ -13845,30 +13846,107 @@ export default function App() {
                 </label>
               )}
             >
-              {isTrasformato && (
-                <div
-                  style={{
-                    background: 'rgba(231,76,60,0.08)',
-                    border: '1px solid #e74c3c',
-                    borderRadius: 8,
-                    padding: '8px 12px',
-                    marginBottom: 12,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    fontSize: 12,
-                    color: C.ink
-                  }}
-                >
-                  <span style={{ fontSize: 18 }}>🐾</span>
-                  <div>
-                    <strong>{lingua === 'en' ? 'Spellcasting Unavailable:' : 'Lancio Incantesimi Non Disponibile:'}</strong>{' '}
-                    {lingua === 'en'
-                      ? `You cannot cast spells while transformed into ${formaAttiva.dati.nome}. Transforming does not break your concentration on a spell already cast.`
-                      : `Non puoi lanciare incantesimi mentre sei in ${campoForma === 'metamorfosi' ? 'Metamorfosi' : 'Forma Selvatica'} (${formaAttiva.dati.nome}). La trasformazione non interrompe la concentrazione su un incantesimo già attivo.`}
+              {isTrasformato && (() => {
+                const nomeBestia = formaAttiva.dati.nome || formaAttiva.dati.nomeEn || 'Bestia';
+                const eMetamorfosi = campoForma === 'metamorfosi';
+                const livDruido = livelloDiClasse(scheda, 'druido');
+                const haIncantesimiBestiali = !eMetamorfosi && livDruido >= 18;
+                const cosMod = modificatore(Number(formaAttiva.dati.costituzione) || 10);
+                const en = lingua === 'en';
+
+                return (
+                  <div
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(231,76,60,0.12) 0%, rgba(180,40,30,0.05) 100%)',
+                      border: '1.5px solid rgba(231,76,60,0.45)',
+                      borderRadius: 10,
+                      padding: '12px 14px',
+                      marginBottom: 14,
+                      boxShadow: '0 3px 10px rgba(0,0,0,0.08)',
+                      color: C.ink,
+                      fontSize: 12,
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {/* Intestazione del riquadro */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap', marginBottom: 10, borderBottom: '1px solid rgba(231,76,60,0.25)', paddingBottom: 6 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: 20 }}>{eMetamorfosi ? '🔮' : '🐾'}</span>
+                        <strong style={{ fontSize: 13, color: '#c0392b', letterSpacing: 0.3 }}>
+                          {en
+                            ? `Spellcasting Rules in ${eMetamorfosi ? 'Polymorph' : 'Wild Shape'} (${nomeBestia})`
+                            : `Regole di Magia in ${eMetamorfosi ? 'Metamorfosi' : 'Forma Selvatica'} (${nomeBestia})`}
+                        </strong>
+                      </div>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4, background: 'rgba(231,76,60,0.15)', color: '#c0392b', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                        {en ? 'Official Rules (PHB / 5e.tools)' : 'Manuale del Giocatore (PHB 5e)'}
+                      </span>
+                    </div>
+
+                    {/* Griglia dei punti delle regole dal Manuale Ufficiale */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 10 }}>
+                      {/* Punto 1: Lancio di Incantesimi */}
+                      <div style={{ background: 'rgba(255,255,255,0.04)', padding: '8px 10px', borderRadius: 6, borderLeft: '3px solid #c0392b' }}>
+                        <div style={{ fontWeight: 700, color: '#c0392b', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
+                          <span>🚫</span> {en ? 'New Spell Casting' : 'Lancio di Nuovi Incantesimi'}
+                        </div>
+                        <div style={{ fontSize: 11.5, opacity: 0.95 }}>
+                          {haIncantesimiBestiali ? (
+                            <span>
+                              <strong>{en ? 'Beast Spells (Level 18+):' : 'Incantesimi Bestiali (18° Livello):'}</strong>{' '}
+                              {en
+                                ? `You can cast druid spells in beast form performing somatic and verbal components, but providing no material components (PHB p. 67).`
+                                : `Puoi lanciare molti dei tuoi incantesimi da druido nella forma animale compiendo le componenti verbali e somatiche, purché prive di componenti materiali con costo (PHB p. 67).`}
+                            </span>
+                          ) : (
+                            <span>
+                              {en
+                                ? `You cannot cast spells while transformed. Your ability to speak or take any action that requires hands is limited to the capabilities of ${nomeBestia} (PHB p. 67).`
+                                : `Non puoi lanciare nuovi incantesimi né compiere azioni che richiedano mani o parola umana, limitato dalle capacità biologiche di ${nomeBestia} (PHB p. 67).`}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Punto 2: Concentrazione Mantenuta */}
+                      <div style={{ background: 'rgba(255,255,255,0.04)', padding: '8px 10px', borderRadius: 6, borderLeft: '3px solid #27ae60' }}>
+                        <div style={{ fontWeight: 700, color: '#27ae60', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
+                          <span>🔮</span> {en ? 'Concentration Maintained' : 'Concentrazione Mantenuta'}
+                        </div>
+                        <div style={{ fontSize: 11.5, opacity: 0.95 }}>
+                          {en
+                            ? `Transforming does not break your concentration on a spell already cast. If you take damage, you roll a CON saving throw (${conSegno(cosMod)}) to maintain it (DC 10 or half damage).`
+                            : `La trasformazione non interrompe la concentrazione su un incantesimo già attivo (es. Pelle Coriacea, Invocare il Fulmine). Se subisci danni, tiri il TS Costituzione (${conSegno(cosMod)}) con CD 10 o metà danno per mantenerlo.`}
+                        </div>
+                      </div>
+
+                      {/* Punto 3: Azioni di Incantesimi già Attivi */}
+                      <div style={{ background: 'rgba(255,255,255,0.04)', padding: '8px 10px', borderRadius: 6, borderLeft: '3px solid #f39c12' }}>
+                        <div style={{ fontWeight: 700, color: '#d35400', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
+                          <span>⚡</span> {en ? 'Directing Active Magic' : 'Azioni di Magie già Attive'}
+                        </div>
+                        <div style={{ fontSize: 11.5, opacity: 0.95 }}>
+                          {en
+                            ? `You can still take actions that are part of an active spell cast before shifting, such as directing Call Lightning, moving a Flaming Sphere, or Heat Metal (PHB / SAC).`
+                            : `Puoi continuare a compiere le azioni previste da incantesimi lanciati prima della trasformazione, come richiamare un fulmine con Invocare il Fulmine, muovere una Sfera Infuocata o attivare Riscaldare il Metallo.`}
+                        </div>
+                      </div>
+
+                      {/* Punto 4: Ritorno alla Forma Umanoide */}
+                      <div style={{ background: 'rgba(255,255,255,0.04)', padding: '8px 10px', borderRadius: 6, borderLeft: '3px solid #2980b9' }}>
+                        <div style={{ fontWeight: 700, color: '#2980b9', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
+                          <span>🔄</span> {en ? 'Reverting Form' : 'Ritorno alla Forma Base'}
+                        </div>
+                        <div style={{ fontSize: 11.5, opacity: 0.95 }}>
+                          {en
+                            ? `You can revert to your normal form as a Bonus Action on your turn, or you instantly revert if reduced to 0 HP (excess damage carries over to your normal HP).`
+                            : `Puoi ritornare alla tua forma normale con un'Azione Bonus nel tuo turno, oppure vieni ritrasformato istantaneamente se scendi a 0 PF (con riporto dei danni in eccesso sui tuoi PF umani).`}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
               <div style={{ marginBottom: 14 }}>
                 {(() => {
                   const conc = incantesimiConcentrazioneClasse(scheda.classe, scheda.sottoclasse, versione);
@@ -15689,14 +15767,71 @@ export default function App() {
                           </h2>
                           <button style={styles.buttonMini} onClick={() => setTabTrasformazione(null)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
                         </div>
-                        <div style={{ ...styles.detail, fontSize: 12, marginBottom: 8, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
+                        <div style={{ ...styles.detail, fontSize: 12, marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
                           <span>
                             Grado di Sfida Max: <strong>GS {lim?.gsMax === 0.25 ? '1/4' : lim?.gsMax === 0.5 ? '1/2' : lim?.gsMax || '1/4'}</strong>
                             {lim?.nuoto && ' · Nuoto'}
                             {lim?.volo && ' · Volo'}
                           </span>
-                          <span style={{ opacity: 0.8 }}>{disp.length} {tabTrasformazione === 'metamorfosi' ? 'creature utilizzabili' : 'bestie utilizzabili'}</span>
+                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ opacity: 0.8 }}>{disp.length} {tabTrasformazione === 'metamorfosi' ? 'creature utilizzabili' : 'bestie utilizzabili'}</span>
+                            <button
+                              type="button"
+                              onClick={() => setMostraInfoRegoleForma((v) => !v)}
+                              style={{
+                                ...styles.buttonMini,
+                                fontSize: 11,
+                                padding: '2px 8px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 4,
+                                color: tabTrasformazione === 'metamorfosi' ? '#7b4fb0' : '#2e7d32',
+                                borderColor: tabTrasformazione === 'metamorfosi' ? '#7b4fb0' : '#2e7d32',
+                                fontWeight: 600,
+                              }}
+                              title={lingua === 'en' ? 'Click to show/hide official rules from PHB / 5e.tools' : 'Clicca per mostrare/nascondere le regole ufficiali del Manuale del Giocatore'}
+                            >
+                              📖 {mostraInfoRegoleForma ? (lingua === 'en' ? 'Hide Rules' : 'Chiudi Regole') : (lingua === 'en' ? 'Official Rules' : 'Regole dal Manuale')}
+                            </button>
+                          </div>
                         </div>
+
+                        {/* Riquadro Spiegazioni e Regole Ufficiali dal Manuale */}
+                        {mostraInfoRegoleForma && (
+                          <div
+                            style={{
+                              background: tabTrasformazione === 'metamorfosi' ? 'rgba(123,79,176,0.08)' : 'rgba(46,125,50,0.08)',
+                              border: `1.5px solid ${tabTrasformazione === 'metamorfosi' ? '#7b4fb0' : '#2e7d32'}`,
+                              borderRadius: 8,
+                              padding: '10px 12px',
+                              marginBottom: 12,
+                              fontSize: 11.5,
+                              lineHeight: 1.5,
+                              color: C.ink,
+                            }}
+                          >
+                            <div style={{ fontWeight: 700, color: tabTrasformazione === 'metamorfosi' ? '#7b4fb0' : '#2e7d32', marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4 }}>
+                              <span>📖 {tabTrasformazione === 'metamorfosi' ? tr('Regole Ufficiali di Metamorfosi (PHB p. 269)', 'Official Polymorph Rules (PHB p. 269)') : tr('Regole Ufficiali di Forma Selvatica (PHB p. 67 / 2024)', 'Official Wild Shape Rules (PHB p. 67 / 2024)')}</span>
+                              <span style={{ fontSize: 10, opacity: 0.8 }}>Fonti: 5e.tools · D&D Beyond · PHB</span>
+                            </div>
+                            {tabTrasformazione === 'metamorfosi' ? (
+                              <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                                <li><strong>{tr('Bersaglio e GS:', 'Target & CR:')}</strong> {tr('La nuova forma può essere una qualsiasi bestia con GS pari o inferiore al livello del bersaglio (o al suo GS se non ha livelli).', 'The new form can be any beast whose challenge rating is equal to or less than the target’s level (or CR).')}</li>
+                                <li><strong>{tr('Statistiche sostituite:', 'Game Statistics:')}</strong> {tr('Sostituisci tutte le caratteristiche del bersaglio (incluse le caratteristiche mentali INT, SAG, CAR) e le sue azioni con quelle della bestia scelta.', 'All game statistics (including mental abilities INT, WIS, CHA) and actions are replaced by those of the chosen beast.')}</li>
+                                <li><strong>{tr('Punti Ferita e 0 PF:', 'Hit Points & 0 HP:')}</strong> {tr('Assume i PF della bestia. A 0 PF ritorna alla forma normale e i danni residui si trasferiscono ai PF originari.', 'Assumes the beast’s HP. Reverts at 0 HP with excess damage transferring to base HP.')}</li>
+                                <li><strong>{tr('Incantesimi e Concentrazione:', 'Spells & Concentration:')}</strong> {tr('Il bersaglio non può lanciare incantesimi. Chi ha lanciato la metamorfosi deve mantenere la concentrazione (fino a 1 ora).', 'Target cannot cast spells. The caster must maintain concentration (up to 1 hour).')}</li>
+                              </ul>
+                            ) : (
+                              <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                                <li><strong>{tr('Durata:', 'Duration:')}</strong> {tr(`Puoi rimanere in forma selvatica per un numero di ore pari a metà del tuo livello da druido (minimo 1 ora). Ritorno come Azione Bonus.`, `You can stay in wild shape for hours equal to half your druid level (minimum 1 hour). Revert as a Bonus Action.`)}</li>
+                                <li><strong>{tr('Punti Ferita e 0 PF:', 'Hit Points & 0 HP:')}</strong> {tr('Assumi i PF e i dadi vita della bestia. Quando scendi a 0 PF ritorni alla tua forma normale e gli eventuali danni in eccesso si trasferiscono ai tuoi PF umani.', 'You assume the beast’s HP. Revert at 0 HP with excess damage transferring to normal HP.')}</li>
+                                <li><strong>{tr('Caratteristiche fisiche e mentali:', 'Ability Scores:')}</strong> {tr('Sostituisci Forza, Destrezza e Costituzione con quelli della creatura; mantieni Intelligenza, Saggezza, Carisma e tutti i tiri salvezza/abilità in cui hai competenza.', 'Replace STR, DEX, CON with the beast; retain INT, WIS, CHA and all proficiencies.')}</li>
+                                <li><strong>{tr('Lancio di Incantesimi:', 'Spellcasting:')}</strong> {tr('Non puoi lanciare nuovi incantesimi (fino al 18° liv. con Incantesimi Bestiali), ma mantieni la concentrazione attiva e puoi usare le azioni di magie già lanciate.', 'Cannot cast new spells (until lvl 18 Beast Spells), but maintain active concentration and spell actions.')}</li>
+                                <li><strong>{tr('Equipaggiamento:', 'Equipment:')}</strong> {tr('Scegli se farlo cadere a terra, fonderlo nella nuova forma (non operativo) o indossarlo se la forma lo consente.', 'Choose whether it falls to the ground, merges into your new form (inoperative), or is worn if compatible.')}</li>
+                              </ul>
+                            )}
+                          </div>
+                        )}
 
                         {/* Scorciatoie Forme Preferite (Accesso Rapido) */}
                         {listaPref.length > 0 && (
