@@ -2,7 +2,7 @@
 // Funzioni pure (nessun React, nessuno stato): testabili in isolamento.
 import { modificatore, bonusCompetenzaDaLivello } from './dadi.js';
 import { ABILITA } from '../data/caratteristiche.js';
-import { bonusPotereBersaglio } from './poteri.js';
+import { bonusPotereBersaglio, soglieDebitoAttive } from './poteri.js';
 
 export function formattaNomePg(nome) {
   if (!nome || typeof nome !== 'string') return '';
@@ -790,4 +790,297 @@ export function attaccoIncantesimoAttivo(att, incantesimiLista, preparaIncantesi
   const voce = lista.find((x) => String(x?.nome || '').trim().toLowerCase() === pulito);
   if (!voce) return false;
   return voce.livello === 0 || Boolean(voce.preparato || voce.semprePreparato || voce.bonus) || !preparaIncantesimi;
+}
+
+/**
+ * Verifica se un testo contiene parole chiave associate a una determinata abilità 5e.
+ */
+function matchAbilitaNelTesto(abilitaKey, testo) {
+  if (!testo || typeof testo !== 'string') return false;
+  switch (abilitaKey) {
+    case 'percezione':
+      return /(percezion|perception|vista\s*acuta|olfatto\s*acuto|udito\s*acuto|sensi\s*acuti|vista\s*e\s*olfatto|udito\s*e\s*vista|udito\s*e\s*olfatto|ecolocalizz)/i.test(testo);
+    case 'furtivita':
+      return /(furtivit|stealth|mimetismo)/i.test(testo);
+    case 'atletica':
+      return /(atletic|athletic)/i.test(testo);
+    case 'acrobazia':
+      return /(acrobaz|acrobatic)/i.test(testo);
+    case 'sopravvivenza':
+      return /(sopravvivenz|survival|tracciamento|fiuto)/i.test(testo);
+    case 'intuizione':
+      return /(intuizion|insight)/i.test(testo);
+    case 'indagare':
+      return /(indagar|investiga)/i.test(testo);
+    case 'addestrareAnimali':
+      return /(addestrare\s*animal|animal\s*handling)/i.test(testo);
+    case 'rapiditaDiMano':
+      return /(rapidit[àa]\s*di\s*mano|sleight\s*of\s*hand)/i.test(testo);
+    case 'arcano':
+      return /(arcana|arcano)/i.test(testo);
+    case 'storia':
+      return /(storia|history)/i.test(testo);
+    case 'natura':
+      return /(natur)/i.test(testo);
+    case 'religione':
+      return /(religion)/i.test(testo);
+    case 'medicina':
+      return /(medicin)/i.test(testo);
+    case 'inganno':
+      return /(ingann|deception)/i.test(testo);
+    case 'intimidire':
+      return /(intimid)/i.test(testo);
+    case 'intrattenere':
+      return /(intratten|performance|esibizion)/i.test(testo);
+    case 'persuasione':
+      return /(persuas)/i.test(testo);
+    default:
+      return false;
+  }
+}
+
+/**
+ * Individua se il personaggio gode di vantaggio automatico per una data abilità
+ * da trasformazioni (Forma Bestiale / Metamorfosi), soglie di debito Araldi,
+ * poteri attivi o privilegi del personaggio.
+ *
+ * Restituisce:
+ * {
+ *   attivo: true,
+ *   fonte: string,
+ *   fonteEn?: string,
+ *   dettaglio: string,
+ *   tipo: 'forma' | 'debito' | 'potere' | 'privilegio'
+ * } | null
+ */
+export function trovaVantaggioAbilita(scheda, abilitaKey) {
+  if (!scheda || !abilitaKey) return null;
+
+  // 1. Trasformazione Attiva (Forma Bestiale o Metamorfosi)
+  const forma = trasformazioneAttiva(scheda);
+  if (forma && forma.dati) {
+    const tratti = Array.isArray(forma.dati.tratti)
+      ? forma.dati.tratti
+      : (forma.dati.tratti ? [forma.dati.tratti] : []);
+
+    for (const tr of tratti) {
+      const strTratto = String(tr || '').trim();
+      if (!strTratto) continue;
+      if (!/(vantaggio|advantage)/i.test(strTratto)) continue;
+
+      if (matchAbilitaNelTesto(abilitaKey, strTratto)) {
+        const parti = strTratto.split(':');
+        const nomeTratto = parti.length > 1 ? parti[0].trim() : strTratto.slice(0, 30).trim();
+        const nomeForma = forma.dati.nome || (forma.campo === 'metamorfosi' ? 'Metamorfosi' : 'Forma Bestiale');
+        return {
+          attivo: true,
+          fonte: `${nomeTratto} (${nomeForma})`,
+          fonteEn: `${nomeTratto} (${nomeForma})`,
+          dettaglio: strTratto,
+          tipo: 'forma',
+        };
+      }
+    }
+  }
+
+  // 2. Soglie Debito Araldi del Segreto
+  const soglie = soglieDebitoAttive(scheda);
+  if (abilitaKey === 'intuizione' && soglie.voceOmbra) {
+    return {
+      attivo: true,
+      fonte: "Voce nell'Ombra (Debito 5)",
+      fonteEn: "Voice in the Shadows (Debt 5)",
+      dettaglio: "Vantaggio permanente a tutte le prove di Intuizione.",
+      tipo: 'debito',
+    };
+  }
+  if ((abilitaKey === 'percezione' || abilitaKey === 'indagare') && soglie.occhioRisvegliato) {
+    return {
+      attivo: true,
+      fonte: "Occhio Risvegliato (Debito 15)",
+      fonteEn: "Awakened Eye (Debt 15)",
+      dettaglio: `Vantaggio permanente alle prove di ${abilitaKey === 'percezione' ? 'Percezione' : 'Indagare'}.`,
+      tipo: 'debito',
+    };
+  }
+
+  // 3. Poteri Attivi
+  if (Array.isArray(scheda.poteri)) {
+    for (const pot of scheda.poteri) {
+      if (!pot?.attivo) continue;
+      const testo = `${pot.nome || ''} ${pot.descrizione || ''} ${pot.effetto || ''}`.toLowerCase();
+      if (/(vantaggio|advantage)/i.test(testo) && matchAbilitaNelTesto(abilitaKey, testo)) {
+        return {
+          attivo: true,
+          fonte: pot.nome || 'Potere attivo',
+          dettaglio: pot.effetto || pot.descrizione || 'Vantaggio da potere attivo.',
+          tipo: 'potere',
+        };
+      }
+    }
+  }
+
+  // 4. Privilegi, Tratti o Talenti del PG
+  const testoPrivilegi = `${scheda.privilegi || ''}\n${scheda.privilegiSottoclasse || ''}\n${scheda.tratti || ''}\n${scheda.talenti || ''}`;
+  if (/(vantaggio|advantage)/i.test(testoPrivilegi)) {
+    const righe = testoPrivilegi.split('\n');
+    for (const riga of righe) {
+      if (/(vantaggio|advantage)/i.test(riga) && matchAbilitaNelTesto(abilitaKey, riga)) {
+        const parti = riga.split(':');
+        const nome = parti.length > 1 ? parti[0].trim() : 'Tratto';
+        return {
+          attivo: true,
+          fonte: nome,
+          dettaglio: riga.trim(),
+          tipo: 'privilegio',
+        };
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Individua se il personaggio gode di vantaggio su un dato Tiro Salvezza (per caratteristica).
+ * Restituisce i dettagli e l'eventuale condizione contestuale (es. contro spaventato, contro veleno, contro magia).
+ */
+export function trovaVantaggioTiroSalvezza(scheda, carattKey) {
+  if (!scheda || !carattKey) return null;
+
+  // 1. Debito Araldi (Coraggio, Debito 35 -> Saggezza contro spaventato)
+  const soglie = soglieDebitoAttive(scheda);
+  if (carattKey === 'saggezza' && soglie.coraggio) {
+    return {
+      attivo: true,
+      fonte: "Coraggio (Debito 35)",
+      fonteEn: "Courage (Debt 35)",
+      dettaglio: "Vantaggio ai tiri salvezza contro l'essere spaventato.",
+      tipo: 'debito',
+      condizionale: 'spaventato',
+      badgeText: '🦁 Vant. Spaventato',
+    };
+  }
+
+  // 2. Trasformazioni Attive
+  const forma = trasformazioneAttiva(scheda);
+  if (forma && forma.dati) {
+    const tratti = Array.isArray(forma.dati.tratti)
+      ? forma.dati.tratti
+      : (forma.dati.tratti ? [forma.dati.tratti] : []);
+
+    for (const tr of tratti) {
+      const str = String(tr || '');
+      // Resistenza alla magia (vale per tutti i TS)
+      if (/(resistenza\s+alla\s+magia|magic\s+resistance)/i.test(str)) {
+        return {
+          attivo: true,
+          fonte: `Resistenza alla Magia (${forma.dati.nome || 'Bestia'})`,
+          dettaglio: "Vantaggio ai tiri salvezza contro incantesimi e altri effetti magici.",
+          tipo: 'forma',
+          condizionale: 'magia',
+          badgeText: '✨ Vant. Magia',
+        };
+      }
+      // Piedi saldi (TS Forza / Destrezza contro caduta o spinta)
+      if (/(piedi\s+saldi|sure-footed)/i.test(str) && (carattKey === 'forza' || carattKey === 'destrezza')) {
+        return {
+          attivo: true,
+          fonte: `Piedi saldi (${forma.dati.nome || 'Bestia'})`,
+          dettaglio: "Vantaggio a TS e prove contro l'essere atterrato o spinto.",
+          tipo: 'forma',
+          condizionale: 'atterrato/spinto',
+          badgeText: '▲ Vant. Prono/Spinto',
+        };
+      }
+    }
+  }
+
+  // 3. Tratti razziali e Privilegi di classe
+  const testo = `${scheda.classe || ''}\n${scheda.razza || ''}\n${scheda.privilegi || ''}\n${scheda.privilegiSottoclasse || ''}\n${scheda.tratti || ''}\n${scheda.talenti || ''}`.toLowerCase();
+
+  // Barbaro: Percezione del Pericolo (Danger Sense) -> TS Destrezza
+  if (carattKey === 'destrezza' && (testo.includes('percezione del pericolo') || testo.includes('danger sense') || (testo.includes('barbaro') && (Number(scheda.livello) || 1) >= 2))) {
+    return {
+      attivo: true,
+      fonte: "Percezione del Pericolo",
+      fonteEn: "Danger Sense",
+      dettaglio: "Vantaggio ai tiri salvezza su Destrezza contro effetti visibili (trappole, incantesimi ad area).",
+      tipo: 'privilegio',
+      condizionale: 'effetti visibili',
+      badgeText: '▲ Vant. Pericolo',
+    };
+  }
+
+  // Nano: Resistenza Nanica (Dwarven Resilience) -> TS Costituzione contro veleno
+  if (carattKey === 'costituzione' && (testo.includes('resistenza nanica') || testo.includes('dwarven resilience') || testo.includes('nano'))) {
+    return {
+      attivo: true,
+      fonte: "Resistenza Nanica",
+      fonteEn: "Dwarven Resilience",
+      dettaglio: "Vantaggio ai tiri salvezza contro veleno.",
+      tipo: 'razza',
+      condizionale: 'veleno',
+      badgeText: '🛡️ Vant. Veleno',
+    };
+  }
+
+  // Elfo / Mezzelfo: Ascendenza Fatata (Fey Ancestry) -> TS Saggezza contro affascinato
+  if (carattKey === 'saggezza' && (testo.includes('ascendenza fatata') || testo.includes('fey ancestry'))) {
+    return {
+      attivo: true,
+      fonte: "Ascendenza Fatata",
+      fonteEn: "Fey Ancestry",
+      dettaglio: "Vantaggio ai tiri salvezza per evitare o interrompere l'essere affascinato.",
+      tipo: 'razza',
+      condizionale: 'affascinato',
+      badgeText: '✨ Vant. Affascinato',
+    };
+  }
+
+  // Gnomo: Astuzia Gnomesca (Gnome Cunning) -> TS Int, Sag, Car contro magia
+  if (['intelligenza', 'saggezza', 'carisma'].includes(carattKey) && (testo.includes('astuzia gnomesca') || testo.includes('gnome cunning') || testo.includes('gnomo'))) {
+    return {
+      attivo: true,
+      fonte: "Astuzia Gnomesca",
+      fonteEn: "Gnome Cunning",
+      dettaglio: "Vantaggio a tutti i tiri salvezza di Intelligenza, Saggezza e Carisma contro la magia.",
+      tipo: 'razza',
+      condizionale: 'magia',
+      badgeText: '✨ Vant. Magia',
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Individua se il PG ha vantaggio sui tiri di Iniziativa (Destrezza).
+ * Es. Istinto Ferino (Barbaro 7+), Arma di Avvertimento, tratti.
+ */
+export function haVantaggioIniziativa(scheda) {
+  if (!scheda) return null;
+  const testo = `${scheda.classe || ''}\n${scheda.privilegi || ''}\n${scheda.privilegiSottoclasse || ''}\n${scheda.tratti || ''}\n${scheda.talenti || ''}`.toLowerCase();
+  
+  if (testo.includes('istinto ferino') || testo.includes('feral instinct') || (testo.includes('barbaro') && (Number(scheda.livello) || 1) >= 7)) {
+    return {
+      attivo: true,
+      fonte: "Istinto Ferino (Barbaro)",
+      dettaglio: "Vantaggio alle prove di iniziativa.",
+      tipo: 'privilegio',
+    };
+  }
+
+  const oggetti = oggettiConEffettoAttivo(scheda);
+  const armaAvv = oggetti.find((o) => /(avvertimento|warning)/i.test(o.nome || ''));
+  if (armaAvv) {
+    return {
+      attivo: true,
+      fonte: armaAvv.nome,
+      dettaglio: "Vantaggio all'iniziativa mentre l'arma è sintonizzata e indossata.",
+      tipo: 'oggetto',
+    };
+  }
+
+  return null;
 }

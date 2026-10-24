@@ -9,7 +9,7 @@ import { styles, GLOBAL_CSS } from './ui/stili.js';
 import { Editable, Rollable, iconaTipoDanno, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, caratteristicaDaTesto, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
 import { IconaAzione, IconaRunica, IconaOggetto, IconaUI, rimuoviEmoji, IconaModalInfo } from './ui/IconaFantasy.jsx';
-import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, estraiTipoDannoBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, attaccoIncantesimoAttivo, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
+import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, estraiTipoDannoBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, attaccoIncantesimoAttivo, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo, trovaVantaggioAbilita, trovaVantaggioTiroSalvezza } from './rules/scheda.js';
 import { normalizzaTrascrizione } from './rules/importSchede.js';
 import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } from "./data/esempi.js";
 import { fixEquipaggiamentoVaelion, migrazioneRegoleVaelion, autoIdratazionePersonaggioPredefinito } from './data/migrazioniPersonaggi.js';
@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.115.3';
+const APP_VERSION = '4.116.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -11924,27 +11924,39 @@ export default function App() {
                         </span>
                         <strong style={{ width: 26, flexShrink: 0, textAlign: 'center' }}>{conSegno(bonusTS)}</strong>
                         <em className="skill-nome" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0, flex: 1 }}>{t('attr.tiro_salvezza')}</em>
-                        {key === 'saggezza' && soglieDebito.coraggio && (
-                          <span
-                            style={{
-                              fontSize: 10,
-                              fontWeight: 700,
-                              padding: '0 4px',
-                              borderRadius: 4,
-                              background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))',
-                              color: 'var(--c-araldi, #a45a2a)',
-                              border: '1px solid var(--c-araldi-border, #a45a2a)',
-                              marginLeft: 4,
-                              whiteSpace: 'nowrap',
-                              lineHeight: '14px',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                            }}
-                            title={lingua === 'en' ? 'Advantage on saving throws against being frightened (Courage · Debt 35)' : 'Vantaggio ai TS contro spaventato (Coraggio · Debito 35)'}
-                          >
-                            🦁 Vant. Spaventato
-                          </span>
-                        )}
+                        {(() => {
+                          const vInfoTs = trovaVantaggioTiroSalvezza(scheda, key);
+                          if (!vInfoTs) return null;
+                          const stileBadgeTs = vInfoTs.tipo === 'forma'
+                            ? { bg: 'rgba(46, 125, 50, 0.12)', col: '#2e7d32', bdr: '#2e7d32' }
+                            : vInfoTs.tipo === 'debito'
+                              ? { bg: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))', col: 'var(--c-araldi, #a45a2a)', bdr: 'var(--c-araldi-border, #a45a2a)' }
+                              : { bg: 'rgba(201, 162, 39, 0.15)', col: C.goldDark, bdr: C.gold };
+                          const titoloTs = lingua === 'en'
+                            ? `Advantage from ${vInfoTs.fonteEn || vInfoTs.fonte} (${vInfoTs.dettaglio})`
+                            : `Vantaggio da ${vInfoTs.fonte} (${vInfoTs.dettaglio})`;
+                          return (
+                            <span
+                              style={{
+                                fontSize: 10,
+                                fontWeight: 700,
+                                padding: '0 4px',
+                                borderRadius: 4,
+                                background: stileBadgeTs.bg,
+                                color: stileBadgeTs.col,
+                                border: `1px solid ${stileBadgeTs.bdr}`,
+                                marginLeft: 4,
+                                whiteSpace: 'nowrap',
+                                lineHeight: '14px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                              }}
+                              title={titoloTs}
+                            >
+                              {vInfoTs.badgeText || '▲ Vant.'}
+                            </span>
+                          );
+                        })()}
                         {tsMancante && (
                           <span style={{ marginLeft: 'auto', fontSize: 11, color: C.red, fontWeight: 700 }}>Manca</span>
                         )}
@@ -11989,12 +12001,17 @@ export default function App() {
                     const bonus = bonusAbilita(scheda, a.key);
                     const liv = scheda.abilita[a.key] || 0;
                     const abMancante = controlliAttivi.find((c) => c.tipo === 'abilita' && c.targetKey === a.key);
-                    const soglieDeb = soglieDebitoAttive(scheda);
-                    const haVantaggioDebito = (a.key === 'intuizione' && soglieDeb.voceOmbra) ||
-                      ((a.key === 'percezione' || a.key === 'indagare') && soglieDeb.occhioRisvegliato);
-                    const labelVantaggioDebito = a.key === 'intuizione'
-                      ? (lingua === 'en' ? 'Voice in the Shadows (Debt 5)' : 'Voce nell’Ombra (Debito 5)')
-                      : (lingua === 'en' ? 'Awakened Eye (Debt 15)' : 'Occhio Risvegliato (Debito 15)');
+                    const vInfo = trovaVantaggioAbilita(scheda, a.key);
+                    const stileBadgeAb = vInfo?.tipo === 'forma'
+                      ? { bg: 'rgba(46, 125, 50, 0.12)', col: '#2e7d32', bdr: '#2e7d32' }
+                      : vInfo?.tipo === 'debito'
+                        ? { bg: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))', col: 'var(--c-araldi, #a45a2a)', bdr: 'var(--c-araldi-border, #a45a2a)' }
+                        : { bg: 'rgba(201, 162, 39, 0.15)', col: C.goldDark, bdr: C.gold };
+                    const titoloVant = vInfo
+                      ? (lingua === 'en'
+                        ? `Advantage from ${vInfo.fonteEn || vInfo.fonte} (${vInfo.dettaglio})`
+                        : `Vantaggio da ${vInfo.fonte} (${vInfo.dettaglio})`)
+                      : '';
                     return (
                       <Rollable
                         as="div"
@@ -12007,8 +12024,8 @@ export default function App() {
                           background: abMancante ? 'rgba(231,76,60,0.12)' : 'transparent',
                           padding: abMancante ? '2px 4px' : styles.skillRow(true).padding,
                         }}
-                        title={abMancante ? `${abMancante.testo} (clicca per tirare, clicca sul pallino per impostare)` : `Tieni premuto e rilascia: prova di ${t('skill.' + a.key)}${haVantaggioDebito ? ` · Vantaggio da ${labelVantaggioDebito}` : ''} · click sul pallino: niente → competenza (●) → competenza di classe/razza (★) → Maestria/Expertise, doppia competenza (✦)`}
-                        onRoll={() => lanciaD20(`${t('skill.' + a.key)}`, bonus, { tipoTiro: 'prova', modalitaForzata: haVantaggioDebito ? 'vantaggio' : undefined })}
+                        title={abMancante ? `${abMancante.testo} (clicca per tirare, clicca sul pallino per impostare)` : `Tieni premuto e rilascia: prova di ${t('skill.' + a.key)}${vInfo ? ` · ${titoloVant}` : ''} · click sul pallino: niente → competenza (●) → competenza di classe/razza (★) → Maestria/Expertise, doppia competenza (✦)`}
+                        onRoll={() => lanciaD20(`${t('skill.' + a.key)}`, bonus, { tipoTiro: 'prova', modalitaForzata: vInfo ? 'vantaggio' : undefined })}
                       >
                         <span
                           style={styles.dot(liv)}
@@ -12031,23 +12048,23 @@ export default function App() {
                           }}
                           title={lingua === 'en' ? 'Click for 5e rules, reference DCs and tool synergies' : 'Clicca per regole 5e, CD di riferimento e sinergie con gli strumenti'}
                         >{t('skill.' + a.key)}</span>
-                        {haVantaggioDebito && (
+                        {vInfo && (
                           <span
                             style={{
                               fontSize: 10,
                               fontWeight: 700,
                               padding: '0 4px',
                               borderRadius: 4,
-                              background: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))',
-                              color: 'var(--c-araldi, #a45a2a)',
-                              border: '1px solid var(--c-araldi-border, #a45a2a)',
+                              background: stileBadgeAb.bg,
+                              color: stileBadgeAb.col,
+                              border: `1px solid ${stileBadgeAb.bdr}`,
                               marginLeft: 4,
                               whiteSpace: 'nowrap',
                               lineHeight: '14px',
                               display: 'inline-flex',
                               alignItems: 'center',
                             }}
-                            title={lingua === 'en' ? `Advantage from ${labelVantaggioDebito}` : `Vantaggio permanente grazie a ${labelVantaggioDebito}`}
+                            title={titoloVant}
                           >
                             ▲ Vant.
                           </span>
