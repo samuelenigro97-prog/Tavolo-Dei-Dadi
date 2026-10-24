@@ -3,7 +3,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, punteggioCaratteristica, formattaNomePg, bonusCopertura, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, trasformazioneAttiva, pfMassimiEffettivi, estraiCategorieNota, esitoDannoPf0 } from '../src/rules/scheda.js';
+import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, punteggioCaratteristica, formattaNomePg, bonusCopertura, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, trasformazioneAttiva, pfMassimiEffettivi, estraiCategorieNota, esitoDannoPf0, parseAzioneBestia, estraiTipoDannoBestia } from '../src/rules/scheda.js';
+import { trovaReazioniDisponibili } from '../src/rules/regole.js';
 import { ABILITA, CARATTERISTICHE } from '../src/data/caratteristiche.js';
 import { spiegaIncantesimo } from '../src/data/spiegazioni.js';
 import { tiraDanni, parseEspressioneDado } from '../src/rules/dadi.js';
@@ -522,6 +523,67 @@ test('trasformazioneAttiva: al più una attiva, Metamorfosi ha precedenza se ent
 test('pfMassimiEffettivi: non è mai influenzato da Forma Bestiale/Metamorfosi (hanno un pool di PF proprio)', () => {
   const scheda = { pfMax: 40, metamorfosi: { attiva: true, pfMax: 157, car: {} } };
   assert.equal(pfMassimiEffettivi(scheda), 40);
+});
+
+test('estraiTipoDannoBestia e parseAzioneBestia: estrae formula, bonus, tipo danno e CD correttamente', () => {
+  const becco = "Becco: Tiro per colpire con arma da mischia: +5 per colpire, portata 1,5 m, un bersaglio. Colpisce: 1d6 + 3 danni perforanti.";
+  const artigli = "Artigli: Tiro per colpire con arma da mischia: +5 per colpire, portata 1,5 m, un bersaglio. Colpisce: 2d6 + 3 danni taglienti.";
+  const morsoVeleno = "Morso: +4 al tiro per colpire, 1d4+2 danni perforanti più 2d8 danni da veleno (CD 11)";
+
+  assert.equal(estraiTipoDannoBestia(becco), 'Perforante');
+  assert.equal(estraiTipoDannoBestia(artigli), 'Tagliente');
+  assert.equal(estraiTipoDannoBestia(morsoVeleno), 'Perforante');
+
+  const pBecco = parseAzioneBestia(becco);
+  assert.equal(pBecco.nome, 'Becco');
+  assert.equal(pBecco.bonus, 5);
+  assert.equal(pBecco.danno, '1d6+3');
+  assert.equal(pBecco.tipoDanno, 'Perforante');
+
+  const pArtigli = parseAzioneBestia(artigli);
+  assert.equal(pArtigli.nome, 'Artigli');
+  assert.equal(pArtigli.bonus, 5);
+  assert.equal(pArtigli.danno, '2d6+3');
+  assert.equal(pArtigli.tipoDanno, 'Tagliente');
+
+  const pMorso = parseAzioneBestia(morsoVeleno);
+  assert.equal(pMorso.bonus, 4);
+  assert.equal(pMorso.cd, 11);
+});
+
+test('trovaReazioniDisponibili in forma animale: usa l attacco della bestia per l attacco di opportunita ed esclude incantesimi', () => {
+  const druido = {
+    livello: 4,
+    bonusCompetenza: 2,
+    caratteristiche: { forza: 10, destrezza: 14, costituzione: 14, intelligenza: 12, saggezza: 16, carisma: 10 },
+    incantesimiLista: [
+      { id: 'scudo', nome: 'Scudo', tempo: '1 reazione', note: '+5 CA' },
+      { id: 'assorbire', nome: 'Assorbire Elementi', tempo: '1 reazione' },
+    ],
+    formaBestiale: {
+      attiva: true,
+      nome: 'Aquila gigante',
+      pfAttuali: 26,
+      pfMax: 26,
+      car: { forza: 16, destrezza: 17, costituzione: 13 },
+      azioni: [
+        "Attacco multiplo: L'aquila compie due attacchi: uno con il becco e uno con gli artigli.",
+        "Becco: Tiro per colpire con arma da mischia: +5 per colpire, portata 1,5 m, un bersaglio. Colpisce: 1d6 + 3 danni perforanti.",
+        "Artigli: Tiro per colpire con arma da mischia: +5 per colpire, portata 1,5 m, un bersaglio. Colpisce: 2d6 + 3 danni taglienti."
+      ]
+    }
+  };
+
+  const reazioni = trovaReazioniDisponibili(druido, '2024');
+  const opp = reazioni.find((r) => r.nome === 'Attacco di Opportunità');
+  assert.ok(opp, 'Attacco di Opportunità deve essere presente');
+  assert.equal(opp.bonus, 5, 'Usa il bonus per colpire del primo attacco della bestia (+5)');
+  assert.equal(opp.danno, '1d6+3', 'Usa il danno del becco (1d6+3)');
+  assert.ok(opp.note.includes('Aquila gigante'), 'Nota indica la forma animale attiva');
+
+  // Gli incantesimi di reazione come Scudo o Assorbire Elementi non devono apparire
+  const spellReaz = reazioni.filter((r) => r.isSpell || r.tipo === 'incantesimo');
+  assert.equal(spellReaz.length, 0, 'Nessun incantesimo di reazione in forma selvatica');
 });
 
 test('Forma Bestiale: genera avatar SVG e icone coerenti per ogni animale', async () => {

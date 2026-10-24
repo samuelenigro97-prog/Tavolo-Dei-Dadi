@@ -9,7 +9,7 @@ import { styles, GLOBAL_CSS } from './ui/stili.js';
 import { Editable, Rollable, iconaTipoDanno, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, caratteristicaDaTesto, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
 import { IconaAzione, IconaRunica, IconaOggetto, IconaUI, rimuoviEmoji, IconaModalInfo } from './ui/IconaFantasy.jsx';
-import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, attaccoIncantesimoAttivo, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
+import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, estraiTipoDannoBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, attaccoIncantesimoAttivo, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo } from './rules/scheda.js';
 import { normalizzaTrascrizione } from './rules/importSchede.js';
 import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } from "./data/esempi.js";
 import { fixEquipaggiamentoVaelion, migrazioneRegoleVaelion, autoIdratazionePersonaggioPredefinito } from './data/migrazioniPersonaggi.js';
@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.112.6';
+const APP_VERSION = '4.113.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4493,6 +4493,16 @@ export default function App() {
   const formaAttiva = trasformazioneAttiva(scheda);
   const campoForma = formaAttiva?.campo || 'formaBestiale';
   const isTrasformato = !!formaAttiva;
+
+  // Regola Ufficiale PHB: Se la forma scende a 0 PF, ci si ritrasforma automaticamente nella forma normale
+  useEffect(() => {
+    if (isTrasformato && formaAttiva?.dati && Number(formaAttiva.dati.pfAttuali) <= 0) {
+      aggiorna({
+        [campoForma]: { ...formaAttiva.dati, pfAttuali: 0, attiva: false }
+      });
+    }
+  }, [isTrasformato, formaAttiva, campoForma]);
+
   // Allinea SUBITO le spiegazioni all'edizione del PG: le voci che cambiano fra
   // 5.0 e 5.5 mostrano solo le regole dell'edizione di questo personaggio.
   setEdizioneAttuale(versione);
@@ -10214,34 +10224,44 @@ export default function App() {
           <span className="angolo-ornamento angolo-tr" aria-hidden="true" />
           <span className="angolo-ornamento angolo-bl" aria-hidden="true" />
           <span className="angolo-ornamento angolo-br" aria-hidden="true" />
-          {/* ===== BANNER FORMA BESTIALE ATTIVA (Regole Ufficiali 5e PHB) ===== */}
+          {/* ===== BANNER FORMA SELVATICA / METAMORFOSI (Status compatto: le statistiche sono nelle sezioni native) ===== */}
           {isTrasformato && (
             <div
+              className="forma-selvatica-banner"
               style={{
                 background: 'linear-gradient(135deg, rgba(46,125,50,0.18) 0%, rgba(201,162,39,0.15) 100%)',
                 border: `2px solid ${C.green || '#3e7d32'}`,
                 borderRadius: 12,
-                padding: '12px 16px',
+                padding: '10px 16px',
                 marginBottom: 16,
                 boxShadow: '0 4px 18px rgba(0,0,0,0.12)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
               }}
             >
-              {/* Intestazione Banner */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, borderBottom: `1px solid ${C.border}`, paddingBottom: 8, marginBottom: 10 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {/* Intestazione Status Bar */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <span style={{ fontSize: 26, lineHeight: 1 }}>{campoForma === 'metamorfosi' ? '🔮' : '🐾'}</span>
                   <div>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: C.green || '#3e7d32', letterSpacing: 0.3 }}>
-                      {campoForma === 'metamorfosi'
-                        ? (lingua === 'en' ? 'Polymorph active' : 'Metamorfosi attiva')
-                        : (lingua === 'en' ? 'Wild Shape active' : 'Forma Selvatica attiva')}: {lingua === 'en' ? (formaAttiva.dati.nomeEn || formaAttiva.dati.nome) : formaAttiva.dati.nome}
+                    <div style={{ fontSize: 16, fontWeight: 800, color: C.green || '#3e7d32', letterSpacing: 0.3, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <span>
+                        {campoForma === 'metamorfosi'
+                          ? (lingua === 'en' ? 'Polymorph active' : 'Metamorfosi attiva')
+                          : (lingua === 'en' ? 'Wild Shape active' : 'Forma Selvatica attiva')}: {lingua === 'en' ? (formaAttiva.dati.nomeEn || formaAttiva.dati.nome) : formaAttiva.dati.nome}
+                      </span>
+                      <span style={{ fontSize: 12, padding: '2px 8px', borderRadius: 6, background: 'rgba(46,125,50,0.2)', color: C.ink, fontWeight: 700 }}>
+                        {formaAttiva.dati.taglia} {formaAttiva.dati.tipo || 'bestia'} · GS {formaAttiva.dati.gs}
+                      </span>
                     </div>
-                    <div style={{ fontSize: 12, color: C.inkDim, fontWeight: 600 }}>
-                      {formaAttiva.dati.taglia} {formaAttiva.dati.tipo || 'bestia'} · GS {formaAttiva.dati.gs} · CA {formaAttiva.dati.ca} · {formaAttiva.dati.velocita?.terra || 9}m
-                      {formaAttiva.dati.velocita?.nuoto ? ` · ${formaAttiva.dati.velocita.nuoto}m` : ''}
-                      {formaAttiva.dati.velocita?.volo ? ` · ${formaAttiva.dati.velocita.volo}m` : ''}
-                      {formaAttiva.dati.velocita?.scalata ? ` · ${formaAttiva.dati.velocita.scalata}m` : ''}
-                      {formaAttiva.dati.velocita?.scavo ? ` · ${formaAttiva.dati.velocita.scavo}m` : ''}
+                    <div style={{ fontSize: 12, color: C.inkDim, fontWeight: 600, marginTop: 2 }}>
+                      CA {formaAttiva.dati.ca} · Velocità: {formaAttiva.dati.velocita?.terra || 9}m
+                      {formaAttiva.dati.velocita?.nuoto ? ` · Nuoto ${formaAttiva.dati.velocita.nuoto}m` : ''}
+                      {formaAttiva.dati.velocita?.volo ? ` · Volo ${formaAttiva.dati.velocita.volo}m` : ''}
+                      {formaAttiva.dati.velocita?.scalata ? ` · Scalata ${formaAttiva.dati.velocita.scalata}m` : ''}
+                      {formaAttiva.dati.velocita?.scavo ? ` · Scavo ${formaAttiva.dati.velocita.scavo}m` : ''}
+                      {formaAttiva.dati.sensi ? ` · Sensi: ${formaAttiva.dati.sensi}` : ''}
                     </div>
                   </div>
                 </div>
@@ -10269,215 +10289,15 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Punti Ferita della Bestia (con barra e pulsanti di danno/cura) */}
-              <div style={{ marginBottom: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: C.ink }}>
-                    {lingua === 'en' ? 'Form Hit Points' : 'Punti Ferita della Forma'}
-                  </span>
-                  <span style={{ fontSize: 14, fontWeight: 800, color: C.ink }}>
-                    {formaAttiva.dati.pfAttuali} / {formaAttiva.dati.pfMax} PF
-                  </span>
-                </div>
-                {/* Barra Vita Bestia */}
-                <div style={{ width: '100%', height: 16, background: 'rgba(0,0,0,0.12)', borderRadius: 8, overflow: 'hidden', border: `1px solid ${C.border}` }}>
-                  <div style={{
-                    width: `${Math.max(0, Math.min(100, ((Number(formaAttiva.dati.pfAttuali) || 0) / (Number(formaAttiva.dati.pfMax) || 1)) * 100))}%`,
-                    height: '100%',
-                    background: 'linear-gradient(90deg, #2e7d32, #4caf50)',
-                    transition: 'width 0.3s ease'
-                  }} />
-                </div>
-                {/* Tasti Rapidi Danno / Cura */}
-                <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', justifyContent: 'center', marginTop: 6 }}>
-                  {[-20, -10, -5, -1, 1, 5, 10, 20].map((delta) => (
-                    <button
-                      key={delta}
-                      type="button"
-                      style={{
-                        ...styles.buttonMini,
-                        padding: '4px 9px',
-                        fontSize: 12,
-                        fontWeight: 800,
-                        borderRadius: 6,
-                        color: delta < 0 ? C.red : C.green,
-                        background: C.panel,
-                        border: `1px solid ${C.border}`,
-                      }}
-                      onClick={() => {
-                        const attuali = Number(formaAttiva.dati.pfAttuali) || 0;
-                        const nuovo = attuali + delta;
-                        if (nuovo <= 0) {
-                          // Danni in eccesso passano ai PF del druido (Regola PHB)
-                          const eccesso = Math.abs(nuovo);
-                          const pfDruidoNuovi = Math.max(0, (Number(scheda.pfAttuali ?? scheda.pf) || 0) - eccesso);
-                          aggiorna({
-                            pfAttuali: pfDruidoNuovi,
-                            [campoForma]: { ...formaAttiva.dati, pfAttuali: 0, attiva: false }
-                          });
-                        } else {
-                          aggiorna({
-                            [campoForma]: {
-                              ...formaAttiva.dati,
-                              pfAttuali: Math.min(formaAttiva.dati.pfMax, nuovo)
-                            }
-                          });
-                        }
-                      }}
-                    >
-                      {delta > 0 ? `+${delta}` : delta}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Tutte e sei le caratteristiche: quelle sostituite dalla forma
-                  (FOR/DES/COS sempre, +INT/SAG/CAR solo con la Metamorfosi)
-                  hanno le prove interattive; le tue restano in chiaro, così
-                  non serve scendere alla scheda per vederle mentre sei
-                  trasformato. */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8, background: C.panel, padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`, textAlign: 'center', marginBottom: 10 }}>
-                {[['forza', 'FOR'], ['destrezza', 'DES'], ['costituzione', 'COS'], ['intelligenza', 'INT'], ['saggezza', 'SAG'], ['carisma', 'CAR']].map(([car, sigla]) => {
-                  const sostituita = formaAttiva.tutteLeCaratteristiche || ['forza', 'destrezza', 'costituzione'].includes(car);
-                  const val = punteggioCaratteristica(scheda, car);
-                  const mod = modificatore(val);
-                  return (
-                    <div role="button" tabIndex={0}
-                      key={car}
-                      style={{ cursor: 'pointer', padding: '4px', borderRadius: 6, transition: 'all 0.15s ease', opacity: sostituita ? 1 : 0.6 }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.05)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                      onClick={() => lanciaD20(`Prova di ${t('attr.' + car)}${sostituita ? ` (${formaAttiva.dati.nome})` : ''}`, mod, { tipoTiro: 'prova' })}
-                      title={sostituita ? `Clicca per tirare Prova di ${t('attr.' + car)}: 1d20 ${conSegno(mod)}` : `Tua: non sostituita dalla forma. Clicca per tirare Prova di ${t('attr.' + car)}: 1d20 ${conSegno(mod)}`}
-                    >
-                      <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: C.inkDim }}>{sigla} ({sostituita ? 'Forma' : 'Tua'}) 🎲</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: C.ink }}>
-                        {val} <span style={{ color: C.goldDark, fontSize: 13 }}>({conSegno(mod)})</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Tratti Speciali & Sensi della Bestia (se presenti) */}
-              {((formaAttiva.dati.tratti && formaAttiva.dati.tratti.length > 0) || formaAttiva.dati.sensi) && (
-                <div style={{ marginBottom: 10, background: 'rgba(0,0,0,0.02)', padding: '6px 10px', borderRadius: 6, border: `1px dashed ${C.border}` }}>
-                  {formaAttiva.dati.sensi && (
-                    <div style={{ fontSize: 12, color: C.inkDim, marginBottom: (formaAttiva.dati.tratti && formaAttiva.dati.tratti.length > 0) ? 4 : 0 }}>
-                      <strong>{lingua === 'en' ? 'Senses' : 'Sensi'}:</strong> {formaAttiva.dati.sensi}
-                    </div>
-                  )}
-                  {formaAttiva.dati.tratti && formaAttiva.dati.tratti.map((tratto, tIdx) => (
-                    <div key={tIdx} style={{ fontSize: 12, color: C.ink, lineHeight: 1.35, marginTop: 2 }}>
+              {/* Tratti Speciali della Bestia (se presenti) */}
+              {formaAttiva.dati.tratti && formaAttiva.dati.tratti.length > 0 && (
+                <div style={{ fontSize: 12, color: C.inkDim, borderTop: `1px dashed ${C.border}`, paddingTop: 6, display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+                  <strong>{lingua === 'en' ? 'Traits:' : 'Tratti:'}</strong>
+                  {formaAttiva.dati.tratti.map((tratto, tIdx) => (
+                    <span key={tIdx} style={{ background: 'rgba(0,0,0,0.04)', padding: '2px 8px', borderRadius: 6, border: `1px solid ${C.border}`, color: C.ink }}>
                       <em>{typeof tratto === 'string' ? tratto : tratto.nome}</em>
-                    </div>
+                    </span>
                   ))}
-                </div>
-              )}
-
-              {/* Azioni & Attacchi della Bestia */}
-              {formaAttiva.dati.azioni && formaAttiva.dati.azioni.length > 0 && (
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 800, color: C.goldDark, marginBottom: 6 }}>
-                    {lingua === 'en' ? 'Beast actions and attacks' : 'Azioni e attacchi della bestia'}
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 8 }}>
-                    {formaAttiva.dati.azioni.map((azRaw, idx) => {
-                      const az = parseAzioneBestia(azRaw);
-                      const hasAzioniRapide = az.bonus != null || az.danno != null || az.cd != null;
-                      const spanTutto = !hasAzioniRapide;
-                      return (
-                        <div
-                          key={idx}
-                          style={{
-                            gridColumn: spanTutto ? '1 / -1' : undefined,
-                            fontSize: 13,
-                            padding: '8px 10px',
-                            background: C.panel,
-                            border: `1px solid ${C.border}`,
-                            borderRadius: 8,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: 5,
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                          }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'wrap' }}>
-                            <span style={{ fontWeight: 800, color: C.ink, fontSize: 13 }}>
-                              {az.nome}
-                            </span>
-                          </div>
-                          {az.desc && (
-                            <div style={{ fontSize: 12, color: C.ink, lineHeight: 1.4 }}>
-                              {az.desc}
-                            </div>
-                          )}
-                          {(az.bonus != null || az.danno || az.cd != null) && (
-                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginTop: 2, borderTop: `1px dashed ${C.border}`, paddingTop: 6 }}>
-                              {az.bonus != null && (
-                                <button
-                                  type="button"
-                                  style={{
-                                    ...styles.button,
-                                    fontSize: 12,
-                                    padding: '4px 10px',
-                                    borderRadius: 6,
-                                    fontWeight: 800,
-                                    borderColor: coloreCategoria('attacco', notteAttiva),
-                                    color: coloreCategoria('attacco', notteAttiva),
-                                    background: `${coloreCategoria('attacco', notteAttiva)}1f`,
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: 4,
-                                  }}
-                                  onClick={() => {
-                                    lanciaD20(tr(`Attacco (${formaAttiva.dati.nome}): ${az.nome}`, `Attack (${formaAttiva.dati.nome}): ${az.nome}`), az.bonus, {
-                                      attacco: {
-                                        nome: `${formaAttiva.dati.nome}: ${az.nome}`,
-                                        danno: az.danno,
-                                      },
-                                      suono: 'arma',
-                                      tipoTiro: 'attacco',
-                                    });
-                                  }}
-                                  title={tr(`Tira per colpire: 1d20 ${conSegno(az.bonus)}`, `Attack roll: 1d20 ${conSegno(az.bonus)}`)}
-                                >
-                                  <span>{lingua === 'en' ? 'Attack Roll' : 'Tiro per Colpire'} ({conSegno(az.bonus)})</span>
-                                </button>
-                              )}
-                              {az.danno && (
-                                <button
-                                  type="button"
-                                  style={{
-                                    ...styles.button,
-                                    fontSize: 12,
-                                    padding: '4px 10px',
-                                    borderRadius: 6,
-                                    fontWeight: 800,
-                                    borderColor: C.red,
-                                    color: C.red,
-                                    background: 'transparent',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: 4,
-                                  }}
-                                  onClick={() => {
-                                    lanciaDanniDiretti(tr(`Danni (${formaAttiva.dati.nome}): ${az.nome}`, `Damage (${formaAttiva.dati.nome}): ${az.nome}`), az.danno);
-                                  }}
-                                  title={tr(`Tira danni: ${az.danno}`, `Roll damage: ${az.danno}`)}
-                                >
-                                  <span>{lingua === 'en' ? 'Damage' : 'Danni'} ({az.danno})</span>
-                                </button>
-                              )}
-                              {az.cd != null && (
-                                <BadgeTiroSalvezza cd={az.cd} caratteristica={caratteristicaDaTesto(az.desc || az.testoOriginale)} colore={coloreCategoria('tiroSalvezza', notteAttiva)} />
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
                 </div>
               )}
             </div>
@@ -11224,7 +11044,7 @@ export default function App() {
                   {/* Sezione Superiore: Punti Ferita — perfettamente centrata nello spazio disponibile */}
                   <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2px 0' }}>
                     <div style={{ ...styles.vitalLabel, position: 'static', margin: 0, marginBottom: 6, fontSize: 12 }}>
-                      {t("vital.pf")} {isTrasformato && <span style={{ color: C.green, fontWeight: 800 }}>· {formaAttiva.dati.nome}</span>}
+                      {t("vital.pf")} {isTrasformato && <span style={{ color: C.green, fontWeight: 800 }}>· 🐾 PF Forma: {formaAttiva.dati.nome}</span>}
                     </div>
 
                     {/* BARRA DELLA VITA STILE VIDEOGIOCO */}
@@ -11266,6 +11086,13 @@ export default function App() {
                                       aggiorna({
                                         pfAttuali: pfDruido,
                                         [campoForma]: { ...formaAttiva.dati, pfAttuali: 0, attiva: false }
+                                      });
+                                      registra({
+                                        etichetta: tr('Forma Selvatica esaurita', 'Wild Shape ended'),
+                                        tipo: 'tattica',
+                                        dettaglio: eccesso > 0
+                                          ? tr(`I PF della forma (${formaAttiva.dati.nome}) sono scesi a 0. Sei tornato alla forma umana; ${eccesso} danni in eccesso inflitti ai PF base (${pfDruido}/${scheda.pfMax}).`, `Form HP (${formaAttiva.dati.nome}) dropped to 0. Reverted to humanoid form; ${eccesso} excess damage dealt to base HP (${pfDruido}/${scheda.pfMax}).`)
+                                          : tr(`I PF della forma (${formaAttiva.dati.nome}) sono scesi a 0. Sei tornato alla forma normale.`, `Form HP (${formaAttiva.dati.nome}) dropped to 0. Reverted to normal form.`),
                                       });
                                     } else {
                                       aggiorna({
@@ -11322,9 +11149,12 @@ export default function App() {
 
                     {/* PF Temporanei / Info PF Druido se in Forma Bestiale */}
                     {isTrasformato ? (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, margin: '3px 0 4px' }}>
-                        <span style={{ fontSize: 11, color: C.inkDim, background: 'rgba(0,0,0,0.04)', padding: '2px 8px', borderRadius: 6, border: `1px solid ${C.border}` }}>
-                          {lingua === 'en' ? 'Humanoid HP (preserved)' : 'PF Umanoide (preservati)'}: <strong>{scheda.pfAttuali} / {scheda.pfMax}</strong>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, margin: '4px 0 6px', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: 11, color: C.ink, background: 'rgba(46,125,50,0.14)', border: '1px solid #52b788', padding: '2px 8px', borderRadius: 6, fontWeight: 700 }}>
+                          🐾 {formaAttiva.dati.nome}: <strong>{formaAttiva.dati.pfAttuali} / {formaAttiva.dati.pfMax} PF</strong>
+                        </span>
+                        <span style={{ fontSize: 11, color: C.inkDim, background: 'rgba(0,0,0,0.04)', padding: '2px 8px', borderRadius: 6, border: `1px solid ${C.border}` }} title={tr('I PF base del personaggio sono preservati. Se la forma animale scende a 0 PF, torni umanoide e gli eventuali danni in eccesso intaccano questi PF.', 'Base PC HP is preserved. Reaching 0 HP in beast form reverts you to humanoid form with excess damage applied.')}>
+                          👤 {lingua === 'en' ? 'Base PC HP (preserved)' : 'PF PG (preservati)'}: <strong>{scheda.pfAttuali} / {scheda.pfMax}</strong>
                         </span>
                       </div>
                     ) : (
@@ -11351,6 +11181,13 @@ export default function App() {
                             aggiorna({
                               pfAttuali: pfDruido,
                               [campoForma]: { ...formaAttiva.dati, pfAttuali: 0, attiva: false }
+                            });
+                            registra({
+                              etichetta: tr('Forma Selvatica esaurita', 'Wild Shape ended'),
+                              tipo: 'tattica',
+                              dettaglio: eccesso > 0
+                                ? tr(`I PF della forma (${formaAttiva.dati.nome}) sono scesi a 0. Sei tornato alla forma umana; ${eccesso} danni in eccesso inflitti ai PF base (${pfDruido}/${scheda.pfMax}).`, `Form HP (${formaAttiva.dati.nome}) dropped to 0. Reverted to humanoid form; ${eccesso} excess damage dealt to base HP (${pfDruido}/${scheda.pfMax}).`)
+                                : tr(`I PF della forma (${formaAttiva.dati.nome}) sono scesi a 0. Sei tornato alla forma normale.`, `Form HP (${formaAttiva.dati.nome}) dropped to 0. Reverted to normal form.`),
                             });
                           } else {
                             aggiorna({
@@ -11985,6 +11822,7 @@ export default function App() {
               const bonusTS = bonusTiroSalvezza(scheda, key);
               const abilitaDellaCar = ABILITA.filter((a) => a.car === key);
               const sfondoCar = SFONDO_CARATTERISTICA[key];
+              const sostituitaDaForma = isTrasformato && (formaAttiva.tutteLeCaratteristiche || ['forza', 'destrezza', 'costituzione'].includes(key));
               return (
                 <div key={key} className={`blocco-car car-colore car-${key}`} style={{ ...styles.abilityBlock, position: 'relative', overflow: 'hidden' }}>
                   {/* Sfondo SVG opaco vettoriale che rappresenta la caratteristica */}
@@ -12004,22 +11842,48 @@ export default function App() {
                       {mod < 0 ? `−${Math.abs(mod)}` : mod}
                     </span>
                     <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 3 }}>
-                      <div role="button" tabIndex={0}
-                        className="car-header-label"
-                        style={{ minWidth: 0, fontSize: 12, color: C.ink, letterSpacing: 0.2, fontWeight: 'bold', cursor: 'help', textDecoration: 'underline dotted', textUnderlineOffset: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                        title={t('tip.cosa_governa')}
-                        onClick={() => setInfo({ titolo: t('attr.' + key), testo: t('spieg.' + key) })}
-                      >{t('attr.' + key).toUpperCase()}</div>
-                      <div className="car-punteggio" style={{ flexShrink: 0, fontSize: 14, fontWeight: 'bold', color: C.goldDark, display: 'flex', alignItems: 'center' }} title={t('tip.punteggio_car')}>
-                        <Editable
-                          value={scheda.caratteristiche[key]}
-                          tipo="numero"
-                          width={24}
-                          onChange={(v) =>
-                            aggiorna({ caratteristiche: { ...scheda.caratteristiche, [key]: v } })
-                          }
-                        />
-                        {punteggioEffettivo !== scheda.caratteristiche[key] && (() => {
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0 }}>
+                        <div role="button" tabIndex={0}
+                          className="car-header-label"
+                          style={{ minWidth: 0, fontSize: 12, color: C.ink, letterSpacing: 0.2, fontWeight: 'bold', cursor: 'help', textDecoration: 'underline dotted', textUnderlineOffset: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                          title={sostituitaDaForma ? `${formaAttiva.dati.nome}: caratteristica sostituita dalla forma (${punteggioEffettivo}). Base PG: ${scheda.caratteristiche[key]}` : t('tip.cosa_governa')}
+                          onClick={() => setInfo({ titolo: t('attr.' + key), testo: t('spieg.' + key) })}
+                        >{t('attr.' + key).toUpperCase()}</div>
+                        {sostituitaDaForma && (
+                          <span
+                            style={{
+                              fontSize: 9,
+                              fontWeight: 800,
+                              padding: '1px 4px',
+                              borderRadius: 4,
+                              background: 'rgba(46,125,50,0.18)',
+                              color: '#2e7d32',
+                              border: '1px solid rgba(46,125,50,0.4)',
+                              lineHeight: 1.2,
+                              flexShrink: 0
+                            }}
+                            title={`Punteggio sostituito da ${formaAttiva.dati.nome} (${punteggioEffettivo}). Base PG: ${scheda.caratteristiche[key]}`}
+                          >
+                            🐾 {formaAttiva.dati.nome.split(' ')[0]}
+                          </span>
+                        )}
+                      </div>
+                      <div className="car-punteggio" style={{ flexShrink: 0, fontSize: 14, fontWeight: 'bold', color: C.goldDark, display: 'flex', alignItems: 'center' }} title={sostituitaDaForma ? `Punteggio forma: ${punteggioEffettivo} (PG base: ${scheda.caratteristiche[key]})` : t('tip.punteggio_car')}>
+                        {sostituitaDaForma ? (
+                          <span style={{ fontWeight: 800, color: '#2e7d32', fontSize: 14 }}>
+                            {punteggioEffettivo}
+                          </span>
+                        ) : (
+                          <Editable
+                            value={scheda.caratteristiche[key]}
+                            tipo="numero"
+                            width={24}
+                            onChange={(v) =>
+                              aggiorna({ caratteristiche: { ...scheda.caratteristiche, [key]: v } })
+                            }
+                          />
+                        )}
+                        {!sostituitaDaForma && punteggioEffettivo !== scheda.caratteristiche[key] && (() => {
                           const fontiCar = oggettiConEffettoAttivo(scheda).filter((o) => new RegExp(`^${key}_impostata_(\\d+)$`).test(o.effettoMeccanico));
                           return (
                             <span style={{ position: 'relative' }}>
@@ -12833,42 +12697,61 @@ export default function App() {
                   {t('combat.titolo')}
                 </h3>
                 <div style={{ justifySelf: 'end', display: 'inline-flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                  <button
-                    type="button"
-                    style={{
-                      ...styles.buttonMini,
-                      fontSize: 11,
-                      fontWeight: 700,
-                      padding: '3px 8px',
-                      borderRadius: 6,
-                      cursor: 'pointer',
-                      background: scheda.mostraArmiAttacco !== false ? 'rgba(201,162,39,0.22)' : 'transparent',
-                      color: scheda.mostraArmiAttacco !== false ? C.goldDark : C.inkDim,
-                      border: `1px solid ${scheda.mostraArmiAttacco !== false ? C.gold : C.border}`
-                    }}
-                    onClick={() => aggiorna({ mostraArmiAttacco: scheda.mostraArmiAttacco === false })}
-                    title={t('attacchi.armi_tip')}
-                  >
-                    {t('attacchi.armi')}: {scheda.mostraArmiAttacco !== false ? 'ON' : 'OFF'}
-                  </button>
-                  <button
-                    type="button"
-                    style={{
-                      ...styles.buttonMini,
-                      fontSize: 11,
-                      fontWeight: 700,
-                      padding: '3px 8px',
-                      borderRadius: 6,
-                      cursor: 'pointer',
-                      background: scheda.mostraIncantesimiAttacco !== false ? 'rgba(201,162,39,0.22)' : 'transparent',
-                      color: scheda.mostraIncantesimiAttacco !== false ? C.goldDark : C.inkDim,
-                      border: `1px solid ${scheda.mostraIncantesimiAttacco !== false ? C.gold : C.border}`
-                    }}
-                    onClick={() => aggiorna({ mostraIncantesimiAttacco: scheda.mostraIncantesimiAttacco === false })}
-                    title={t('attacchi.incantesimi_offensivi_tip')}
-                  >
-                    {t('attacchi.incantesimi_offensivi')}: {scheda.mostraIncantesimiAttacco !== false ? 'ON' : 'OFF'}
-                  </button>
+                  {isTrasformato ? (
+                    <span
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        padding: '3px 8px',
+                        borderRadius: 6,
+                        background: 'rgba(46,125,50,0.18)',
+                        color: '#2e7d32',
+                        border: '1px solid #52b788',
+                      }}
+                      title={lingua === 'en' ? 'Actions and attacks adapted to current form' : 'Azioni e attacchi adattati alla forma selvatica attiva'}
+                    >
+                      🐾 {formaAttiva.dati.nome}
+                    </span>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        style={{
+                          ...styles.buttonMini,
+                          fontSize: 11,
+                          fontWeight: 700,
+                          padding: '3px 8px',
+                          borderRadius: 6,
+                          cursor: 'pointer',
+                          background: scheda.mostraArmiAttacco !== false ? 'rgba(201,162,39,0.22)' : 'transparent',
+                          color: scheda.mostraArmiAttacco !== false ? C.goldDark : C.inkDim,
+                          border: `1px solid ${scheda.mostraArmiAttacco !== false ? C.gold : C.border}`
+                        }}
+                        onClick={() => aggiorna({ mostraArmiAttacco: scheda.mostraArmiAttacco === false })}
+                        title={t('attacchi.armi_tip')}
+                      >
+                        {t('attacchi.armi')}: {scheda.mostraArmiAttacco !== false ? 'ON' : 'OFF'}
+                      </button>
+                      <button
+                        type="button"
+                        style={{
+                          ...styles.buttonMini,
+                          fontSize: 11,
+                          fontWeight: 700,
+                          padding: '3px 8px',
+                          borderRadius: 6,
+                          cursor: 'pointer',
+                          background: scheda.mostraIncantesimiAttacco !== false ? 'rgba(201,162,39,0.22)' : 'transparent',
+                          color: scheda.mostraIncantesimiAttacco !== false ? C.goldDark : C.inkDim,
+                          border: `1px solid ${scheda.mostraIncantesimiAttacco !== false ? C.gold : C.border}`
+                        }}
+                        onClick={() => aggiorna({ mostraIncantesimiAttacco: scheda.mostraIncantesimiAttacco === false })}
+                        title={t('attacchi.incantesimi_offensivi_tip')}
+                      >
+                        {t('attacchi.incantesimi_offensivi')}: {scheda.mostraIncantesimiAttacco !== false ? 'ON' : 'OFF'}
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -13016,7 +12899,26 @@ export default function App() {
                     }
                     return scheda.mostraArmiAttacco !== false;
                   });
-                  const listaAttacchiBase = [...attacchiVisibili, ...attacchiSpettro];
+                  const listaAttacchiBase = isTrasformato
+                    ? (formaAttiva.dati.azioni || []).map((azRaw, idx) => {
+                        const az = parseAzioneBestia(azRaw);
+                        return {
+                          id: `bestia-att-${idx}`,
+                          nome: az.nome,
+                          categoria: 'Azione',
+                          bonus: az.bonus,
+                          danno: az.danno || '',
+                          tipoDanno: az.tipoDanno || estraiTipoDannoBestia(az.desc) || 'Bestia',
+                          cd: az.cd,
+                          caratteristicaTS: az.cd ? caratteristicaDaTesto(az.desc || az.testoOriginale) : '',
+                          isTS: az.cd != null && az.bonus == null,
+                          gittata: az.desc?.match(/portata\s+([0-9,.]+\s*m)/i)?.[1] || '1,5 m',
+                          note: az.desc || az.testoOriginale || '',
+                          isBestia: true,
+                          isAuto: true,
+                        };
+                      })
+                    : [...attacchiVisibili, ...attacchiSpettro];
                   const listaAttacchiCompleta = soglieDebito.veglia
                     ? listaAttacchiBase.map((a) => (typeof a.bonus === 'number' ? {
                         ...a,
@@ -13028,7 +12930,7 @@ export default function App() {
                   // borsa da componenti / simbolo sacro) EQUIPAGGIATO nell'inventario.
                   const haFocus = (scheda.inventario || []).some((o) => o.equip && /focus|simbolo sacro|borsa (da )?componenti|bacchetta|cristallo|totem|bastone runico|feticcio|strumento musicale|liuto|flauto|arpa|tamburo|cornamusa|lira/i.test(o.nome || ''));
                   const serveFocus = Boolean(caratteristicaIncantatore) && (attacchiSpettro.length > 0 || attacchiVisibili.some((a) => a.isSpell));
-                  const bloccaSpell = serveFocus && !haFocus;
+                  const bloccaSpell = (!isTrasformato) && serveFocus && !haFocus;
                   const avvisoFocus = bloccaSpell ? (
                     <div style={{ fontSize: 12, color: C.red, background: 'rgba(200,40,40,0.10)', border: `1px solid ${C.red}`, borderRadius: 8, padding: '6px 10px', marginBottom: 10 }}>
                       {tr('Nessun focus equipaggiato: per lanciare incantesimi equipaggia un focus arcano/druidico, un simbolo sacro o una borsa da componenti dall\'Inventario (spunta “equip.”).', 'No focus equipped: to cast spells, equip an arcane/druidic focus, a holy symbol or a component pouch from the Inventory (tick “equip.”).')}
@@ -13038,6 +12940,27 @@ export default function App() {
                     const arr = (() => {
                       if (cat === 'Reazione') {
                         const reazDisponibili = trovaReazioniDisponibili(scheda, versione);
+                        if (isTrasformato) {
+                          return reazDisponibili.filter((r) => !r.isSpell && r.tipo !== 'incantesimo').map((r) => ({
+                            id: r.id || `reaz-auto-${r.tipo}-${String(r.nome || '').toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+                            nome: r.nome,
+                            categoria: 'Reazione',
+                            tipo: r.tipo,
+                            isSpell: false,
+                            bonus: r.bonus,
+                            danno: r.danno || '',
+                            tipoDanno: r.tipoDanno || '',
+                            innescoIt: r.innescoIt,
+                            innescoEn: r.innescoEn,
+                            effettoIt: r.effettoIt,
+                            effettoEn: r.effettoEn,
+                            note: r.note || (lingua === 'en' ? (r.innescoEn || r.effettoEn) : (r.innescoIt || r.effettoIt)) || '',
+                            hasReach: r.hasReach,
+                            gittata: r.gittata || '',
+                            isAuto: true,
+                            isBestia: true,
+                          }));
+                        }
                         const salvatiReaz = attacchiSalvati.filter((a) => (a.categoria || 'Azione') === 'Reazione');
                         const nomiSalvati = new Set(salvatiReaz.map((a) => String(a.nome || '').replace(/^✨\s*/, '').trim().toLowerCase()));
 
@@ -13347,7 +13270,7 @@ export default function App() {
                                 <tr key={a.id} className="attacchi-riga">
                                   <td style={styles.td} className="attacchi-nome">
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                      {a.isSpell || cat === 'Reazione' || a.tipoFonte === 'araldi' ? (
+                                      {a.isSpell || cat === 'Reazione' || a.tipoFonte === 'araldi' || a.isBestia ? (
                                         <button
                                           type="button"
                                           style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'help', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24, flexShrink: 0 }}
@@ -13449,6 +13372,23 @@ export default function App() {
                                         title={castBloccato ? tr('Equipaggia un focus per lanciare questo incantesimo', 'Equip a focus to cast this spell') : undefined}
                                         style={{ background: 'transparent', border: 0, padding: 0, fontSize: 13, fontWeight: 700, color: C.ink, cursor: 'help', textAlign: 'left', textDecoration: 'underline dotted', textUnderlineOffset: 3, textDecorationColor: C.inkDim, minWidth: 0 }}
                                       >{traduciDato(cleanNome) || cleanNome}</button>
+                                      {a.isBestia && (
+                                        <span
+                                          style={{
+                                            fontSize: 10,
+                                            fontWeight: 700,
+                                            padding: '1px 5px',
+                                            borderRadius: 4,
+                                            background: 'rgba(46,125,50,0.18)',
+                                            color: '#2e7d32',
+                                            border: '1px solid rgba(46,125,50,0.4)',
+                                            marginLeft: 4,
+                                            whiteSpace: 'nowrap',
+                                          }}
+                                        >
+                                          🐾 Bestia
+                                        </span>
+                                      )}
                                       {a.tipoFonte === 'araldi' && (
                                         <span
                                           style={{
@@ -13777,6 +13717,30 @@ export default function App() {
                 </label>
               )}
             >
+              {isTrasformato && (
+                <div
+                  style={{
+                    background: 'rgba(231,76,60,0.08)',
+                    border: '1px solid #e74c3c',
+                    borderRadius: 8,
+                    padding: '8px 12px',
+                    marginBottom: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    fontSize: 12,
+                    color: C.ink
+                  }}
+                >
+                  <span style={{ fontSize: 18 }}>🐾</span>
+                  <div>
+                    <strong>{lingua === 'en' ? 'Spellcasting Unavailable:' : 'Lancio Incantesimi Non Disponibile:'}</strong>{' '}
+                    {lingua === 'en'
+                      ? `You cannot cast spells while transformed into ${formaAttiva.dati.nome}. Transforming does not break your concentration on a spell already cast.`
+                      : `Non puoi lanciare incantesimi mentre sei in ${campoForma === 'metamorfosi' ? 'Metamorfosi' : 'Forma Selvatica'} (${formaAttiva.dati.nome}). La trasformazione non interrompe la concentrazione su un incantesimo già attivo.`}
+                  </div>
+                </div>
+              )}
               <div style={{ marginBottom: 14 }}>
                 {(() => {
                   const conc = incantesimiConcentrazioneClasse(scheda.classe, scheda.sottoclasse, versione);

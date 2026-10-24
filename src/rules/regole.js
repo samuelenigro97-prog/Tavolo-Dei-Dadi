@@ -7,7 +7,7 @@ import { CLASSI, CLASSI_FULL_CASTER, CLASSI_MEZZO_CASTER, SLOT_FULL_CASTER, SLOT
   TS_CLASSE, COMPETENZE_CLASSE, COMPETENZE_SPECIE, BACKGROUND_COMPETENZE,
   MULTICLASSE_REQUISITI_5E, MULTICLASSE_COMPETENZE_5E, PE_PER_LIVELLO, REAZIONI_5E, ARMI_5E, ARMATURE_5E } from '../data/dati5e.js';
 import { modificatore, conSegno, bonusCompetenzaDaLivello } from './dadi.js';
-import { punteggioCaratteristica, effettiSfinimento, trasformazioneAttiva, estraiCategorieNota } from './scheda.js';
+import { punteggioCaratteristica, effettiSfinimento, trasformazioneAttiva, estraiCategorieNota, parseAzioneBestia } from './scheda.js';
 import { bonusPotereBersaglio, soglieDebitoAttive } from './poteri.js';
 import { spiegaIncantesimo } from '../data/spiegazioni.js';
 import { INCANTESIMI_DB, datiIncantesimo, valoreIncantesimoPerEdizione } from '../data/incantesimi.js';
@@ -1835,56 +1835,81 @@ export function trovaReazioniDisponibili(scheda, versione = (scheda?.versione ||
   }
 
   // 1. Tattica Universale Base: Attacco di Opportunità
-  addReazione({
-    nome: 'Attacco di Opportunità',
-    tipo: 'tattica',
-    bonus: bonusMischia,
-    danno: dannoMischia,
-    tipoDanno: tipoDannoMischia,
-    hasReach,
-    innescoIt: 'Quando una creatura ostile che puoi vedere esce dalla tua portata in mischia.',
-    innescoEn: 'When a hostile creature that you can see moves out of your melee reach.',
-    effettoIt: `Compi un singolo attacco con arma da mischia (${nomeArmaMischia}${hasReach ? ' - Portata 3m' : ''}) contro la creatura che fugge.`,
-    effettoEn: `Make one melee weapon attack (${nomeArmaMischia}${hasReach ? ' - Reach 10ft' : ''}) against the fleeing creature.`,
-    note: `Arma: ${nomeArmaMischia}${hasReach ? ' (Portata 3m)' : ''}${usaRandelloIncantato ? ` · Shillelagh (${(carInc || 'SAG').slice(0, 3).toUpperCase()})` : ''}`,
-    gittata: hasReach ? '3m' : '1,5 m',
-  });
+  const trans = trasformazioneAttiva(scheda);
+  if (trans && trans.dati) {
+    const azMischia = (trans.dati.azioni || []).map(parseAzioneBestia).find((a) => a.bonus != null || a.danno);
+    const nomeAttacco = azMischia ? azMischia.nome : 'Colpo della bestia';
+    const bonusBestia = azMischia?.bonus != null ? azMischia.bonus : (modFor + bonusComp);
+    const dannoBestia = azMischia?.danno || '1d4';
+    const tipoDannoBestia = azMischia?.tipoDanno || 'Bestia';
+    addReazione({
+      nome: 'Attacco di Opportunità',
+      tipo: 'tattica',
+      bonus: bonusBestia,
+      danno: dannoBestia,
+      tipoDanno: tipoDannoBestia,
+      hasReach: false,
+      innescoIt: 'Quando una creatura ostile che puoi vedere esce dalla tua portata in mischia.',
+      innescoEn: 'When a hostile creature that you can see moves out of your melee reach.',
+      effettoIt: `Compi un attacco di opportunità con ${nomeAttacco} (${trans.dati.nome}) contro la creatura che fugge.`,
+      effettoEn: `Make an opportunity attack with ${nomeAttacco} (${trans.dati.nome}) against the fleeing creature.`,
+      note: `Forma: ${trans.dati.nome} (${nomeAttacco})`,
+      gittata: '1,5 m',
+    });
+  } else {
+    addReazione({
+      nome: 'Attacco di Opportunità',
+      tipo: 'tattica',
+      bonus: bonusMischia,
+      danno: dannoMischia,
+      tipoDanno: tipoDannoMischia,
+      hasReach,
+      innescoIt: 'Quando una creatura ostile che puoi vedere esce dalla tua portata in mischia.',
+      innescoEn: 'When a hostile creature that you can see moves out of your melee reach.',
+      effettoIt: `Compi un singolo attacco con arma da mischia (${nomeArmaMischia}${hasReach ? ' - Portata 3m' : ''}) contro la creatura che fugge.`,
+      effettoEn: `Make one melee weapon attack (${nomeArmaMischia}${hasReach ? ' - Reach 10ft' : ''}) against the fleeing creature.`,
+      note: `Arma: ${nomeArmaMischia}${hasReach ? ' (Portata 3m)' : ''}${usaRandelloIncantato ? ` · Shillelagh (${(carInc || 'SAG').slice(0, 3).toUpperCase()})` : ''}`,
+      gittata: hasReach ? '3m' : '1,5 m',
+    });
+  }
 
-  // 2. Incantesimi di Reazione noti o preparati
-  for (const inc of listaInc) {
-    const nomeInc = inc.nome || '';
-    const sp = datiIncantesimo(nomeInc) || {};
-    const tempo = (inc.tempo || sp.tempo || '').toLowerCase();
-    const matchDb = REAZIONI_5E.find((x) => x.nome.toLowerCase() === nomeInc.toLowerCase() && x.tipo === 'incantesimo');
+  // 2. Incantesimi di Reazione noti o preparati (non utilizzabili in forma animale/bestiale)
+  if (!trans) {
+    for (const inc of listaInc) {
+      const nomeInc = inc.nome || '';
+      const sp = datiIncantesimo(nomeInc) || {};
+      const tempo = (inc.tempo || sp.tempo || '').toLowerCase();
+      const matchDb = REAZIONI_5E.find((x) => x.nome.toLowerCase() === nomeInc.toLowerCase() && x.tipo === 'incantesimo');
 
-    if (tempo.includes('reaz') || tempo.includes('react') || matchDb) {
-      const desc = (inc.note || '') + ' ' + (spiegaIncantesimo(nomeInc) || '') + ' ' + (sp.desc || '');
-      const isTS = /ts\s|tiro salvezza|save/i.test(desc) || Boolean(inc.isTS);
-      const danno = inc.danno || matchDb?.danno || sp.danno || '';
-      const tipoDanno = inc.tipoDanno || matchDb?.tipoDanno || sp.tipoDanno || '';
-      // Un "danno" in scheda non implica che QUESTA reazione tiri per colpire
-      // (es. Assorbire Elementi ha un danno bonus che si applica al TUO prossimo
-      // attacco, non è un tiro proprio): serve una frase esplicita di attacco.
-      const faAttaccoProprio = /tiro per colpire|attacco con incantesimo|spell attack|attack roll|compi un attacco|effettua un attacco/i.test(desc);
+      if (tempo.includes('reaz') || tempo.includes('react') || matchDb) {
+        const desc = (inc.note || '') + ' ' + (spiegaIncantesimo(nomeInc) || '') + ' ' + (sp.desc || '');
+        const isTS = /ts\s|tiro salvezza|save/i.test(desc) || Boolean(inc.isTS);
+        const danno = inc.danno || matchDb?.danno || sp.danno || '';
+        const tipoDanno = inc.tipoDanno || matchDb?.tipoDanno || sp.tipoDanno || '';
+        // Un "danno" in scheda non implica che QUESTA reazione tiri per colpire
+        // (es. Assorbire Elementi ha un danno bonus che si applica al TUO prossimo
+        // attacco, non è un tiro proprio): serve una frase esplicita di attacco.
+        const faAttaccoProprio = /tiro per colpire|attacco con incantesimo|spell attack|attack roll|compi un attacco|effettua un attacco/i.test(desc);
 
-      addReazione({
-        id: inc.id ? `spell-${inc.id}` : undefined,
-        idIncantesimo: inc.id,
-        nome: nomeInc,
-        tipo: 'incantesimo',
-        isSpell: true,
-        isTS,
-        cd: isTS ? cdIncantesimi : undefined,
-        bonus: isTS ? undefined : (faAttaccoProprio ? bonusAttaccoMagico : (matchDb?.bonus || undefined)),
-        danno,
-        tipoDanno,
-        innescoIt: matchDb?.innescoIt || (sp.tempo ? sp.tempo : 'Quando si verifica la condizione di innesco dell\'incantesimo.'),
-        innescoEn: matchDb?.innescoEn || (sp.tempo ? sp.tempo : 'When the spell trigger condition occurs.'),
-        effettoIt: inc.note || matchDb?.note || sp.desc || '',
-        effettoEn: matchDb?.noteEn || sp.desc || '',
-        note: inc.note || matchDb?.note || (sp.scuola ? `${sp.scuola} • ${sp.gittata || ''}` : ''),
-        gittata: sp.gittata || inc.gittata || '',
-      });
+        addReazione({
+          id: inc.id ? `spell-${inc.id}` : undefined,
+          idIncantesimo: inc.id,
+          nome: nomeInc,
+          tipo: 'incantesimo',
+          isSpell: true,
+          isTS,
+          cd: isTS ? cdIncantesimi : undefined,
+          bonus: isTS ? undefined : (faAttaccoProprio ? bonusAttaccoMagico : (matchDb?.bonus || undefined)),
+          danno,
+          tipoDanno,
+          innescoIt: matchDb?.innescoIt || (sp.tempo ? sp.tempo : 'Quando si verifica la condizione di innesco dell\'incantesimo.'),
+          innescoEn: matchDb?.innescoEn || (sp.tempo ? sp.tempo : 'When the spell trigger condition occurs.'),
+          effettoIt: inc.note || matchDb?.note || sp.desc || '',
+          effettoEn: matchDb?.noteEn || sp.desc || '',
+          note: inc.note || matchDb?.note || (sp.scuola ? `${sp.scuola} • ${sp.gittata || ''}` : ''),
+          gittata: sp.gittata || inc.gittata || '',
+        });
+      }
     }
   }
 
