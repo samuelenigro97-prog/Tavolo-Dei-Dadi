@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.113.1] – 2026-10-24
+
+### Modificato
+- **Forma Selvatica / Metamorfosi - Rimozione PF duplicati**: rimossa completamente la barra dei Punti Ferita e i pulsanti rapidi dal banner superiore della trasformazione. Tutti i PF (forma animale vs base PG) sono gestiti esclusivamente nel box vitale in basso.
+- **Banner superiore dedicato a bonus e attacchi**: il banner superiore conserva e valorizza i bonus delle 6 caratteristiche della bestia (con tiri d20 interattivi), i sensi e tratti speciali, e le schede delle azioni/attacchi della trasformazione (tiri per colpire, danni diretti e CD salvezza).
+
 ## [4.113.0] – 2026-10-24
 
 ### Aggiunto
