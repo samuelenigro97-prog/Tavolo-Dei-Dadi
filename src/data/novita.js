@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.114.0',
+    voci: {
+      it: [
+        'Regole Magia e Forma Selvatica: riscritta la sezione incantesimi con spiegazioni ufficiali esaustive tratte dal Manuale del Giocatore 5e (lancio, concentrazione, azioni attive e Incantesimi Bestiali al 18° liv.).',
+        'Pannello Regole Ufficiali nel Catalogo: pulsante apribile con le regole complete di Forma Selvatica e Metamorfosi (durata, GS, equipaggiamento, PF).',
+      ],
+      en: [
+        'Magic & Wild Shape Rules: rewrote spellcasting notice with exhaustive official rules from PHB 5e (casting, concentration, active magic actions, and Beast Spells at 18th level).',
+        'Official Rules Panel in Catalog: toggleable panel with complete Wild Shape and Polymorph rules (duration, CR, equipment, HP).',
+      ],
+    },
+  },
+  {
     versione: '4.113.4',
     voci: {
       it: [
