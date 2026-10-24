@@ -2,6 +2,11 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.115.3] – 2026-10-24
+
+### Rimosso
+- **Etichetta Scuola di Magia nelle righe della Lista Incantesimi**: rimossa la chip della scuola dalle singole righe per snellire la visualizzazione e ridurre il rumore visivo; l'informazione sulla scuola rimane consultabile cliccando sull'incantesimo e tramite il filtro scuole in alto.
+
 ## [4.115.2] – 2026-10-24
 
 ### Rimosso

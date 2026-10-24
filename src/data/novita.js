@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.115.3',
+    voci: {
+      it: [
+        'Incantesimi: rimossa l\'etichetta della scuola di magia dalle righe della lista per una visualizzazione più pulita (la scuola resta consultabile aprendo i dettagli dell\'incantesimo).',
+      ],
+      en: [
+        'Spells: removed magic school tag from list rows for a cleaner view (school remains available when opening spell details).',
+      ],
+    },
+  },
+  {
     versione: '4.115.2',
     voci: {
       it: [
