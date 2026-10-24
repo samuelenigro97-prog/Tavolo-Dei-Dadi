@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.115.0',
+    voci: {
+      it: [
+        'Temi di Classe Bilanciati: introdotto un misto armonico tra il colore della classe e l\'oro neutrale classico D&D per bottoni e accenti (65% oro / 35% classe).',
+        'Pannelli e Bordi Puliti: rimossa la tinta colorata invasiva dai pannelli per preservare la leggibilità naturale di carta e ardesia, con bordi e auree più discreti ed eleganti.',
+      ],
+      en: [
+        'Balanced Class Themes: introduced a harmonious blend of class color and classic D&D neutral gold for buttons and accents (65% gold / 35% class).',
+        'Clean Panels & Borders: removed invasive tinting from panels to preserve parchment and slate readability, with subtle borders and ambient auras.',
+      ],
+    },
+  },
+  {
     versione: '4.114.1',
     voci: {
       it: [
