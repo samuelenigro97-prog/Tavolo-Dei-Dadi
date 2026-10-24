@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.115.2';
+const APP_VERSION = '4.115.3';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -14749,29 +14749,6 @@ export default function App() {
                                       return chipIncantesimo('', t('spell.chip_note'), notaBreve, isAraldiNota ? 'var(--c-araldi, #a45a2a)' : undefined, 'chip-nota', note);
                                     })()}
                                   </div>
-                                  {scuola && (
-                                    <span
-                                      className="chip-scuola"
-                                      style={{
-                                        fontSize: 11,
-                                        fontWeight: 700,
-                                        color: coloreCategoria('scuola', notteAttiva),
-                                        border: `1px solid ${coloreCategoria('scuola', notteAttiva)}`,
-                                        background: `${coloreCategoria('scuola', notteAttiva)}1f`,
-                                        borderRadius: 4,
-                                        padding: '1px 5px',
-                                        lineHeight: '13px',
-                                        whiteSpace: 'nowrap',
-                                        flexShrink: 0,
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        gap: 3,
-                                      }}
-                                      title={`${en ? 'School' : 'Scuola'}: ${traduciDato(scuola)}`}
-                                    >
-                                      {traduciDato(scuola)}
-                                    </span>
-                                  )}
                                   {parseEspressioneDado(danno) && (
                                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
                                       {modIncantatore !== null && isTSInc && (
