@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.112.5';
+const APP_VERSION = '4.112.6';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -7709,7 +7709,7 @@ export default function App() {
           onClick={() => setInfo(null)}
         >
           <div
-            style={{ ...styles.panel, maxWidth: 360, width: '100%', position: 'relative', boxShadow: '0 12px 35px rgba(0,0,0,0.4)', borderTop: `2px solid ${C.goldDark}` }}
+            style={{ ...styles.panel, maxWidth: 500, width: '92vw', position: 'relative', boxShadow: '0 12px 35px rgba(0,0,0,0.4)', borderTop: `2px solid ${C.goldDark}` }}
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 8 }}>
@@ -13279,8 +13279,11 @@ export default function App() {
                               const isUltimoCrit = (tiro?.attacco && (tiro.attacco.id === a.id || tiro.attacco.nome === a.nome) && (tiro.critico || tiro.naturale >= 20))
                                 || (ultimoAttaccoCritico && (ultimoAttaccoCritico.id === a.id || ultimoAttaccoCritico.nome === a.nome));
                               const cleanNome = String(a.nome || '').replace(/^✨\s*/, '').trim();
-                              const spSpell = datiIncantesimo(cleanNome);
-                              const spiegazioneEffetto = spiegaIncantesimo(cleanNome) || spSpell?.desc || (dettagliIncantesimo(cleanNome)?.desc) || spiegaPrivilegio(cleanNome) || spiegaTratto(cleanNome) || spiegaTalento(cleanNome) || a.note || '';
+                              const spSpell = datiIncantesimo(cleanNome, versione);
+                              const descDbSpell = spSpell?.desc || (dettagliIncantesimo(cleanNome)?.desc) || '';
+                              const spiegazioneEffetto = a.isSpell
+                                ? (lingua === 'en' ? (spiegaIncantesimo(cleanNome) || descDbSpell) : (descDbSpell || spiegaIncantesimo(cleanNome))) || a.note || ''
+                                : (spiegaIncantesimo(cleanNome) || descDbSpell || spiegaPrivilegio(cleanNome) || spiegaTratto(cleanNome) || spiegaTalento(cleanNome) || a.note || '');
                               
                               const armaDb = !a.isSpell ? trovaArma(a.nome) : null;
                               const infoArma = analizzaArmaVersatileEPortata(a, armaDb);
@@ -13336,7 +13339,7 @@ export default function App() {
                                     cat,
                                     dimensione: 22,
                                   },
-                                  testo: testoNuvoletta(righe, descr) || (en ? 'No description available.' : 'Nessuna descrizione disponibile.')
+                                  testo: (a.isSpell ? [righe.filter(Boolean).join('\n'), descr].filter(Boolean).join('\n\n') : testoNuvoletta(righe, descr)) || (en ? 'No description available.' : 'Nessuna descrizione disponibile.')
                                 });
                               };
 
@@ -14443,8 +14446,9 @@ export default function App() {
                       {spellsDaMostrare.length > 0 && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                           {spellsDaMostrare.map((s) => {
-                            const d = datiIncantesimo(s.nome);
-                            const spieg = spiegaIncantesimo(s.nome) || d?.desc || s.note || '';
+                            const d = datiIncantesimo(s.nome, versione);
+                            const descDb = d?.desc || '';
+                            const spieg = (lingua === 'en' ? (spiegaIncantesimo(s.nome) || descDb) : (descDb || spiegaIncantesimo(s.nome))) || s.note || '';
                             // Tempo/gittata/danno per l'edizione del PG (vedi valoreIncantesimoPerEdizione).
                             const tempoLabel = traduciDato(valoreIncantesimoPerEdizione(s, 'tempo', versione));
                             const gittata = valoreIncantesimoPerEdizione(s, 'gittata', versione);
@@ -14492,7 +14496,8 @@ export default function App() {
                               scuola && `${en ? 'School' : 'Scuola'}: ${traduciDato(scuola)}`,
                               note && s.note !== spieg && `${en ? 'Notes' : 'Note'}: ${note}`,
                             ];
-                            const testoModal = testoNuvoletta(righeInfo, spieg);
+                            const essenziale = righeInfo.filter(Boolean).join('\n');
+                            const testoModal = [essenziale, spieg].filter(Boolean).join('\n\n');
 
                             const chipIncantesimo = (icona, label, val, colore, classe, testoPieno) => val ? (
                               <span

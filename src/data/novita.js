@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.112.6',
+    voci: {
+      it: [
+        'Incantesimi: testi integrali e completi al 100% dal manuale ufficiale D&D nelle nuvolette di dettaglio.',
+        'Nuvolette: rimossa la troncatura a 2 frasi per gli incantesimi e finestra di lettura allargata.',
+      ],
+      en: [
+        'Spells: 100% unabridged official D&D manual rules texts in the info tooltips.',
+        'Tooltips: removed 2-sentence truncation on spells and widened modal view.',
+      ],
+    },
+  },
+  {
     versione: '4.112.5',
     voci: {
       it: [

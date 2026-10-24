@@ -2,6 +2,13 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.112.6] – 2026-10-24
+
+### Modificato
+- **Testi completi degli incantesimi (100% ufficiali D&D)**: arricchito l'intero database (`INCANTESIMI_DB`) con i testi originali e integrali del manuale/SRD ufficiale in italiano, inclusi tutti i paragrafi di regole, opzioni, tiri salvezza e scaling "Ai Livelli Superiori" / "Potenziamento per i Trucchetti".
+- **Nuvolette incantesimi non troncate**: eliminato il limite di 2 frasi / 320 caratteri per gli incantesimi sia nella lista degli incantesimi sia nella tabella combattimento, mostrando la descrizione integrale e completa.
+- **Finestra di dettaglio nuvoletta**: allargata la larghezza massima del modal info (`maxWidth: 500px`) per una lettura confortevole e scorrevole dei testi completi.
+
 ## [4.112.5] – 2026-10-24
 
 ### Modificato
