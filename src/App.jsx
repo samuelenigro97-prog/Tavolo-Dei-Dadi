@@ -1216,7 +1216,7 @@ function mescola(a, b, t) {
 }
 
 /** Intensità dell'aura del colore di classe attorno alle sezioni (1 = intensità storica). */
-const INTENSITA_CLASSE = 0.85;
+const INTENSITA_CLASSE = 0.55;
 
 /** Luminanza relativa (WCAG) di un colore esadecimale. */
 function luminanzaRelativa(hex) {
@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.114.1';
+const APP_VERSION = '4.115.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4304,11 +4304,12 @@ export default function App() {
       const n = parseInt(m[1], 16);
       return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
     };
-    const accClasse = temaCornici === 'disattivato' ? null : coloreClasse(classeAttiva);
+    const accTema = (temaCornici && temaCornici !== 'auto' && temaCornici !== 'disattivato') ? coloreClasse(temaCornici) : null;
+    const accClasse = temaCornici === 'disattivato' ? null : (accTema || coloreClasse(classeAttiva));
     const tintaClasse = accClasse ? accClasse[modo] : t.gold;
-    const coloreGlow = mescola(t.bg, tintaClasse, scuroEff ? 0.22 : 0.12);
-    const glowClasse = `radial-gradient(150% 110% at 50% -18%, ${hexRgba(coloreGlow, (scuroEff ? 0.15 : 0.08) * INTENSITA_CLASSE)}, transparent 75%)`;
-    const auraClasseSotto = `radial-gradient(120% 90% at 50% 110%, ${hexRgba(tintaClasse, (scuroEff ? 0.13 : 0.05) * INTENSITA_CLASSE)}, transparent 80%)`;
+    const coloreGlow = mescola(t.bg, tintaClasse, scuroEff ? 0.14 : 0.07);
+    const glowClasse = `radial-gradient(150% 110% at 50% -18%, ${hexRgba(coloreGlow, (scuroEff ? 0.11 : 0.05) * INTENSITA_CLASSE)}, transparent 75%)`;
+    const auraClasseSotto = `radial-gradient(120% 90% at 50% 110%, ${hexRgba(tintaClasse, (scuroEff ? 0.08 : 0.03) * INTENSITA_CLASSE)}, transparent 80%)`;
     const ambra = scuroEff ? '' : `radial-gradient(75% 50% at 50% -2%, rgba(224,162,74,0.04), transparent 70%)`;
     const vignetta = `radial-gradient(120% 120% at 50% 42%, transparent 56%, ${mescola(t.bg, '#000000', scuroEff ? 0.45 : 0.11)} 100%)`;
     const sfondoAmbiente = presetDati.sfondo || '';
@@ -4340,18 +4341,16 @@ export default function App() {
     const t = { ...BASE_TEMA[modo] };
     const accTema = (temaCornici && temaCornici !== 'auto' && temaCornici !== 'disattivato') ? coloreClasse(temaCornici) : null;
     const accClasse = temaCornici === 'disattivato' ? null : (accTema || coloreClasse(classeAttiva));
+    const tintaClasse = accClasse ? accClasse[modo] : BASE_TEMA[modo].gold;
     if (accClasse) {
-      const tintaClasse = accClasse[modo];
-      // Prima la tinta era quasi invisibile: restava solo su titoli e bagliori. Portarla
-      // anche sugli accenti rende riconoscibile a colpo d'occhio la classe del PG.
-      t.gold = tintaClasse;
-      t.goldDark = tintaClasse;
-      t.title = tintaClasse;
-      t.border = mescola(t.border, tintaClasse, scuroEff ? 0.50 : 0.38);
-      if (!scuroEff) {
-        t.panel = mescola(t.panel, tintaClasse, 0.13);
-        t.panelLight = mescola(t.panelLight, tintaClasse, 0.20);
-      }
+      // Misto armonico: l'oro classico D&D conserva nobiltà e chiarezza neutra (65%),
+      // arricchendosi dei riflessi caldi e distintivi della classe (35%).
+      t.gold = mescola(BASE_TEMA[modo].gold, tintaClasse, 0.35);
+      t.goldDark = mescola(BASE_TEMA[modo].goldDark, tintaClasse, 0.35);
+      t.title = mescola(BASE_TEMA[modo].title, tintaClasse, 0.40);
+      // Bordi sobri con tocco morbido della classe (15%) senza appesantire i riquadri
+      t.border = mescola(t.border, tintaClasse, scuroEff ? 0.20 : 0.14);
+      // I pannelli e fogli NON vengono tinti: mantengono la perfetta leggibilità pergamena/ardesia
     }
     garantisciContrastoTema(t);
     const root = document.documentElement;
@@ -4370,29 +4369,28 @@ export default function App() {
     set('--c-gold', t.gold); set('--c-gold-dark', t.goldDark); set('--c-red', t.red);
     set('--c-green', t.green); set('--c-title', t.title);
     set('--c-on-gold', testoSu(t.goldDark));
-    // Colore della classe per angoli, bordi e controlli principali.
-    set('--c-classe', t.gold);
+    // Colore puro della classe per stemmi, badge e dettagli identitari
+    set('--c-classe', tintaClasse);
     // Copia con un altro nome, che il menu iniziale (tema base dell'app) non ridefinisce:
     // serve alla card "Ultimo usato", l'unica parte del menu nei colori del personaggio.
     set('--c-pg-gold', t.gold); set('--c-pg-gold-dark', t.goldDark); set('--c-pg-title', t.title);
     set('--c-pg-on-gold', testoSu(t.goldDark));
     set('--c-pg-border', t.border); set('--c-pg-panel-light', t.panelLight); set('--c-pg-panel', t.panel);
 
-    const tintaClasse = accClasse ? accClasse[modo] : t.gold;
     const hexRgba = (hex, a) => {
       const m = /^#?([0-9a-fA-F]{6})$/.exec(hex || '');
       if (!m) return `rgba(0,0,0,${a})`;
       const n = parseInt(m[1], 16);
       return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
     };
-    const aura1 = hexRgba(tintaClasse, (scuroEff ? 0.20 : 0.09) * INTENSITA_CLASSE);
-    const aura2 = hexRgba(tintaClasse, (scuroEff ? 0.14 : 0.05) * INTENSITA_CLASSE);
-    const auraPulse1 = hexRgba(tintaClasse, (scuroEff ? 0.36 : 0.18) * INTENSITA_CLASSE);
-    const auraPulse2 = hexRgba(tintaClasse, (scuroEff ? 0.24 : 0.10) * INTENSITA_CLASSE);
-    const auraGlowMin = hexRgba(tintaClasse, (scuroEff ? 0.14 : 0.06) * INTENSITA_CLASSE);
-    const auraGlowMax = hexRgba(tintaClasse, (scuroEff ? 0.38 : 0.20) * INTENSITA_CLASSE);
-    const borderGlowMin = hexRgba(tintaClasse, (scuroEff ? 0.45 : 0.30) * INTENSITA_CLASSE);
-    const borderGlowMax = hexRgba(tintaClasse, (scuroEff ? 0.85 : 0.65) * INTENSITA_CLASSE);
+    const aura1 = hexRgba(tintaClasse, (scuroEff ? 0.15 : 0.06) * INTENSITA_CLASSE);
+    const aura2 = hexRgba(tintaClasse, (scuroEff ? 0.10 : 0.03) * INTENSITA_CLASSE);
+    const auraPulse1 = hexRgba(tintaClasse, (scuroEff ? 0.26 : 0.12) * INTENSITA_CLASSE);
+    const auraPulse2 = hexRgba(tintaClasse, (scuroEff ? 0.16 : 0.07) * INTENSITA_CLASSE);
+    const auraGlowMin = hexRgba(tintaClasse, (scuroEff ? 0.10 : 0.04) * INTENSITA_CLASSE);
+    const auraGlowMax = hexRgba(tintaClasse, (scuroEff ? 0.25 : 0.13) * INTENSITA_CLASSE);
+    const borderGlowMin = hexRgba(tintaClasse, (scuroEff ? 0.32 : 0.20) * INTENSITA_CLASSE);
+    const borderGlowMax = hexRgba(tintaClasse, (scuroEff ? 0.60 : 0.40) * INTENSITA_CLASSE);
     const auraOmbra = `0 6px 28px -4px ${aura1}, 0 16px 48px -8px ${aura2}, 0 1px 3px rgba(0,0,0,${scuroEff ? 0.35 : 0.05})`;
 
     set('--c-aura-color', tintaClasse);

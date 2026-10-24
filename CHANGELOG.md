@@ -2,6 +2,15 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.115.0] – 2026-10-24
+
+### Modificato
+- **Misto Armonico tra Tema Neutrale e Colore di Classe**:
+  - **Oro Ibrido Elegante (`--c-gold` / `--c-gold-dark`)**: I pulsanti, i selettori, i contatori e gli accenti della scheda ora fondono l'oro classico D&D nobile (65%) con i riflessi distintivi della classe (35%), anziché sovrascrivere l'intera interfaccia con il colore saturo puro.
+  - **Pannelli e Fogli 100% Puliti**: Rimossa la tintura invasiva sui pannelli e sui fogli di carta/ardesia (`t.panel` e `t.panelLight`), restituendo una superficie neutrale, riposante e ad alto contrasto per la lettura.
+  - **Bordi e Auree Atmosferiche**: I bordi dei riquadri adottano una sfumatura leggera e discreta (15% di tocco di classe) e l'intensità complessiva delle auree è stata calibrata (`INTENSITA_CLASSE = 0.55`) per un bagliore d'atmosfera senza abbagliamenti neon.
+  - **Accento Identitario Puro (`--c-classe`)**: Il colore puro della classe è riservato agli stemmi, ai badge identificativi del personaggio e alle risorse specifiche di classe.
+
 ## [4.114.1] – 2026-10-24
 
 ### Rimosso

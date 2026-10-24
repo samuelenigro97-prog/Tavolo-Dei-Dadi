@@ -36,9 +36,9 @@ test('menu iniziale: propone subito l’ultimo personaggio attivo', () => {
   assert.match(menu, /t\('menu\.riprendi'\)/);
 });
 
-test('tema: il colore della classe guida gli accenti principali', () => {
-  assert.match(app, /const INTENSITA_CLASSE = 0\.85/);
-  assert.match(app, /t\.gold = tintaClasse/);
-  assert.match(app, /t\.goldDark = tintaClasse/);
-  assert.match(app, /set\('--c-classe', t\.gold\)/);
+test('tema: misto armonico tra colore di classe e oro neutrale D&D', () => {
+  assert.match(app, /const INTENSITA_CLASSE = 0\.55/);
+  assert.match(app, /t\.gold = mescola\(BASE_TEMA\[modo\]\.gold, tintaClasse, 0\.35\)/);
+  assert.match(app, /t\.goldDark = mescola\(BASE_TEMA\[modo\]\.goldDark, tintaClasse, 0\.35\)/);
+  assert.match(app, /set\('--c-classe', tintaClasse\)/);
 });
