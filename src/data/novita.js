@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.113.3',
+    voci: {
+      it: [
+        'Contatori e Risorse: allineamento e sincronizzazione completa tra Combattimento, Riposi e Risorse di classe (Ira, Ispirazione Bardica, Punizione Divina).',
+        'Riposo Breve: estesa la ricarica degli slot di Magia del Patto anche a personaggi multiclasse Warlock.',
+      ],
+      en: [
+        'Counters and Resources: complete sync and alignment between Combat, Rests and Class resources (Rage, Bardic Inspiration, Divine Smite).',
+        'Short Rest: extended Pact Magic slot recovery to multiclass Warlock characters.',
+      ],
+    },
+  },
+  {
     versione: '4.113.2',
     voci: {
       it: [
