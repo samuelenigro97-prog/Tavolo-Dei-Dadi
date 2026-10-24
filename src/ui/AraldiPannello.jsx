@@ -368,9 +368,6 @@ export function AraldiPannello({ scheda, aggiorna, lingua = 'it', registra, onMo
                             onClick={() => (onInfo ? onInfo({ titolo: nomeBreve, testo: p.descrizione }) : setAperti((x) => ({ ...x, [p.id]: !x[p.id] })))}
                             style={{ cursor: 'help', textDecoration: 'underline dotted', textUnderlineOffset: 3, fontWeight: 700, fontSize: 13 }}
                           >{nomeBreve}</span>
-                          {onModifica && (
-                            <button type="button" style={{ background: 'none', border: 0, padding: '0 0 0 8px', color: C.inkDim, cursor: 'pointer', fontSize: 11 }} onClick={() => onModifica(p.id)} title={en ? 'Edit' : 'Modifica'}>✎</button>
-                          )}
                         </div>
                         {futuro ? (
                           <span style={{ ...styles.detail, fontStyle: 'italic' }}>— {en ? 'not reached yet' : 'non ancora raggiunto'}</span>

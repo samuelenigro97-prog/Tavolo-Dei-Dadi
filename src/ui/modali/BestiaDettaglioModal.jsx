@@ -117,15 +117,12 @@ export function BestiaDettaglioModal({ aggiorna, bestiaDettaglio, lanciaD20, lan
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'wrap' }}>
                       <span style={{ fontWeight: 800, color: C.ink }}>{az.nome}</span>
-                      {az.cd != null && (
-                        <BadgeTiroSalvezza cd={az.cd} caratteristica={caratteristicaDaTesto(az.desc || az.testoOriginale)} colore={coloreCategoria('tiroSalvezza', notteAttiva)} />
-                      )}
                     </div>
                     {az.desc && (
                       <div style={{ fontSize: 12, color: C.ink }}>{az.desc}</div>
                     )}
-                    {(az.bonus != null || az.danno) && (
-                      <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 2, paddingTop: 4, borderTop: `1px dashed ${C.border}` }}>
+                    {(az.bonus != null || az.danno || az.cd != null) && (
+                      <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', alignItems: 'center', marginTop: 2, paddingTop: 4, borderTop: `1px dashed ${C.border}` }}>
                         {az.bonus != null && (
                           <button
                             type="button"
@@ -152,6 +149,9 @@ export function BestiaDettaglioModal({ aggiorna, bestiaDettaglio, lanciaD20, lan
                           >
                             <span>{lingua === 'en' ? 'Damage' : 'Danni'} ({az.danno})</span>
                           </button>
+                        )}
+                        {az.cd != null && (
+                          <BadgeTiroSalvezza cd={az.cd} caratteristica={caratteristicaDaTesto(az.desc || az.testoOriginale)} colore={coloreCategoria('tiroSalvezza', notteAttiva)} />
                         )}
                       </div>
                     )}

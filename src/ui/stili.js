@@ -1733,8 +1733,8 @@ tbody tr:hover {
 /* Etichette e valori si leggono SEMPRE per intero: se lo spazio è poco vanno a capo (e le
    etichette si rimpiccioliscono con la larghezza del blocco), non si tagliano con "…". */
 .profilo-anagrafica-campi { container-type: inline-size; }
-.campi-anagrafica .campo-modulo-label { font-size: clamp(9px, 2.5cqw, 11px) !important; margin-top: 2px; font-weight: 700 !important; letter-spacing: 0.1px !important; white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.15; padding: 0 !important; }
-.campi-anagrafica .campo-modulo-box > div { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; overflow-wrap: anywhere; line-height: 1.2; }
+.campi-anagrafica .campo-modulo-label { font-size: clamp(8px, 2.5cqw, 11px) !important; margin-top: 2px; font-weight: 700 !important; letter-spacing: 0.1px !important; white-space: nowrap; overflow: visible; text-overflow: clip; overflow-wrap: normal; word-break: normal; line-height: 1.15; padding: 0 !important; }
+.campi-anagrafica .campo-modulo-box > div { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; overflow-wrap: break-word; word-break: normal; line-height: 1.2; }
 /* Sottoclasse con più classi (multiclasse): una riga per classe, l'altezza fissa
     da campo singolo taglierebbe via le righe in più. */
 .campi-anagrafica .campo-modulo-box.sottoclasse-multi { height: auto !important; align-items: flex-start !important; overflow: visible !important; padding-top: 2px !important; padding-bottom: 2px !important; }

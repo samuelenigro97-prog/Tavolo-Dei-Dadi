@@ -5,6 +5,21 @@
 
 export const NOVITA = [
   {
+    versione: '4.112.4',
+    voci: {
+      it: [
+        'Forma Selvatica: azioni su due colonne con azioni generiche a piena larghezza.',
+        'Badge Tiro Salvezza (CD) spostato sulla riga delle azioni di attacco e rimosso badge bestia superfluo.',
+        'Allineamento pulito per le reazioni in tabella combattimento, correzione a capo anagrafica e pulizia Araldi.',
+      ],
+      en: [
+        'Wild Shape: actions arranged in 2 columns with generic actions full-width.',
+        'Saving throw (DC) badge moved to attack action buttons row and removed redundant beast badge.',
+        'Clean alignment for reactions in combat table, fixed mid-word wrapping in profile, cleaned Heralds buttons.',
+      ],
+    },
+  },
+  {
     versione: '4.112.3',
     voci: {
       it: ['Barra in alto e combat tracker con i colori del personaggio, non più il tema generico.', 'Combat tracker ridotto largo come la barra; tolto il tasto ▲.', 'Tiro con vantaggio: dadi tra parentesi tonde e senza il punto iniziale.', 'Menu iniziale: "Ripristina" ed "Esporta".'],

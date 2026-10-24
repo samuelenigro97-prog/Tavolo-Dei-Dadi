@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.112.3';
+const APP_VERSION = '4.112.4';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -10381,13 +10381,16 @@ export default function App() {
                   <div style={{ fontSize: 12, fontWeight: 800, color: C.goldDark, marginBottom: 6 }}>
                     {lingua === 'en' ? 'Beast actions and attacks' : 'Azioni e attacchi della bestia'}
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 8 }}>
                     {formaAttiva.dati.azioni.map((azRaw, idx) => {
                       const az = parseAzioneBestia(azRaw);
+                      const hasAzioniRapide = az.bonus != null || az.danno != null || az.cd != null;
+                      const spanTutto = !hasAzioniRapide;
                       return (
                         <div
                           key={idx}
                           style={{
+                            gridColumn: spanTutto ? '1 / -1' : undefined,
                             fontSize: 13,
                             padding: '8px 10px',
                             background: C.panel,
@@ -10403,17 +10406,14 @@ export default function App() {
                             <span style={{ fontWeight: 800, color: C.ink, fontSize: 13 }}>
                               {az.nome}
                             </span>
-                            {az.cd != null && (
-                              <BadgeTiroSalvezza cd={az.cd} caratteristica={caratteristicaDaTesto(az.desc || az.testoOriginale)} colore={coloreCategoria('tiroSalvezza', notteAttiva)} />
-                            )}
                           </div>
                           {az.desc && (
                             <div style={{ fontSize: 12, color: C.ink, lineHeight: 1.4 }}>
                               {az.desc}
                             </div>
                           )}
-                          {(az.bonus != null || az.danno) && (
-                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 2, borderTop: `1px dashed ${C.border}`, paddingTop: 6 }}>
+                          {(az.bonus != null || az.danno || az.cd != null) && (
+                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginTop: 2, borderTop: `1px dashed ${C.border}`, paddingTop: 6 }}>
                               {az.bonus != null && (
                                 <button
                                   type="button"
@@ -10468,6 +10468,9 @@ export default function App() {
                                 >
                                   <span>{lingua === 'en' ? 'Damage' : 'Danni'} ({az.danno})</span>
                                 </button>
+                              )}
+                              {az.cd != null && (
+                                <BadgeTiroSalvezza cd={az.cd} caratteristica={caratteristicaDaTesto(az.desc || az.testoOriginale)} colore={coloreCategoria('tiroSalvezza', notteAttiva)} />
                               )}
                             </div>
                           )}
@@ -10969,7 +10972,6 @@ export default function App() {
                           style={{
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'space-between',
                             width: '100%',
                             gap: 4,
                             padding: '1px 0',
@@ -10983,20 +10985,6 @@ export default function App() {
                           <span style={{ fontWeight: 800, color: C.green, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
                             <span>{isTrasformato ? '🐾' : '✨'}</span>
                             <span>{tagliaEffettiva(scheda)}</span>
-                          </span>
-                          <span
-                            style={{
-                              fontSize: 11,
-                              color: '#1b4332',
-                              background: 'rgba(46,125,50,0.15)',
-                              border: '1px solid #52b788',
-                              borderRadius: 4,
-                              padding: '1px 4px',
-                              fontWeight: 800,
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {isTrasformato ? (campoForma === 'metamorfosi' ? 'Metamorfosi' : 'Bestia') : 'Attiva'}
                           </span>
                         </div>
                       ) : (
@@ -13717,10 +13705,10 @@ export default function App() {
                                           <span>{scheda.reazioneUsata ? (lingua === 'en' ? 'Used' : 'Usata') : (lingua === 'en' ? 'Use' : 'Usa')}</span>
                                         </button>
                                       )}
-                                      {/* Niente ✕ per armi e incantesimi: spariscono da soli (disequipaggi l'arma,
-                                          cambi o togli l'incantesimo). Resta solo per un attacco "orfano": non è
+                                      {/* Niente ✕ per armi, incantesimi e reazioni: le reazioni hanno il loro tasto Usa e si gestiscono
+                                          dagli inneschi/compendio. Resta solo per un attacco "orfano": non è
                                           un incantesimo e non c'è l'oggetto in inventario (es. aggiunto dal compendio). */}
-                                      {!a.isAuto && !a.isSpell && !(scheda.inventario || []).some((x) => String(x.nome || '').toLowerCase() === String(a.nome || '').toLowerCase()) && (
+                                      {cat !== 'Reazione' && !a.isAuto && !a.isSpell && !(scheda.inventario || []).some((x) => String(x.nome || '').toLowerCase() === String(a.nome || '').toLowerCase()) && (
                                         <button
                                           type="button"
                                           data-testid="attacco-orfano-elimina"
