@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.113.4',
+    voci: {
+      it: [
+        'Indicatore versione: resa di poco più visibile e leggibile la scritta di versione in basso a destra, con verifica aggiornamenti al tocco.',
+      ],
+      en: [
+        'Version watermark: made bottom-right version text slightly more visible and readable, with update check on click.',
+      ],
+    },
+  },
+  {
     versione: '4.113.3',
     voci: {
       it: [
