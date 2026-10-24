@@ -992,3 +992,80 @@ test('trovaVantaggioTiroSalvezza: rileva debito 35 (Saggezza), Barbaro (Destrezz
   assert.ok(trovaVantaggioTiroSalvezza(schedaMagia, 'costituzione'));
   assert.equal(trovaVantaggioTiroSalvezza(schedaMagia, 'costituzione').condizionale, 'magia');
 });
+
+test('trovaSvantaggioAbilita: rileva svantaggio a Furtivita da cotta di maglia, mancata competenza e avvelenato', async () => {
+  const { trovaSvantaggioAbilita } = await import('../src/rules/scheda.js');
+
+  const sCotta = {
+    armatura: { nome: 'Cotta di maglia', tipo: 'pesante' },
+    addestramento: { armature: { pesante: true } },
+  };
+  const svFurt = trovaSvantaggioAbilita(sCotta, 'furtivita');
+  assert.ok(svFurt);
+  assert.equal(svFurt.tipo, 'armatura');
+
+  // Maestro delle armature medie rimuove lo svantaggio a furtività su armature medie
+  const sMediaMaestro = {
+    armatura: { nome: 'Mezza armatura', tipo: 'media' },
+    addestramento: { armature: { media: true } },
+    talenti: 'Maestro delle Armature Medie',
+  };
+  assert.equal(trovaSvantaggioAbilita(sMediaMaestro, 'furtivita'), null);
+
+  // Avvelenato dà svantaggio a tutto
+  const sAvvelenato = {
+    condizioni: ['Avvelenato'],
+  };
+  assert.ok(trovaSvantaggioAbilita(sAvvelenato, 'atletica'));
+  assert.ok(trovaSvantaggioAbilita(sAvvelenato, 'percezione'));
+});
+
+test('calcolaPunteggioPassivo: applica 10 + bonus (+5 vantaggio, -5 svantaggio, +5 Osservatore)', async () => {
+  const { calcolaPunteggioPassivo } = await import('../src/rules/scheda.js');
+
+  const sBase = {
+    caratteristiche: { saggezza: 14 }, // mod +2
+    bonusCompetenza: 2,
+    abilita: { percezione: 1 }, // competente: bonus +4
+  };
+  assert.equal(calcolaPunteggioPassivo(sBase, 'percezione'), 14); // 10 + 4
+
+  // Con Aquila gigante (vantaggio Percezione -> +5 al passivo)
+  const sAquila = {
+    ...sBase,
+    formaBestiale: {
+      attiva: true,
+      nome: 'Aquila gigante',
+      tratti: ['Vista acuta: vantaggio alle prove di Percezione basate sulla vista.'],
+    },
+  };
+  assert.equal(calcolaPunteggioPassivo(sAquila, 'percezione'), 19); // 10 + 4 + 5
+
+  // Con talento Osservatore (+5)
+  const sOsservatore = {
+    ...sBase,
+    talenti: 'Osservatore',
+  };
+  assert.equal(calcolaPunteggioPassivo(sOsservatore, 'percezione'), 19); // 10 + 4 + 5
+
+  // Con avvelenato (-5)
+  const sAvv = {
+    ...sBase,
+    condizioni: ['Avvelenato'],
+  };
+  assert.equal(calcolaPunteggioPassivo(sAvv, 'percezione'), 9); // 10 + 4 - 5
+});
+
+test('trattiVantaggioAttaccoBestia: rileva Tattiche di Branco e Fiuto del Sangue', async () => {
+  const { trattiVantaggioAttaccoBestia } = await import('../src/rules/scheda.js');
+
+  const formaLupo = {
+    dati: {
+      nome: 'Lupo',
+      tratti: ['Tattiche di branco: vantaggio al tiro per colpire se un alleato è vicino.'],
+    },
+  };
+  const tratti = trattiVantaggioAttaccoBestia(formaLupo);
+  assert.equal(tratti.length, 1);
+  assert.equal(tratti[0].id, 'tattiche_branco');
+});
