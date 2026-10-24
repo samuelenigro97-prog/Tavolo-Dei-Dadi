@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.112.5',
+    voci: {
+      it: [
+        'Forma Selvatica: rimosso il pulsante "?" dalle Risorse di Classe.',
+        'Catalogo Evocazioni: i nomi delle creature non sono più tagliati da puntini di sospensione.',
+      ],
+      en: [
+        'Wild Shape: removed the "?" button from Class Resources.',
+        'Summons Catalog: creature names are no longer truncated with ellipsis.',
+      ],
+    },
+  },
+  {
     versione: '4.112.4',
     voci: {
       it: [

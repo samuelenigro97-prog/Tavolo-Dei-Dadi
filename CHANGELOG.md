@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.112.5] – 2026-10-24
+
+### Modificato
+- **Forma Selvatica**: rimosso il pulsante `[ ? ]` dalle Risorse di Classe per uniformità e pulizia visiva con tutte le altre risorse.
+- **Catalogo Bestie ed Evocazioni**: i nomi delle creature non vengono più troncati con ellissi (`...`), supportando il testo a capo su due righe e larghezza minima aumentata (`150px`).
+
 ## [4.112.4] – 2026-10-24
 
 ### Modificato

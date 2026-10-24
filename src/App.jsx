@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.112.4';
+const APP_VERSION = '4.112.5';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -10787,15 +10787,6 @@ export default function App() {
                               style={{ padding: 0, border: 0, background: 'transparent', color: C.ink, font: 'inherit', fontWeight: 600, textAlign: 'left', cursor: 'help', textDecoration: 'underline dotted', textUnderlineOffset: 3, textDecorationColor: C.inkDim, marginRight: 'auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}
                             >{nomeVisualizzato}</button>
                           )}
-                          {isFormaSelvatica && (
-                            <button
-                              type="button"
-                              className="risorsa-info"
-                              onClick={apriInfoRisorsa}
-                              aria-label={tr(`Spiegazione: ${nomeVisualizzato}`, `Explanation: ${nomeVisualizzato}`)}
-                              style={{ ...styles.buttonMini, padding: '0 6px', fontSize: 11, flexShrink: 0 }}
-                            >?</button>
-                          )}
                           {!automatica && (
                             <button
                               style={{ ...styles.buttonMini, padding: '0 6px', color: C.red, flexShrink: 0 }}
@@ -16137,7 +16128,7 @@ export default function App() {
                             <span>{lingua === 'en' ? 'Bestiary and summons catalog' : 'Catalogo di bestie ed evocazioni'}</span>
                             <span style={{ fontSize: 11, color: C.inkDim, fontWeight: 400 }}>{creatureRapide.length} creature</span>
                           </div>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(135px, 1fr))', gap: 6 }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 6 }}>
                             {creatureRapide.map((c) => (
                               <div role="button" tabIndex={0}
                                 key={c.nome}
@@ -16150,14 +16141,15 @@ export default function App() {
                                   cursor: 'pointer',
                                   display: 'flex',
                                   flexDirection: 'column',
-                                  gap: 2,
+                                  justifyContent: 'space-between',
+                                  gap: 4,
                                   transition: 'border-color 0.15s ease',
                                 }}
                               >
-                                <div style={{ fontWeight: 700, fontSize: 12, color: C.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                <div style={{ fontWeight: 700, fontSize: 12, color: C.ink, lineHeight: 1.25, wordBreak: 'normal', overflowWrap: 'break-word' }}>
                                   {lingua === 'en' ? c.nomeEn : c.nome}
                                 </div>
-                                <div style={{ fontSize: 11, color: C.inkDim }}>
+                                <div style={{ fontSize: 11, color: C.inkDim, marginTop: 'auto' }}>
                                   CA {c.ca} · {c.pf} PF
                                 </div>
                               </div>
