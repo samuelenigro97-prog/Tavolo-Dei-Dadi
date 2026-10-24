@@ -2,6 +2,21 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.117.0] – 2026-10-24
+
+### Aggiunto
+- **Punteggi Passivi Completi 5e (`calcolaPunteggioPassivo`)**: calcolo rigoroso secondo il capitolo 7 del PHB (base 10 + bonus abilità; +5 in caso di vantaggio attivo, -5 in caso di svantaggio attivo, +5 dal talento *Osservatore* su Percezione e Indagare). Nel riquadro *Percezione Passiva* ora compaiono anche *Indagare Passivo* e *Intuizione Passiva* con tooltip esplicativo.
+- **Rilevamento Automatico Svantaggio (`trovaSvantaggioAbilita`)**:
+  - Badge rosso **`▼ Svant.`** applicato in automatico su Furtività per armature pesanti e medie rumorose (es. cotta di maglia, corazza a piastre, mezza armatura, salvo possesso del talento *Maestro delle Armature Medie*).
+  - Svantaggio automatico su tutte le prove per le condizioni *Avvelenato* o *Spaventato*, o sfinimento 2014.
+  - Elisione automatica con badge neutro **`⚖ Vant.+Svant.`** e tiro normale quando coesistono sia vantaggio che svantaggio (regola PHB).
+- **Attacchi Bestiali con Vantaggio Rapido (`trattiVantaggioAttaccoBestia`)**:
+  - Pulsanti rapidi dedicati `▲ Tattiche di Branco` e `▲ Fiuto del Sangue` inseriti direttamente accanto al tiro per colpire delle bestie in Forma Selvatica/Metamorfosi per attaccare con vantaggio in un tocco.
+- **Iniziativa con Vantaggio Automatico**:
+  - Collegato il riquadro Iniziativa a `haVantaggioIniziativa`, mostrando il badge `▲ Vant.` e forzando 2d20 (prendendo il migliore) sia al lancio manuale sia all'inserimento nel combat tracker.
+- **Tiri Salvezza con Click Diretto al Vantaggio**:
+  - Il badge `▲ Vant.` accanto al Tiro Salvezza è ora direttamente cliccabile per lanciare subito il TS specifico con vantaggio (`2d20` max).
+
 ## [4.116.0] – 2026-10-24
 
 ### Aggiunto

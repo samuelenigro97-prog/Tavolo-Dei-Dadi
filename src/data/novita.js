@@ -5,6 +5,23 @@
 
 export const NOVITA = [
   {
+    versione: '4.117.0',
+    voci: {
+      it: [
+        'Percezione, Indagare e Intuizione Passivi: calcolo completo da regole 5e (bonus +5 con Vantaggio, -5 con Svantaggio, +5 Talento Osservatore) visibili nel riquadro Sensi.',
+        'Svantaggi Automatici Furtività e Condizioni: badge "▼ Svant." automatico per armature pesanti/medie rumorose o condizioni Avvelenato/Spaventato, con elisione automatica quando coesistono vantaggio e svantaggio.',
+        'Attacchi Bestiali con Vantaggio Rapido: pulsanti "▲ Tattiche di Branco" e "▲ Fiuto del Sangue" sugli attacchi delle bestie trasformate per lanciare subito il tiro con vantaggio.',
+        'Iniziativa Automatica e Tiri Salvezza Cliccabili: rilevamento vantaggio all\'Iniziativa nel riquadro parametri vitali e click diretto sul badge dei Tiri Salvezza per tirare subito con vantaggio.',
+      ],
+      en: [
+        'Passive Perception, Investigation & Insight: full 5e rules calculation (+5 bonus with Advantage, -5 with Disadvantage, +5 Observant feat) visible in Senses box.',
+        'Automatic Disadvantage on Stealth & Conditions: automatic "▼ Svant." badge for noisy armor or Poisoned/Frightened conditions, with proper 5e cancellation when both advantage and disadvantage are present.',
+        'Fast Advantage for Beast Attacks: "▲ Pack Tactics" and "▲ Blood Frenzy" quick buttons on transformed beast attacks to attack with advantage in one tap.',
+        'Automatic Initiative & Interactive Save Badges: initiative advantage detection in vital boxes and direct click on Saving Throw advantage badges to roll immediately with advantage.',
+      ],
+    },
+  },
+  {
     versione: '4.116.0',
     voci: {
       it: [
