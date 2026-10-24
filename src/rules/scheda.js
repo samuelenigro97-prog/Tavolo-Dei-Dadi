@@ -297,20 +297,57 @@ export function tagliaEffettiva(scheda) {
  * Parsea una stringa o un oggetto azione di una bestia / mostro 5e,
  * estraendo nome, descrizione, bonus per colpire, formula del danno e CD tiro salvezza.
  */
+export function estraiTipoDannoBestia(desc) {
+  if (!desc) return '';
+  const match = desc.match(/danni?\s+(taglienti|perforanti|contundenti|da veleno|da fuoco|da freddo|necrotici|radiosi|psichici|di forza|da tuono|da acido)/i)
+    || desc.match(/(slashing|piercing|bludgeoning|poison|fire|cold|necrotic|radiant|psychic|force|thunder|acid)\s+damage/i);
+  if (!match) return '';
+  const map = {
+    taglienti: 'Tagliente',
+    perforanti: 'Perforante',
+    contundenti: 'Contundente',
+    'da veleno': 'Veleno',
+    'da fuoco': 'Fuoco',
+    'da freddo': 'Freddo',
+    necrotici: 'Necrotico',
+    radiosi: 'Radioso',
+    psichici: 'Psichico',
+    'di forza': 'Forza',
+    'da tuono': 'Tuono',
+    'da acido': 'Acido',
+    slashing: 'Tagliente',
+    piercing: 'Perforante',
+    bludgeoning: 'Contundente',
+    poison: 'Veleno',
+    fire: 'Fuoco',
+    cold: 'Freddo',
+    necrotic: 'Necrotico',
+    radiant: 'Radioso',
+    psychic: 'Psichico',
+    force: 'Forza',
+    thunder: 'Tuono',
+    acid: 'Acido'
+  };
+  return map[match[1].toLowerCase()] || match[1];
+}
+
 export function parseAzioneBestia(azione) {
-  if (!azione) return { nome: 'Azione', desc: '', bonus: null, danno: '', cd: null, testoOriginale: '' };
+  if (!azione) return { nome: 'Azione', desc: '', bonus: null, danno: '', tipoDanno: '', cd: null, testoOriginale: '' };
   const str = typeof azione === 'string' ? azione : (azione.nome || azione.desc || '');
   const colonIdx = str.indexOf(':');
   const nome = colonIdx > -1 ? str.slice(0, colonIdx).trim() : (str.split(/[,.]/)[0] || 'Attacco');
   const desc = colonIdx > -1 ? str.slice(colonIdx + 1).trim() : str;
 
-  // Trova bonus per colpire: es. "+4 al tiro per colpire", "+5 to hit"
-  const matchHit = str.match(/([+-]?\d+)\s*(?:al tiro per colpire|to hit)/i);
+  // Trova bonus per colpire: es. "+4 al tiro per colpire", "+5 per colpire", "+5 to hit"
+  const matchHit = str.match(/([+-]?\d+)\s*(?:al tiro per colpire|per colpire|to hit)/i);
   const bonus = matchHit ? parseInt(matchHit[1], 10) : null;
 
   // Trova formula danno primaria: es. "1d10+2", "2d6+4", "3d6", "1" (es. "1 danno tagliente")
   const matchDanno = desc.match(/(\d+d\d+(?:\s*[+-]\s*\d+)?|\b\d+\b(?=\s+danno|\s+danni|\s+damage))/i);
   const danno = matchDanno ? matchDanno[1].replace(/\s+/g, '') : '';
+
+  // Trova tipo di danno: es. "danni perforanti", "slashing damage"
+  const tipoDanno = estraiTipoDannoBestia(desc);
 
   // Trova CD: es. "CD 13", "DC 14"
   const matchCD = desc.match(/(?:CD|DC)\s*(\d+)/i);
@@ -321,6 +358,7 @@ export function parseAzioneBestia(azione) {
     desc,
     bonus,
     danno,
+    tipoDanno,
     cd,
     testoOriginale: str,
   };

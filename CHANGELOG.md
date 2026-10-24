@@ -2,6 +2,17 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.113.0] – 2026-10-24
+
+### Aggiunto
+- **Integrazione nativa di Forma Selvatica e Metamorfosi**: rimossa la schermata/banner separata ridondante e trasferite tutte le statistiche nelle sezioni native della scheda.
+- **Punti Ferita dedicati della Forma**: i PF della bestia sono tracciati direttamente nella sezione nativa Punti Ferita, mantenendo chiaramente distinti e preservati i PF base del personaggio umanoide.
+- **Auto-ritrasformazione a 0 PF (Regola PHB 5e)**: quando i PF della forma animale scendono a 0 o meno (tramite pulsanti rapidi, modifica manuale o danni subiti), il personaggio ritorna automaticamente alla forma umanoide normale, applicando eventuali danni in eccesso direttamente ai PF base del druido.
+- **Caratteristiche nelle Caratteristiche**: la griglia delle 6 caratteristiche mostra i valori sostituiti dalla bestia (FOR, DES, COS) contrassegnati con badge dedicato `🐾 Forma`, mentre le caratteristiche mentali (INT, SAG, CAR) e quelle base rimangono intatte.
+- **Azioni e Combattimento adattabili**: in forma animale la tabella combattimento nasconde le armi e gli incantesimi umanoidi non utilizzabili, mostrando invece le azioni e gli attacchi della bestia con tiri per colpire e danni diretti.
+- **Reazione Attacco di Opportunità della Bestia**: calcolato automaticamente l'attacco di opportunità con il morso/becco/artigli della bestia con portata e danni corretti, escludendo gli incantesimi di reazione.
+- **Avviso sezione Incantesimi**: banner informativo nella sezione magia che segnala l'indisponibilità del lancio degli incantesimi in forma animale preservando la concentrazione attiva.
+
 ## [4.112.6] – 2026-10-24
 
 ### Modificato

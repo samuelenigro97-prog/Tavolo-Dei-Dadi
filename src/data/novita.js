@@ -5,6 +5,21 @@
 
 export const NOVITA = [
   {
+    versione: '4.113.0',
+    voci: {
+      it: [
+        'Forma Selvatica: statistiche integrate direttamente nelle sezioni native della scheda (PF, Caratteristiche, Combattimento).',
+        'Punti Ferita: gestione PF forma separata dai PF base del PG con auto-ritrasformazione al raggiungimento di 0 PF e riporto danni in eccesso.',
+        'Combattimento: azioni adattate alla forma animale (attacchi e attacco di opportunità della bestia, incantesimi disabilitati).',
+      ],
+      en: [
+        'Wild Shape: statistics integrated directly into the sheet native sections (HP, Ability Scores, Combat).',
+        'Hit Points: form HP tracked distinctly from PC base HP with auto-revert upon reaching 0 HP and carryover damage.',
+        'Combat: actions adapted to animal form (beast attacks and opportunity attacks, spells disabled).',
+      ],
+    },
+  },
+  {
     versione: '4.112.6',
     voci: {
       it: [
