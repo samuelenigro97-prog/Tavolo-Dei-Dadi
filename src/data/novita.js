@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.113.2',
+    voci: {
+      it: [
+        'Barra superiore: ripristinate le emoticon classiche sui pulsanti di navigazione e gestione scheda.',
+        'Forma Selvatica: rimosse le statistiche dal banner superiore in favore della colonna caratteristiche aggiornata.',
+      ],
+      en: [
+        'Top bar: restored classic emojis on navigation and sheet management buttons.',
+        'Wild Shape: removed ability stats from top banner in favor of the updated characteristics column.',
+      ],
+    },
+  },
+  {
     versione: '4.113.1',
     voci: {
       it: [

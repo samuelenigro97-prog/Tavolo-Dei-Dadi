@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.113.2] – 2026-10-24
+
+### Modificato
+- **Barra in alto a scomparsa - Ritorno alle emoticon classiche**: ripristinate le amate emoji tradizionali (`🆙`, `🗑`, `🎲`, `🔍`, `🌗`/`☀️`/`🌙`, `📜`, `🗺️`, `⚔️`, `☁️`) su tutti i pulsanti della barra superiore desktop e mobile hub.
+- **Forma Selvatica / Metamorfosi - Rimozione statistiche caratteristiche dal banner superiore**: rimosso il riquadro ridondante delle 6 caratteristiche dal banner in alto, ora consultabili e tirabili direttamente nella colonna caratteristiche aggiornata sulla destra con badge dedicato.
+
 ## [4.113.1] – 2026-10-24
 
 ### Modificato
