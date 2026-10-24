@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.114.1] – 2026-10-24
+
+### Rimosso
+- **Badge "Arte" sul ritratto**: rimosso il pulsante/badge sovrapposto in alto a sinistra sul ritratto del personaggio trasformato.
+- **Attacchi e danni duplicati nel banner superiore**: rimossa l'intera scheda delle azioni e attacchi/danni della bestia dal banner superiore di Forma Selvatica e Metamorfosi, ora consultabili e tirabili esclusivamente nella sezione nativa Combattimento / Azioni sottostante.
+
 ## [4.114.0] – 2026-10-24
 
 ### Aggiunto

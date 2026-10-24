@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.114.1',
+    voci: {
+      it: [
+        'Ritratto Forma: rimosso il badge "Arte" sovrapposto in alto a sinistra sul ritratto della forma animale.',
+        'Banner Forma: rimossi gli attacchi e tiri di danno duplicati dal banner in alto, ora gestiti esclusivamente nella sezione Combattimento / Azioni.',
+      ],
+      en: [
+        'Form Portrait: removed overlapping "Art" badge on top left of beast portrait.',
+        'Form Banner: removed duplicate attack cards and damage rolls from top banner, now exclusively managed in Combat / Actions below.',
+      ],
+    },
+  },
+  {
     versione: '4.114.0',
     voci: {
       it: [
