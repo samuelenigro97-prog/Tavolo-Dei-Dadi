@@ -2,6 +2,18 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.114.0] – 2026-10-24
+
+### Aggiunto
+- **Regole ufficiali di Magia in Forma Selvatica e Metamorfosi (PHB 5e / 2024 / 5e.tools)**:
+  - Riscritto completamente l'avviso in Incantesimi trasformandolo in una scheda esaustiva basata sulle regole ufficiali del Manuale del Giocatore:
+    - *Lancio di nuovi incantesimi*: spiegazione completa sulle limitazioni somatiche/verbali e rilevamento automatico del privilegio *Incantesimi Bestiali* (18° livello Druido).
+    - *Concentrazione*: chiarimento sul mantenimento degli incantesimi già attivi e TS Costituzione con modificatore della bestia.
+    - *Azioni magiche già attive*: permesso di dirigere o riattivare magie in corso (es. *Invocare il Fulmine*, *Sfera Infuocata*, *Riscaldare il Metallo*).
+    - *Ritorno alla forma*: istruzioni su Azione Bonus e de-trasformazione automatica a 0 PF.
+- **Pannello Regole Ufficiali nel Catalogo Creature**:
+  - Aggiunto nel modal di Forma Selvatica e Metamorfosi il pulsante apribile `📖 Regole dal Manuale` con i dettagli su durata, calcolo GS, sostituzione statistiche, gestione equipaggiamento e punti ferita.
+
 ## [4.113.4] – 2026-10-24
 
 ### Modificato
