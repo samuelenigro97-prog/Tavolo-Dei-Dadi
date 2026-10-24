@@ -10224,7 +10224,7 @@ export default function App() {
           <span className="angolo-ornamento angolo-tr" aria-hidden="true" />
           <span className="angolo-ornamento angolo-bl" aria-hidden="true" />
           <span className="angolo-ornamento angolo-br" aria-hidden="true" />
-          {/* ===== BANNER FORMA SELVATICA / METAMORFOSI (Status compatto: le statistiche sono nelle sezioni native) ===== */}
+          {/* ===== BANNER FORMA SELVATICA / METAMORFOSI (Dettagli, bonus e attacchi della trasformazione; i PF sono gestiti esclusivamente nella sezione vitale in basso) ===== */}
           {isTrasformato && (
             <div
               className="forma-selvatica-banner"
@@ -10232,31 +10232,23 @@ export default function App() {
                 background: 'linear-gradient(135deg, rgba(46,125,50,0.18) 0%, rgba(201,162,39,0.15) 100%)',
                 border: `2px solid ${C.green || '#3e7d32'}`,
                 borderRadius: 12,
-                padding: '10px 16px',
+                padding: '12px 16px',
                 marginBottom: 16,
                 boxShadow: '0 4px 18px rgba(0,0,0,0.12)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 8,
               }}
             >
-              {/* Intestazione Status Bar */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              {/* Intestazione Banner */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, borderBottom: `1px solid ${C.border}`, paddingBottom: 8, marginBottom: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 26, lineHeight: 1 }}>{campoForma === 'metamorfosi' ? '🔮' : '🐾'}</span>
                   <div>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: C.green || '#3e7d32', letterSpacing: 0.3, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                      <span>
-                        {campoForma === 'metamorfosi'
-                          ? (lingua === 'en' ? 'Polymorph active' : 'Metamorfosi attiva')
-                          : (lingua === 'en' ? 'Wild Shape active' : 'Forma Selvatica attiva')}: {lingua === 'en' ? (formaAttiva.dati.nomeEn || formaAttiva.dati.nome) : formaAttiva.dati.nome}
-                      </span>
-                      <span style={{ fontSize: 12, padding: '2px 8px', borderRadius: 6, background: 'rgba(46,125,50,0.2)', color: C.ink, fontWeight: 700 }}>
-                        {formaAttiva.dati.taglia} {formaAttiva.dati.tipo || 'bestia'} · GS {formaAttiva.dati.gs}
-                      </span>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: C.green || '#3e7d32', letterSpacing: 0.3 }}>
+                      {campoForma === 'metamorfosi'
+                        ? (lingua === 'en' ? 'Polymorph active' : 'Metamorfosi attiva')
+                        : (lingua === 'en' ? 'Wild Shape active' : 'Forma Selvatica attiva')}: {lingua === 'en' ? (formaAttiva.dati.nomeEn || formaAttiva.dati.nome) : formaAttiva.dati.nome}
                     </div>
-                    <div style={{ fontSize: 12, color: C.inkDim, fontWeight: 600, marginTop: 2 }}>
-                      CA {formaAttiva.dati.ca} · Velocità: {formaAttiva.dati.velocita?.terra || 9}m
+                    <div style={{ fontSize: 12, color: C.inkDim, fontWeight: 600 }}>
+                      {formaAttiva.dati.taglia} {formaAttiva.dati.tipo || 'bestia'} · GS {formaAttiva.dati.gs} · CA {formaAttiva.dati.ca} · {formaAttiva.dati.velocita?.terra || 9}m
                       {formaAttiva.dati.velocita?.nuoto ? ` · Nuoto ${formaAttiva.dati.velocita.nuoto}m` : ''}
                       {formaAttiva.dati.velocita?.volo ? ` · Volo ${formaAttiva.dati.velocita.volo}m` : ''}
                       {formaAttiva.dati.velocita?.scalata ? ` · Scalata ${formaAttiva.dati.velocita.scalata}m` : ''}
@@ -10289,15 +10281,151 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Tratti Speciali della Bestia (se presenti) */}
-              {formaAttiva.dati.tratti && formaAttiva.dati.tratti.length > 0 && (
-                <div style={{ fontSize: 12, color: C.inkDim, borderTop: `1px dashed ${C.border}`, paddingTop: 6, display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                  <strong>{lingua === 'en' ? 'Traits:' : 'Tratti:'}</strong>
-                  {formaAttiva.dati.tratti.map((tratto, tIdx) => (
-                    <span key={tIdx} style={{ background: 'rgba(0,0,0,0.04)', padding: '2px 8px', borderRadius: 6, border: `1px solid ${C.border}`, color: C.ink }}>
+              {/* Tutte e sei le caratteristiche: quelle sostituite dalla forma
+                  (FOR/DES/COS sempre, +INT/SAG/CAR solo con la Metamorfosi)
+                  hanno le prove interattive; le tue restano in chiaro con bonus e modificatori. */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8, background: C.panel, padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`, textAlign: 'center', marginBottom: 10 }}>
+                {[['forza', 'FOR'], ['destrezza', 'DES'], ['costituzione', 'COS'], ['intelligenza', 'INT'], ['saggezza', 'SAG'], ['carisma', 'CAR']].map(([car, sigla]) => {
+                  const sostituita = formaAttiva.tutteLeCaratteristiche || ['forza', 'destrezza', 'costituzione'].includes(car);
+                  const val = punteggioCaratteristica(scheda, car);
+                  const mod = modificatore(val);
+                  return (
+                    <div role="button" tabIndex={0}
+                      key={car}
+                      style={{ cursor: 'pointer', padding: '4px', borderRadius: 6, transition: 'all 0.15s ease', opacity: sostituita ? 1 : 0.6 }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.05)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                      onClick={() => lanciaD20(`Prova di ${t('attr.' + car)}${sostituita ? ` (${formaAttiva.dati.nome})` : ''}`, mod, { tipoTiro: 'prova' })}
+                      title={sostituita ? `Clicca per tirare Prova di ${t('attr.' + car)}: 1d20 ${conSegno(mod)}` : `Tua: non sostituita dalla forma. Clicca per tirare Prova di ${t('attr.' + car)}: 1d20 ${conSegno(mod)}`}
+                    >
+                      <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: C.inkDim }}>{sigla} ({sostituita ? 'Forma' : 'Tua'}) 🎲</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: C.ink }}>
+                        {val} <span style={{ color: C.goldDark, fontSize: 13 }}>({conSegno(mod)})</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Tratti Speciali & Sensi della Bestia (se presenti) */}
+              {((formaAttiva.dati.tratti && formaAttiva.dati.tratti.length > 0) || formaAttiva.dati.sensi) && (
+                <div style={{ marginBottom: 10, background: 'rgba(0,0,0,0.02)', padding: '6px 10px', borderRadius: 6, border: `1px dashed ${C.border}` }}>
+                  {formaAttiva.dati.sensi && (
+                    <div style={{ fontSize: 12, color: C.inkDim, marginBottom: (formaAttiva.dati.tratti && formaAttiva.dati.tratti.length > 0) ? 4 : 0 }}>
+                      <strong>{lingua === 'en' ? 'Senses' : 'Sensi'}:</strong> {formaAttiva.dati.sensi}
+                    </div>
+                  )}
+                  {formaAttiva.dati.tratti && formaAttiva.dati.tratti.map((tratto, tIdx) => (
+                    <div key={tIdx} style={{ fontSize: 12, color: C.ink, lineHeight: 1.35, marginTop: 2 }}>
                       <em>{typeof tratto === 'string' ? tratto : tratto.nome}</em>
-                    </span>
+                    </div>
                   ))}
+                </div>
+              )}
+
+              {/* Azioni & Attacchi della Bestia */}
+              {formaAttiva.dati.azioni && formaAttiva.dati.azioni.length > 0 && (
+                <div>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: C.goldDark, marginBottom: 6 }}>
+                    {lingua === 'en' ? 'Beast actions and attacks' : 'Azioni e attacchi della bestia'}
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 8 }}>
+                    {formaAttiva.dati.azioni.map((azRaw, idx) => {
+                      const az = parseAzioneBestia(azRaw);
+                      const hasAzioniRapide = az.bonus != null || az.danno != null || az.cd != null;
+                      const spanTutto = !hasAzioniRapide;
+                      return (
+                        <div
+                          key={idx}
+                          style={{
+                            gridColumn: spanTutto ? '1 / -1' : undefined,
+                            fontSize: 13,
+                            padding: '8px 10px',
+                            background: C.panel,
+                            border: `1px solid ${C.border}`,
+                            borderRadius: 8,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 5,
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'wrap' }}>
+                            <span style={{ fontWeight: 800, color: C.ink, fontSize: 13 }}>
+                              {az.nome}
+                            </span>
+                          </div>
+                          {az.desc && (
+                            <div style={{ fontSize: 12, color: C.ink, lineHeight: 1.4 }}>
+                              {az.desc}
+                            </div>
+                          )}
+                          {(az.bonus != null || az.danno || az.cd != null) && (
+                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginTop: 2, borderTop: `1px dashed ${C.border}`, paddingTop: 6 }}>
+                              {az.bonus != null && (
+                                <button
+                                  type="button"
+                                  style={{
+                                    ...styles.button,
+                                    fontSize: 12,
+                                    padding: '4px 10px',
+                                    borderRadius: 6,
+                                    fontWeight: 800,
+                                    borderColor: coloreCategoria('attacco', notteAttiva),
+                                    color: coloreCategoria('attacco', notteAttiva),
+                                    background: `${coloreCategoria('attacco', notteAttiva)}1f`,
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 4,
+                                  }}
+                                  onClick={() => {
+                                    lanciaD20(tr(`Attacco (${formaAttiva.dati.nome}): ${az.nome}`, `Attack (${formaAttiva.dati.nome}): ${az.nome}`), az.bonus, {
+                                      attacco: {
+                                        nome: `${formaAttiva.dati.nome}: ${az.nome}`,
+                                        danno: az.danno,
+                                      },
+                                      suono: 'arma',
+                                      tipoTiro: 'attacco',
+                                    });
+                                  }}
+                                  title={tr(`Tira per colpire: 1d20 ${conSegno(az.bonus)}`, `Attack roll: 1d20 ${conSegno(az.bonus)}`)}
+                                >
+                                  <span>{lingua === 'en' ? 'Attack Roll' : 'Tiro per Colpire'} ({conSegno(az.bonus)})</span>
+                                </button>
+                              )}
+                              {az.danno && (
+                                <button
+                                  type="button"
+                                  style={{
+                                    ...styles.button,
+                                    fontSize: 12,
+                                    padding: '4px 10px',
+                                    borderRadius: 6,
+                                    fontWeight: 800,
+                                    borderColor: C.red,
+                                    color: C.red,
+                                    background: 'transparent',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 4,
+                                  }}
+                                  onClick={() => {
+                                    lanciaDanniDiretti(tr(`Danni (${formaAttiva.dati.nome}): ${az.nome}`, `Damage (${formaAttiva.dati.nome}): ${az.nome}`), az.danno);
+                                  }}
+                                  title={tr(`Tira danni: ${az.danno}`, `Roll damage: ${az.danno}`)}
+                                >
+                                  <span>{lingua === 'en' ? 'Damage' : 'Danni'} ({az.danno})</span>
+                                </button>
+                              )}
+                              {az.cd != null && (
+                                <BadgeTiroSalvezza cd={az.cd} caratteristica={caratteristicaDaTesto(az.desc || az.testoOriginale)} colore={coloreCategoria('tiroSalvezza', notteAttiva)} />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>
