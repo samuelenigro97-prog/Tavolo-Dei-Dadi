@@ -39,8 +39,8 @@ export const styles = {
   main: { maxWidth: 1080, margin: '0 auto' },
   panel: {
     background: C.panel,
-    border: `1px solid ${C.border}`,
-    borderRadius: 10,
+    border: `1.5px solid var(--c-bordo-barra, ${C.border})`,
+    borderRadius: 12,
     padding: 12,
     marginBottom: 8,
     boxSizing: 'border-box',
@@ -100,17 +100,18 @@ export const styles = {
     position: 'sticky',
     top: 'max(46px, calc(env(safe-area-inset-top) + 42px))',
     zIndex: 1100,
-    background: 'linear-gradient(135deg, var(--c-panel, #24201d) 0%, var(--c-panel-light, #2e2824) 100%)',
-    border: `1.5px solid ${C.gold}`,
-    borderRadius: 10,
+    background: 'color-mix(in srgb, var(--c-panel, #24201d) 96%, transparent)',
+    border: '1.5px solid var(--c-bordo-barra, var(--c-border))',
+    borderRadius: 12,
     padding: '8px 14px',
     marginBottom: 8,
     display: 'flex',
     flexDirection: 'column',
     gap: 4,
-    boxShadow: '0 8px 24px -2px rgba(0,0,0,0.45), 0 0 14px rgba(212,175,55,0.22), inset 0 1px 1px rgba(255,255,255,0.12)',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08)',
     minHeight: 38,
-    backdropFilter: 'blur(8px)',
+    backdropFilter: 'blur(14px) saturate(140%)',
+    WebkitBackdropFilter: 'blur(14px) saturate(140%)',
   },
   dado: (rolling, crit, fumble, facce = 20) => {
     let clipPath = 'polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)'; // default d20 hexagon
@@ -1879,19 +1880,29 @@ tbody tr:hover {
   will-change: transform, opacity, box-shadow;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  box-shadow: 0 -10px 36px rgba(0, 0, 0, 0.65), 0 -2px 18px rgba(212, 160, 23, 0.5), inset 0 1px 0 rgba(255, 230, 150, 0.45);
-  border-top: 1.5px solid var(--c-gold, #d4a017);
-  border-left: 1.5px solid var(--c-gold, #d4a017);
-  border-right: 1.5px solid var(--c-gold, #d4a017);
+  backdrop-filter: blur(14px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+  background: color-mix(in srgb, var(--c-panel) 96%, transparent) !important;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25), 0 -1px 4px rgba(0, 0, 0, 0.12) !important;
+  border-top: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
+  border-left: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
+  border-right: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
   transition: transform 0.14s cubic-bezier(0, 0, 0.2, 1), box-shadow 0.14s ease, border-color 0.14s ease;
 }
 
 .combat-tracker-fisso.combat-aperto {
   transform: translate(-50%, 0) !important;
-  border-top: 1.5px solid var(--c-gold, #d4a017) !important;
-  border-left: 1.5px solid var(--c-gold, #d4a017) !important;
-  border-right: 1.5px solid var(--c-gold, #d4a017) !important;
-  box-shadow: 0 -10px 36px rgba(0, 0, 0, 0.65), 0 -2px 18px rgba(212, 160, 23, 0.5), inset 0 1px 0 rgba(255, 230, 150, 0.45) !important;
+  backdrop-filter: blur(14px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+  background: color-mix(in srgb, var(--c-panel) 96%, transparent) !important;
+  border-top: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
+  border-left: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
+  border-right: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25), 0 -1px 4px rgba(0, 0, 0, 0.12) !important;
   transition: transform 0.14s cubic-bezier(0, 0, 0.2, 1), box-shadow 0.14s ease, border-color 0.14s ease !important;
 }
 .combat-tracker-fisso.combat-aperto > * {
@@ -1946,10 +1957,12 @@ tbody tr:hover {
     transform: translate(-50%, 0) !important;
     transition: transform 0.14s cubic-bezier(0, 0, 0.2, 1) 0s, box-shadow 0.14s ease 0s, border-color 0.14s ease 0s !important;
     transition-delay: 0s !important;
-    border-top: 1.5px solid var(--c-gold, #d4a017) !important;
-    border-left: 1.5px solid var(--c-gold, #d4a017) !important;
-    border-right: 1.5px solid var(--c-gold, #d4a017) !important;
-    box-shadow: 0 -10px 36px rgba(0, 0, 0, 0.65), 0 -2px 18px rgba(212, 160, 23, 0.5), inset 0 1px 0 rgba(255, 230, 150, 0.45) !important;
+    border-top: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
+    border-left: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
+    border-right: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
+    border-top-left-radius: 12px !important;
+    border-top-right-radius: 12px !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25), 0 -1px 4px rgba(0, 0, 0, 0.12) !important;
   }
   :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-chiuso > *,
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:hover > *,
@@ -1976,8 +1989,20 @@ tbody tr:hover {
   backdrop-filter: blur(14px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
   background: color-mix(in srgb, var(--c-panel) 96%, transparent) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+  border: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
   animation: apparizioneDolce 0.2s cubic-bezier(0.2, 0.9, 0.3, 1) !important;
+}
+
+/* Banner di Forma Selvatica / Metamorfosi aperta: bordi, raggio e ombre allineati alla barra in alto */
+.forma-selvatica-banner {
+  border: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+  backdrop-filter: blur(14px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
+  background: color-mix(in srgb, var(--c-panel) 96%, transparent) !important;
 }
 @media (max-width: 768px) {
   .barra-tiro {
