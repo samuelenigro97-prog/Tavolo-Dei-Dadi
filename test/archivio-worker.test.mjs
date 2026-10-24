@@ -21,12 +21,18 @@ const deposita = (env, id = 'pg-1') => worker.fetch(req('/pg', { method: 'POST',
 
 test('/pg: le scritture aperte hanno un limite per IP (senza il binding, sul KV)', async () => {
   const env = { SCHEDE: new KvFinto(), DM_KEY: 'segreto' };
-  let ultimo = 0;
-  for (let i = 0; i < 31; i++) ultimo = (await deposita(env)).status;
-  assert.equal(ultimo, 429, 'la 31ª scrittura in un minuto va rifiutata');
-  // Un altro IP non è toccato.
-  const altro = await worker.fetch(req('/pg', { method: 'POST', headers: { 'cf-connecting-ip': '198.51.100.7' }, body: JSON.stringify({ dispositivo: 'dev2', id: 'pg-9', scheda }) }), env);
-  assert.equal(altro.status, 200);
+  const nowOrig = Date.now;
+  Date.now = () => 1700000000000;
+  try {
+    let ultimo = 0;
+    for (let i = 0; i < 31; i++) ultimo = (await deposita(env)).status;
+    assert.equal(ultimo, 429, 'la 31ª scrittura in un minuto va rifiutata');
+    // Un altro IP non è toccato.
+    const altro = await worker.fetch(req('/pg', { method: 'POST', headers: { 'cf-connecting-ip': '198.51.100.7' }, body: JSON.stringify({ dispositivo: 'dev2', id: 'pg-9', scheda }) }), env);
+    assert.equal(altro.status, 200);
+  } finally {
+    Date.now = nowOrig;
+  }
 });
 
 test('/pg: con il binding del rate limiter, se rifiuta la scrittura è 429 e non scrive nulla', async () => {

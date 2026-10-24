@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.115.1] – 2026-10-24
+
+### Risolto
+- **Deploy Automatico su GitHub Pages ad ogni Release**: aggiunto il trigger `release: [published]` al workflow di pubblicazione GitHub Pages per garantire che ogni release sia immediatamente online senza ritardi o dipendenze fragili.
+- **Stabilizzazione Test Rate Limiter**: risolto il problema di cambio minuto orario (`Date.now() / 60000`) che poteva causare rari fallimenti nei test di CI remota.
+
 ## [4.115.0] – 2026-10-24
 
 ### Modificato
