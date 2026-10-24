@@ -1084,3 +1084,149 @@ export function haVantaggioIniziativa(scheda) {
 
   return null;
 }
+
+/**
+ * Individua se il PG subisce svantaggio automatico per una data abilità
+ * da armatura pesante/media rumorosa (es. Cotta di maglia su Furtività),
+ * mancata competenza nelle armature, o condizioni debilitanti attive (Avvelenato, Spaventato, Sfinimento 2014).
+ */
+export function trovaSvantaggioAbilita(scheda, abilitaKey) {
+  if (!scheda || !abilitaKey) return null;
+
+  // 1. Condizioni attive (Avvelenato e Spaventato impongono svantaggio a tutte le prove di caratteristica 5e)
+  const condizioni = Array.isArray(scheda.condizioni) ? scheda.condizioni : (scheda.condizioni ? [scheda.condizioni] : []);
+  const condNomi = condizioni.map((c) => String(typeof c === 'string' ? c : c?.nome || '').toLowerCase());
+  
+  if (condNomi.some((c) => c.includes('avvelenat') || c.includes('poisoned'))) {
+    return {
+      attivo: true,
+      fonte: 'Condizione: Avvelenato',
+      fonteEn: 'Condition: Poisoned',
+      dettaglio: 'Svantaggio a tutte le prove di caratteristica e ai tiri per colpire.',
+      tipo: 'condizione',
+    };
+  }
+
+  if (condNomi.some((c) => c.includes('spaventat') || c.includes('frightened'))) {
+    return {
+      attivo: true,
+      fonte: 'Condizione: Spaventato',
+      fonteEn: 'Condition: Frightened',
+      dettaglio: 'Svantaggio a tutte le prove di caratteristica finché la fonte della paura è in vista.',
+      tipo: 'condizione',
+    };
+  }
+
+  // 2. Sfinimento (regole 2014, grado 1+)
+  const sfin = effettiSfinimento(scheda);
+  if (sfin.svantaggioProve) {
+    return {
+      attivo: true,
+      fonte: `Sfinimento (Grado ${sfin.livello})`,
+      fonteEn: `Exhaustion (Level ${sfin.livello})`,
+      dettaglio: 'Svantaggio a tutte le prove di caratteristica.',
+      tipo: 'sfinimento',
+    };
+  }
+
+  // 3. Mancanza di Competenza nell'Armatura indossata (PHB p. 144: svantaggio a prove FOR/DES)
+  const abilitaInfo = ABILITA.find((a) => a.key === abilitaKey);
+  const carLegata = abilitaInfo?.car || '';
+  const tipoArm = scheda.armatura?.tipo || 'nessuna';
+  if ((carLegata === 'forza' || carLegata === 'destrezza') && !competenteInArmatura(scheda, tipoArm)) {
+    return {
+      attivo: true,
+      fonte: 'Armatura non competente',
+      fonteEn: 'Non-proficient Armor',
+      dettaglio: 'Svantaggio alle prove di Forza e Destrezza per armatura indossata senza competenza.',
+      tipo: 'armatura',
+    };
+  }
+
+  // 4. Svantaggio a Furtività da Armatura
+  if (abilitaKey === 'furtivita') {
+    const nomeArm = String(scheda.armatura?.nome || '').toLowerCase();
+    const haSvantaggioEsplicito = Boolean(scheda.armatura?.svantaggioFurtivita);
+    const armatureConSvantaggio = /(cotta\s+di\s+maglia|corazza\s+a\s+strisce|corazza\s+a\s+piastre|armatura\s+a\s+scaglie|mezza\s+armatura|armatura\s+a\s+riquadri|chain\s*mail|splint|plate|scale\s*mail|half\s*plate|ring\s*mail)/i;
+    
+    // Il talento Maestro delle Armature Medie rimuove lo svantaggio a furtività per le armature medie
+    const testoTalenti = `${scheda.talenti || ''}\n${scheda.privilegi || ''}`.toLowerCase();
+    const haMaestroMedie = testoTalenti.includes('maestro delle armature medie') || testoTalenti.includes('medium armor master');
+    const isMedia = scheda.armatura?.tipo === 'media' || /(armatura\s+a\s+scaglie|mezza\s+armatura|scale\s*mail|half\s*plate)/i.test(nomeArm);
+
+    if ((haSvantaggioEsplicito || armatureConSvantaggio.test(nomeArm)) && !(isMedia && haMaestroMedie)) {
+      return {
+        attivo: true,
+        fonte: scheda.armatura?.nome || 'Armatura pesante/media',
+        fonteEn: scheda.armatura?.nome || 'Heavy/medium armor',
+        dettaglio: 'Questa armatura impone svantaggio alle prove di Furtività.',
+        tipo: 'armatura',
+      };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Calcola il punteggio passivo 5e di un'abilità (PHB Cap. 7, Prove Passive).
+ * Punteggio = 10 + bonusAbilita (+5 con Vantaggio, -5 con Svantaggio, +5 Talento Osservatore su Percezione/Indagare).
+ */
+export function calcolaPunteggioPassivo(scheda, abilitaKey) {
+  if (!scheda || !abilitaKey) return 10;
+  let passivo = 10 + bonusAbilita(scheda, abilitaKey);
+
+  const vant = trovaVantaggioAbilita(scheda, abilitaKey);
+  const svant = trovaSvantaggioAbilita(scheda, abilitaKey);
+
+  if (vant && !svant) {
+    passivo += 5;
+  } else if (!vant && svant) {
+    passivo -= 5;
+  }
+
+  // Talento Osservatore (Observant): +5 a Percezione Passiva e Indagare Passivo
+  if (abilitaKey === 'percezione' || abilitaKey === 'indagare') {
+    const testo = `${scheda.talenti || ''}\n${scheda.privilegi || ''}\n${scheda.tratti || ''}`.toLowerCase();
+    if (testo.includes('osservatore') || testo.includes('observant')) {
+      passivo += 5;
+    }
+  }
+
+  return passivo;
+}
+
+/**
+ * Rileva eventuali tratti di vantaggio all'attacco per una forma bestiale attiva.
+ * Es. Tattiche di branco (Pack Tactics), Fiuto del sangue (Blood Frenzy).
+ */
+export function trattiVantaggioAttaccoBestia(forma) {
+  if (!forma || !forma.dati) return [];
+  const tratti = Array.isArray(forma.dati.tratti)
+    ? forma.dati.tratti
+    : (forma.dati.tratti ? [forma.dati.tratti] : []);
+
+  const ris = [];
+  for (const tr of tratti) {
+    const s = String(tr || '');
+    if (/tattiche\s+di\s+branco|pack\s+tactics/i.test(s)) {
+      ris.push({
+        id: 'tattiche_branco',
+        label: '▲ Tattiche di Branco',
+        labelEn: '▲ Pack Tactics',
+        tooltip: 'Vantaggio al tiro per colpire se almeno un alleato è entro 1,5 m dal bersaglio.',
+        tooltipEn: 'Advantage on attack roll if at least one ally is within 5 ft of the target.',
+      });
+    }
+    if (/fiuto\s+del\s+sangue|blood\s+frenzy/i.test(s)) {
+      ris.push({
+        id: 'fiuto_sangue',
+        label: '▲ Fiuto del Sangue',
+        labelEn: '▲ Blood Frenzy',
+        tooltip: 'Vantaggio al tiro per colpire contro creature con meno del massimo dei PF.',
+        tooltipEn: 'Advantage on attack roll against creatures with less than maximum HP.',
+      });
+    }
+  }
+  return ris;
+}

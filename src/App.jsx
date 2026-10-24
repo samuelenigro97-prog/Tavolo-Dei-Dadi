@@ -9,7 +9,7 @@ import { styles, GLOBAL_CSS } from './ui/stili.js';
 import { Editable, Rollable, iconaTipoDanno, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, caratteristicaDaTesto, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
 import { IconaAzione, IconaRunica, IconaOggetto, IconaUI, rimuoviEmoji, IconaModalInfo } from './ui/IconaFantasy.jsx';
-import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, estraiTipoDannoBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, attaccoIncantesimoAttivo, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo, trovaVantaggioAbilita, trovaVantaggioTiroSalvezza } from './rules/scheda.js';
+import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, estraiTipoDannoBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, attaccoIncantesimoAttivo, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo, trovaVantaggioAbilita, trovaVantaggioTiroSalvezza, trovaSvantaggioAbilita, calcolaPunteggioPassivo, haVantaggioIniziativa, trattiVantaggioAttaccoBestia } from './rules/scheda.js';
 import { normalizzaTrascrizione } from './rules/importSchede.js';
 import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } from "./data/esempi.js";
 import { fixEquipaggiamentoVaelion, migrazioneRegoleVaelion, autoIdratazionePersonaggioPredefinito } from './data/migrazioniPersonaggi.js';
@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.116.0';
+const APP_VERSION = '4.117.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -5337,13 +5337,15 @@ export default function App() {
 
   /** Aggiunge il personaggio attivo al combattimento, tirando l'iniziativa. */
   function aggiungiPgAlCombat() {
-    const initRoll = tiraDado(20) + iniziativaTotale(scheda);
+    const haVantInit = !!haVantaggioIniziativa(scheda);
+    const dInit = haVantInit ? Math.max(tiraDado(20), tiraDado(20)) : tiraDado(20);
+    const initRoll = dInit + iniziativaTotale(scheda);
     aggiungiCombattente('pg', {
       nome: scheda.nome, iniziativa: initRoll,
       pfMax: pfMassimiEffettivi(scheda), pfAttuali: scheda.pfAttuali, ca: caTotale(scheda),
       avatar: scheda.ritratto || generaAvatar(scheda.classe, scheda.specie, scheda.nome),
     });
-    registra({ etichetta: `${t('vital.iniziativa')}: ${scheda.nome}`, tipo: 'd20', totale: initRoll, dettaglio: `d20 ${conSegno(iniziativaTotale(scheda))}` });
+    registra({ etichetta: `${t('vital.iniziativa')}: ${scheda.nome}${haVantInit ? ' (Vantaggio)' : ''}`, tipo: 'd20', totale: initRoll, dettaglio: `${haVantInit ? '2d20 max' : 'd20'} ${conSegno(iniziativaTotale(scheda))}` });
   }
 
   /** Aggiorna (o inserisce) il PG attivo nel combat tracker con l'iniziativa tirata,
@@ -5803,11 +5805,11 @@ export default function App() {
 
 
   /** Tira per colpire con un'arma e, se è a munizioni, ne scala una dall'inventario. */
-  function tiraColpoArma(a) {
+  function tiraColpoArma(a, opzioniExtra = {}) {
     // Il tiro per colpire è sempre un d20: spada, freccia e magia suonano solo
     // quando si tirano i rispettivi danni.
     const etichettaPresa = a?.aDueMani ? (lingua === 'en' ? ' (Two-Handed)' : ' (2 Mani)') : '';
-    lanciaD20(`Attacco: ${a.nome}${etichettaPresa}`, a.bonus, { attacco: a, magia: !!a.isSpell, suono: 'tiro', tipoTiro: 'attacco' });
+    lanciaD20(`Attacco: ${a.nome}${etichettaPresa}`, a.bonus, { attacco: a, magia: !!a.isSpell, suono: 'tiro', tipoTiro: 'attacco', ...opzioniExtra });
     if (!a.isSpell) consumaMunizione(a.nome);
   }
 
@@ -7385,9 +7387,9 @@ export default function App() {
   const fallimento = tiro?.naturale === 1;
   const dannoAttaccoValido = tiro?.attacco && parseEspressioneDado(tiro.attacco.danno || '');
   const soglieDebito = scheda ? soglieDebitoAttive(scheda) : {};
-  const percezionePassiva = 10 + (scheda ? bonusAbilita(scheda, 'percezione') : 0) + (soglieDebito.occhioRisvegliato ? 5 : 0);
-  const indagarePassivo = 10 + (scheda ? bonusAbilita(scheda, 'indagare') : 0) + (soglieDebito.occhioRisvegliato ? 5 : 0);
-  const intuizionePassiva = 10 + (scheda ? bonusAbilita(scheda, 'intuizione') : 0) + (soglieDebito.voceOmbra ? 5 : 0);
+  const percezionePassiva = calcolaPunteggioPassivo(scheda, 'percezione');
+  const indagarePassivo = calcolaPunteggioPassivo(scheda, 'indagare');
+  const intuizionePassiva = calcolaPunteggioPassivo(scheda, 'intuizione');
   const modIncantatore = (scheda && caratteristicaIncantatore)
     ? modificatore(punteggioCaratteristica(scheda, caratteristicaIncantatore))
     : null;
@@ -11519,9 +11521,37 @@ export default function App() {
               <div style={styles.vitalLabel}>{t("vital.iniziativa")}</div>
               <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={styles.vitalValue}>
-                  <Rollable onRoll={() => lanciaD20(t('vital.iniziativa'), iniziativaTotale(scheda), { dopoTiro: (tot) => sincronizzaIniziativaPg(tot), tipoTiro: 'prova' })}>
-                    {conSegno(iniziativaTotale(scheda))}
-                  </Rollable>
+                  {(() => {
+                    const vInit = haVantaggioIniziativa(scheda);
+                    return (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap', justifyContent: 'center' }}>
+                        <Rollable
+                          title={vInit ? `${t('vital.iniziativa')}: ${conSegno(iniziativaTotale(scheda))} · Vantaggio da ${vInit.fonte} (${vInit.dettaglio})` : undefined}
+                          onRoll={() => lanciaD20(t('vital.iniziativa'), iniziativaTotale(scheda), { dopoTiro: (tot) => sincronizzaIniziativaPg(tot), tipoTiro: 'prova', modalitaForzata: vInit ? 'vantaggio' : undefined })}
+                        >
+                          {conSegno(iniziativaTotale(scheda))}
+                        </Rollable>
+                        {vInit && (
+                          <span
+                            style={{
+                              fontSize: 10,
+                              fontWeight: 700,
+                              padding: '1px 4px',
+                              borderRadius: 4,
+                              background: vInit.tipo === 'oggetto' ? 'rgba(59,130,246,0.14)' : 'rgba(201,162,39,0.15)',
+                              color: vInit.tipo === 'oggetto' ? '#2563eb' : C.goldDark,
+                              border: `1px solid ${vInit.tipo === 'oggetto' ? '#3b82f6' : C.gold}`,
+                              lineHeight: '13px',
+                              cursor: 'help',
+                            }}
+                            title={lingua === 'en' ? `Advantage on Initiative from ${vInit.fonte} (${vInit.dettaglio})` : `Vantaggio all'Iniziativa da ${vInit.fonte} (${vInit.dettaglio})`}
+                          >
+                            ▲ Vant.
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })()}
                   <BadgePotere scheda={scheda} bersaglio="iniziativa" unita="" />
                 </div>
               </div>
@@ -11648,11 +11678,19 @@ export default function App() {
               </div>
 
               {/* 2. Box Percezione Passiva */}
-              <div className="vital-box" style={{ ...styles.vitalBox }} title={t('vital.passive_tooltip')}>
+              <div
+                className="vital-box"
+                style={{ ...styles.vitalBox }}
+                title={`${t('vital.percezione_passiva')}: ${percezionePassiva} · ${t('skill.indagare')} ${tr('passivo', 'passive')}: ${indagarePassivo} · ${t('skill.intuizione')} ${tr('passivo', 'passive')}: ${intuizionePassiva} · ${t('vital.passive_tooltip')}`}
+              >
                 <div style={styles.vitalLabel}>{t("vital.percezione_passiva")}</div>
                 <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                   <div style={styles.vitalValue}>
                     {percezionePassiva}
+                  </div>
+                  <div style={{ fontSize: 10, color: C.inkDim, marginTop: 2, display: 'flex', gap: 6, justifyContent: 'center', lineHeight: 1 }} title={`${t('skill.indagare')}: ${indagarePassivo} | ${t('skill.intuizione')}: ${intuizionePassiva}`}>
+                    <span title={`${t('skill.indagare')} ${tr('passivo', 'passive')}: ${indagarePassivo}`}>🔍 {indagarePassivo}</span>
+                    <span title={`${t('skill.intuizione')} ${tr('passivo', 'passive')}: ${intuizionePassiva}`}>💡 {intuizionePassiva}</span>
                   </div>
                 </div>
               </div>
@@ -11940,7 +11978,7 @@ export default function App() {
                               style={{
                                 fontSize: 10,
                                 fontWeight: 700,
-                                padding: '0 4px',
+                                padding: '0 5px',
                                 borderRadius: 4,
                                 background: stileBadgeTs.bg,
                                 color: stileBadgeTs.col,
@@ -11950,10 +11988,17 @@ export default function App() {
                                 lineHeight: '14px',
                                 display: 'inline-flex',
                                 alignItems: 'center',
+                                cursor: 'pointer',
+                                gap: 2,
                               }}
-                              title={titoloTs}
+                              onPointerDown={(e) => e.stopPropagation()}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                lanciaD20(`Tiro salvezza: ${t('attr.' + key)} (${vInfoTs.condizionale || vInfoTs.fonte})`, bonusTS, { tipoTiro: 'salvezza', modalitaForzata: 'vantaggio' });
+                              }}
+                              title={`${titoloTs} · ${lingua === 'en' ? 'Click to roll save with Advantage' : 'Clicca per tirare subito il TS con Vantaggio'}`}
                             >
-                              {vInfoTs.badgeText || '▲ Vant.'}
+                              {vInfoTs.badgeText || '▲ Vant.'} 🎲
                             </span>
                           );
                         })()}
@@ -12002,16 +12047,26 @@ export default function App() {
                     const liv = scheda.abilita[a.key] || 0;
                     const abMancante = controlliAttivi.find((c) => c.tipo === 'abilita' && c.targetKey === a.key);
                     const vInfo = trovaVantaggioAbilita(scheda, a.key);
+                    const sInfo = trovaSvantaggioAbilita(scheda, a.key);
+                    const siAnnullano = Boolean(vInfo && sInfo);
+                    const modalitaForzata = siAnnullano ? 'normale' : (vInfo ? 'vantaggio' : (sInfo ? 'svantaggio' : undefined));
+
                     const stileBadgeAb = vInfo?.tipo === 'forma'
                       ? { bg: 'rgba(46, 125, 50, 0.12)', col: '#2e7d32', bdr: '#2e7d32' }
                       : vInfo?.tipo === 'debito'
                         ? { bg: 'var(--c-araldi-bg, rgba(140, 74, 30, 0.12))', col: 'var(--c-araldi, #a45a2a)', bdr: 'var(--c-araldi-border, #a45a2a)' }
                         : { bg: 'rgba(201, 162, 39, 0.15)', col: C.goldDark, bdr: C.gold };
-                    const titoloVant = vInfo
+
+                    const infoTooltip = siAnnullano
                       ? (lingua === 'en'
-                        ? `Advantage from ${vInfo.fonteEn || vInfo.fonte} (${vInfo.dettaglio})`
-                        : `Vantaggio da ${vInfo.fonte} (${vInfo.dettaglio})`)
-                      : '';
+                        ? `Advantage from ${vInfo.fonte} and Disadvantage from ${sInfo.fonte} cancel each other out (normal roll)`
+                        : `Vantaggio da ${vInfo.fonte} e Svantaggio da ${sInfo.fonte} si annullano (tiro normale)`)
+                      : vInfo
+                        ? (lingua === 'en' ? `Advantage from ${vInfo.fonteEn || vInfo.fonte} (${vInfo.dettaglio})` : `Vantaggio da ${vInfo.fonte} (${vInfo.dettaglio})`)
+                        : sInfo
+                          ? (lingua === 'en' ? `Disadvantage from ${sInfo.fonteEn || sInfo.fonte} (${sInfo.dettaglio})` : `Svantaggio da ${sInfo.fonte} (${sInfo.dettaglio})`)
+                          : '';
+
                     return (
                       <Rollable
                         as="div"
@@ -12024,8 +12079,8 @@ export default function App() {
                           background: abMancante ? 'rgba(231,76,60,0.12)' : 'transparent',
                           padding: abMancante ? '2px 4px' : styles.skillRow(true).padding,
                         }}
-                        title={abMancante ? `${abMancante.testo} (clicca per tirare, clicca sul pallino per impostare)` : `Tieni premuto e rilascia: prova di ${t('skill.' + a.key)}${vInfo ? ` · ${titoloVant}` : ''} · click sul pallino: niente → competenza (●) → competenza di classe/razza (★) → Maestria/Expertise, doppia competenza (✦)`}
-                        onRoll={() => lanciaD20(`${t('skill.' + a.key)}`, bonus, { tipoTiro: 'prova', modalitaForzata: vInfo ? 'vantaggio' : undefined })}
+                        title={abMancante ? `${abMancante.testo} (clicca per tirare, clicca sul pallino per impostare)` : `Tieni premuto e rilascia: prova di ${t('skill.' + a.key)}${infoTooltip ? ` · ${infoTooltip}` : ''} · click sul pallino: niente → competenza (●) → competenza di classe/razza (★) → Maestria/Expertise, doppia competenza (✦)`}
+                        onRoll={() => lanciaD20(`${t('skill.' + a.key)}`, bonus, { tipoTiro: 'prova', modalitaForzata })}
                       >
                         <span
                           style={styles.dot(liv)}
@@ -12048,7 +12103,27 @@ export default function App() {
                           }}
                           title={lingua === 'en' ? 'Click for 5e rules, reference DCs and tool synergies' : 'Clicca per regole 5e, CD di riferimento e sinergie con gli strumenti'}
                         >{t('skill.' + a.key)}</span>
-                        {vInfo && (
+                        {siAnnullano ? (
+                          <span
+                            style={{
+                              fontSize: 10,
+                              fontWeight: 700,
+                              padding: '0 4px',
+                              borderRadius: 4,
+                              background: 'rgba(100,100,100,0.12)',
+                              color: C.inkDim,
+                              border: `1px solid ${C.border}`,
+                              marginLeft: 4,
+                              whiteSpace: 'nowrap',
+                              lineHeight: '14px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                            }}
+                            title={infoTooltip}
+                          >
+                            ⚖ Vant.+Svant.
+                          </span>
+                        ) : vInfo ? (
                           <span
                             style={{
                               fontSize: 10,
@@ -12064,11 +12139,31 @@ export default function App() {
                               display: 'inline-flex',
                               alignItems: 'center',
                             }}
-                            title={titoloVant}
+                            title={infoTooltip}
                           >
                             ▲ Vant.
                           </span>
-                        )}
+                        ) : sInfo ? (
+                          <span
+                            style={{
+                              fontSize: 10,
+                              fontWeight: 700,
+                              padding: '0 4px',
+                              borderRadius: 4,
+                              background: 'rgba(231,76,60,0.12)',
+                              color: C.red,
+                              border: `1px solid ${C.red}`,
+                              marginLeft: 4,
+                              whiteSpace: 'nowrap',
+                              lineHeight: '14px',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                            }}
+                            title={infoTooltip}
+                          >
+                            ▼ Svant.
+                          </span>
+                        ) : null}
                         {abMancante && (
                           <span style={{ marginLeft: 'auto', fontSize: 11, color: C.red, fontWeight: 700 }}>Manca</span>
                         )}
@@ -13433,13 +13528,36 @@ export default function App() {
                                       </span>
                                     ) : (
                                       // Stesso badge "pillola" di Trucchetti/Incantesimi (🎯 +9): 1 click = tiro.
-                                      <BadgeTiroColpire
-                                        bonus={a.bonus}
-                                        colore={coloreCategoria('attacco', notteAttiva)}
-                                        disabled={castBloccato}
-                                        title={castBloccato ? tr('Equipaggia un focus per lanciare questo incantesimo', 'Equip a focus to cast this spell') : tr(`Tira per colpire con ${a.nome}`, `Attack roll with ${a.nome}`)}
-                                        onRoll={() => tiraColpoArma(a)}
-                                      />
+                                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+                                        <BadgeTiroColpire
+                                          bonus={a.bonus}
+                                          colore={coloreCategoria('attacco', notteAttiva)}
+                                          disabled={castBloccato}
+                                          title={castBloccato ? tr('Equipaggia un focus per lanciare questo incantesimo', 'Equip a focus to cast this spell') : tr(`Tira per colpire con ${a.nome}`, `Attack roll with ${a.nome}`)}
+                                          onRoll={() => tiraColpoArma(a)}
+                                        />
+                                        {a.isBestia && trattiVantaggioAttaccoBestia(formaAttiva).map((trV) => (
+                                          <button
+                                            key={trV.id}
+                                            type="button"
+                                            onClick={() => tiraColpoArma(a, { modalitaForzata: 'vantaggio' })}
+                                            style={{
+                                              ...styles.buttonMini,
+                                              fontSize: 10,
+                                              fontWeight: 700,
+                                              padding: '2px 5px',
+                                              background: 'rgba(46,125,50,0.16)',
+                                              borderColor: '#2e7d32',
+                                              color: '#2e7d32',
+                                              lineHeight: '14px',
+                                              whiteSpace: 'nowrap',
+                                            }}
+                                            title={`${lingua === 'en' ? trV.tooltipEn : trV.tooltip} · ${tr('Clicca per attaccare con Vantaggio', 'Click to attack with Advantage')}`}
+                                          >
+                                            {lingua === 'en' ? trV.labelEn : trV.label}
+                                          </button>
+                                        ))}
+                                      </div>
                                     )}
                                   </td>
                                   <td style={{ ...styles.td, color: dannoValido ? undefined : C.red }} className="attacchi-danno" data-label={t('combat.col_danno')}>
