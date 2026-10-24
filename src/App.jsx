@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.118.0';
+const APP_VERSION = '4.118.1';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -10250,20 +10250,22 @@ export default function App() {
             <div
               className="forma-selvatica-banner"
               style={{
-                background: 'linear-gradient(135deg, rgba(46,125,50,0.18) 0%, rgba(201,162,39,0.15) 100%)',
-                border: `2px solid ${C.green || '#3e7d32'}`,
+                background: 'color-mix(in srgb, var(--c-panel) 96%, transparent)',
+                border: '1.5px solid var(--c-bordo-barra, var(--c-border))',
                 borderRadius: 12,
                 padding: '12px 16px',
                 marginBottom: 16,
-                boxShadow: '0 4px 18px rgba(0,0,0,0.12)',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08)',
+                backdropFilter: 'blur(14px) saturate(140%)',
+                WebkitBackdropFilter: 'blur(14px) saturate(140%)',
               }}
             >
               {/* Intestazione Banner */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, borderBottom: `1px solid ${C.border}`, paddingBottom: 8, marginBottom: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, borderBottom: `1px solid var(--c-bordo-barra, ${C.border})`, paddingBottom: 8, marginBottom: 10 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 26, lineHeight: 1 }}>{campoForma === 'metamorfosi' ? '🔮' : '🐾'}</span>
                   <div>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: C.green || '#3e7d32', letterSpacing: 0.3 }}>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--c-title)', letterSpacing: 0.3 }}>
                       {campoForma === 'metamorfosi'
                         ? (lingua === 'en' ? 'Polymorph active' : 'Metamorfosi attiva')
                         : (lingua === 'en' ? 'Wild Shape active' : 'Forma Selvatica attiva')}: {lingua === 'en' ? (formaAttiva.dati.nomeEn || formaAttiva.dati.nome) : formaAttiva.dati.nome}
@@ -15767,7 +15769,16 @@ export default function App() {
                 onClick={() => setTabTrasformazione(null)}
               >
                 <div
-                  style={{ ...styles.panel, maxWidth: 640, width: '100%', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 10px 35px rgba(0,0,0,0.5)', border: `2px solid ${tabTrasformazione === 'metamorfosi' ? '#7b4fb0' : '#3e7d32'}` }}
+                  style={{
+                    ...styles.panel,
+                    maxWidth: 640,
+                    width: '100%',
+                    maxHeight: '90vh',
+                    overflowY: 'auto',
+                    boxShadow: '0 10px 35px rgba(0,0,0,0.5), 0 4px 20px rgba(0,0,0,0.16)',
+                    border: '1.5px solid var(--c-bordo-barra, var(--c-border))',
+                    borderRadius: 12,
+                  }}
                   onClick={(e) => e.stopPropagation()}
                 >
                   {(() => {
@@ -15810,8 +15821,8 @@ export default function App() {
                         <div
                           style={{
                             background: tabTrasformazione === 'metamorfosi' ? 'rgba(123,79,176,0.08)' : 'rgba(46,125,50,0.08)',
-                            border: `1.5px solid ${tabTrasformazione === 'metamorfosi' ? '#7b4fb0' : '#2e7d32'}`,
-                            borderRadius: 8,
+                            border: '1.5px solid var(--c-bordo-barra, var(--c-border))',
+                            borderRadius: 10,
                             padding: '10px 12px',
                             marginBottom: 12,
                             fontSize: 11.5,
@@ -18050,18 +18061,21 @@ export default function App() {
               width: 'calc(100% - 28px)', // come la barra in alto (14 px di margine per lato)
               maxWidth: 1080,
               zIndex: 1500,
-              background: 'var(--c-panel)',
-              borderTop: '1.5px solid var(--c-bordo-barra)',
-              borderLeft: '1.5px solid var(--c-bordo-barra)',
-              borderRight: '1.5px solid var(--c-bordo-barra)',
+              background: 'color-mix(in srgb, var(--c-panel) 96%, transparent)',
+              backdropFilter: 'blur(14px) saturate(140%)',
+              WebkitBackdropFilter: 'blur(14px) saturate(140%)',
+              borderTop: '1.5px solid var(--c-bordo-barra, var(--c-border))',
+              borderLeft: '1.5px solid var(--c-bordo-barra, var(--c-border))',
+              borderRight: '1.5px solid var(--c-bordo-barra, var(--c-border))',
               borderTopLeftRadius: 12,
               borderTopRightRadius: 12,
+              boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.25), 0 -1px 4px rgba(0, 0, 0, 0.12)',
               boxSizing: 'border-box',
             }}
           >
           <div style={{ padding: '8px 12px' }}>
             {/* BARRA SUPERIORE CONTROLLI COMBAT TRACKER */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 8, paddingBottom: 6, borderBottom: `1px solid ${C.border}` }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'nowrap', overflowX: 'auto', scrollbarWidth: 'none', marginBottom: 8, paddingBottom: 6, borderBottom: `1px solid var(--c-bordo-barra, ${C.border})` }}>
               {/* Gruppo 1: Round & Turno */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
                 <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(214,169,15,0.18)', border: `1.5px solid ${C.goldDark}`, color: C.goldDark, padding: '0 9px', borderRadius: 6, fontWeight: 800, fontSize: 12, letterSpacing: 0.5, whiteSpace: 'nowrap', height: 26, boxSizing: 'border-box' }}>

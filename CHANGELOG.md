@@ -2,6 +2,15 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.1] – 2026-10-25
+
+### Modificato
+- **Uniformazione dei Bordi delle Sezioni Aperte**:
+  - Banner di Forma Selvatica e Metamorfosi attiva: sostituito il bordo verde spesso 2px con `1.5px solid var(--c-bordo-barra, var(--c-border))`, angoli arrotondati a 12px, sfondo in vetro acidato con backdrop-filter blur e ombra coordinata con la barra in alto.
+  - Combat Tracker (aperto e closed hover): uniformati i bordi da oro brillante/alone giallo a `1.5px solid var(--c-bordo-barra, var(--c-border))`, angoli superiori a 12px, sfocatura e ombra morbida verso l'alto senza bagliori dissonanti.
+  - Barra del Tiro dei dadi (`rollBar` / `.barra-tiro`) e catalogo trasformazioni: raggio uniformato a 12px e bordo allineato alla barra in alto.
+  - Stile base dei pannelli (`styles.panel`): raggio angolare elevato a 12px e bordo a 1.5px per consistenza visiva generale.
+
 ## [4.118.0] – 2026-10-25
 
 ### Aggiunto
