@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.115.1';
+const APP_VERSION = '4.115.2';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -3758,7 +3758,6 @@ export default function App() {
   const [mostraModalRitrattoBestia, setMostraModalRitrattoBestia] = useState(false);
   const [urlRitrattoBestiaInput, setUrlRitrattoBestiaInput] = useState('');
   const [tabTrasformazione, setTabTrasformazione] = useState(null); // null (popup chiuso) | 'animale' | 'metamorfosi'
-  const [mostraInfoRegoleForma, setMostraInfoRegoleForma] = useState(false); // pannello spiegazioni e regole ufficiali PHB 5e / 5e.tools per la forma selvatica
   const [azioniAltreAperte, setAzioniAltreAperte] = useState(false); // pannello "Altre opzioni" (Tattiche/Copertura/Poteri) nella sezione Azioni
   const [mostraModalAggiungiCompagno, setMostraModalAggiungiCompagno] = useState(false);
   const [filtroCompagnoCat, setFiltroCompagnoCat] = useState('tutti');
@@ -10264,14 +10263,6 @@ export default function App() {
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   <button
                     type="button"
-                    style={{ ...styles.buttonMini, background: C.panel, borderColor: '#52b788', color: '#1b4332', fontWeight: 700, fontSize: 12, padding: '5px 10px', borderRadius: 8, display: 'inline-flex', alignItems: 'center', gap: 4 }}
-                    onClick={() => setMostraModalRitrattoBestia(true)}
-                    title={lingua === 'en' ? 'Change beast portrait artwork' : 'Cambia illustrazione o carica immagine per la forma selvatica'}
-                  >
-                    <span>{lingua === 'en' ? 'Change Art' : 'Cambia Immagine'}</span>
-                  </button>
-                  <button
-                    type="button"
                     style={{ ...styles.button, background: C.panel, borderColor: C.goldDark, color: C.ink, fontWeight: 700, fontSize: 13, padding: '6px 14px', borderRadius: 8 }}
                     onClick={() => {
                       aggiorna({
@@ -15652,63 +15643,43 @@ export default function App() {
                           </span>
                           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                             <span style={{ opacity: 0.8 }}>{disp.length} {tabTrasformazione === 'metamorfosi' ? 'creature utilizzabili' : 'bestie utilizzabili'}</span>
-                            <button
-                              type="button"
-                              onClick={() => setMostraInfoRegoleForma((v) => !v)}
-                              style={{
-                                ...styles.buttonMini,
-                                fontSize: 11,
-                                padding: '2px 8px',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 4,
-                                color: tabTrasformazione === 'metamorfosi' ? '#7b4fb0' : '#2e7d32',
-                                borderColor: tabTrasformazione === 'metamorfosi' ? '#7b4fb0' : '#2e7d32',
-                                fontWeight: 600,
-                              }}
-                              title={lingua === 'en' ? 'Click to show/hide official rules from PHB / 5e.tools' : 'Clicca per mostrare/nascondere le regole ufficiali del Manuale del Giocatore'}
-                            >
-                              📖 {mostraInfoRegoleForma ? (lingua === 'en' ? 'Hide Rules' : 'Chiudi Regole') : (lingua === 'en' ? 'Official Rules' : 'Regole dal Manuale')}
-                            </button>
                           </div>
                         </div>
 
-                        {/* Riquadro Spiegazioni e Regole Ufficiali dal Manuale */}
-                        {mostraInfoRegoleForma && (
-                          <div
-                            style={{
-                              background: tabTrasformazione === 'metamorfosi' ? 'rgba(123,79,176,0.08)' : 'rgba(46,125,50,0.08)',
-                              border: `1.5px solid ${tabTrasformazione === 'metamorfosi' ? '#7b4fb0' : '#2e7d32'}`,
-                              borderRadius: 8,
-                              padding: '10px 12px',
-                              marginBottom: 12,
-                              fontSize: 11.5,
-                              lineHeight: 1.5,
-                              color: C.ink,
-                            }}
-                          >
-                            <div style={{ fontWeight: 700, color: tabTrasformazione === 'metamorfosi' ? '#7b4fb0' : '#2e7d32', marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4 }}>
-                              <span>📖 {tabTrasformazione === 'metamorfosi' ? tr('Regole Ufficiali di Metamorfosi (PHB p. 269)', 'Official Polymorph Rules (PHB p. 269)') : tr('Regole Ufficiali di Forma Selvatica (PHB p. 67 / 2024)', 'Official Wild Shape Rules (PHB p. 67 / 2024)')}</span>
-                              <span style={{ fontSize: 10, opacity: 0.8 }}>Fonti: 5e.tools · D&D Beyond · PHB</span>
-                            </div>
-                            {tabTrasformazione === 'metamorfosi' ? (
-                              <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                                <li><strong>{tr('Bersaglio e GS:', 'Target & CR:')}</strong> {tr('La nuova forma può essere una qualsiasi bestia con GS pari o inferiore al livello del bersaglio (o al suo GS se non ha livelli).', 'The new form can be any beast whose challenge rating is equal to or less than the target’s level (or CR).')}</li>
-                                <li><strong>{tr('Statistiche sostituite:', 'Game Statistics:')}</strong> {tr('Sostituisci tutte le caratteristiche del bersaglio (incluse le caratteristiche mentali INT, SAG, CAR) e le sue azioni con quelle della bestia scelta.', 'All game statistics (including mental abilities INT, WIS, CHA) and actions are replaced by those of the chosen beast.')}</li>
-                                <li><strong>{tr('Punti Ferita e 0 PF:', 'Hit Points & 0 HP:')}</strong> {tr('Assume i PF della bestia. A 0 PF ritorna alla forma normale e i danni residui si trasferiscono ai PF originari.', 'Assumes the beast’s HP. Reverts at 0 HP with excess damage transferring to base HP.')}</li>
-                                <li><strong>{tr('Incantesimi e Concentrazione:', 'Spells & Concentration:')}</strong> {tr('Il bersaglio non può lanciare incantesimi. Chi ha lanciato la metamorfosi deve mantenere la concentrazione (fino a 1 ora).', 'Target cannot cast spells. The caster must maintain concentration (up to 1 hour).')}</li>
-                              </ul>
-                            ) : (
-                              <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                                <li><strong>{tr('Durata:', 'Duration:')}</strong> {tr(`Puoi rimanere in forma selvatica per un numero di ore pari a metà del tuo livello da druido (minimo 1 ora). Ritorno come Azione Bonus.`, `You can stay in wild shape for hours equal to half your druid level (minimum 1 hour). Revert as a Bonus Action.`)}</li>
-                                <li><strong>{tr('Punti Ferita e 0 PF:', 'Hit Points & 0 HP:')}</strong> {tr('Assumi i PF e i dadi vita della bestia. Quando scendi a 0 PF ritorni alla tua forma normale e gli eventuali danni in eccesso si trasferiscono ai tuoi PF umani.', 'You assume the beast’s HP. Revert at 0 HP with excess damage transferring to normal HP.')}</li>
-                                <li><strong>{tr('Caratteristiche fisiche e mentali:', 'Ability Scores:')}</strong> {tr('Sostituisci Forza, Destrezza e Costituzione con quelli della creatura; mantieni Intelligenza, Saggezza, Carisma e tutti i tiri salvezza/abilità in cui hai competenza.', 'Replace STR, DEX, CON with the beast; retain INT, WIS, CHA and all proficiencies.')}</li>
-                                <li><strong>{tr('Lancio di Incantesimi:', 'Spellcasting:')}</strong> {tr('Non puoi lanciare nuovi incantesimi (fino al 18° liv. con Incantesimi Bestiali), ma mantieni la concentrazione attiva e puoi usare le azioni di magie già lanciate.', 'Cannot cast new spells (until lvl 18 Beast Spells), but maintain active concentration and spell actions.')}</li>
-                                <li><strong>{tr('Equipaggiamento:', 'Equipment:')}</strong> {tr('Scegli se farlo cadere a terra, fonderlo nella nuova forma (non operativo) o indossarlo se la forma lo consente.', 'Choose whether it falls to the ground, merges into your new form (inoperative), or is worn if compatible.')}</li>
-                              </ul>
-                            )}
+                        {/* Riquadro Spiegazioni e Regole Ufficiali dal Manuale (sempre in vista) */}
+                        <div
+                          style={{
+                            background: tabTrasformazione === 'metamorfosi' ? 'rgba(123,79,176,0.08)' : 'rgba(46,125,50,0.08)',
+                            border: `1.5px solid ${tabTrasformazione === 'metamorfosi' ? '#7b4fb0' : '#2e7d32'}`,
+                            borderRadius: 8,
+                            padding: '10px 12px',
+                            marginBottom: 12,
+                            fontSize: 11.5,
+                            lineHeight: 1.5,
+                            color: C.ink,
+                          }}
+                        >
+                          <div style={{ fontWeight: 700, color: tabTrasformazione === 'metamorfosi' ? '#7b4fb0' : '#2e7d32', marginBottom: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4 }}>
+                            <span>📖 {tabTrasformazione === 'metamorfosi' ? tr('Regole Ufficiali di Metamorfosi (PHB p. 269)', 'Official Polymorph Rules (PHB p. 269)') : tr('Regole Ufficiali di Forma Selvatica (PHB p. 67 / 2024)', 'Official Wild Shape Rules (PHB p. 67 / 2024)')}</span>
+                            <span style={{ fontSize: 10, opacity: 0.8 }}>Fonti: 5e.tools · D&D Beyond · PHB</span>
                           </div>
-                        )}
+                          {tabTrasformazione === 'metamorfosi' ? (
+                            <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                              <li><strong>{tr('Bersaglio e GS:', 'Target & CR:')}</strong> {tr('La nuova forma può essere una qualsiasi bestia con GS pari o inferiore al livello del bersaglio (o al suo GS se non ha livelli).', 'The new form can be any beast whose challenge rating is equal to or less than the target’s level (or CR).')}</li>
+                              <li><strong>{tr('Statistiche sostituite:', 'Game Statistics:')}</strong> {tr('Sostituisci tutte le caratteristiche del bersaglio (incluse le caratteristiche mentali INT, SAG, CAR) e le sue azioni con quelle della bestia scelta.', 'All game statistics (including mental abilities INT, WIS, CHA) and actions are replaced by those of the chosen beast.')}</li>
+                              <li><strong>{tr('Punti Ferita e 0 PF:', 'Hit Points & 0 HP:')}</strong> {tr('Assume i PF della bestia. A 0 PF ritorna alla forma normale e i danni residui si trasferiscono ai PF originari.', 'Assumes the beast’s HP. Reverts at 0 HP with excess damage transferring to base HP.')}</li>
+                              <li><strong>{tr('Incantesimi e Concentrazione:', 'Spells & Concentration:')}</strong> {tr('Il bersaglio non può lanciare incantesimi. Chi ha lanciato la metamorfosi deve mantenere la concentrazione (fino a 1 ora).', 'Target cannot cast spells. The caster must maintain concentration (up to 1 hour).')}</li>
+                            </ul>
+                          ) : (
+                            <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                              <li><strong>{tr('Durata:', 'Duration:')}</strong> {tr(`Puoi rimanere in forma selvatica per un numero di ore pari a metà del tuo livello da druido (minimo 1 ora). Ritorno come Azione Bonus.`, `You can stay in wild shape for hours equal to half your druid level (minimum 1 hour). Revert as a Bonus Action.`)}</li>
+                              <li><strong>{tr('Punti Ferita e 0 PF:', 'Hit Points & 0 HP:')}</strong> {tr('Assumi i PF e i dadi vita della bestia. Quando scendi a 0 PF ritorni alla tua forma normale e gli eventuali danni in eccesso si trasferiscono ai tuoi PF umani.', 'You assume the beast’s HP. Revert at 0 HP with excess damage transferring to normal HP.')}</li>
+                              <li><strong>{tr('Caratteristiche fisiche e mentali:', 'Ability Scores:')}</strong> {tr('Sostituisci Forza, Destrezza e Costituzione con quelli della creatura; mantieni Intelligenza, Saggezza, Carisma e tutti i tiri salvezza/abilità in cui hai competenza.', 'Replace STR, DEX, CON with the beast; retain INT, WIS, CHA and all proficiencies.')}</li>
+                              <li><strong>{tr('Lancio di Incantesimi:', 'Spellcasting:')}</strong> {tr('Non puoi lanciare nuovi incantesimi (fino al 18° liv. con Incantesimi Bestiali), ma mantieni la concentrazione attiva e puoi usare le azioni di magie già lanciate.', 'Cannot cast new spells (until lvl 18 Beast Spells), but maintain active concentration and spell actions.')}</li>
+                              <li><strong>{tr('Equipaggiamento:', 'Equipment:')}</strong> {tr('Scegli se farlo cadere a terra, fonderlo nella nuova forma (non operativo) o indossarlo se la forma lo consente.', 'Choose whether it falls to the ground, merges into your new form (inoperative), or is worn if compatible.')}</li>
+                            </ul>
+                          )}
+                        </div>
 
                         {/* Scorciatoie Forme Preferite (Accesso Rapido) */}
                         {listaPref.length > 0 && (

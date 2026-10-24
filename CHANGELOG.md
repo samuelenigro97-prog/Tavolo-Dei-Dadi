@@ -2,6 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.115.2] – 2026-10-24
+
+### Rimosso
+- **Pulsante "Cambia Immagine" nel banner Forma Selvatica**: rimosso il pulsante d'azione superfluo accanto a "Torna alla Forma Normale".
+
+### Modificato
+- **Scheda Regole Ufficiali nel Catalogo Trasformazioni**: resa sempre visibile di default all'interno del catalogo (senza dover premere il pulsante "Regole dal Manuale"), mantenendo il riquadro con bordo verde dedicato.
+
 ## [4.115.1] – 2026-10-24
 
 ### Risolto

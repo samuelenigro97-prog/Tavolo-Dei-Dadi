@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.115.2',
+    voci: {
+      it: [
+        'Forma Selvatica: rimosso il pulsante "Cambia Immagine" dal banner superiore.',
+        'Regole dal Manuale: la scheda delle regole ufficiali nel catalogo trasformazioni è ora sempre in vista di default, senza bisogno di premere pulsanti.',
+      ],
+      en: [
+        'Wild Shape: removed "Change Art" button from top banner.',
+        'Manual Rules: the official rules card in the transformation catalog is now always in view by default, no click required.',
+      ],
+    },
+  },
+  {
     versione: '4.115.1',
     voci: {
       it: [
