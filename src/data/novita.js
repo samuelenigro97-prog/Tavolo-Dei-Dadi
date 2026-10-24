@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.113.1',
+    voci: {
+      it: [
+        'Forma Selvatica: rimossa la barra PF duplicata dal banner superiore, ora gestita unicamente nel riquadro Punti Ferita.',
+        'Banner Trasformazione: visualizzazione dedicata a bonus caratteristiche, sensi, tratti speciali e azioni/attacchi della bestia.',
+      ],
+      en: [
+        'Wild Shape: removed duplicate HP bar from the top banner, now managed exclusively in the Hit Points box.',
+        'Transformation Banner: dedicated display for ability bonuses, senses, traits, and beast actions/attacks.',
+      ],
+    },
+  },
+  {
     versione: '4.113.0',
     voci: {
       it: [
