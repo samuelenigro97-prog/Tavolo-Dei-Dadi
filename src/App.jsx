@@ -9937,7 +9937,7 @@ export default function App() {
                           setMostraLevelUp(true);
                         }}
                       >
-                        <IconaUI nome="levelUp" dimensione={14} color="currentColor" />
+                        🆙
                       </button>
                       <button
                         className="btn-header-azione"
@@ -9946,7 +9946,7 @@ export default function App() {
                         title={t('tip.elimina_pg')}
                         aria-label={t('tip.elimina_pg')}
                       >
-                        <IconaUI nome="cestino" dimensione={14} color="currentColor" />
+                        🗑
                       </button>
                       <button
                         className="btn-header-azione"
@@ -9959,7 +9959,7 @@ export default function App() {
                         title={t('roll.tavolo_dadi')}
                         aria-label={t('roll.tavolo_dadi')}
                       >
-                        <IconaUI nome="dado" dimensione={14} color="currentColor" />
+                        🎲
                       </button>
                       <button
                         className="btn-header-azione"
@@ -9972,7 +9972,7 @@ export default function App() {
                         title={`${t('compendio.titolo')} (Cmd+K)`}
                         aria-label={`${t('compendio.titolo')} (Cmd+K)`}
                       >
-                        <IconaUI nome="lente" dimensione={14} color="currentColor" />
+                        🔍
                       </button>
                     </div>
 
@@ -9990,7 +9990,7 @@ export default function App() {
                         aria-label={t('tooltip.tema')}
                         onClick={() => setTema(tema === 'auto' ? 'chiaro' : tema === 'chiaro' ? 'scuro' : 'auto')}
                       >
-                        <IconaUI nome={tema === 'auto' ? 'eclissi' : tema === 'chiaro' ? 'sole' : 'luna'} dimensione={14} color="currentColor" />
+                        {tema === 'auto' ? '🌗' : tema === 'chiaro' ? '☀️' : '🌙'}
                       </button>
                       <button
                         ref={ambientazioneBtnRef}
@@ -10009,7 +10009,7 @@ export default function App() {
                         title={`${t('sez.diario')} (${(Array.isArray(scheda.diario) ? scheda.diario.length : 0)})`}
                         aria-label={t('sez.diario')}
                       >
-                        <IconaUI nome="pergamena" dimensione={14} color="currentColor" />
+                        📜
                       </button>
 
                       <button
@@ -10019,7 +10019,7 @@ export default function App() {
                         title={mappaCampagna ? (mappaAperta ? t('mappa.chiudi') : t('mappa.apri')) : t('mappa.carica')}
                         aria-label={mappaCampagna ? (mappaAperta ? t('mappa.chiudi') : t('mappa.apri')) : t('mappa.carica')}
                       >
-                        <IconaUI nome="mappa" dimensione={14} color="currentColor" />
+                        🗺️
                       </button>
                       <button
                         data-combat-toggle="true"
@@ -10037,7 +10037,7 @@ export default function App() {
                         title={(combat.attivo && combat.aperto ? t('ct.minimizza') : t('ct.apri')) + (combat.combattenti.length ? ` (${combat.combattenti.length})` : '')}
                         aria-label={t('aria.combat_tracker')}
                       >
-                        <IconaUI nome="spadeIncrociate" dimensione={14} color="currentColor" />
+                        ⚔️
                       </button>
                     </div>
                   </div>
@@ -10079,7 +10079,7 @@ export default function App() {
                           : (lingua === 'en' ? 'Sync is off: characters stay on this device only' : 'Sincronizzazione non attiva: i personaggi restano solo su questo dispositivo')}
                       aria-label={t('aria.sync')}
                     >
-                      <IconaUI nome="nuvola" dimensione={14} color="currentColor" />
+                      ☁️
                     </button>
                     <button
                       className="btn-header-azione"
@@ -10088,7 +10088,7 @@ export default function App() {
                       title={t('roll.tavolo_dadi')}
                       aria-label={t('roll.tavolo_dadi')}
                     >
-                      <IconaUI nome="dado" dimensione={14} color="currentColor" />
+                      🎲
                     </button>
                     <button
                       data-combat-toggle="true"
@@ -10112,7 +10112,7 @@ export default function App() {
                       title={combat.attivo && combat.aperto ? t('ct.minimizza') : t('ct.apri')}
                       aria-label={combat.attivo && combat.aperto ? t('ct.minimizza') : t('ct.apri')}
                     >
-                      <IconaUI nome="spadeIncrociate" dimensione={14} color="currentColor" />
+                      ⚔️
                     </button>
                     <button
                       className="btn-header-azione"
@@ -10279,32 +10279,6 @@ export default function App() {
                     {lingua === 'en' ? 'Revert to Normal Form' : 'Torna alla Forma Normale'}
                   </button>
                 </div>
-              </div>
-
-              {/* Tutte e sei le caratteristiche: quelle sostituite dalla forma
-                  (FOR/DES/COS sempre, +INT/SAG/CAR solo con la Metamorfosi)
-                  hanno le prove interattive; le tue restano in chiaro con bonus e modificatori. */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8, background: C.panel, padding: '8px 12px', borderRadius: 8, border: `1px solid ${C.border}`, textAlign: 'center', marginBottom: 10 }}>
-                {[['forza', 'FOR'], ['destrezza', 'DES'], ['costituzione', 'COS'], ['intelligenza', 'INT'], ['saggezza', 'SAG'], ['carisma', 'CAR']].map(([car, sigla]) => {
-                  const sostituita = formaAttiva.tutteLeCaratteristiche || ['forza', 'destrezza', 'costituzione'].includes(car);
-                  const val = punteggioCaratteristica(scheda, car);
-                  const mod = modificatore(val);
-                  return (
-                    <div role="button" tabIndex={0}
-                      key={car}
-                      style={{ cursor: 'pointer', padding: '4px', borderRadius: 6, transition: 'all 0.15s ease', opacity: sostituita ? 1 : 0.6 }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.05)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                      onClick={() => lanciaD20(`Prova di ${t('attr.' + car)}${sostituita ? ` (${formaAttiva.dati.nome})` : ''}`, mod, { tipoTiro: 'prova' })}
-                      title={sostituita ? `Clicca per tirare Prova di ${t('attr.' + car)}: 1d20 ${conSegno(mod)}` : `Tua: non sostituita dalla forma. Clicca per tirare Prova di ${t('attr.' + car)}: 1d20 ${conSegno(mod)}`}
-                    >
-                      <div style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', color: C.inkDim }}>{sigla} ({sostituita ? 'Forma' : 'Tua'}) 🎲</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: C.ink }}>
-                        {val} <span style={{ color: C.goldDark, fontSize: 13 }}>({conSegno(mod)})</span>
-                      </div>
-                    </div>
-                  );
-                })}
               </div>
 
               {/* Tratti Speciali & Sensi della Bestia (se presenti) */}
