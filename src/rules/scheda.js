@@ -856,7 +856,63 @@ function matchAbilitaNelTesto(abilitaKey, testo) {
 export function trovaVantaggioAbilita(scheda, abilitaKey) {
   if (!scheda || !abilitaKey) return null;
 
-  // 1. Trasformazione Attiva (Forma Bestiale o Metamorfosi)
+  // 1. Ira Barbarica (PHB: vantaggio alle prove di Forza se non in armatura pesante)
+  if (scheda.inIra && scheda.armatura?.tipo !== 'pesante') {
+    const abilDef = ABILITA.find((ab) => ab.key === abilitaKey);
+    if (abilDef?.car === 'forza') {
+      return {
+        attivo: true,
+        fonte: 'Ira Barbarica',
+        fonteEn: 'Barbarian Rage',
+        dettaglio: 'Vantaggio a tutte le prove di Forza mentre sei in Ira.',
+        tipo: 'privilegio',
+      };
+    }
+  }
+
+  // 2. Oggetti Equipaggiati nell'Inventario
+  const oggettiEquip = (Array.isArray(scheda.inventario) ? scheda.inventario : []).filter((o) => o?.equip);
+  for (const o of oggettiEquip) {
+    const nomeO = String(o.nome || '').toLowerCase();
+    const noteO = String(o.note || '').toLowerCase();
+    const effO = String(o.effettoMeccanico || '').toLowerCase();
+    const testoO = `${nomeO} ${noteO} ${effO}`;
+
+    if (abilitaKey === 'furtivita' && (testoO.includes('stivali elfici') || testoO.includes('mantello elfico') || testoO.includes('boots of elvenkind') || testoO.includes('cloak of elvenkind'))) {
+      return {
+        attivo: true,
+        fonte: o.nome,
+        dettaglio: 'Vantaggio alle prove di Furtività concesso da questo oggetto.',
+        tipo: 'oggetto',
+      };
+    }
+    if (abilitaKey === 'percezione' && (testoO.includes("occhi dell'aquila") || testoO.includes('eyes of the eagle'))) {
+      return {
+        attivo: true,
+        fonte: o.nome,
+        dettaglio: 'Vantaggio alle prove di Percezione basate sulla vista.',
+        tipo: 'oggetto',
+      };
+    }
+    if (abilitaKey === 'atletica' && (testoO.includes('guanti del nuotare') || testoO.includes('gloves of swimming'))) {
+      return {
+        attivo: true,
+        fonte: o.nome,
+        dettaglio: 'Vantaggio alle prove di Atletica per nuotare o scalare.',
+        tipo: 'oggetto',
+      };
+    }
+    if (/(vantaggio|advantage)/i.test(testoO) && matchAbilitaNelTesto(abilitaKey, testoO)) {
+      return {
+        attivo: true,
+        fonte: o.nome,
+        dettaglio: o.note || o.effettoMeccanico || 'Vantaggio concesso da oggetto equipaggiato.',
+        tipo: 'oggetto',
+      };
+    }
+  }
+
+  // 3. Trasformazione Attiva (Forma Bestiale o Metamorfosi)
   const forma = trasformazioneAttiva(scheda);
   if (forma && forma.dati) {
     const tratti = Array.isArray(forma.dati.tratti)
@@ -948,7 +1004,33 @@ export function trovaVantaggioAbilita(scheda, abilitaKey) {
 export function trovaVantaggioTiroSalvezza(scheda, carattKey) {
   if (!scheda || !carattKey) return null;
 
-  // 1. Debito Araldi (Coraggio, Debito 35 -> Saggezza contro spaventato)
+  // 1. Ira Barbarica (TS Forza mentre in ira, se non in armatura pesante)
+  if (scheda.inIra && carattKey === 'forza' && scheda.armatura?.tipo !== 'pesante') {
+    return {
+      attivo: true,
+      fonte: 'Ira Barbarica',
+      fonteEn: 'Barbarian Rage',
+      dettaglio: 'Vantaggio ai tiri salvezza su Forza mentre sei in Ira.',
+      tipo: 'privilegio',
+      condizionale: 'in ira',
+      badgeText: '🔥 Vant. Ira',
+    };
+  }
+
+  // 2. Azione di Schivata attiva nel turno (vantaggio ai TS su Destrezza)
+  if (scheda.turnoAzioni?.tatticaAttiva === 'schivata' && carattKey === 'destrezza') {
+    return {
+      attivo: true,
+      fonte: 'Azione: Schivata',
+      fonteEn: 'Action: Dodge',
+      dettaglio: 'Vantaggio ai tiri salvezza su Destrezza grazie all\'azione di Schivata.',
+      tipo: 'privilegio',
+      condizionale: 'schivata attiva',
+      badgeText: '💨 Vant. Schivata',
+    };
+  }
+
+  // 3. Debito Araldi (Coraggio, Debito 35 -> Saggezza contro spaventato)
   const soglie = soglieDebitoAttive(scheda);
   if (carattKey === 'saggezza' && soglie.coraggio) {
     return {
@@ -1071,6 +1153,40 @@ export function haVantaggioIniziativa(scheda) {
     };
   }
 
+  if (testo.includes('benedizione della veglia') || testo.includes('vigilant blessing')) {
+    return {
+      attivo: true,
+      fonte: "Benedizione della Veglia",
+      dettaglio: "Vantaggio alle prove di iniziativa.",
+      tipo: 'privilegio',
+    };
+  }
+
+  // Poteri attivi o privilegi espliciti con vantaggio all'iniziativa
+  if (Array.isArray(scheda.poteri)) {
+    for (const p of scheda.poteri) {
+      if (!p?.attivo) continue;
+      const tP = `${p.nome || ''} ${p.descrizione || ''} ${p.effetto || ''}`.toLowerCase();
+      if (/(vantaggio|advantage).*(iniziativa|initiative)/i.test(tP)) {
+        return {
+          attivo: true,
+          fonte: p.nome || 'Potere attivo',
+          dettaglio: p.effetto || p.descrizione || 'Vantaggio all\'iniziativa.',
+          tipo: 'potere',
+        };
+      }
+    }
+  }
+
+  if (/(vantaggio|advantage).*(iniziativa|initiative)/i.test(testo)) {
+    return {
+      attivo: true,
+      fonte: 'Privilegio/Tratto',
+      dettaglio: 'Vantaggio all\'iniziativa concesso da privilegi o talenti.',
+      tipo: 'privilegio',
+    };
+  }
+
   const oggetti = oggettiConEffettoAttivo(scheda);
   const armaAvv = oggetti.find((o) => /(avvertimento|warning)/i.test(o.nome || ''));
   if (armaAvv) {
@@ -1079,6 +1195,109 @@ export function haVantaggioIniziativa(scheda) {
       fonte: armaAvv.nome,
       dettaglio: "Vantaggio all'iniziativa mentre l'arma è sintonizzata e indossata.",
       tipo: 'oggetto',
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Rileva se il PG subisce svantaggio automatico su un Tiro Salvezza (es. Trattenuto su Destrezza,
+ * o armatura senza competenza su Forza e Destrezza).
+ */
+export function trovaSvantaggioTiroSalvezza(scheda, carattKey) {
+  if (!scheda || !carattKey) return null;
+
+  const condizioni = Array.isArray(scheda.condizioni) ? scheda.condizioni : (scheda.condizioni ? [scheda.condizioni] : []);
+  const condNomi = condizioni.map((c) => String(typeof c === 'string' ? c : c?.nome || '').toLowerCase());
+
+  // Trattenuto (Restrained): svantaggio ai TS su Destrezza
+  if (carattKey === 'destrezza' && condNomi.some((c) => c.includes('trattenut') || c.includes('restrained'))) {
+    return {
+      attivo: true,
+      fonte: 'Condizione: Trattenuto',
+      fonteEn: 'Condition: Restrained',
+      dettaglio: 'Svantaggio ai tiri salvezza su Destrezza.',
+      tipo: 'condizione',
+      badgeText: '⛓️ Svant. Trattenuto',
+    };
+  }
+
+  // Mancata competenza in armatura: svantaggio a TS Forza e Destrezza (PHB p. 144)
+  const tipoArm = scheda.armatura?.tipo || 'nessuna';
+  if ((carattKey === 'forza' || carattKey === 'destrezza') && !competenteInArmatura(scheda, tipoArm)) {
+    return {
+      attivo: true,
+      fonte: 'Armatura non competente',
+      fonteEn: 'Non-proficient Armor',
+      dettaglio: 'Svantaggio ai tiri salvezza di Forza e Destrezza per armatura indossata senza competenza.',
+      tipo: 'armatura',
+      badgeText: '▼ Svant. Armatura',
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Rileva se il PG gode di vantaggio automatico ai tiri per colpire (es. condizione Invisibile).
+ */
+export function trovaVantaggioAttacco(scheda, attacco = null) {
+  if (!scheda) return null;
+  const condizioni = Array.isArray(scheda.condizioni) ? scheda.condizioni : (scheda.condizioni ? [scheda.condizioni] : []);
+  const condNomi = condizioni.map((c) => String(typeof c === 'string' ? c : c?.nome || '').toLowerCase());
+
+  // Invisibile (Invisible): gli attacchi hanno vantaggio
+  if (condNomi.some((c) => c.includes('invisibil') || c.includes('invisible'))) {
+    return {
+      attivo: true,
+      fonte: 'Condizione: Invisibile',
+      fonteEn: 'Condition: Invisible',
+      dettaglio: 'Vantaggio ai tiri per colpire poiché invisibile.',
+      tipo: 'condizione',
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Rileva se il PG subisce svantaggio automatico ai tiri per colpire (es. Avvelenato, Spaventato, Prono, Accecato, Trattenuto, o armatura non competente).
+ */
+export function trovaSvantaggioAttacco(scheda, attacco = null) {
+  if (!scheda) return null;
+  const condizioni = Array.isArray(scheda.condizioni) ? scheda.condizioni : (scheda.condizioni ? [scheda.condizioni] : []);
+  const condNomi = condizioni.map((c) => String(typeof c === 'string' ? c : c?.nome || '').toLowerCase());
+
+  const condSvant = [
+    { k: 'avvelenat', en: 'poisoned', label: 'Avvelenato' },
+    { k: 'spaventat', en: 'frightened', label: 'Spaventato' },
+    { k: 'pron', en: 'prone', label: 'Prono' },
+    { k: 'accecat', en: 'blinded', label: 'Accecato' },
+    { k: 'trattenut', en: 'restrained', label: 'Trattenuto' },
+  ];
+
+  for (const cs of condSvant) {
+    if (condNomi.some((c) => c.includes(cs.k) || c.includes(cs.en))) {
+      return {
+        attivo: true,
+        fonte: `Condizione: ${cs.label}`,
+        fonteEn: `Condition: ${cs.en}`,
+        dettaglio: `Svantaggio ai tiri per colpire per la condizione ${cs.label}.`,
+        tipo: 'condizione',
+      };
+    }
+  }
+
+  // Armatura indossata senza competenza (svantaggio ai tiri per colpire con Forza o Destrezza)
+  const tipoArm = scheda.armatura?.tipo || 'nessuna';
+  if (!competenteInArmatura(scheda, tipoArm)) {
+    return {
+      attivo: true,
+      fonte: 'Armatura non competente',
+      fonteEn: 'Non-proficient Armor',
+      dettaglio: 'Svantaggio ai tiri per colpire per armatura indossata senza competenza.',
+      tipo: 'armatura',
     };
   }
 

@@ -1069,3 +1069,51 @@ test('trattiVantaggioAttaccoBestia: rileva Tattiche di Branco e Fiuto del Sangue
   assert.equal(tratti.length, 1);
   assert.equal(tratti[0].id, 'tattiche_branco');
 });
+
+test('trovaVantaggioAbilita e TS: rileva Ira Barbarica, Schivata ed equipaggiamento', async () => {
+  const { trovaVantaggioAbilita, trovaVantaggioTiroSalvezza } = await import('../src/rules/scheda.js');
+
+  // Barbaro in Ira
+  const sIra = {
+    inIra: true,
+    armatura: { tipo: 'media' },
+  };
+  assert.ok(trovaVantaggioAbilita(sIra, 'atletica'), 'Ira conferisce vantaggio ad Atletica');
+  assert.ok(trovaVantaggioTiroSalvezza(sIra, 'forza'), 'Ira conferisce vantaggio a TS Forza');
+  assert.equal(trovaVantaggioAbilita(sIra, 'acrobazia'), null);
+
+  // Schivata attiva nel turno
+  const sSchivata = {
+    turnoAzioni: { tatticaAttiva: 'schivata' },
+  };
+  const vSchiv = trovaVantaggioTiroSalvezza(sSchivata, 'destrezza');
+  assert.ok(vSchiv);
+  assert.equal(vSchiv.condizionale, 'schivata attiva');
+
+  // Oggetti equipaggiati (Stivali elfici, Occhi dell'aquila)
+  const sOggetti = {
+    inventario: [
+      { nome: 'Stivali Elfici', equip: true },
+      { nome: "Occhi dell'Aquila", equip: true },
+      { nome: 'Corda', equip: false },
+    ],
+  };
+  assert.ok(trovaVantaggioAbilita(sOggetti, 'furtivita'));
+  assert.ok(trovaVantaggioAbilita(sOggetti, 'percezione'));
+  assert.equal(trovaVantaggioAbilita(sOggetti, 'atletica'), null);
+});
+
+test('trovaVantaggioAttacco e trovaSvantaggioAttacco: rileva Invisibile, Avvelenato, Trattenuto', async () => {
+  const { trovaVantaggioAttacco, trovaSvantaggioAttacco, trovaSvantaggioTiroSalvezza } = await import('../src/rules/scheda.js');
+
+  const sInvisibile = { condizioni: ['Invisibile'] };
+  assert.ok(trovaVantaggioAttacco(sInvisibile));
+  assert.equal(trovaSvantaggioAttacco(sInvisibile), null);
+
+  const sAvvelenato = { condizioni: ['Avvelenato'] };
+  assert.ok(trovaSvantaggioAttacco(sAvvelenato));
+
+  const sTrattenuto = { condizioni: ['Trattenuto'] };
+  assert.ok(trovaSvantaggioAttacco(sTrattenuto));
+  assert.ok(trovaSvantaggioTiroSalvezza(sTrattenuto, 'destrezza'), 'Trattenuto impone svantaggio a TS Destrezza');
+});
