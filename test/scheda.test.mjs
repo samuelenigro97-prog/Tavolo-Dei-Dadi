@@ -916,3 +916,79 @@ test('coloreCategoria: Concentrazione e Rituale hanno ciascuno una tinta propria
     }
   }
 });
+
+test('trovaVantaggioAbilita: rileva vantaggi da trasformazioni attive (Aquila gigante, Lupo, Polpo)', async () => {
+  const { trovaVantaggioAbilita } = await import('../src/rules/scheda.js');
+  
+  // Aquila gigante con Vista acuta
+  const schedaAquila = {
+    formaBestiale: {
+      attiva: true,
+      nome: 'Aquila gigante',
+      tratti: ['Vista acuta: vantaggio alle prove di Percezione basate sulla vista.'],
+    },
+  };
+  const vPercezione = trovaVantaggioAbilita(schedaAquila, 'percezione');
+  assert.ok(vPercezione, 'Dovrebbe trovare vantaggio su Percezione per Aquila gigante');
+  assert.equal(vPercezione.tipo, 'forma');
+  assert.match(vPercezione.fonte, /Vista acuta/i);
+  assert.equal(trovaVantaggioAbilita(schedaAquila, 'atletica'), null);
+
+  // Polpo con Mimetismo subacqueo
+  const schedaPolpo = {
+    metamorfosi: {
+      attiva: true,
+      nome: 'Polpo',
+      tratti: ['Mimetismo subacqueo: vantaggio alle prove di Furtività sott’acqua.'],
+    },
+  };
+  const vFurtivita = trovaVantaggioAbilita(schedaPolpo, 'furtivita');
+  assert.ok(vFurtivita, 'Dovrebbe trovare vantaggio su Furtività per Polpo');
+  assert.equal(vFurtivita.tipo, 'forma');
+  assert.match(vFurtivita.fonte, /Mimetismo/i);
+});
+
+test('trovaVantaggioAbilita: rileva vantaggi da debito Araldi (Intuizione a debito 5, Percezione/Indagare a debito 15)', async () => {
+  const { trovaVantaggioAbilita } = await import('../src/rules/scheda.js');
+
+  const schedaDebito5 = {
+    risorse: [{ nome: 'Debito', attuali: 5 }],
+  };
+  assert.ok(trovaVantaggioAbilita(schedaDebito5, 'intuizione'));
+  assert.equal(trovaVantaggioAbilita(schedaDebito5, 'intuizione').tipo, 'debito');
+  assert.equal(trovaVantaggioAbilita(schedaDebito5, 'percezione'), null);
+
+  const schedaDebito15 = {
+    risorse: [{ nome: 'Debito', attuali: 15 }],
+  };
+  assert.ok(trovaVantaggioAbilita(schedaDebito15, 'intuizione'));
+  assert.ok(trovaVantaggioAbilita(schedaDebito15, 'percezione'));
+  assert.ok(trovaVantaggioAbilita(schedaDebito15, 'indagare'));
+  assert.equal(trovaVantaggioAbilita(schedaDebito15, 'atletica'), null);
+});
+
+test('trovaVantaggioTiroSalvezza: rileva debito 35 (Saggezza), Barbaro (Destrezza), Resistenza alla Magia', async () => {
+  const { trovaVantaggioTiroSalvezza } = await import('../src/rules/scheda.js');
+
+  const schedaDebito35 = {
+    risorse: [{ nome: 'Debito', attuali: 35 }],
+  };
+  const vSag = trovaVantaggioTiroSalvezza(schedaDebito35, 'saggezza');
+  assert.ok(vSag);
+  assert.equal(vSag.condizionale, 'spaventato');
+
+  const schedaBarbaro = { classe: 'Barbaro', livello: 3 };
+  const vDes = trovaVantaggioTiroSalvezza(schedaBarbaro, 'destrezza');
+  assert.ok(vDes);
+  assert.match(vDes.fonte, /Percezione del Pericolo/i);
+
+  const schedaMagia = {
+    formaBestiale: {
+      attiva: true,
+      nome: 'Creatura Magica',
+      tratti: ['Resistenza alla magia: vantaggio ai tiri salvezza contro incantesimi.'],
+    },
+  };
+  assert.ok(trovaVantaggioTiroSalvezza(schedaMagia, 'costituzione'));
+  assert.equal(trovaVantaggioTiroSalvezza(schedaMagia, 'costituzione').condizionale, 'magia');
+});
