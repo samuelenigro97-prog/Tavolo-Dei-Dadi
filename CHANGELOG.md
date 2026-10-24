@@ -2,7 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
-## [4.113.2] – 2026-10-24
+## [4.113.3] – 2026-10-24
+
+### Corretto
+- **Allineamento e collegamento totale contatori e risorse di classe**:
+  - **Ira Barbarica**: il pulsante di attivazione in Combattimento si sincronizza in tempo reale con il contatore `Ira` in `Risorse di classe` scalando l'uso e riflettendo le risorse disponibili.
+  - **Ispirazione Bardica**: il pulsante di tiro in Combattimento scala 1 uso dal contatore `Ispirazione Bardica` in `Risorse di classe` e mostra gli utilizzi rimanenti.
+  - **Punizione Divina (Smite)**: corretto il consumo dello slot incantesimo su `scheda.slotIncantesimo` al momento del colpo.
+  - **Riposo Breve per Warlock Multiclasse**: garantito il recupero degli slot di Magia del Patto (fino al 5° cerchio) anche se il Warlock è una classe secondaria nel multiclasse.
 
 ### Modificato
 - **Barra in alto a scomparsa - Ritorno alle emoticon classiche**: ripristinate le amate emoji tradizionali (`🆙`, `🗑`, `🎲`, `🔍`, `🌗`/`☀️`/`🌙`, `📜`, `🗺️`, `⚔️`, `☁️`) su tutti i pulsanti della barra superiore desktop e mobile hub.

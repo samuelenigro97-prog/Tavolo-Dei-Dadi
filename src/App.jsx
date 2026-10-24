@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.113.2';
+const APP_VERSION = '4.113.3';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -5721,14 +5721,19 @@ export default function App() {
       dannoExpr = dannoExpr ? `${dannoExpr} + ${smiteDadi.formula}` : smiteDadi.formula;
       notaExtra += ` (Smite +${smiteDadi.formula})`;
       // Se era attivo, scala lo slot se ancora disponibile
-      if (scheda.smiteSlot && scheda.slot?.[scheda.smiteSlot] > 0) {
+      const livSmite = scheda.smiteSlot || 1;
+      const slotMap = scheda.slotIncantesimo || {};
+      const curSlot = slotMap[livSmite] || { totale: 0, spesi: 0 };
+      if (curSlot.totale - (curSlot.spesi || 0) > 0) {
         aggiorna({
-          slot: {
-            ...scheda.slot,
-            [scheda.smiteSlot]: Math.max(0, (scheda.slot[scheda.smiteSlot] || 0) - 1),
+          slotIncantesimo: {
+            ...slotMap,
+            [livSmite]: { ...curSlot, spesi: (curSlot.spesi || 0) + 1 },
           },
           smiteAttivo: false,
         });
+      } else {
+        aggiorna({ smiteAttivo: false });
       }
     }
 
@@ -7859,7 +7864,7 @@ export default function App() {
                       {(() => {
                         // Il campo è `reset` ('breve' = tutti gli usi, 'breve-uno' = un uso; il lungo li dà tutti).
                         const risorseBrevi = (scheda.risorse || []).filter((r) => r.reset === 'breve' || r.reset === 'breve-uno');
-                        const isWarlock = /warlock|patto/i.test(scheda.classe || '');
+                        const isWarlock = /warlock|patto/i.test(scheda.classe || '') || (Array.isArray(scheda.multiclasse) && scheda.multiclasse.some((m) => /warlock|patto/i.test(m?.classe || '')));
                         const elenco = [
                           ...risorseBrevi.map((r) => (r.reset === 'breve-uno' ? `${traduciDato(r.nome)} (${lingua === 'en' ? '+1 use' : '+1 uso'})` : traduciDato(r.nome))),
                           ...(isWarlock ? [lingua === 'en' ? 'Pact Magic Slots' : 'Slot del Patto (Warlock)'] : []),
@@ -7880,7 +7885,7 @@ export default function App() {
                   <button
                     style={{ ...styles.buttonMini, flex: 1.5, background: 'rgba(200,140,20,0.2)', borderColor: C.goldDark, color: C.goldDark, fontWeight: 700, fontSize: 12, padding: '6px 12px' }}
                     onClick={() => {
-                      const isWarlock = /warlock|patto/i.test(scheda.classe || '');
+                      const isWarlock = /warlock|patto/i.test(scheda.classe || '') || (Array.isArray(scheda.multiclasse) && scheda.multiclasse.some((m) => /warlock|patto/i.test(m?.classe || '')));
                       setScheda((s) => ({
                         ...s,
                         risorse: risorseDopoRiposo(s.risorse, 'breve'),
@@ -12637,36 +12642,45 @@ export default function App() {
                                 )}
 
                                 {/* 2. Ira Barbarica (Barbaro) */}
-                                {ira && (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      const v = !scheda.inIra;
-                                      const ireUsate = v ? Math.min(ira.utilizziMax, (scheda.ireUsate || 0) + 1) : (scheda.ireUsate || 0);
-                                      aggiorna({ inIra: v, ireUsate });
-                                      registra({
-                                        etichetta: v ? tr('Entra in Ira', 'Enter Rage') : tr('Fine Ira', 'End Rage'),
-                                        tipo: 'tattica',
-                                        dettaglio: v
-                                          ? tr(`${scheda.nome || 'PG'} entra in Ira! (+${ira.bonusDanni} danni FOR, resistenza a contundente/perforante/tagliente, vantaggio a prove/TS FOR)`, `${scheda.nome || 'PC'} rages! (+${ira.bonusDanni} STR damage, resistance to bludgeoning/piercing/slashing, advantage on STR checks/saves)`)
-                                          : tr(`${scheda.nome || 'PG'} termina l'Ira Barbarica.`, `${scheda.nome || 'PC'} ends the Rage.`),
-                                      });
-                                    }}
-                                    style={{
-                                      ...styles.buttonMini,
-                                      fontSize: 11,
-                                      padding: '2px 7px',
-                                      fontWeight: scheda.inIra ? 700 : 500,
-                                      background: scheda.inIra ? 'rgba(239,68,68,0.2)' : 'transparent',
-                                      borderColor: scheda.inIra ? C.red : C.border,
-                                      color: scheda.inIra ? C.red : C.inkDim,
-                                      cursor: 'pointer',
-                                    }}
-                                    title={lingua === 'en' ? `Rage (+${ira.bonusDanni} STR melee damage, physical resistances)` : `Ira Barbarica (+${ira.bonusDanni} danni mischia FOR, resistenze contundente/perforante/tagliente)`}
-                                  >
-                                    {lingua === 'en' ? 'Rage' : 'Ira'} (+{ira.bonusDanni}) {scheda.inIra ? 'attiva' : `(${Math.max(0, ira.utilizziMax - (scheda.ireUsate || 0))}/${ira.utilizziMax})`}
-                                  </button>
-                                )}
+                                {ira && (() => {
+                                  const risIra = (Array.isArray(scheda.risorse) ? scheda.risorse : []).find((r) => /^(ira|rage)$/i.test(r.nome || ''));
+                                  const rimaste = risIra ? Math.max(0, Number(risIra.attuali) || 0) : Math.max(0, ira.utilizziMax - (scheda.ireUsate || 0));
+                                  const maxTot = risIra ? Math.max(1, Number(risIra.max) || ira.utilizziMax) : ira.utilizziMax;
+                                  return (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const v = !scheda.inIra;
+                                        const ireUsate = v ? Math.min(maxTot, (scheda.ireUsate || 0) + 1) : (scheda.ireUsate || 0);
+                                        const patch = { inIra: v, ireUsate };
+                                        if (v && risIra && risIra.attuali > 0) {
+                                          patch.risorse = (scheda.risorse || []).map((r) => r === risIra ? { ...r, attuali: Math.max(0, r.attuali - 1) } : r);
+                                        }
+                                        aggiorna(patch);
+                                        registra({
+                                          etichetta: v ? tr('Entra in Ira', 'Enter Rage') : tr('Fine Ira', 'End Rage'),
+                                          tipo: 'tattica',
+                                          dettaglio: v
+                                            ? tr(`${scheda.nome || 'PG'} entra in Ira! (+${ira.bonusDanni} danni FOR, resistenza a contundente/perforante/tagliente, vantaggio a prove/TS FOR)`, `${scheda.nome || 'PC'} rages! (+${ira.bonusDanni} STR damage, resistance to bludgeoning/piercing/slashing, advantage on STR checks/saves)`)
+                                            : tr(`${scheda.nome || 'PG'} termina l'Ira Barbarica.`, `${scheda.nome || 'PC'} ends the Rage.`),
+                                        });
+                                      }}
+                                      style={{
+                                        ...styles.buttonMini,
+                                        fontSize: 11,
+                                        padding: '2px 7px',
+                                        fontWeight: scheda.inIra ? 700 : 500,
+                                        background: scheda.inIra ? 'rgba(239,68,68,0.2)' : 'transparent',
+                                        borderColor: scheda.inIra ? C.red : C.border,
+                                        color: scheda.inIra ? C.red : C.inkDim,
+                                        cursor: 'pointer',
+                                      }}
+                                      title={lingua === 'en' ? `Rage (+${ira.bonusDanni} STR melee damage, physical resistances)` : `Ira Barbarica (+${ira.bonusDanni} danni mischia FOR, resistenze contundente/perforante/tagliente)`}
+                                    >
+                                      {lingua === 'en' ? 'Rage' : 'Ira'} (+{ira.bonusDanni}) {scheda.inIra ? (lingua === 'en' ? 'active' : 'attiva') : `(${rimaste}/${maxTot})`}
+                                    </button>
+                                  );
+                                })()}
 
                                 {/* 3. Punizione Divina (Paladino) */}
                                 {smite && (
@@ -12696,38 +12710,50 @@ export default function App() {
                                 )}
 
                                 {/* 4. Ispirazione Bardica (Bardo) */}
-                                {bardo && (
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      const d = tiraDado(bardo.facce);
-                                      conAnimazione(() => {
-                                        setTiro({
-                                          etichetta: 'Ispirazione Bardica',
-                                          naturale: d,
-                                          dadi: [d],
-                                          bonus: 0,
-                                          totale: d,
-                                          modalita: 'normale',
-                                        });
-                                        registra({ etichetta: 'Ispirazione Bardica', tipo: 'dadi', totale: d, dettaglio: `1${bardo.dado} [${d}]` });
-                                      }, d);
-                                    }}
-                                    style={{
-                                      ...styles.buttonMini,
-                                      fontSize: 11,
-                                      padding: '2px 7px',
-                                      fontWeight: 700,
-                                      background: 'rgba(158,75,230,0.15)',
-                                      borderColor: '#9e4be6',
-                                      color: '#9e4be6',
-                                      cursor: 'pointer',
-                                    }}
-                                    title={lingua === 'en' ? `Roll Bardic Inspiration (1${bardo.dado})` : `Tira dado Ispirazione Bardica (1${bardo.dado})`}
-                                  >
-                                    {bardo.dado} {lingua === 'en' ? 'Inspiration' : 'Ispirazione'}
-                                  </button>
-                                )}
+                                {bardo && (() => {
+                                  const risBardo = (Array.isArray(scheda.risorse) ? scheda.risorse : []).find((r) => /ispirazione\s*bardica|bardic\s*inspiration/i.test(r.nome || ''));
+                                  const rimaste = risBardo ? Math.max(0, Number(risBardo.attuali) || 0) : bardo.utilizziMax;
+                                  const maxTot = risBardo ? Math.max(1, Number(risBardo.max) || bardo.utilizziMax) : bardo.utilizziMax;
+                                  return (
+                                    <button
+                                      type="button"
+                                      disabled={rimaste <= 0}
+                                      onClick={() => {
+                                        const d = tiraDado(bardo.facce);
+                                        if (risBardo && risBardo.attuali > 0) {
+                                          aggiorna({
+                                            risorse: (scheda.risorse || []).map((r) => r === risBardo ? { ...r, attuali: Math.max(0, r.attuali - 1) } : r),
+                                          });
+                                        }
+                                        conAnimazione(() => {
+                                          setTiro({
+                                            etichetta: 'Ispirazione Bardica',
+                                            naturale: d,
+                                            dadi: [d],
+                                            bonus: 0,
+                                            totale: d,
+                                            modalita: 'normale',
+                                          });
+                                          registra({ etichetta: 'Ispirazione Bardica', tipo: 'dadi', totale: d, dettaglio: `1${bardo.dado} [${d}]` });
+                                        }, d);
+                                      }}
+                                      style={{
+                                        ...styles.buttonMini,
+                                        fontSize: 11,
+                                        padding: '2px 7px',
+                                        fontWeight: 700,
+                                        background: rimaste > 0 ? 'rgba(158,75,230,0.15)' : 'transparent',
+                                        borderColor: rimaste > 0 ? '#9e4be6' : C.border,
+                                        color: rimaste > 0 ? '#9e4be6' : C.inkDim,
+                                        cursor: rimaste > 0 ? 'pointer' : 'not-allowed',
+                                        opacity: rimaste > 0 ? 1 : 0.5,
+                                      }}
+                                      title={lingua === 'en' ? `Roll Bardic Inspiration (1${bardo.dado}, ${rimaste}/${maxTot} left)` : `Tira dado Ispirazione Bardica (1${bardo.dado}, ${rimaste}/${maxTot} rimasti)`}
+                                    >
+                                      {bardo.dado} {lingua === 'en' ? 'Inspiration' : 'Ispirazione'} ({rimaste}/{maxTot})
+                                    </button>
+                                  );
+                                })()}
 
                                 {/* 5. Ispirazione Eroica */}
                                 <button
