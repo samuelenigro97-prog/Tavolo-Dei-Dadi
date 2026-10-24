@@ -9,7 +9,7 @@ import { styles, GLOBAL_CSS } from './ui/stili.js';
 import { Editable, Rollable, iconaTipoDanno, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, caratteristicaDaTesto, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
 import { IconaAzione, IconaRunica, IconaOggetto, IconaUI, rimuoviEmoji, IconaModalInfo } from './ui/IconaFantasy.jsx';
-import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, estraiTipoDannoBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, attaccoIncantesimoAttivo, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo, trovaVantaggioAbilita, trovaVantaggioTiroSalvezza, trovaSvantaggioAbilita, calcolaPunteggioPassivo, haVantaggioIniziativa, trattiVantaggioAttaccoBestia } from './rules/scheda.js';
+import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, estraiTipoDannoBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, attaccoIncantesimoAttivo, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo, trovaVantaggioAbilita, trovaVantaggioTiroSalvezza, trovaSvantaggioAbilita, trovaSvantaggioTiroSalvezza, trovaVantaggioAttacco, trovaSvantaggioAttacco, calcolaPunteggioPassivo, haVantaggioIniziativa, trattiVantaggioAttaccoBestia } from './rules/scheda.js';
 import { normalizzaTrascrizione } from './rules/importSchede.js';
 import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } from "./data/esempi.js";
 import { fixEquipaggiamentoVaelion, migrazioneRegoleVaelion, autoIdratazionePersonaggioPredefinito } from './data/migrazioniPersonaggi.js';
@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.117.0';
+const APP_VERSION = '4.118.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -5574,12 +5574,28 @@ export default function App() {
     // secondo la regola 5e: vantaggio+svantaggio insieme = tiro normale).
     const sfin = tipoTiro ? effettiSfinimento(scheda) : null;
     const penSfinimento = sfin ? sfin.penalitaD20 : 0;
-    const forzaSvantaggio = !!sfin && (
+
+    // Rilevamento automatico condizioni per attacchi e tiri salvezza
+    let modCondizione = undefined;
+    if (!restExtra.modalitaForzata && tipoTiro === 'attacco') {
+      const vAtt = trovaVantaggioAttacco(scheda, restExtra.attacco);
+      const sAtt = trovaSvantaggioAttacco(scheda, restExtra.attacco);
+      if (vAtt && sAtt) modCondizione = 'normale';
+      else if (vAtt) modCondizione = 'vantaggio';
+      else if (sAtt) modCondizione = 'svantaggio';
+    }
+
+    const sTsCond = (!restExtra.modalitaForzata && tipoTiro === 'salvezza' && restExtra.carattKey)
+      ? trovaSvantaggioTiroSalvezza(scheda, restExtra.carattKey)
+      : null;
+
+    const forzaSvantaggio = (!!sfin && (
       (tipoTiro === 'prova' && sfin.svantaggioProve) ||
       ((tipoTiro === 'attacco' || tipoTiro === 'salvezza') && sfin.svantaggioAttacchiSalvezza)
-    );
+    )) || (!!sTsCond) || (modCondizione === 'svantaggio');
+
     const bonusEff = bonus - penSfinimento;
-    const modalitaBase = restExtra.modalitaForzata || modalita;
+    const modalitaBase = restExtra.modalitaForzata || (modCondizione === 'vantaggio' ? 'vantaggio' : modCondizione === 'normale' ? 'normale' : modalita);
     const modalitaUsata = modalitaEffettiva(modalitaBase, forzaSvantaggio);
     const { naturale, dadi } = tiraD20(modalitaUsata);
     const sogliaCrit = (() => {
@@ -11948,7 +11964,7 @@ export default function App() {
                           padding: tsMancante ? '2px 4px' : styles.skillRow(true).padding,
                         }}
                         title={tsMancante ? `${tsMancante.testo} (clicca per tirare, clicca sul pallino per impostare)` : `Tieni premuto e rilascia: tiro salvezza di ${t('attr.' + key)} · click sul pallino: competenza`}
-                        onRoll={() => lanciaD20(`Tiro salvezza: ${t('attr.' + key)}`, bonusTS, { tipoTiro: 'salvezza' })}
+                        onRoll={() => lanciaD20(`Tiro salvezza: ${t('attr.' + key)}`, bonusTS, { tipoTiro: 'salvezza', carattKey: key })}
                       >
                         <span
                           style={styles.dot(scheda.tiriSalvezza[key] ? 1 : 0)}
@@ -11994,11 +12010,43 @@ export default function App() {
                               onPointerDown={(e) => e.stopPropagation()}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                lanciaD20(`Tiro salvezza: ${t('attr.' + key)} (${vInfoTs.condizionale || vInfoTs.fonte})`, bonusTS, { tipoTiro: 'salvezza', modalitaForzata: 'vantaggio' });
+                                lanciaD20(`Tiro salvezza: ${t('attr.' + key)} (${vInfoTs.condizionale || vInfoTs.fonte})`, bonusTS, { tipoTiro: 'salvezza', carattKey: key, modalitaForzata: 'vantaggio' });
                               }}
                               title={`${titoloTs} · ${lingua === 'en' ? 'Click to roll save with Advantage' : 'Clicca per tirare subito il TS con Vantaggio'}`}
                             >
                               {vInfoTs.badgeText || '▲ Vant.'} 🎲
+                            </span>
+                          );
+                        })()}
+                        {(() => {
+                          const sInfoTs = trovaSvantaggioTiroSalvezza(scheda, key);
+                          if (!sInfoTs) return null;
+                          return (
+                            <span
+                              style={{
+                                fontSize: 10,
+                                fontWeight: 700,
+                                padding: '0 5px',
+                                borderRadius: 4,
+                                background: 'rgba(231,76,60,0.12)',
+                                color: C.red,
+                                border: `1px solid ${C.red}`,
+                                marginLeft: 4,
+                                whiteSpace: 'nowrap',
+                                lineHeight: '14px',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                cursor: 'pointer',
+                                gap: 2,
+                              }}
+                              onPointerDown={(e) => e.stopPropagation()}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                lanciaD20(`Tiro salvezza: ${t('attr.' + key)} (${sInfoTs.fonte})`, bonusTS, { tipoTiro: 'salvezza', carattKey: key, modalitaForzata: 'svantaggio' });
+                              }}
+                              title={`${sInfoTs.fonte} (${sInfoTs.dettaglio}) · ${lingua === 'en' ? 'Click to roll save with Disadvantage' : 'Clicca per tirare subito il TS con Svantaggio'}`}
+                            >
+                              {sInfoTs.badgeText || '▼ Svant.'} 🎲
                             </span>
                           );
                         })()}
