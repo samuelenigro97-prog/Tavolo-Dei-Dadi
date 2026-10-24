@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.115.1',
+    voci: {
+      it: [
+        'Deploy Automatico Immediato: abilitata la pubblicazione diretta su GitHub Pages a ogni rilascio e stabilizzato il test CI del rate limiter.',
+      ],
+      en: [
+        'Immediate Auto-Deploy: enabled direct GitHub Pages deploy on every release and stabilized CI rate limiter test.',
+      ],
+    },
+  },
+  {
     versione: '4.115.0',
     voci: {
       it: [
