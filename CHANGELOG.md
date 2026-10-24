@@ -2,6 +2,16 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.112.4] – 2026-10-24
+
+### Modificato
+- **Azioni e attacchi della bestia in Forma Selvatica**: disposti su griglia a due colonne responsive (`repeat(auto-fit, minmax(280px, 1fr))`), mantenendo le azioni descrittive o a piena descrizione (es. Attacco Multiplo) a tutta larghezza.
+- **Badge Tiro Salvezza (CD)**: spostato dalla testata della scheda della bestia direttamente sulla riga delle azioni di attacco, allineato con "Tiro per colpire" e "Danni", sia nella scheda principale sia nel modal di dettaglio bestia.
+- **Taglia del personaggio**: rimosso il badge ridondante `[Bestia]` / `[Metamorfosi]` accanto alla taglia.
+- **Allineamento reazioni nella tabella combattimento**: rimosso il pulsante rosso `[ ✕ ]` dalle righe di reazione per mantenere un perfetto allineamento verticale dei tasti `[ Usa ]`.
+- **Anagrafica profilo**: rimosso `overflow-wrap: anywhere;` per impedire la sillabazione errata a metà parola (es. `BACKGROUN-D`, `Gran-de`), impostando `white-space: nowrap` sulle etichette e `overflow-wrap: break-word` sui valori.
+- **Araldi del Segreto**: rimosso il pulsante modifica `✎` accanto ai privilegi di campagna per evitare caratteri spuri.
+
 ## [4.112.3] – 2026-10-21
 
 ### Modificato
