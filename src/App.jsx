@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.114.0';
+const APP_VERSION = '4.114.1';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -10289,7 +10289,7 @@ export default function App() {
 
               {/* Tratti Speciali & Sensi della Bestia (se presenti) */}
               {((formaAttiva.dati.tratti && formaAttiva.dati.tratti.length > 0) || formaAttiva.dati.sensi) && (
-                <div style={{ marginBottom: 10, background: 'rgba(0,0,0,0.02)', padding: '6px 10px', borderRadius: 6, border: `1px dashed ${C.border}` }}>
+                <div style={{ background: 'rgba(0,0,0,0.02)', padding: '6px 10px', borderRadius: 6, border: `1px dashed ${C.border}` }}>
                   {formaAttiva.dati.sensi && (
                     <div style={{ fontSize: 12, color: C.inkDim, marginBottom: (formaAttiva.dati.tratti && formaAttiva.dati.tratti.length > 0) ? 4 : 0 }}>
                       <strong>{lingua === 'en' ? 'Senses' : 'Sensi'}:</strong> {formaAttiva.dati.sensi}
@@ -10300,112 +10300,6 @@ export default function App() {
                       <em>{typeof tratto === 'string' ? tratto : tratto.nome}</em>
                     </div>
                   ))}
-                </div>
-              )}
-
-              {/* Azioni & Attacchi della Bestia */}
-              {formaAttiva.dati.azioni && formaAttiva.dati.azioni.length > 0 && (
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 800, color: C.goldDark, marginBottom: 6 }}>
-                    {lingua === 'en' ? 'Beast actions and attacks' : 'Azioni e attacchi della bestia'}
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 8 }}>
-                    {formaAttiva.dati.azioni.map((azRaw, idx) => {
-                      const az = parseAzioneBestia(azRaw);
-                      const hasAzioniRapide = az.bonus != null || az.danno != null || az.cd != null;
-                      const spanTutto = !hasAzioniRapide;
-                      return (
-                        <div
-                          key={idx}
-                          style={{
-                            gridColumn: spanTutto ? '1 / -1' : undefined,
-                            fontSize: 13,
-                            padding: '8px 10px',
-                            background: C.panel,
-                            border: `1px solid ${C.border}`,
-                            borderRadius: 8,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: 5,
-                            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                          }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'wrap' }}>
-                            <span style={{ fontWeight: 800, color: C.ink, fontSize: 13 }}>
-                              {az.nome}
-                            </span>
-                          </div>
-                          {az.desc && (
-                            <div style={{ fontSize: 12, color: C.ink, lineHeight: 1.4 }}>
-                              {az.desc}
-                            </div>
-                          )}
-                          {(az.bonus != null || az.danno || az.cd != null) && (
-                            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginTop: 2, borderTop: `1px dashed ${C.border}`, paddingTop: 6 }}>
-                              {az.bonus != null && (
-                                <button
-                                  type="button"
-                                  style={{
-                                    ...styles.button,
-                                    fontSize: 12,
-                                    padding: '4px 10px',
-                                    borderRadius: 6,
-                                    fontWeight: 800,
-                                    borderColor: coloreCategoria('attacco', notteAttiva),
-                                    color: coloreCategoria('attacco', notteAttiva),
-                                    background: `${coloreCategoria('attacco', notteAttiva)}1f`,
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: 4,
-                                  }}
-                                  onClick={() => {
-                                    lanciaD20(tr(`Attacco (${formaAttiva.dati.nome}): ${az.nome}`, `Attack (${formaAttiva.dati.nome}): ${az.nome}`), az.bonus, {
-                                      attacco: {
-                                        nome: `${formaAttiva.dati.nome}: ${az.nome}`,
-                                        danno: az.danno,
-                                      },
-                                      suono: 'arma',
-                                      tipoTiro: 'attacco',
-                                    });
-                                  }}
-                                  title={tr(`Tira per colpire: 1d20 ${conSegno(az.bonus)}`, `Attack roll: 1d20 ${conSegno(az.bonus)}`)}
-                                >
-                                  <span>{lingua === 'en' ? 'Attack Roll' : 'Tiro per Colpire'} ({conSegno(az.bonus)})</span>
-                                </button>
-                              )}
-                              {az.danno && (
-                                <button
-                                  type="button"
-                                  style={{
-                                    ...styles.button,
-                                    fontSize: 12,
-                                    padding: '4px 10px',
-                                    borderRadius: 6,
-                                    fontWeight: 800,
-                                    borderColor: C.red,
-                                    color: C.red,
-                                    background: 'transparent',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: 4,
-                                  }}
-                                  onClick={() => {
-                                    lanciaDanniDiretti(tr(`Danni (${formaAttiva.dati.nome}): ${az.nome}`, `Damage (${formaAttiva.dati.nome}): ${az.nome}`), az.danno);
-                                  }}
-                                  title={tr(`Tira danni: ${az.danno}`, `Roll damage: ${az.danno}`)}
-                                >
-                                  <span>{lingua === 'en' ? 'Damage' : 'Danni'} ({az.danno})</span>
-                                </button>
-                              )}
-                              {az.cd != null && (
-                                <BadgeTiroSalvezza cd={az.cd} caratteristica={caratteristicaDaTesto(az.desc || az.testoOriginale)} colore={coloreCategoria('tiroSalvezza', notteAttiva)} />
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
                 </div>
               )}
             </div>
@@ -10506,21 +10400,6 @@ export default function App() {
                           <div style={{ position: 'absolute', top: 6, right: 6, zIndex: 3, background: 'rgba(8, 28, 21, 0.92)', color: '#d8f3dc', border: '1px solid #52b788', borderRadius: 6, fontSize: 11, fontWeight: 800, padding: '2px 6px', textTransform: 'uppercase', letterSpacing: 0.5, boxShadow: '0 2px 6px rgba(0,0,0,0.4)' }}>
                             {campoForma === 'metamorfosi' ? '🔮' : '🐾'} {campoForma === 'metamorfosi' ? (lingua === 'en' ? 'Polymorph' : 'Metamorfosi') : (lingua === 'en' ? 'Beast' : 'Bestia')}
                           </div>
-                          <button
-                            type="button"
-                            style={{
-                              position: 'absolute', top: 6, left: 6, zIndex: 3,
-                              background: 'rgba(8, 28, 21, 0.9)', color: '#d8f3dc',
-                              border: '1px solid #52b788', borderRadius: 6, fontSize: 11,
-                              fontWeight: 800, padding: '2px 6px', cursor: 'pointer',
-                              display: 'flex', alignItems: 'center', gap: 3,
-                              boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
-                            }}
-                            onClick={(e) => { e.stopPropagation(); setMostraModalRitrattoBestia(true); }}
-                            title={tr('Cambia immagine o illustrazione della forma selvatica', 'Change the image or art of the wild shape')}
-                          >
-                            <span>{lingua === 'en' ? 'Art' : 'Arte'}</span>
-                          </button>
                         </div>
                       ) : (
                         scheda.ritratto ? (
