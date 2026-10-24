@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.1',
+    voci: {
+      it: [
+        'Bordi Uniformati: le sezioni aperte (banner Forma Selvatica e Metamorfosi, Combat Tracker fisso, popup trasformazioni e barra tiro) hanno ora bordi, raggio (12px), sfocatura e ombre perfettamente allineati alla barra di navigazione superiore.',
+      ],
+      en: [
+        'Unified Borders: open sections (active Wild Shape / Polymorph banner, fixed Combat Tracker, transformations popup and roll bar) now feature borders, radius (12px), blur and shadows perfectly matching the top navigation bar.',
+      ],
+    },
+  },
+  {
     versione: '4.118.0',
     voci: {
       it: [
