@@ -2,6 +2,13 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.2] – 2026-10-25
+
+### Modificato
+- **Nome file backup roster chiaro ed esplicito**:
+  - Sostituita la sigla tecnica contratta (`AAAAMMGG_TDD_ALL_vX.X.json`) con un formato parlante e pulito: `Backup Tavolo dei Dadi (AAAA-MM-GG).json` (es. `Backup Tavolo dei Dadi (2026-10-25).json`).
+  - Anche i download di risoluzione conflitti sincronizzazione usano ora la dicitura pulita `Backup Tavolo dei Dadi - <etichetta> (AAAA-MM-GG).json`.
+
 ## [4.118.1] – 2026-10-25
 
 ### Modificato

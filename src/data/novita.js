@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.2',
+    voci: {
+      it: [
+        'Nome File di Backup Roster Chiaro: il file scaricato dal backup completo si chiama ora "Backup Tavolo dei Dadi (AAAA-MM-GG).json", immediatamente riconoscibile ed esplicito in qualsiasi cartella.',
+      ],
+      en: [
+        'Clear Roster Backup Filename: the exported full backup file is now named "Backup Tavolo dei Dadi (YYYY-MM-DD).json", immediately clear and readable in any folder.',
+      ],
+    },
+  },
+  {
     versione: '4.118.1',
     voci: {
       it: [
