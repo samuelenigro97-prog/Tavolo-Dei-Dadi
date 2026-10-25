@@ -3,9 +3,10 @@ import { styles } from '../stili.js';
 import { C } from '../tema.js';
 import { t } from '../../i18n';
 import { modificatore } from '../../rules/dadi.js';
-import { punteggioCaratteristica } from '../../rules/scheda.js';
+import { punteggioCaratteristica, calcolaStatoCombat } from '../../rules/scheda.js';
 
 export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, combat, controlliAttivi, daNotificare, eliminaPersonaggio, lingua, mappaAperta, mappaCampagna, mappaRef, mostraPannelloAudio, scheda, setBozzaCrea, setCloudStatus, setCombat, setLevelUpBozza, setLingua, setMappaAperta, setMostraCloud, setMostraCompendio, setMostraCrea, setMostraDadiModal, setMostraDiarioModal, setMostraLevelUp, setMostraMenu, setMostraMenuEsporta, setMostraMenuHubMobile, setMostraPannelloAudio, setPosEsporta, setPosPannelloAudio, setSyncCodiceStatus, setTema, statoBgCloud, statoColoreCloud, statoGlowCloud, tema }) {
+  const statoCombat = calcolaStatoCombat(combat);
   return (
     <div
       className="modal-backdrop"
@@ -297,7 +298,24 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
             <button
               type="button"
               data-combat-toggle="true"
-              style={{ ...styles.button, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 8, padding: '10px 12px', fontSize: 13, fontWeight: 700, borderRadius: 8, background: combat.attivo && combat.aperto ? 'rgba(201,162,39,0.18)' : C.panelLight, border: `1px solid ${C.border}`, color: C.ink }}
+              style={{
+                ...styles.button,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                gap: 8,
+                padding: '10px 12px',
+                fontSize: 13,
+                fontWeight: 700,
+                borderRadius: 8,
+                background: combat.attivo && combat.aperto
+                  ? 'rgba(46, 157, 77, 0.15)'
+                  : combat.attivo
+                  ? 'rgba(201, 162, 39, 0.18)'
+                  : C.panelLight,
+                border: `1px solid ${combat.attivo && combat.aperto ? 'var(--c-green, #2e9d4d)' : combat.attivo ? 'var(--c-gold, #c9a227)' : C.border}`,
+                color: C.ink,
+              }}
               onClick={() => {
                 if (combat.attivo && combat.aperto) setCombat((c) => ({ ...c, aperto: false }));
                 else if (combat.combattenti.length) setCombat((c) => ({ ...c, attivo: true, aperto: true }));
@@ -305,8 +323,27 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 setMostraMenuHubMobile(false);
               }}
             >
+              <span
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  background: statoCombat.colore,
+                  boxShadow: statoCombat.glow,
+                  display: 'inline-block',
+                  flexShrink: 0,
+                  transition: 'background 0.25s ease, box-shadow 0.25s ease',
+                }}
+              />
               <span style={{ fontSize: 16 }}>⚔️</span>
               <span>{lingua === 'en' ? 'Combat' : 'Combattimento'}</span>
+              <span style={{ fontSize: 11, marginLeft: 'auto', opacity: 0.7, fontWeight: 500 }}>
+                {!combat.attivo
+                  ? (lingua === 'en' ? 'Inactive' : 'Disattivo')
+                  : combat.aperto
+                  ? (lingua === 'en' ? 'Open' : 'Aperto')
+                  : (lingua === 'en' ? 'Minimized' : 'Minimizzato')}
+              </span>
             </button>
           </div>
         </div>

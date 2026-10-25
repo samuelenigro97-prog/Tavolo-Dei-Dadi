@@ -2768,10 +2768,12 @@ tbody tr:hover {
   position: absolute;
   top: 3px;
   right: 3px;
-  width: 6px;
-  height: 6px;
+  width: 6.5px;
+  height: 6.5px;
   border-radius: 50%;
   background: var(--stato-pallino, transparent);
+  box-shadow: var(--stato-glow, none);
+  transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
 }
 /* Il contorno di focus da tastiera della barra è neutro, non dorato: il doppio anello dorato

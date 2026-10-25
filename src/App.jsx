@@ -9,7 +9,7 @@ import { styles, GLOBAL_CSS } from './ui/stili.js';
 import { Editable, Rollable, iconaTipoDanno, BadgeTiroColpire, BadgeTiroDanno, BadgeTiroSalvezza, caratteristicaDaTesto, CampoModulo, CampoConTendina, CampoTendina, AreaTesto, ListaQuadratini, estraiVociLista, Sezione, CampoBloccato, formattaVoceConIcona } from './ui/componenti.jsx';
 import { SezionePoteri, BadgePotere } from './ui/PoteriSezione.jsx';
 import { IconaAzione, IconaRunica, IconaOggetto, IconaUI, rimuoviEmoji, IconaModalInfo } from './ui/IconaFantasy.jsx';
-import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, estraiTipoDannoBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, attaccoIncantesimoAttivo, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo, trovaVantaggioAbilita, trovaVantaggioTiroSalvezza, trovaSvantaggioAbilita, trovaSvantaggioTiroSalvezza, trovaVantaggioAttacco, trovaSvantaggioAttacco, calcolaPunteggioPassivo, haVantaggioIniziativa, trattiVantaggioAttaccoBestia } from './rules/scheda.js';
+import { caTotale, competenteInArmatura, bonusAbilita, bonusTiroSalvezza, bonusClasseArmaturaOggetti, bonusTiriSalvezzaOggetti, oggettiConEffettoAttivo, punteggioCaratteristica, formattaNomePg, formattaTitoloVoce, tagliaEffettiva, parseAzioneBestia, estraiTipoDannoBestia, MOLTIPLICATORI_TAGLIA, SPAZIO_TAGLIA_5E, LOTTA_MAX_TAGLIA_5E, bonusCopertura, TIPI_COPERTURA_5E, analizzaArmaVersatileEPortata, alternaImpugnaturaVersatile, analizzaMunizioniArma, estraiCategorieNota, coloreCategoria, separaNotaIncantesimo, esitoDannoPf0, attaccoIncantesimoAttivo, patchTransizionePf, cdConcentrazione, difesaControDanno, dannoConDifesa, iniziativaTotale, pfMassimiEffettivi, effettiSfinimento, trasformazioneAttiva, dadiVitaRecuperatiRiposoLungo, trovaVantaggioAbilita, trovaVantaggioTiroSalvezza, trovaSvantaggioAbilita, trovaSvantaggioTiroSalvezza, trovaVantaggioAttacco, trovaSvantaggioAttacco, calcolaPunteggioPassivo, haVantaggioIniziativa, trattiVantaggioAttaccoBestia, calcolaStatoCombat } from './rules/scheda.js';
 import { normalizzaTrascrizione } from './rules/importSchede.js';
 import { FLYORA_JSON, VAELION_JSON, ELEVORN_JSON, WENDELL_JSON, LYRIAN_JSON } from "./data/esempi.js";
 import { fixEquipaggiamentoVaelion, migrazioneRegoleVaelion, autoIdratazionePersonaggioPredefinito } from './data/migrazioniPersonaggi.js';
@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.118.4';
+const APP_VERSION = '4.118.5';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4136,6 +4136,20 @@ export default function App() {
       : isCloudConfigurato
         ? '0 0 6px rgba(245, 158, 11, 0.25)'
         : '0 0 6px rgba(239, 68, 68, 0.25)';
+
+  // Stato bollino Combat Tracker: verde se aperto, oro se minimizzato, rosso se disattivo (non in fight)
+  const statoCombatInfo = calcolaStatoCombat(combat);
+  const statoColoreCombat = statoCombatInfo.colore;
+  const statoGlowCombat = statoCombatInfo.glow;
+  const tooltipCombat = !combat.attivo
+    ? (lingua === 'en' ? 'Combat inactive (click to start)' : 'Combattimento non attivo (clicca per avviare)')
+    : combat.aperto
+    ? (lingua === 'en'
+        ? `Combat tracker open${combat.combattenti.length ? ` (${combat.combattenti.length})` : ''} — click to minimize`
+        : `Combat tracker aperto${combat.combattenti.length ? ` (${combat.combattenti.length})` : ''} — clicca per ridurre a icona`)
+    : (lingua === 'en'
+        ? `Combat in progress${combat.combattenti.length ? ` (${combat.combattenti.length})` : ''} — click to open`
+        : `Combattimento in corso${combat.combattenti.length ? ` (${combat.combattenti.length})` : ''} — clicca per aprire`);
 
   // Level Up
   const [mostraLevelUp, setMostraLevelUp] = useState(false);
@@ -10086,16 +10100,16 @@ export default function App() {
                         className="btn-header-azione btn-con-stato"
                         style={{
                           ...btnAzione,
-                          // Combattimento in corso: pallino oro (fondo e bordo restano quelli della barra).
-                          '--stato-pallino': combat.attivo ? 'var(--c-gold)' : 'transparent',
+                          '--stato-pallino': statoColoreCombat,
+                          '--stato-glow': statoGlowCombat,
                         }}
                         onClick={() => {
                           if (combat.attivo && combat.aperto) setCombat((c) => ({ ...c, aperto: false }));
                           else if (combat.combattenti.length) setCombat((c) => ({ ...c, attivo: true, aperto: true }));
                           else aggiungiPgAlCombat();
                         }}
-                        title={(combat.attivo && combat.aperto ? t('ct.minimizza') : t('ct.apri')) + (combat.combattenti.length ? ` (${combat.combattenti.length})` : '')}
-                        aria-label={t('aria.combat_tracker')}
+                        title={tooltipCombat}
+                        aria-label={tooltipCombat}
                       >
                         ⚔️
                       </button>
@@ -10162,15 +10176,16 @@ export default function App() {
                         minHeight: 28,
                         maxHeight: 28,
                         fontSize: 13,
-                        '--stato-pallino': combat.attivo ? 'var(--c-gold)' : 'transparent',
+                        '--stato-pallino': statoColoreCombat,
+                        '--stato-glow': statoGlowCombat,
                       }}
                       onClick={() => {
                         if (combat.attivo && combat.aperto) setCombat((c) => ({ ...c, aperto: false }));
                         else if (combat.combattenti.length) setCombat((c) => ({ ...c, attivo: true, aperto: true }));
                         else aggiungiPgAlCombat();
                       }}
-                      title={combat.attivo && combat.aperto ? t('ct.minimizza') : t('ct.apri')}
-                      aria-label={combat.attivo && combat.aperto ? t('ct.minimizza') : t('ct.apri')}
+                      title={tooltipCombat}
+                      aria-label={tooltipCombat}
                     >
                       ⚔️
                     </button>
@@ -12876,16 +12891,34 @@ export default function App() {
                       padding: '2px 8px',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: 4,
-                      background: combat.attivo ? 'rgba(212, 160, 23, 0.18)' : 'transparent',
-                      borderColor: combat.attivo ? 'var(--c-gold, #d4a017)' : C.border,
-                      color: combat.attivo ? 'var(--c-gold-dark, #b8860b)' : C.inkDim,
+                      gap: 6,
+                      background: combat.attivo
+                        ? (combat.aperto ? 'rgba(46, 157, 77, 0.15)' : 'rgba(212, 160, 23, 0.18)')
+                        : 'transparent',
+                      borderColor: combat.attivo
+                        ? (combat.aperto ? 'var(--c-green, #2e9d4d)' : 'var(--c-gold, #d4a017)')
+                        : C.border,
+                      color: combat.attivo
+                        ? (combat.aperto ? 'var(--c-green, #2e9d4d)' : 'var(--c-gold-dark, #b8860b)')
+                        : C.inkDim,
                       fontWeight: combat.attivo ? 700 : 500,
                       cursor: 'pointer',
                     }}
-                    title={combat.attivo && combat.aperto ? t('ct.minimizza') : t('ct.apri')}
+                    title={tooltipCombat}
                   >
-                    <IconaUI nome="spadeIncrociate" dimensione={13} color={combat.attivo ? 'var(--c-gold, #d4a017)' : 'currentColor'} />
+                    <span
+                      style={{
+                        width: 7,
+                        height: 7,
+                        borderRadius: '50%',
+                        background: statoColoreCombat,
+                        boxShadow: statoGlowCombat,
+                        display: 'inline-block',
+                        flexShrink: 0,
+                        transition: 'background 0.25s ease, box-shadow 0.25s ease',
+                      }}
+                    />
+                    <IconaUI nome="spadeIncrociate" dimensione={13} color={combat.attivo ? (combat.aperto ? 'var(--c-green, #2e9d4d)' : 'var(--c-gold, #d4a017)') : 'currentColor'} />
                     <span>Combat Tracker</span>
                     {combat.attivo && (
                       <span style={{ fontSize: 9, opacity: 0.8 }}>{combat.aperto ? '▼' : '▲'}</span>

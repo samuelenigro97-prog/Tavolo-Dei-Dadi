@@ -2,6 +2,17 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.5] – 2026-10-25
+
+### Aggiunto
+- **Bollino di stato dinamico per il Combat Tracker**:
+  - L'icona delle spade incrociate (`⚔️`) nella barra superiore (desktop e mobile), nel menu Hub mobile e nella sezione attacchi della scheda ha ora un bollino di stato semaforico:
+    - 🟢 **Verde** (`var(--c-green)`): quando il combat tracker è aperto e attivo a schermo.
+    - 🟡 **Oro/Giallo** (`var(--c-gold)`): quando il combattimento è in corso ma il tracker è ridotto a icona/minimizzato.
+    - 🔴 **Rosso** (`var(--c-red)`): quando il combattimento è disattivo (cioè non si è in combattimento).
+  - Aggiunto alone delicato coordinato (`--stato-glow`) e transizione morbida al cambio di stato.
+  - Tooltip informativo aggiornato per indicare lo stato esatto al passaggio del mouse.
+
 ## [4.118.4] – 2026-10-25
 
 ### Aggiunto

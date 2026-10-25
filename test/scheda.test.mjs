@@ -1129,3 +1129,29 @@ test('trovaVantaggioAttacco e trovaSvantaggioAttacco: rileva Invisibile, Avvelen
   assert.ok(trovaSvantaggioAttacco(sTrattenuto));
   assert.ok(trovaSvantaggioTiroSalvezza(sTrattenuto, 'destrezza'), 'Trattenuto impone svantaggio a TS Destrezza');
 });
+
+test('calcolaStatoCombat: verde se aperto, rosso se disattivo (non in fight), oro se in fight ma minimizzato', async () => {
+  const { calcolaStatoCombat } = await import('../src/rules/scheda.js');
+
+  // Disattivo / non in combattimento: rosso
+  const nonAttivo = calcolaStatoCombat({ attivo: false, aperto: true });
+  assert.equal(nonAttivo.stato, 'disattivo');
+  assert.ok(nonAttivo.colore.includes('--c-red'));
+  assert.equal(nonAttivo.aperto, false);
+
+  const nonInizializzato = calcolaStatoCombat(null);
+  assert.equal(nonInizializzato.stato, 'disattivo');
+  assert.ok(nonInizializzato.colore.includes('--c-red'));
+
+  // In combattimento e tracker aperto: verde
+  const aperto = calcolaStatoCombat({ attivo: true, aperto: true, combattenti: ['pg-vaelion'] });
+  assert.equal(aperto.stato, 'aperto');
+  assert.ok(aperto.colore.includes('--c-green'));
+  assert.equal(aperto.aperto, true);
+
+  // In combattimento ma tracker chiuso / minimizzato: oro / ambra
+  const minimizzato = calcolaStatoCombat({ attivo: true, aperto: false, combattenti: ['pg-vaelion'] });
+  assert.equal(minimizzato.stato, 'minimizzato');
+  assert.ok(minimizzato.colore.includes('--c-gold'));
+  assert.equal(minimizzato.aperto, false);
+});
