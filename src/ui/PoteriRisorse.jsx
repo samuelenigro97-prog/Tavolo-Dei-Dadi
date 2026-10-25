@@ -74,7 +74,7 @@ export function PoteriRisorse({ scheda, aggiorna, lingua = 'it', registra, mostr
         const eDebito = nome.trim().toLowerCase() === 'debito';
         const effettivoMax = eDebito || max === 0 ? null : max;
         const conPerle = effettivoMax != null && effettivoMax > 0 && effettivoMax <= PERLE_MASSIME;
-        const prossima = eDebito ? SOGLIE_DEBITO_ARALDI.find((s) => attuali < s.soglia) : null;
+        const prossima = (araldi && eDebito) ? SOGLIE_DEBITO_ARALDI.find((s) => attuali < s.soglia) : null;
         const descrizione = potere.descrizione || '';
         const titolo = [descrizione, contatore.ricarica ? `↻ ${etichettaRicarica(contatore.ricarica, en)}` : '', debitoUso ? (en ? `+${debitoUso} Debt per use` : `+${debitoUso} Debito a ogni uso`) : '']
           .filter(Boolean).join('\n');
@@ -86,7 +86,7 @@ export function PoteriRisorse({ scheda, aggiorna, lingua = 'it', registra, mostr
               onClick={() => descrizione && mostraInfo?.({ titolo: nome, testo: descrizione })}
               style={{ padding: 0, border: 0, background: 'transparent', color: C.ink, font: 'inherit', fontWeight: 600, textAlign: 'left', cursor: descrizione ? 'help' : 'default', flex: '1 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
             >
-              {nome}
+              <span>{nome}</span>
               {prossima && <span style={{ color: C.inkDim, fontWeight: 400, fontSize: 11 }}> → {prossima.soglia}</span>}
             </button>
             {conPerle ? (

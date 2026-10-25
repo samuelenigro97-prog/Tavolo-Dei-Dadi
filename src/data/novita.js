@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.7',
+    voci: {
+      it: [
+        'Perfezionamento Riquadro Poteri e Test E2E: racchiuso il nome dei contatori in elemento dedicato e allineata la visualizzazione della soglia del Debito in assenza del modello Araldi, garantendo stabilità assoluta nei test di integrazione e nel deploy continuo.',
+      ],
+      en: [
+        'Power Counter Box Refinement and E2E Alignment: isolated counter labels and aligned Debt threshold visibility when the Heralds model is inactive, ensuring full integration test pass and stable continuous deployment.',
+      ],
+    },
+  },
+  {
     versione: '4.118.6',
     voci: {
       it: [

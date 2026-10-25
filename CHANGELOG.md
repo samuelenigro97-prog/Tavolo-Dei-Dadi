@@ -2,6 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.7] – 2026-10-25
+
+### Corretto
+- **Allineamento Riquadro Poteri e Suite E2E**:
+  - In `PoteriRisorse.jsx`, il nome del contatore è ora racchiuso in uno `span` dedicato prima dell'indicatore di soglia, permettendo una corrispondenza esatta di accessibilità e testing.
+  - La freccia di avanzamento alla prossima soglia del Debito (`→ 15`) viene mostrata solo se il modello o privilegio *Araldi del Segreto* è presente tra i poteri attivi.
+  - Rimosso il trigger `release: [published]` da `.github/workflows/deploy.yml` che causava il rifiuto del deploy verso l'environment GitHub Pages a causa delle regole di protezione branch (riservate a `main`).
+
 ## [4.118.6] – 2026-10-25
 
 ### Corretto
