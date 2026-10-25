@@ -306,9 +306,9 @@ function PotereModal({ potere, scheda, indice, totale, onChiudi, onAggiorna, onE
               <input
                 type="number"
                 value={c.max === null ? '' : c.max}
-                onChange={(e) => setContatore(i, { max: e.target.value === '' ? null : Number(e.target.value) })}
+                onChange={(e) => setContatore(i, { max: (e.target.value === '' || Number(e.target.value) <= 0) ? null : Number(e.target.value) })}
                 placeholder="∞"
-                title={lingua === 'en' ? 'Maximum (empty = no cap)' : 'Massimo (vuoto = nessun tetto)'}
+                title={lingua === 'en' ? 'Maximum (empty or 0 = no cap)' : 'Massimo (vuoto o 0 = nessun tetto)'}
                 style={{ ...styles.inlineInput, width: 56, fontSize: 12, padding: '4px 6px', textAlign: 'center' }}
               />
               <select

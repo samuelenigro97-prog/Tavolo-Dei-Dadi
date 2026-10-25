@@ -2,6 +2,16 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.6] – 2026-10-25
+
+### Corretto
+- **Persistenza e Rimozione Tetto Massimo per il Debito (Araldi del Segreto / Potere del Patrono)**:
+  - Risolto il bug per cui la funzione di normalizzazione numeri `num(v, fallback)` considerava `null` come `0`, trasformando il `max: null` del contatore Debito in `max: 0` durante i cicli di normalizzazione e import della scheda.
+  - Rimosso il clamping a 0 di `attuali` causato dal finto massimale `max: 0` sia in `sincronizzaRisorsePoteri` che in `patchVariaContatori` e `normalizeImported`.
+  - In `PoteriRisorse.jsx` e `PoteriSezione.jsx`, il Debito viene trattato come risorsa senza tetto massimo (`max: null`), eliminando la scritta fuorviante `/ 0` e sbloccando il pulsante `+`.
+  - In `garantisciDebitoAraldi`, unificata la gestione del Debito tra "Potere del Patrono" e "Araldi del Segreto" per evitare che duplicati a 0 sovrascrivessero il valore reale accumulato.
+  - Implementata la migrazione automatica in `migrazioniPersonaggi.js` per ripristinare a 6 il Debito di Vaelion qualora fosse stato azzerato dal bug.
+
 ## [4.118.5] – 2026-10-25
 
 ### Aggiunto

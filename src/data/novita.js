@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.6',
+    voci: {
+      it: [
+        'Risoluzione Persistenza e Azzeramento Debito: risolto il problema per cui il contatore del Debito (Araldi del Segreto e Potere del Patrono) veniva erroneamente limitato con un tetto massimo di 0 ("/ 0") e azzerato a ogni salvataggio o modifica della scheda. Il Debito è ora privo di massimale (senza limite), non viene più sovrascritto da istanze duplicate, e per Vaelion il valore originale di 6 viene automaticamente ripristinato.',
+      ],
+      en: [
+        'Fix Debt Reset and Counter Persistence: resolved an issue where the Debt counter (Heralds of the Secret and Patron Power) was incorrectly assigned a max of 0 ("/ 0") and clamped to 0 after sheet modifications. Debt is now properly uncapped, protected against duplicate power overrides, and Vaelion\'s previous Debt value of 6 is automatically restored.',
+      ],
+    },
+  },
+  {
     versione: '4.118.5',
     voci: {
       it: [

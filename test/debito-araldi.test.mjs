@@ -33,3 +33,43 @@ test('con il Debito già attivo, o senza Araldi, la lista non cambia', () => {
   const altri = [{ id: 'x', nome: 'Altro', contatori: [{ nome: 'Usi', attuali: 1, max: 2 }] }];
   assert.equal(garantisciDebitoAraldi(altri, []), altri);
 });
+
+test('il Debito ha sempre max: null e non si azzera mai a 0 per cap errato', async () => {
+  const { maxContatore, valoreContatore, sincronizzaRisorsePoteri, patchVariaContatori } = await import('../src/rules/poteri.js');
+
+  // maxContatore su Debito restituisce sempre null, anche se passato con max: 0 o max: ""
+  assert.equal(maxContatore({ nome: 'Debito', max: 0 }, 4), null);
+  assert.equal(maxContatore({ nome: 'Debito', max: '' }, 4), null);
+  assert.equal(maxContatore({ nome: 'Debito', max: null }, 4), null);
+
+  // valoreContatore su Debito ignora max: 0
+  const cDebito = { nome: 'Debito', attuali: 6, max: 0 };
+  const v = valoreContatore({ poteri: [{ id: 'p', contatori: [cDebito] }], risorse: [{ id: 'potere-p-0', nome: 'Debito', attuali: 6, max: 0 }] }, 'p', 0, cDebito);
+  assert.equal(v.attuali, 6);
+  assert.equal(v.max, null);
+
+  // sincronizzaRisorsePoteri non tappa Debito a 0
+  const res = sincronizzaRisorsePoteri([{ id: 'p', attivo: true, contatori: [cDebito] }], [], 10, 4);
+  assert.equal(res[0].attuali, 6);
+  assert.equal(res[0].max, null);
+  assert.equal(res[0].reset, 'manuale');
+
+  // patchVariaContatori aggiunge correttamente a Debito senza bloccarlo su max 0
+  const patch = patchVariaContatori({ poteri: [{ id: 'p', contatori: [cDebito] }], risorse: res }, [{ nome: 'Debito', delta: 1 }]);
+  assert.equal(patch.poteri[0].contatori[0].attuali, 7);
+  assert.equal(patch.poteri[0].contatori[0].max, null);
+  assert.equal(patch.risorse[0].attuali, 7);
+  assert.equal(patch.risorse[0].max, null);
+});
+
+test('garantisciDebitoAraldi deduplica contatori multipli di Debito preservando il valore massimo', () => {
+  const p1 = { id: 'p1', nome: 'Potere del Patrono', attivo: true, contatori: [{ nome: 'Debito', attuali: 6, max: null }] };
+  const p2 = { id: 'p2', modello: 'araldi-del-segreto', nome: 'Araldi del Segreto · Segreti e Debito', attivo: true, contatori: [{ nome: 'Segreti', attuali: 2, max: 8 }, { nome: 'Debito', attuali: 0, max: 0 }] };
+  const esito = garantisciDebitoAraldi([p1, p2], []);
+
+  // Deve esistere un solo contatore Debito con valore 6 e max null
+  const debitti = esito.flatMap((p) => p.contatori.filter((c) => c.nome === 'Debito'));
+  assert.equal(debitti.length, 1);
+  assert.equal(debitti[0].attuali, 6);
+  assert.equal(debitti[0].max, null);
+});

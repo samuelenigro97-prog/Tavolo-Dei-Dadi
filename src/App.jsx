@@ -38,7 +38,11 @@ import { CompendioModal } from './ui/CompendioModal.jsx';
 const VOCE_I_MIEI_PERSONAGGI = '__i-miei-personaggi__';
 
 /** Numero valido o fallback (helper condiviso: usato da loader e dal Level Up). */
-function num(v, fallback) { return Number.isFinite(Number(v)) ? Number(v) : fallback; }
+function num(v, fallback) {
+  if (v === null || v === undefined || v === '') return fallback;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
 
 /** Fetch che non può lasciare l'interfaccia sospesa indefinitamente (Safari/iOS). */
 async function fetchConTimeout(url, opzioni = {}, timeoutMs = 8000) {
@@ -1993,7 +1997,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.118.5';
+const APP_VERSION = '4.118.6';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -2424,7 +2428,11 @@ function normalizeImported(rawDati) {
   const base = schedaVuota();
   if (!dati || typeof dati !== 'object') return base;
 
-  const num = (v, fallback) => (Number.isFinite(Number(v)) ? Number(v) : fallback);
+  const num = (v, fallback) => {
+    if (v === null || v === undefined || v === '') return fallback;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : fallback;
+  };
   const str = (v, fallback = '') => (typeof v === 'string' ? v : fallback);
   // Safety net import: il Worker deve già uscire in italiano, ma se arriva EN (Fighter/Soldier/Wood Elf) traduciamo in canonico IT.
   const EN_IT = { 'Soldier':'Soldato','Acolyte':'Accolito','Criminal':'Criminale','Entertainer':'Intrattenitore','Hermit':'Eremita','Sage':'Saggio','Sailor':'Marinaio','Noble':'Nobile','Charlatan':'Ciarlatano','Artisan':'Artigiano','Guard':'Guardia','Guide':'Guida','Farmer':'Contadino','Merchant':'Mercante','Scribe':'Scriba','Wayfarer':'Viandante','Fighter':'Guerriero','Rogue':'Ladro','Wizard':'Mago','Cleric':'Chierico','Bard':'Bardo','Druid':'Druido','Monk':'Monaco','Paladin':'Paladino','Ranger':'Ranger','Sorcerer':'Stregone','Warlock':'Warlock','Barbarian':'Barbaro','Half-Elf':'Mezzelfo','Half Elf':'Mezzelfo','Wood Elf':'Elfo dei Boschi','High Elf':'Elfo Alto','Dark Elf':'Elfo Oscuro (Drow)','Drow':'Elfo Oscuro (Drow)','Hill Dwarf':'Nano delle Colline','Mountain Dwarf':'Nano delle Montagne','Lightfoot Halfling':'Halfling Piedelesto','Stout Halfling':'Halfling Tozzo','Forest Gnome':'Gnomo delle Foreste','Rock Gnome':'Gnomo delle Rocce','Darkvision':'Scurovisione','Blindsight':'Percezione cieca','Tremorsense':'Percezione tremorsensitiva','Truesight':'Vista vera','Common':'Comune','Elvish':'Elfico','Dwarvish':'Nanico','Gnomish':'Gnomesco','Orc':'Orco','Infernal':'Infernale','Celestial':'Celestiale','Abyssal':'Abissale','Undercommon':'Sottocomune','Sylvan':'Silvano','Draconic':'Draconico','Giant':'Gigante','Goblin':'Goblin' };
@@ -2751,13 +2759,21 @@ function normalizeImported(rawDati) {
         ? dati.risorse
             .filter((r) => r && typeof r === 'object')
             .slice(0, 20)
-            .map((r, i) => ({
-              id: r.id || Date.now() + i,
-              nome: str(r.nome, 'Risorsa') || 'Risorsa',
-              max: Math.max(0, num(r.max, 0)),
-              attuali: Math.max(0, Math.min(Math.max(0, num(r.max, 0)), num(r.attuali, num(r.max, 0)))),
-              reset: ['breve', 'breve-uno', 'lungo'].includes(r.reset) ? r.reset : '',
-            }))
+            .map((r, i) => {
+              const isDeb = String(r?.nome || '').trim().toLowerCase() === 'debito';
+              const rawMax = r?.max;
+              const maxVal = (rawMax === null || rawMax === undefined || rawMax === '' || Number(rawMax) <= 0 || isDeb)
+                ? null
+                : Math.max(0, num(rawMax, 0));
+              const attVal = Math.max(0, num(r?.attuali, 0));
+              return {
+                id: r.id || Date.now() + i,
+                nome: str(r.nome, 'Risorsa') || 'Risorsa',
+                max: maxVal,
+                attuali: maxVal === null ? attVal : Math.min(maxVal, attVal),
+                reset: ['breve', 'breve-uno', 'lungo', 'manuale'].includes(r.reset) ? r.reset : (maxVal === null ? 'manuale' : ''),
+              };
+            })
         : [],
     }, versionePin),
     // Le risorse "manuale" collegate ai contatori vengono ricostruite subito

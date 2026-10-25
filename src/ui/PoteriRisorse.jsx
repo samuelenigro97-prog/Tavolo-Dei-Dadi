@@ -71,8 +71,9 @@ export function PoteriRisorse({ scheda, aggiorna, lingua = 'it', registra, mostr
           debitoUso ? (en ? `Used: +${debitoUso} Debt` : `Usato: +${debitoUso} Debito`) : undefined,
         );
         const ripristina = () => applica([{ nome, delta: 1 }]);
-        const conPerle = max != null && max > 0 && max <= PERLE_MASSIME;
-        const eDebito = araldi && nome.trim().toLowerCase() === 'debito';
+        const eDebito = nome.trim().toLowerCase() === 'debito';
+        const effettivoMax = eDebito || max === 0 ? null : max;
+        const conPerle = effettivoMax != null && effettivoMax > 0 && effettivoMax <= PERLE_MASSIME;
         const prossima = eDebito ? SOGLIE_DEBITO_ARALDI.find((s) => attuali < s.soglia) : null;
         const descrizione = potere.descrizione || '';
         const titolo = [descrizione, contatore.ricarica ? `↻ ${etichettaRicarica(contatore.ricarica, en)}` : '', debitoUso ? (en ? `+${debitoUso} Debt per use` : `+${debitoUso} Debito a ogni uso`) : '']
@@ -89,8 +90,8 @@ export function PoteriRisorse({ scheda, aggiorna, lingua = 'it', registra, mostr
               {prossima && <span style={{ color: C.inkDim, fontWeight: 400, fontSize: 11 }}> → {prossima.soglia}</span>}
             </button>
             {conPerle ? (
-              <span style={{ display: 'inline-flex', gap: 3, flexShrink: 0, alignItems: 'center' }} role="group" aria-label={`${nome}: ${attuali}/${max}`}>
-                {Array.from({ length: max }, (_, i) => {
+              <span style={{ display: 'inline-flex', gap: 3, flexShrink: 0, alignItems: 'center' }} role="group" aria-label={`${nome}: ${attuali}/${effettivoMax}`}>
+                {Array.from({ length: effettivoMax }, (_, i) => {
                   const disponibile = i < attuali;
                   return (
                     <button
@@ -110,9 +111,9 @@ export function PoteriRisorse({ scheda, aggiorna, lingua = 'it', registra, mostr
             ) : (
               <span style={{ display: 'inline-flex', gap: 4, flexShrink: 0, alignItems: 'center' }}>
                 <button type="button" style={{ ...styles.buttonMini, padding: '0 6px' }} disabled={attuali <= 0} onClick={usa} aria-label={`${nome} −1`} title={en ? 'Spend' : 'Spendi'}>−</button>
-                <strong style={{ minWidth: 18, textAlign: 'center', color: max != null && attuali === max ? C.goldDark : (attuali === 0 ? C.inkDim : C.ink) }}>{attuali}</strong>
-                <button type="button" style={{ ...styles.buttonMini, padding: '0 6px' }} disabled={max != null && attuali >= max} onClick={ripristina} aria-label={`${nome} +1`} title={en ? 'Add' : 'Aggiungi'}>+</button>
-                {max != null && <span style={{ ...styles.detail, fontSize: 11 }}>/{max}</span>}
+                <strong style={{ minWidth: 18, textAlign: 'center', color: effettivoMax != null && attuali === effettivoMax ? C.goldDark : (attuali === 0 ? C.inkDim : C.ink) }}>{attuali}</strong>
+                <button type="button" style={{ ...styles.buttonMini, padding: '0 6px' }} disabled={effettivoMax != null && attuali >= effettivoMax} onClick={ripristina} aria-label={`${nome} +1`} title={en ? 'Add' : 'Aggiungi'}>+</button>
+                {effettivoMax != null && <span style={{ ...styles.detail, fontSize: 11 }}>/{effettivoMax}</span>}
               </span>
             )}
           </div>
