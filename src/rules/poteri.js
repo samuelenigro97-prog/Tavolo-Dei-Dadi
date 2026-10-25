@@ -82,13 +82,20 @@ export function normalizzaPotere(p) {
     // Id del modello da cui arriva (es. 'araldi-del-segreto'): serve al pannello dedicato.
     modello: p.modello ? String(p.modello) : '',
     contatori: Array.isArray(p.contatori)
-      ? p.contatori.map((c) => ({
-          nome: String(c?.nome || ''),
-          attuali: Number(c?.attuali) || 0,
-          max: (c?.max === null || c?.max === undefined || c?.max === '') ? null : Number(c.max),
-          ...(RICARICHE_CONTATORE.includes(c?.ricarica) ? { ricarica: c.ricarica } : {}),
-          ...(MAX_AUTO_CONTATORE.includes(c?.maxAuto) ? { maxAuto: c.maxAuto } : {}),
-        }))
+      ? p.contatori.map((c) => {
+          const isDebito = String(c?.nome || '').trim().toLowerCase() === 'debito';
+          const rawMax = c?.max;
+          const maxVal = (rawMax === null || rawMax === undefined || rawMax === '' || Number(rawMax) <= 0 || isDebito)
+            ? null
+            : Number(rawMax);
+          return {
+            nome: String(c?.nome || ''),
+            attuali: Math.max(0, Number(c?.attuali) || 0),
+            max: maxVal,
+            ...(RICARICHE_CONTATORE.includes(c?.ricarica) ? { ricarica: c.ricarica } : {}),
+            ...(MAX_AUTO_CONTATORE.includes(c?.maxAuto) ? { maxAuto: c.maxAuto } : {}),
+          };
+        })
       : [],
     modificatori: Array.isArray(p.modificatori)
       ? p.modificatori
@@ -122,10 +129,15 @@ export function potereSbloccato(potere, livelloTotale) {
 
 /** Massimo "vero" di un contatore: calcolato dalla competenza se `maxAuto`, altrimenti `max`. */
 export function maxContatore(contatore, bonusCompetenza) {
+  const isDebito = String(contatore?.nome || '').trim().toLowerCase() === 'debito';
+  if (isDebito) return null;
   const comp = Number(bonusCompetenza) || 2;
   if (contatore?.maxAuto === 'competenza') return comp;
   if (contatore?.maxAuto === 'doppia-competenza') return comp * 2;
-  return contatore?.max === null || contatore?.max === undefined ? null : Number(contatore.max);
+  const rawMax = contatore?.max;
+  if (rawMax === null || rawMax === undefined || rawMax === '' || Number(rawMax) <= 0) return null;
+  const n = Number(rawMax);
+  return Number.isFinite(n) && n > 0 ? n : null;
 }
 
 /** Valore attuale di un contatore cercato per NOME fra tutti i poteri o risorse (0 se non esiste). */
@@ -205,10 +217,17 @@ export function bonusPotereBersaglio(scheda, bersaglio) {
  * ha perso le risorse).
  */
 export function valoreContatore(scheda, potereId, indiceContatore, contatore) {
+  const isDebito = String(contatore?.nome || '').trim().toLowerCase() === 'debito';
   const idRis = idRisorsaContatore(potereId, indiceContatore);
   const risorsa = (Array.isArray(scheda?.risorse) ? scheda.risorse : []).find((r) => r?.id === idRis);
-  if (risorsa) return { attuali: Number(risorsa.attuali) || 0, max: risorsa.max === null || risorsa.max === undefined ? null : Number(risorsa.max) };
-  return { attuali: Number(contatore?.attuali) || 0, max: contatore?.max === null || contatore?.max === undefined ? null : Number(contatore.max) };
+  if (risorsa) {
+    const rawMax = risorsa.max;
+    const maxVal = (rawMax === null || rawMax === undefined || rawMax === '' || Number(rawMax) <= 0 || isDebito) ? null : Number(rawMax);
+    return { attuali: Math.max(0, Number(risorsa.attuali) || 0), max: maxVal };
+  }
+  const rawMax = contatore?.max;
+  const maxVal = (rawMax === null || rawMax === undefined || rawMax === '' || Number(rawMax) <= 0 || isDebito) ? null : Number(rawMax);
+  return { attuali: Math.max(0, Number(contatore?.attuali) || 0), max: maxVal };
 }
 
 /**
@@ -229,17 +248,18 @@ export function sincronizzaRisorsePoteri(poteri, risorseAttuali, livelloTotale =
   for (const p of listaPoteri) {
     if (!p.attivo || !potereSbloccato(p, livelloTotale)) continue;
     p.contatori.forEach((c, i) => {
+      const isDebito = String(c?.nome || '').trim().toLowerCase() === 'debito';
       const id = idRisorsaContatore(p.id, i);
       const esistente = mappaEsistenti.get(id);
-      const max = maxContatore(c, bonusCompetenza);
+      const max = isDebito ? null : maxContatore(c, bonusCompetenza);
       const attualiBase = esistente ? Number(esistente.attuali) || 0 : (Number(c.attuali) || 0);
       risorsePoteri.push({
         id,
         nome: c.nome || p.nome || 'Potere',
         max,
-        attuali: max === null ? attualiBase : Math.min(attualiBase, max),
+        attuali: max === null ? Math.max(0, attualiBase) : Math.max(0, Math.min(attualiBase, max)),
         // Con `ricarica` il contatore si ripristina con i riposi come le risorse di classe.
-        reset: c.ricarica || 'manuale',
+        reset: isDebito ? 'manuale' : (c.ricarica || 'manuale'),
       });
     });
   }
@@ -277,16 +297,26 @@ export function patchVariaContatori(scheda, variazioni) {
   let risorse = Array.isArray(scheda?.risorse) ? scheda.risorse : [];
   let toccato = false;
   for (const { nome, delta } of variazioni) {
+    const isDebito = String(nome || '').trim().toLowerCase() === 'debito';
     const t = trovaContatore({ ...scheda, poteri, risorse }, nome);
     if (!t) continue;
     toccato = true;
     const voluto = t.attuali + (Number(delta) || 0);
-    const nuovo = Math.max(0, t.max === null || t.max === undefined ? voluto : Math.min(voluto, t.max));
+    const maxEffettivo = isDebito ? null : ((t.max === null || t.max === undefined || Number(t.max) <= 0) ? null : Number(t.max));
+    const nuovo = Math.max(0, maxEffettivo === null ? voluto : Math.min(voluto, maxEffettivo));
     const idRis = idRisorsaContatore(t.potere.id, t.indice);
     poteri = poteri.map((p) => (p.id === t.potere.id
       ? { ...p, contatori: p.contatori.map((c, i) => (i === t.indice ? { ...c, attuali: nuovo } : c)) }
       : p));
-    risorse = risorse.map((r) => (r?.id === idRis ? { ...r, attuali: nuovo } : r));
+    if (isDebito) {
+      poteri = poteri.map((p) => ({
+        ...p,
+        contatori: p.contatori.map((c) => (String(c.nome || '').trim().toLowerCase() === 'debito' ? { ...c, attuali: nuovo, max: null } : c)),
+      }));
+      risorse = risorse.map((r) => (String(r?.nome || '').trim().toLowerCase() === 'debito' ? { ...r, attuali: nuovo, max: null } : r));
+    } else {
+      risorse = risorse.map((r) => (r?.id === idRis ? { ...r, attuali: nuovo } : r));
+    }
   }
   return toccato ? { poteri, risorse } : null;
 }
@@ -318,28 +348,70 @@ export function contatoriInGioco(scheda) {
  * Debito proprio quando lo dà un altro potere (es. il Potere del Patrono). Se quel
  * potere sparisce o viene spento, il Debito non si vede più da nessuna parte: qui
  * torna nel potere "Segreti e Debito" degli Araldi, con l'ultimo valore ancora
- * noto (contatore spento, o risorsa "Debito"). Senza poteri degli Araldi, o con un
- * Debito già attivo, restituisce `poteri` così com'è (stesso riferimento).
+ * noto (contatore spento, o risorsa "Debito").
+ * Se esistono contatori duplicati per Debito, li deduplica mantenendo il valore
+ * massimo tra essi per non perdere mai il progresso dell'utente.
  */
 export function garantisciDebitoAraldi(poteri, risorse) {
   const lista = normalizzaPoteri(poteri);
   const araldi = lista.filter((p) => p.modello === 'araldi-del-segreto');
   if (!araldi.length) return poteri;
   const eDebito = (c) => String(c?.nome || '').trim().toLowerCase() === 'debito';
-  if (lista.some((p) => p.attivo && p.contatori.some(eDebito))) return poteri;
   const schedaFinta = { risorse: Array.isArray(risorse) ? risorse : [] };
-  let valore = 0;
+
+  let valoreMax = 0;
   for (const p of lista) {
-    const i = p.contatori.findIndex(eDebito);
-    if (i >= 0) { valore = valoreContatore(schedaFinta, p.id, i, p.contatori[i]).attuali; break; }
+    p.contatori.forEach((c, i) => {
+      if (eDebito(c)) {
+        const v = Math.max(Number(c.attuali) || 0, valoreContatore(schedaFinta, p.id, i, c).attuali);
+        if (v > valoreMax) valoreMax = v;
+      }
+    });
   }
-  if (!valore) {
-    const ris = schedaFinta.risorse.find((r) => eDebito(r));
-    if (ris) valore = Number(ris.attuali) || 0;
+  for (const r of schedaFinta.risorse) {
+    if (eDebito(r)) {
+      const v = Number(r.attuali) || 0;
+      if (v > valoreMax) valoreMax = v;
+    }
   }
+
+  const haDebitoAttivo = lista.some((p) => p.attivo && p.contatori.some(eDebito));
+
+  if (haDebitoAttivo) {
+    const poteriConDebito = lista.filter((p) => p.contatori.some(eDebito));
+    // Troviamo il potere primario su cui risiede il Debito (preferenza a Potere del Patrono se presente)
+    const poterePrincipale = lista.find((p) => p.attivo && /patrono/i.test(p.nome) && p.contatori.some(eDebito))
+      || lista.find((p) => p.attivo && p.contatori.some(eDebito));
+    const debitoContatore = poterePrincipale?.contatori.find(eDebito);
+    const necessitaModifica = poteriConDebito.length > 1
+      || (debitoContatore && (debitoContatore.max !== null || debitoContatore.attuali < valoreMax));
+
+    if (!necessitaModifica) {
+      return poteri;
+    }
+
+    return lista.map((p) => {
+      if (p === poterePrincipale) {
+        return {
+          ...p,
+          contatori: p.contatori.map((c) => (eDebito(c) ? { ...c, attuali: Math.max(Number(c.attuali) || 0, valoreMax), max: null } : c)),
+        };
+      }
+      // Rimuoviamo eventuali contatori Debito doppioni da altri poteri
+      if (p.contatori.some(eDebito)) {
+        return {
+          ...p,
+          contatori: p.contatori.filter((c) => !eDebito(c)),
+        };
+      }
+      return p;
+    });
+  }
+
+  // Nessun potere attivo aveva Debito: ripristina nel potere dei Segreti
   const bersaglio = araldi.find((p) => p.attivo && p.contatori.some((c) => String(c.nome || '').trim().toLowerCase() === 'segreti'))
     || araldi.find((p) => p.attivo) || araldi[0];
   return lista.map((p) => (p === bersaglio
-    ? { ...p, attivo: true, contatori: [...p.contatori, { nome: 'Debito', attuali: valore, max: null }] }
+    ? { ...p, attivo: true, contatori: [...p.contatori.filter((c) => !eDebito(c)), { nome: 'Debito', attuali: valoreMax, max: null }] }
     : p));
 }

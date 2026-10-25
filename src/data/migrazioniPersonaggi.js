@@ -136,6 +136,34 @@ export function migrazioneRegoleVaelion(roster) {
     }
     if (Array.isArray(s.poteri)) {
       s.poteri = s.poteri.filter((p) => !patternSpurio.test(p?.nome || '') && !patternSpurio.test(p?.descrizione || ''));
+      // Ripristino e protezione Debito di Vaelion (evita azzeramento da bug max: 0)
+      const eDeb = (c) => String(c?.nome || '').trim().toLowerCase() === 'debito';
+      let debAttuale = 0;
+      for (const p of s.poteri) {
+        for (const c of (p?.contatori || [])) {
+          if (eDeb(c)) {
+            const v = Number(c?.attuali) || 0;
+            if (v > debAttuale) debAttuale = v;
+          }
+        }
+      }
+      if (Array.isArray(s.risorse)) {
+        for (const r of s.risorse) {
+          if (eDeb(r)) {
+            const v = Number(r?.attuali) || 0;
+            if (v > debAttuale) debAttuale = v;
+          }
+        }
+      }
+      // Se era azzerato dal bug, ripristina a 6 (il valore raggiunto nella campagna)
+      const valoreFinale = debAttuale <= 0 ? 6 : debAttuale;
+      s.poteri = s.poteri.map((p) => ({
+        ...p,
+        contatori: (p?.contatori || []).map((c) => (eDeb(c) ? { ...c, attuali: valoreFinale, max: null } : c)),
+      }));
+      if (Array.isArray(s.risorse)) {
+        s.risorse = s.risorse.map((r) => (eDeb(r) ? { ...r, attuali: valoreFinale, max: null, reset: 'manuale' } : r));
+      }
     }
   }
 }
