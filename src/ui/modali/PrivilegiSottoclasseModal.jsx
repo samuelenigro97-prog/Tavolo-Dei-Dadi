@@ -16,10 +16,11 @@ export function PrivilegiSottoclasseModal({ lingua, mostraPrivilegiSub, scheda, 
   const subDaMostrare = subFiltrate.length > 0 ? subFiltrate : tutteLeSub;
   return (
     <div
+      className="modal-backdrop"
       style={{ position: 'fixed', inset: 0, zIndex: 1003, padding: 16, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       onClick={(e) => { if (e.target === e.currentTarget) setMostraPrivilegiSub(false); }}
     >
-      <div style={{ ...styles.panel, maxWidth: 540, width: '100%', maxHeight: '88vh', overflowY: 'auto' }}>
+      <div className="anim-modal-rapida" style={{ ...styles.panel, maxWidth: 540, width: '100%', maxHeight: '88vh', overflowY: 'auto' }}>
         <h1 style={{ ...styles.title, textAlign: 'center', marginBottom: 4 }}>{t('priv.panoramica_sub')}</h1>
         <div style={{ textAlign: 'center', ...styles.detail, marginBottom: 12 }}>
           {versione === '2024' ? 'D&D 5.5' : 'D&D 5.0'}

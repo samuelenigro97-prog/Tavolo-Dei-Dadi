@@ -7,6 +7,7 @@ import { styles } from '../stili.js';
 export function RitrattoBestiaModal({ aggiorna, campoForma, formaAttiva, lingua, ritrattoBestiaRef, setMostraModalRitrattoBestia, setUrlRitrattoBestiaInput, urlRitrattoBestiaInput }) {
   return (
     <div
+      className="modal-backdrop"
       style={{
         position: 'fixed', inset: 0, zIndex: 1150, padding: 16,
         background: 'rgba(0,0,0,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -14,7 +15,7 @@ export function RitrattoBestiaModal({ aggiorna, campoForma, formaAttiva, lingua,
       }}
       onClick={(e) => { if (e.target === e.currentTarget) setMostraModalRitrattoBestia(false); }}
     >
-      <div style={{ ...styles.panel, maxWidth: 540, width: '100%', maxHeight: '90vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14, boxShadow: '0 12px 48px rgba(0,0,0,0.55)' }}>
+      <div className="anim-modal-rapida" style={{ ...styles.panel, maxWidth: 540, width: '100%', maxHeight: '90vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 14, boxShadow: '0 12px 48px rgba(0,0,0,0.55)' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${C.border}`, paddingBottom: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

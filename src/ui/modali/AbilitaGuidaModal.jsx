@@ -50,6 +50,7 @@ export function AbilitaGuidaModal({ conAnimazione, lingua, modalAbilitaGuida, re
 
   return (
     <div
+      className="modal-backdrop"
       style={{
         position: 'fixed',
         top: 0,
@@ -67,6 +68,7 @@ export function AbilitaGuidaModal({ conAnimazione, lingua, modalAbilitaGuida, re
       onClick={(e) => { if (e.target === e.currentTarget) setModalAbilitaGuida(null); }}
     >
       <div
+        className="anim-modal-rapida"
         style={{
           background: C.panel,
           border: `1px solid ${C.border}`,

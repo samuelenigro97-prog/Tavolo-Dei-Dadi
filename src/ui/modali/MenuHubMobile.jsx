@@ -8,6 +8,7 @@ import { punteggioCaratteristica } from '../../rules/scheda.js';
 export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, combat, controlliAttivi, daNotificare, eliminaPersonaggio, lingua, mappaAperta, mappaCampagna, mappaRef, mostraPannelloAudio, scheda, setBozzaCrea, setCloudStatus, setCombat, setLevelUpBozza, setLingua, setMappaAperta, setMostraCloud, setMostraCompendio, setMostraCrea, setMostraDadiModal, setMostraDiarioModal, setMostraLevelUp, setMostraMenu, setMostraMenuEsporta, setMostraMenuHubMobile, setMostraPannelloAudio, setPosEsporta, setPosPannelloAudio, setSyncCodiceStatus, setTema, statoBgCloud, statoColoreCloud, statoGlowCloud, tema }) {
   return (
     <div
+      className="modal-backdrop"
       style={{
         position: 'fixed',
         inset: 0,

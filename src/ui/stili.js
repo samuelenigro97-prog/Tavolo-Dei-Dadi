@@ -1799,29 +1799,27 @@ tbody tr:hover {
     will-change: transform, opacity, box-shadow;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    /* Apertura e chiusura fulminee senza alcun delay artificiale */
-    transition: transform 0.14s cubic-bezier(0, 0, 0.2, 1) 0s, box-shadow 0.14s ease 0s !important;
+    /* Apertura fluida e naturale con curva ergonomica */
+    transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1) 0s, box-shadow 0.26s ease 0s !important;
     box-shadow: none !important;
   }
   :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:focus-within {
     transform: translateY(0);
-    transition: transform 0.14s cubic-bezier(0, 0, 0.2, 1) 0s, box-shadow 0.14s ease 0s !important;
-    transition-delay: 0s !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0s, box-shadow 0.3s ease 0s !important;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.12) !important;
   }
   /* A barra chiusa il contenuto è nascosto: nella striscia resta solo la maniglia. */
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa > * {
     opacity: 0;
-    transition: opacity 0.1s ease 0s !important;
+    transition: opacity 0.16s ease 0s !important;
   }
   :root[data-barra-a-scomparsa="si"] .barra-zona-apertura:hover + .barra-superiore-fissa > *,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:hover > *,
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa:focus-within > * {
     opacity: 1;
-    /* Apertura istantanea senza ritardi artificiali */
-    transition: opacity 0.1s ease 0s !important;
+    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0.04s !important;
   }
   /* Maniglia: si vede solo a barra chiusa. */
   :root[data-barra-a-scomparsa="si"] .barra-superiore-fissa::before {
@@ -1889,11 +1887,11 @@ tbody tr:hover {
   border-right: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
   border-top-left-radius: 12px !important;
   border-top-right-radius: 12px !important;
-  transition: transform 0.14s cubic-bezier(0, 0, 0.2, 1), box-shadow 0.14s ease, border-color 0.14s ease;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease, border-color 0.2s ease;
 }
 
 .combat-tracker-fisso.combat-aperto {
-  transform: translate(-50%, 0) !important;
+  transform: translate3d(-50%, 0, 0) !important;
   backdrop-filter: blur(14px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
   background: color-mix(in srgb, var(--c-panel) 96%, transparent) !important;
@@ -1903,12 +1901,11 @@ tbody tr:hover {
   border-top-left-radius: 12px !important;
   border-top-right-radius: 12px !important;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25), 0 -1px 4px rgba(0, 0, 0, 0.12) !important;
-  transition: transform 0.14s cubic-bezier(0, 0, 0.2, 1), box-shadow 0.14s ease, border-color 0.14s ease !important;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease, border-color 0.2s ease !important;
 }
 .combat-tracker-fisso.combat-aperto > * {
   opacity: 1 !important;
-  /* Apertura istantanea senza ritardi */
-  transition: opacity 0.1s ease 0s !important;
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0.04s !important;
 }
 .combat-tracker-fisso.combat-aperto::before {
   display: none !important;
@@ -1920,12 +1917,12 @@ tbody tr:hover {
   box-shadow: none !important;
   cursor: pointer;
   border-color: var(--c-bordo-barra, var(--c-border)) !important;
-  transition: transform 0.14s cubic-bezier(0, 0, 0.2, 1), box-shadow 0.14s ease, border-color 0.14s ease !important;
+  transition: transform 0.24s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease !important;
 }
 .combat-tracker-fisso.combat-chiuso > * {
   opacity: 0 !important;
   pointer-events: none !important;
-  transition: opacity 0.08s ease 0s !important;
+  transition: opacity 0.14s ease 0s !important;
 }
 .combat-tracker-fisso.combat-chiuso::before {
   content: '';
@@ -1938,7 +1935,7 @@ tbody tr:hover {
   border-radius: 3px;
   background: var(--c-gold, var(--c-bordo-barra, var(--c-border)));
   pointer-events: none;
-  transition: opacity 0.1s ease;
+  transition: opacity 0.15s ease;
 }
 
 @media (hover: hover) and (pointer: fine) and (min-width: 681px) {
@@ -1954,8 +1951,8 @@ tbody tr:hover {
   :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-chiuso,
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:hover,
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:focus-within {
-    transform: translate(-50%, 0) !important;
-    transition: transform 0.14s cubic-bezier(0, 0, 0.2, 1) 0s, box-shadow 0.14s ease 0s, border-color 0.14s ease 0s !important;
+    transform: translate3d(-50%, 0, 0) !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0s, box-shadow 0.3s ease 0s, border-color 0.2s ease 0s !important;
     transition-delay: 0s !important;
     border-top: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
     border-left: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
@@ -1969,8 +1966,7 @@ tbody tr:hover {
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:focus-within > * {
     opacity: 1 !important;
     pointer-events: auto !important;
-    /* Apertura istantanea senza ritardi */
-    transition: opacity 0.1s ease 0s !important;
+    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0.04s !important;
   }
   :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-chiuso::before,
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:hover::before,
@@ -1992,7 +1988,8 @@ tbody tr:hover {
   border: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
   border-radius: 12px !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
-  animation: apparizioneDolce 0.2s cubic-bezier(0.2, 0.9, 0.3, 1) !important;
+  animation: apparizioneDolce 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity;
 }
 
 /* Banner di Forma Selvatica / Metamorfosi aperta: bordi, raggio e ombre allineati alla barra in alto */
@@ -2003,6 +2000,8 @@ tbody tr:hover {
   backdrop-filter: blur(14px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
   background: color-mix(in srgb, var(--c-panel) 96%, transparent) !important;
+  animation: banner-apri-dolce 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
 }
 @media (max-width: 768px) {
   .barra-tiro {
@@ -2529,14 +2528,54 @@ tbody tr:hover {
   to { opacity: 1; transform: translate(-50%, 0) scale(1); }
 }
 
-/* Animazione di apertura rapida e scattante per modali e menu */
-.anim-modal-rapida {
-  animation: modal-scivola-su 0.16s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+/* Animazione di apertura fluida e organica per finestre a comparsa, modali e menu */
+.menu-iniziale-sfondo,
+.modal-backdrop {
+  animation: backdrop-fade-in 0.22s ease-out forwards;
+}
+
+@keyframes backdrop-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.anim-modal-rapida,
+.menu-iniziale {
+  animation: modal-scivola-su 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   will-change: transform, opacity;
 }
+
 @keyframes modal-scivola-su {
-  from { opacity: 0; transform: translateY(14px) scale(0.985); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes apparizioneDolce {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes banner-apri-dolce {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* Nuvoletta "Bonus dato da": tooltip INVERTITO rispetto al tema, così
@@ -2586,7 +2625,9 @@ tbody tr:hover {
   50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.15); border-color: #f87171; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .incantesimo-in-eccesso, .incantesimo-mancante-controllo, .incantesimo-mancante-row { animation: none; }
+  .incantesimo-in-eccesso, .incantesimo-mancante-controllo, .incantesimo-mancante-row,
+  .anim-modal-rapida, .menu-iniziale, .modal-backdrop, .menu-iniziale-sfondo,
+  .barra-tiro, .forma-selvatica-banner { animation: none !important; }
 }
 
 /* STAMPA / PDF: produce la sola scheda ottimizzata per carta */

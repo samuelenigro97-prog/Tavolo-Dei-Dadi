@@ -45,8 +45,8 @@ export function ConcentrazioneModal({ aggiorna, checkConc, lingua, registra, sch
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 3300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(3px)' }} onClick={() => setCheckConc(null)}>
-      <div style={{ ...styles.panel, maxWidth: 420, width: '100%', boxShadow: '0 8px 30px rgba(0,0,0,0.4)', borderRadius: 12 }} onClick={(e) => e.stopPropagation()}>
+    <div className="modal-backdrop" style={{ position: 'fixed', inset: 0, zIndex: 3300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(3px)' }} onClick={() => setCheckConc(null)}>
+      <div className="anim-modal-rapida" style={{ ...styles.panel, maxWidth: 420, width: '100%', boxShadow: '0 8px 30px rgba(0,0,0,0.4)', borderRadius: 12 }} onClick={(e) => e.stopPropagation()}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
           <strong style={{ color: C.goldDark, fontSize: 16, display: 'flex', alignItems: 'center', gap: 6 }}>
             {t('conc.auto_titolo')}

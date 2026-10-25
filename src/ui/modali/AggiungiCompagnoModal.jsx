@@ -9,6 +9,7 @@ import { generaAvatarBestia } from '../../ritratti.js';
 export function AggiungiCompagnoModal({ aggiorna, cercaCompagnoText, filtroCompagnoCat, lingua, manualiAttivi, registra, scheda, setBestiaDettaglio, setCercaCompagnoText, setFiltroCompagnoCat, setMostraModalAggiungiCompagno }) {
   return (
     <div
+      className="modal-backdrop"
       style={{
         position: 'fixed',
         top: 0,
@@ -26,6 +27,7 @@ export function AggiungiCompagnoModal({ aggiorna, cercaCompagnoText, filtroCompa
       onClick={(e) => { if (e.target === e.currentTarget) setMostraModalAggiungiCompagno(false); }}
     >
       <div
+        className="anim-modal-rapida"
         style={{
           background: C.panel,
           border: `1px solid ${C.border}`,

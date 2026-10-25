@@ -6,10 +6,10 @@ import { decodificaScheda } from '../../utils/condivisione.js';
 
 export function MenuEsportaModal({ aggiorna, condividiLink, esportaBackupCompleto, esportaJson, jsonRef, lingua, normalizeImported, posEsporta, setInfo, setMostraMenuEsporta }) {
   return (
-    <div onClick={() => setMostraMenuEsporta(false)} style={{ position: 'fixed', inset: 0, zIndex: 1400, background: 'transparent' }}>
+    <div className="modal-backdrop" onClick={() => setMostraMenuEsporta(false)} style={{ position: 'fixed', inset: 0, zIndex: 1400, background: 'transparent' }}>
       <div
         onClick={(e) => e.stopPropagation()}
-        className="no-stampa"
+        className="anim-modal-rapida no-stampa"
         style={{
           position: 'fixed', top: posEsporta.top, left: posEsporta.left,
           width: 'min(300px, calc(100vw - 16px))',

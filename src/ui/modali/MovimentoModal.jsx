@@ -8,6 +8,7 @@ export function MovimentoModal({ lingua, scheda, setMostraModalMovimento }) {
   const mov = calcolaMovimentoESalti(scheda);
   return (
     <div
+      className="modal-backdrop"
       style={{
         position: 'fixed',
         top: 0,
@@ -25,6 +26,7 @@ export function MovimentoModal({ lingua, scheda, setMostraModalMovimento }) {
       onClick={(e) => { if (e.target === e.currentTarget) setMostraModalMovimento(false); }}
     >
       <div
+        className="anim-modal-rapida"
         style={{
           background: C.panel,
           border: `1px solid ${C.border}`,

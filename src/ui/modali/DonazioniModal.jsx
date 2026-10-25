@@ -6,10 +6,11 @@ import { t } from '../../i18n';
 export function DonazioniModal({ setMostraDonazioni }) {
   return (
     <div
+      className="modal-backdrop"
       style={{ position: 'fixed', inset: 0, zIndex: 1010, padding: 16, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       onClick={(e) => { if (e.target === e.currentTarget) setMostraDonazioni(false); }}
     >
-      <div style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 460, width: '100%', maxHeight: '86vh', overflowY: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.45)' }}>
+      <div className="anim-modal-rapida" style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 460, width: '100%', maxHeight: '86vh', overflowY: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.45)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <h2 style={{ ...styles.title, fontSize: 18, margin: 0 }}>{t('donazioni.titolo')}</h2>
           <button style={styles.buttonMini} onClick={() => setMostraDonazioni(false)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>

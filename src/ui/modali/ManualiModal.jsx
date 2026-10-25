@@ -19,13 +19,14 @@ export function ManualiModal({ lingua, manualiAttivi, setManualiAttivi, setMostr
   };
   return (
     <div
+      className="modal-backdrop"
       style={{
         position: 'fixed', inset: 0, zIndex: 1100, padding: 16,
         background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}
       onClick={(e) => { if (e.target === e.currentTarget) setMostraModalManuali(false); }}
     >
-      <div style={{ ...styles.panel, maxWidth: 540, width: '100%', maxHeight: '90vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12, boxShadow: '0 12px 48px rgba(0,0,0,0.5)' }}>
+      <div className="anim-modal-rapida" style={{ ...styles.panel, maxWidth: 540, width: '100%', maxHeight: '90vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12, boxShadow: '0 12px 48px rgba(0,0,0,0.5)' }}>
         {/* Titolo e Chiusura */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${C.border}`, paddingBottom: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

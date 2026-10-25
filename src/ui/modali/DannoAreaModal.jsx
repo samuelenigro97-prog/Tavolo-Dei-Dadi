@@ -36,6 +36,7 @@ export function DannoAreaModal({ area, setArea, combattenti, testoDifese, applic
   return (
     <div
       data-no-ct-close
+      className="modal-backdrop"
       style={{ position: 'fixed', inset: 0, zIndex: 3300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(3px)' }}
       onClick={() => setArea(null)}
     >
@@ -43,6 +44,7 @@ export function DannoAreaModal({ area, setArea, combattenti, testoDifese, applic
         role="dialog"
         aria-label={tr('Danno ad area', 'Area damage')}
         data-testid="area-modal"
+        className="anim-modal-rapida"
         style={{ ...styles.panel, maxWidth: 520, width: '100%', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 8px 30px rgba(0,0,0,0.4)', borderRadius: 12 }}
         onClick={(e) => e.stopPropagation()}
       >
