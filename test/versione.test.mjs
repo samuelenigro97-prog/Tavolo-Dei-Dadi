@@ -34,8 +34,8 @@ test('le Novità in-app: versioni in ordine decrescente e nessuna oltre la versi
   }
 });
 
-test('formato nome file backup: usa data YYYYMMDD, sigle TDD_ALL e versione app', () => {
+test('formato nome file backup: usa formato chiaro "Backup Tavolo dei Dadi (AAAA-MM-GG).json"', () => {
   const src = readFileSync('src/App.jsx', 'utf8');
-  assert.ok(src.includes('aRoster.download = `${dataStr}_TDD_ALL_v${APP_VERSION}.json`'), 'nome file backup roster non aggiornato al formato compatto');
+  assert.ok(src.includes('aRoster.download = `Backup Tavolo dei Dadi (${dataStr}).json`'), 'nome file backup roster non aggiornato al formato chiaro');
 });
 
