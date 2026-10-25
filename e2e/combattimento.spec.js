@@ -329,3 +329,44 @@ test('gli attacchi non hanno la ✕: un incantesimo non più preparato sparisce 
   await apriScheda(page);
   await expect(page.locator('tr.attacchi-riga').filter({ hasText: 'Frusta di Spine' })).toHaveCount(1);
 });
+
+test('combat tracker aperto fluttua con bordi arrotondati su tutti i lati e si minimizza cliccando fuori (v4.118.8)', async ({ page }) => {
+  await apriScheda(page);
+  await page.evaluate(() => {
+    localStorage.setItem('scheda-interattiva:combat', JSON.stringify({
+      attivo: true, aperto: false, round: 1, turno: 0,
+      combattenti: [
+        { id: 'p1', nome: 'Vaelion', tipo: 'pg', iniziativa: 17, pfMax: 64, pfAttuali: 61, ca: 19, condizioni: [] },
+      ],
+    }));
+  });
+  await apriScheda(page);
+  const tracker = page.getByTestId('combat-tracker');
+  await expect(tracker).toHaveClass(/combat-chiuso/);
+
+  // Cliccando sul pulsante combat tracker si apre
+  await page.locator('button[data-combat-toggle="true"]').first().click();
+  await expect(tracker).toHaveClass(/combat-aperto/);
+
+  // Verifica stile fluttuante (come la barra in alto): bordi arrotondati su tutti e 4 gli angoli
+  const stili = await tracker.evaluate((el) => {
+    const cs = getComputedStyle(el);
+    return {
+      borderRadius: cs.borderRadius,
+      borderTopWidth: cs.borderTopWidth,
+      borderBottomWidth: cs.borderBottomWidth,
+      bottom: cs.bottom,
+    };
+  });
+  expect(stili.borderRadius).toBe('12px');
+  expect(parseFloat(stili.borderBottomWidth)).toBeGreaterThan(0);
+  expect(parseFloat(stili.bottom)).toBeGreaterThanOrEqual(10);
+
+  // Cliccando all'esterno (sulla scheda o sullo sfondo) si minimizza in automatico
+  await page.locator('.selettore-personaggio').first().click({ position: { x: 50, y: 10 } });
+  await expect.poll(async () => {
+    const c = await page.evaluate(() => JSON.parse(localStorage.getItem('scheda-interattiva:combat')));
+    return c.aperto;
+  }).toBe(false);
+  await expect(tracker).toHaveClass(/combat-chiuso/);
+});

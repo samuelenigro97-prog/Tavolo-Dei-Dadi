@@ -1869,39 +1869,35 @@ tbody tr:hover {
 .combat-tracker-fisso {
   position: fixed;
   left: 50%;
-  transform: translate(-50%, 0);
-  bottom: 0;
-  /* Larghezza come la barra in alto (la pagina ha 14 px di margine per lato) */
+  transform: translate3d(-50%, 0, 0);
+  bottom: 14px;
+  /* Larghezza e forma identica alla barra in alto (14 px di margine per lato) */
   width: calc(100% - 28px);
   max-width: 1080px;
   z-index: 1500;
-  will-change: transform, opacity, box-shadow;
+  will-change: transform, opacity, box-shadow, bottom;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   backdrop-filter: blur(14px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
   background: color-mix(in srgb, var(--c-panel) 96%, transparent) !important;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25), 0 -1px 4px rgba(0, 0, 0, 0.12) !important;
-  border-top: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
-  border-left: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
-  border-right: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
-  border-top-left-radius: 12px !important;
-  border-top-right-radius: 12px !important;
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease, border-color 0.2s ease;
+  border: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.4), 0 2px 10px rgba(0, 0, 0, 0.18) !important;
+  box-sizing: border-box !important;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease, border-color 0.2s ease, bottom 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .combat-tracker-fisso.combat-aperto {
+  bottom: 14px !important;
   transform: translate3d(-50%, 0, 0) !important;
   backdrop-filter: blur(14px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
   background: color-mix(in srgb, var(--c-panel) 96%, transparent) !important;
-  border-top: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
-  border-left: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
-  border-right: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
-  border-top-left-radius: 12px !important;
-  border-top-right-radius: 12px !important;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25), 0 -1px 4px rgba(0, 0, 0, 0.12) !important;
-  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease, border-color 0.2s ease !important;
+  border: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 12px 42px rgba(0, 0, 0, 0.45), 0 3px 12px rgba(0, 0, 0, 0.2) !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.2s ease, bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 .combat-tracker-fisso.combat-aperto > * {
   opacity: 1 !important;
@@ -1911,13 +1907,19 @@ tbody tr:hover {
   display: none !important;
 }
 
-/* Quando è chiuso (sia su mobile che ridotto esplicitamente con ▲): resta la linguetta con maniglia */
+/* Quando è chiuso (minimizzato): linguetta a filo in basso con maniglia dorata */
 .combat-tracker-fisso.combat-chiuso {
+  bottom: 0 !important;
   transform: translate3d(-50%, calc(100% - 14px), 0) !important;
-  box-shadow: none !important;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15) !important;
   cursor: pointer;
-  border-color: var(--c-bordo-barra, var(--c-border)) !important;
-  transition: transform 0.24s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease !important;
+  border: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
+  border-bottom: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+  transition: transform 0.24s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease, bottom 0.24s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 .combat-tracker-fisso.combat-chiuso > * {
   opacity: 0 !important;
@@ -1929,49 +1931,27 @@ tbody tr:hover {
   position: absolute;
   left: 50%;
   top: 4px;
-  width: 42px;
+  width: 44px;
   height: 3.5px;
-  margin-left: -21px;
+  margin-left: -22px;
   border-radius: 3px;
-  background: var(--c-gold, var(--c-bordo-barra, var(--c-border)));
+  background: var(--c-gold-dark, var(--c-bordo-barra, var(--c-border)));
+  box-shadow: 0 0 5px rgba(201, 162, 39, 0.35);
   pointer-events: none;
-  transition: opacity 0.15s ease;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.combat-tracker-fisso.combat-chiuso:hover::before {
+  background: var(--c-gold, #f1c40f);
+  transform: scaleX(1.15);
 }
 
 @media (hover: hover) and (pointer: fine) and (min-width: 681px) {
   :root[data-barra-a-scomparsa="si"] .combat-zona-apertura {
-    display: block;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 18px;
-    z-index: 1499;
+    display: none;
   }
-  :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-chiuso,
-  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:hover,
-  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:focus-within {
-    transform: translate3d(-50%, 0, 0) !important;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0s, box-shadow 0.3s ease 0s, border-color 0.2s ease 0s !important;
-    transition-delay: 0s !important;
-    border-top: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
-    border-left: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
-    border-right: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
-    border-top-left-radius: 12px !important;
-    border-top-right-radius: 12px !important;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25), 0 -1px 4px rgba(0, 0, 0, 0.12) !important;
-  }
-  :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-chiuso > *,
-  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:hover > *,
-  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:focus-within > * {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0.04s !important;
-  }
-  :root[data-barra-a-scomparsa="si"] .combat-zona-apertura:hover + .combat-tracker-fisso.combat-chiuso::before,
-  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:hover::before,
-  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:focus-within::before {
-    opacity: 0;
+  :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:hover {
+    transform: translate3d(-50%, calc(100% - 18px), 0) !important;
+    border-color: var(--c-gold-dark, var(--c-border)) !important;
   }
 }
 

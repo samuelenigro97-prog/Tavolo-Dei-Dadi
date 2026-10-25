@@ -2,6 +2,19 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.8] – 2026-10-25
+
+### Modificato
+- **Combat Tracker Fluttuante in Stile Barra Superiore e Minimizzazione al Click Esterno**:
+  - Quando aperto, il Combat Tracker assume ora la forma a isola fluttuante identica alla barra in alto:
+    - Tutti e 4 gli angoli sono arrotondati con raggio di `12px` (`border-radius: 12px`).
+    - Bordo completo su tutti e 4 i lati (`border: 1.5px solid var(--c-bordo-barra, var(--c-border))`).
+    - Posizionamento fluttuante distanziato di `14px` dal fondo dello schermo con ombra di elevazione (`0 12px 42px rgba(0, 0, 0, 0.45)`).
+    - Rimosse le forzature inline su bordi e angoli per garantire uniformità visiva perfetta.
+  - Migliorata l'autominimizzazione al click esterno:
+    - Gestore eventi in fase di cattura (`capture: true`) per intercettare qualsiasi click o tocco esterno prima che altri elementi della pagina blocchino la propagazione.
+    - Disattivazione dell'auto-espansione al passaggio del mouse (`:hover`) sullo stato chiuso, consentendo al tracker di restare chiuso e minimizzato finché l'utente non lo attiva intenzionalmente.
+
 ## [4.118.7] – 2026-10-25
 
 ### Corretto

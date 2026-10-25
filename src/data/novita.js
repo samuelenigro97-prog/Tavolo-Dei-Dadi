@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.8',
+    voci: {
+      it: [
+        'Combat Tracker Fluttuante con Minimizzazione al Click Esterno: il tracker aperto assume ora la forma identica alla barra in alto (bordi arrotondati su tutti e 4 i lati a 12px, contorno completo e ombra elevata), fluttuando sopra la scheda a 14px dal fondo. Cliccando in qualsiasi punto esterno della pagina, il tracker si minimizza dolcemente in automatico.',
+      ],
+      en: [
+        'Floating Combat Tracker with Click-Outside Minimization: when open, the combat tracker matches the top bar\'s island shape (full 12px border radius on all 4 corners, complete border and elevation shadow), floating above the sheet 14px off the bottom. Clicking anywhere outside smoothly minimizes it automatically.',
+      ],
+    },
+  },
+  {
     versione: '4.118.7',
     voci: {
       it: [
