@@ -108,20 +108,48 @@ export function BestiaDettaglioModal({ aggiorna, bestiaDettaglio, lanciaD20, lan
                     style={{
                       fontSize: 12,
                       lineHeight: 1.4,
-                      background: 'rgba(0,0,0,0.03)',
+                      background: az.isMultiattacco ? 'color-mix(in srgb, var(--c-panel-light) 94%, var(--c-gold, #c9a227))' : 'rgba(0,0,0,0.03)',
                       padding: '6px 8px',
                       borderRadius: 6,
                       border: `1px solid ${C.border}`,
+                      borderLeft: az.isMultiattacco ? `3.5px solid ${C.goldDark}` : `1px solid ${C.border}`,
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 4,
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, flexWrap: 'wrap' }}>
-                      <span style={{ fontWeight: 800, color: C.ink }}>{az.nome}</span>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontWeight: 800, color: C.ink }}>{az.nome}</span>
+                        {az.isMultiattacco && (
+                          <span
+                            style={{
+                              fontSize: 10,
+                              fontWeight: 700,
+                              padding: '1px 5px',
+                              borderRadius: 4,
+                              background: 'rgba(201,162,39,0.18)',
+                              color: C.goldDark,
+                              border: `1px solid ${C.goldDark}`,
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            📋 {lingua === 'en' ? 'Reference' : 'Riferimento'}
+                          </span>
+                        )}
+                      </div>
+                      {az.isMultiattacco && (
+                        <span style={{ fontSize: 11, fontStyle: 'italic', color: C.goldDark, fontWeight: 600 }}>
+                          👇 {lingua === 'en' ? 'Uses both attacks below' : 'Usa entrambi gli attacchi sotto'}
+                        </span>
+                      )}
                     </div>
                     {az.desc && (
-                      <div style={{ fontSize: 12, color: C.ink }}>{az.desc}</div>
+                      <div style={{ fontSize: 12, color: C.ink, fontStyle: az.isMultiattacco ? 'italic' : 'normal' }}>
+                        {az.isMultiattacco
+                          ? (lingua === 'en' ? `Both attacks below: ${az.desc}` : `Effettua entrambi gli attacchi sottostanti: ${az.desc}`)
+                          : az.desc}
+                      </div>
                     )}
                     {(az.bonus != null || az.danno || az.cd != null) && (
                       <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', alignItems: 'center', marginTop: 2, paddingTop: 4, borderTop: `1px dashed ${C.border}` }}>

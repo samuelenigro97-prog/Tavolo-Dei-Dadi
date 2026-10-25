@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.118.3';
+const APP_VERSION = '4.118.4';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -13111,10 +13111,11 @@ export default function App() {
                           cd: az.cd,
                           caratteristicaTS: az.cd ? caratteristicaDaTesto(az.desc || az.testoOriginale) : '',
                           isTS: az.cd != null && az.bonus == null,
-                          gittata: az.desc?.match(/portata\s+([0-9,.]+\s*m)/i)?.[1] || '1,5 m',
+                          gittata: az.isMultiattacco ? '' : (az.desc?.match(/portata\s+([0-9,.]+\s*m)/i)?.[1] || '1,5 m'),
                           note: az.desc || az.testoOriginale || '',
                           isBestia: true,
                           isAuto: true,
+                          isMultiattacco: az.isMultiattacco,
                         };
                       })
                     : [...attacchiVisibili, ...attacchiSpettro];
@@ -13407,6 +13408,16 @@ export default function App() {
                                 ? (lingua === 'en' ? (spiegaIncantesimo(cleanNome) || descDbSpell) : (descDbSpell || spiegaIncantesimo(cleanNome))) || a.note || ''
                                 : (spiegaIncantesimo(cleanNome) || descDbSpell || spiegaPrivilegio(cleanNome) || spiegaTratto(cleanNome) || spiegaTalento(cleanNome) || a.note || '');
                               
+                              const isMultiattacco = Boolean(
+                                a.isMultiattacco ||
+                                /^(?:attacco\s+multiplo|multiattacco|multiattack)\b/i.test(cleanNome || '')
+                              );
+                              const testoCombo = isMultiattacco
+                                ? (a.note || a.desc || '')
+                                    .replace(/^(?:attacco\s+multiplo|multiattacco|multiattack)\s*:\s*/i, '')
+                                    .replace(/\.$/, '')
+                                    .trim()
+                                : '';
                               const armaDb = !a.isSpell ? trovaArma(a.nome) : null;
                               const infoArma = analizzaArmaVersatileEPortata(a, armaDb);
                               const { isVersatile, dado1M, dado2M } = infoArma;
@@ -13424,10 +13435,12 @@ export default function App() {
                               const isTrucchetto = (spellInLista && spellInLista.livello === 0) || (spSpell && spSpell.livello === 0) || a.livello === 0;
                               const tipoAzione = cat === 'Azione' ? tr('1 Azione', '1 Action') : cat === 'Bonus' ? tr('Azione Bonus', 'Bonus Action') : tr('Reazione', 'Reaction');
                               const tempoLabel = tipoAzione;
-                              const distanza = gittataAttacco(a, spellInLista, armaDb)
-                                || a.gittata
-                                || (hasReach ? '3m' : '') || spSpell?.gittata
-                                || (!a.isSpell && (armaDb || a.tipo === 'tattica' || a.tipo === 'attacco') ? (lingua === 'en' ? '5 ft' : '1,5 m') : '');
+                              const distanza = isMultiattacco
+                                ? ''
+                                : (gittataAttacco(a, spellInLista, armaDb)
+                                  || a.gittata
+                                  || (hasReach ? '3m' : '') || spSpell?.gittata
+                                  || (!a.isSpell && (armaDb || a.tipo === 'tattica' || a.tipo === 'attacco') ? (lingua === 'en' ? '5 ft' : '1,5 m') : ''));
                               const isConc = !!(spSpell?.conc || (spellInLista && (spellInLista.conc || spellInLista.concentrazione)));
                               const isRituale = !!(spSpell?.rituale || (spellInLista && spellInLista.rituale));
 
@@ -13448,7 +13461,11 @@ export default function App() {
                                 if (infoMunizioni.usaMunizioni) righe.push(`${en ? 'Ammunition' : 'Munizioni'}: ${infoMunizioni.totale}`);
                                 if (a.aDueMani !== undefined && isVersatile) righe.push(`${en ? 'Grip' : 'Impugnatura'}: ${a.aDueMani ? (en ? 'two hands' : 'a due mani') : (en ? 'one hand' : 'a una mano')}`);
                                 for (const c of categorieNota) righe.push(c.etichetta ? `${c.etichetta}: ${c.testo}` : c.testo);
-                                const descr = (a.innescoIt || a.effettoIt) ? '' : (spiegazioneEffetto || (categorieNotaTutte.length ? '' : a.note) || '');
+                                const descr = isMultiattacco
+                                  ? (en
+                                      ? `When you take the Attack action, you make both attacks listed below in the same turn${testoCombo ? ` (${testoCombo})` : ''}. Roll the attack roll and damage separately for each individual attack below.`
+                                      : `Quando usi l'azione di Attacco con questa forma, effettui ENTRAMBI gli attacchi elencati di seguito nello stesso turno${testoCombo ? ` (${testoCombo})` : ''}. Tira per colpire e i danni separatamente per ciascun attacco sottostante.`)
+                                  : ((a.innescoIt || a.effettoIt) ? '' : (spiegazioneEffetto || (categorieNotaTutte.length ? '' : a.note) || ''));
                                 setInfo({
                                   titolo: cleanNome,
                                   iconaProps: {
@@ -13466,7 +13483,7 @@ export default function App() {
                               };
 
                               return (
-                                <tr key={a.id} className="attacchi-riga">
+                                <tr key={a.id} className={`attacchi-riga ${isMultiattacco ? 'attacco-multiplo-riga' : ''}`.trim()}>
                                   <td style={styles.td} className="attacchi-nome">
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                                       {a.isSpell || cat === 'Reazione' || a.tipoFonte === 'araldi' || a.isBestia ? (
@@ -13588,6 +13605,27 @@ export default function App() {
                                           🐾 Bestia
                                         </span>
                                       )}
+                                      {isMultiattacco && (
+                                        <span
+                                          style={{
+                                            fontSize: 10,
+                                            fontWeight: 700,
+                                            padding: '1px 5px',
+                                            borderRadius: 4,
+                                            background: 'rgba(201,162,39,0.18)',
+                                            color: C.goldDark,
+                                            border: `1px solid ${C.goldDark}`,
+                                            marginLeft: 4,
+                                            whiteSpace: 'nowrap',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: 3,
+                                          }}
+                                          title={lingua === 'en' ? 'Action reference: allows executing both attacks below with 1 Action' : 'Azione di riferimento: consente di effettuare entrambi gli attacchi sottostanti con 1 Azione'}
+                                        >
+                                          📋 {lingua === 'en' ? 'Reference' : 'Riferimento'}
+                                        </span>
+                                      )}
                                       {a.tipoFonte === 'araldi' && (
                                         <span
                                           style={{
@@ -13609,7 +13647,29 @@ export default function App() {
                                     </div>
                                   </td>
                                   <td style={styles.td} className="attacchi-bonus" data-label={t('combat.col_bonus')}>
-                                    {a.isTS ? (
+                                    {isMultiattacco ? (
+                                      <span
+                                        className="badge-multiattacco-riferimento"
+                                        style={{
+                                          fontSize: 11,
+                                          fontWeight: 600,
+                                          fontStyle: 'italic',
+                                          color: C.goldDark,
+                                          display: 'inline-flex',
+                                          alignItems: 'center',
+                                          gap: 4,
+                                          padding: '2px 8px',
+                                          background: 'rgba(201,162,39,0.08)',
+                                          borderRadius: 6,
+                                          border: `1px dashed rgba(201,162,39,0.4)`,
+                                          whiteSpace: 'nowrap',
+                                        }}
+                                        title={lingua === 'en' ? 'Perform both attacks listed below on your turn' : 'Effettua entrambi gli attacchi elencati sotto nel tuo turno'}
+                                      >
+                                        <span>👇</span>
+                                        <span>{lingua === 'en' ? 'Use both attacks below' : 'Usa entrambi gli attacchi sotto'}</span>
+                                      </span>
+                                    ) : a.isTS ? (
                                       // Incantesimo a tiro salvezza: solo la CD, mai un tiro per colpire.
                                       <BadgeTiroSalvezza cd={a.cd} caratteristica={a.caratteristicaTS} colore={coloreCategoria('tiroSalvezza', notteAttiva)} />
                                     ) : a.bonus === undefined || a.bonus === null || (!a.danno && (cat === 'Reazione' || !Number(a.bonus))) ? null : typeof a.bonus === 'string' && isNaN(Number(a.bonus)) ? (
@@ -13716,6 +13776,28 @@ export default function App() {
                                       >
                                         {tempoLabel}
                                       </span>
+                                      {isMultiattacco && testoCombo && (
+                                        <span
+                                          className="chip-combo-multiattacco"
+                                          style={{
+                                            fontSize: 11,
+                                            fontWeight: 600,
+                                            background: 'rgba(201,162,39,0.12)',
+                                            border: '1px solid rgba(201,162,39,0.35)',
+                                            borderRadius: 4,
+                                            padding: '1px 6px',
+                                            color: C.goldDark,
+                                            whiteSpace: 'nowrap',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: 4,
+                                          }}
+                                          title={a.note}
+                                        >
+                                          <span>⚔️</span>
+                                          <span>{lingua === 'en' ? `Both: ${testoCombo}` : `Entrambi: ${testoCombo}`}</span>
+                                        </span>
+                                      )}
                                       {distanza && (
                                         <span
                                           className="chip-gittata"

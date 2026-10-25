@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.4',
+    voci: {
+      it: [
+        'Riferimento Chiaro per Attacco Multiplo: quando una bestia o creatura possiede "Attacco multiplo", la riga compare evidenziata come promemoria di riferimento con badge "📋 Riferimento" e indicatore "👇 Usa entrambi gli attacchi sotto", indicando che con 1 Azione si eseguono entrambi gli attacchi elencati.',
+      ],
+      en: [
+        'Clear Reference for Multiattack: when a beast or creature has "Multiattack", its entry is highlighted as an action reference with a "📋 Reference" badge and "👇 Use both attacks below" guide, clarifying that 1 Action grants both attacks listed below.',
+      ],
+    },
+  },
+  {
     versione: '4.118.3',
     voci: {
       it: [

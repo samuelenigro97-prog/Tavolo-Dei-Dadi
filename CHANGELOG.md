@@ -2,6 +2,17 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.4] – 2026-10-25
+
+### Aggiunto
+- **Attacco Multiplo come Riferimento Visivo Chiaro**:
+  - Quando una bestia o trasformazione possiede l'azione "Attacco multiplo" (es. Aquila Gigante con 1 Becco + 1 Artigli), l'azione non viene più mostrata come un attacco fantasma vuoto, ma come promemoria di combinazione:
+    - Badge dorato `📋 Riferimento` e bordo laterale dorato per evidenziarla rispetto agli attacchi singoli tirabili.
+    - Indicatore `👇 Usa entrambi gli attacchi sotto` nell'area dei bonus d'attacco.
+    - Chip azione `[1 Azione]` e combinazione `[⚔️ Entrambi: <dettaglio>]` (senza la portata fuorviante di fallback `1,5 m`).
+    - Finestra dettagli esplicativa che chiarisce il funzionamento in D&D 5e (l'azione permette di effettuare tutti gli attacchi indicati con una sola Azione).
+  - Anche nella modale di dettaglio del compendio bestie (`BestiaDettaglioModal.jsx`), l'azione di attacco multiplo è contrassegnata dal badge `📋 Riferimento` e da spiegazione guidata.
+
 ## [4.118.3] – 2026-10-25
 
 ### Aggiunto

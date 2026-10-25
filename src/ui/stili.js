@@ -2193,6 +2193,10 @@ tbody tr:hover {
   background: var(--c-panel-light);
   box-shadow: none;
 }
+.attacchi-table .attacchi-riga.attacco-multiplo-riga {
+  border-left: 3.5px solid var(--c-gold, #c9a227) !important;
+  background: color-mix(in srgb, var(--c-panel-light) 94%, var(--c-gold, #c9a227)) !important;
+}
 .attacchi-table .attacchi-riga > td {
   display: inline-flex;
   align-items: center;
