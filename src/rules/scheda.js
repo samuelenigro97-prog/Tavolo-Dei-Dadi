@@ -332,11 +332,12 @@ export function estraiTipoDannoBestia(desc) {
 }
 
 export function parseAzioneBestia(azione) {
-  if (!azione) return { nome: 'Azione', desc: '', bonus: null, danno: '', tipoDanno: '', cd: null, testoOriginale: '' };
+  if (!azione) return { nome: 'Azione', desc: '', bonus: null, danno: '', tipoDanno: '', cd: null, testoOriginale: '', isMultiattacco: false };
   const str = typeof azione === 'string' ? azione : (azione.nome || azione.desc || '');
   const colonIdx = str.indexOf(':');
   const nome = colonIdx > -1 ? str.slice(0, colonIdx).trim() : (str.split(/[,.]/)[0] || 'Attacco');
   const desc = colonIdx > -1 ? str.slice(colonIdx + 1).trim() : str;
+  const isMultiattacco = /^(?:attacco\s+multiplo|multiattacco|multiattack)\b/i.test(nome);
 
   // Trova bonus per colpire: es. "+4 al tiro per colpire", "+5 per colpire", "+5 to hit"
   const matchHit = str.match(/([+-]?\d+)\s*(?:al tiro per colpire|per colpire|to hit)/i);
@@ -361,6 +362,7 @@ export function parseAzioneBestia(azione) {
     tipoDanno,
     cd,
     testoOriginale: str,
+    isMultiattacco,
   };
 }
 

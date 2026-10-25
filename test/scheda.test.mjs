@@ -549,6 +549,18 @@ test('estraiTipoDannoBestia e parseAzioneBestia: estrae formula, bonus, tipo dan
   const pMorso = parseAzioneBestia(morsoVeleno);
   assert.equal(pMorso.bonus, 4);
   assert.equal(pMorso.cd, 11);
+  assert.equal(pMorso.isMultiattacco, false);
+
+  const pMulti1 = parseAzioneBestia('Attacco multiplo: un becco e un artiglio.');
+  assert.equal(pMulti1.nome, 'Attacco multiplo');
+  assert.equal(pMulti1.isMultiattacco, true);
+  assert.equal(pMulti1.bonus, null);
+
+  const pMulti2 = parseAzioneBestia('Multiattacco: 1 Morso e 2 Artigli.');
+  assert.equal(pMulti2.isMultiattacco, true);
+
+  const pMulti3 = parseAzioneBestia('Multiattack: two claw attacks.');
+  assert.equal(pMulti3.isMultiattacco, true);
 });
 
 test('trovaReazioniDisponibili in forma animale: usa l attacco della bestia per l attacco di opportunita ed esclude incantesimi', () => {
