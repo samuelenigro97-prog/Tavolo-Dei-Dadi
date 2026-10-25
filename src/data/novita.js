@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.10',
+    voci: {
+      it: [
+        'Auto-apertura Combat Tracker: passando con il mouse sopra la barra/linguetta in basso quando il tracker è minimizzato, si auto-apre immediatamente, e si richiude cliccando all\'esterno.',
+      ],
+      en: [
+        'Combat Tracker Hover Auto-open: passing the mouse cursor over the bottom bar when minimized automatically opens the tracker, and clicking outside closes it.',
+      ],
+    },
+  },
+  {
     versione: '4.118.9',
     voci: {
       it: [

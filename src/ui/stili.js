@@ -1860,7 +1860,18 @@ tbody tr:hover {
    Quando RIDOTTO/CHIUSO (combat-chiuso): resta in vista solo la striscia con maniglia (10px / 14px),
    e avvicinando il cursore o passando col Tab fa capolino e sale in modo fluido;
    Cliccando sulla maniglia o sul pulsante ⚔️ si auto-apre completamente da sotto e resta aperto. */
-.combat-zona-apertura { display: none; }
+.combat-zona-apertura {
+  display: block;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 28px);
+  max-width: 1080px;
+  height: 22px;
+  z-index: 1499;
+  pointer-events: auto;
+}
 
 .combat-spacer {
   transition: height 0.14s cubic-bezier(0, 0, 0.2, 1);
@@ -1947,7 +1958,7 @@ tbody tr:hover {
 
 @media (hover: hover) and (pointer: fine) and (min-width: 681px) {
   :root[data-barra-a-scomparsa="si"] .combat-zona-apertura {
-    display: none;
+    display: block;
   }
   :root[data-barra-a-scomparsa="si"] .combat-tracker-fisso.combat-chiuso:hover {
     transform: translate3d(-50%, calc(100% - 18px), 0) !important;

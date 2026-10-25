@@ -1997,7 +1997,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.118.9';
+const APP_VERSION = '4.118.10';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -18226,11 +18226,26 @@ export default function App() {
       {/* ===== Combat tracker: barra fissa in basso a scomparsa (stile Fantasy Grounds) ===== */}
       {combat.attivo ? (
         <>
-          <div className="combat-zona-apertura" aria-hidden="true" />
+          {!combat.aperto && (
+            <div
+              className="combat-zona-apertura"
+              aria-hidden="true"
+              onMouseEnter={() => {
+                if (!combat.aperto) {
+                  setCombat((c) => ({ ...c, aperto: true }));
+                }
+              }}
+            />
+          )}
           <div
             ref={combatRef}
             data-testid="combat-tracker"
             className={`combat-tracker-fisso ${combat.aperto ? 'combat-aperto' : 'combat-chiuso'}`}
+            onMouseEnter={() => {
+              if (!combat.aperto) {
+                setCombat((c) => ({ ...c, aperto: true }));
+              }
+            }}
             onClick={() => {
               if (!combat.aperto) {
                 setCombat((c) => ({ ...c, aperto: true }));

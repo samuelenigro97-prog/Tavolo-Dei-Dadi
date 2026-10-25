@@ -347,6 +347,7 @@ test('combat tracker aperto fluttua con bordi arrotondati su tutti i lati e si m
   // Cliccando sul pulsante combat tracker si apre
   await page.locator('button[data-combat-toggle="true"]').first().click();
   await expect(tracker).toHaveClass(/combat-aperto/);
+  await page.waitForTimeout(350);
 
   // Verifica stile fluttuante (come la barra in alto): bordi arrotondati su tutti e 4 gli angoli
   const stili = await tracker.evaluate((el) => {
@@ -369,4 +370,8 @@ test('combat tracker aperto fluttua con bordi arrotondati su tutti i lati e si m
     return c.aperto;
   }).toBe(false);
   await expect(tracker).toHaveClass(/combat-chiuso/);
+
+  // Passando il mouse sopra la barra in basso (hover) si auto-apre
+  await tracker.hover();
+  await expect(tracker).toHaveClass(/combat-aperto/);
 });
