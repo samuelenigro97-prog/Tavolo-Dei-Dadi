@@ -1997,7 +1997,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.118.7';
+const APP_VERSION = '4.118.8';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4518,19 +4518,31 @@ export default function App() {
       if (!combatRef.current) return;
       if (combatRef.current.contains(e.target)) return;
       if (e.target && typeof e.target.closest === 'function') {
-        if (e.target.closest('[data-combat-toggle="true"]') || e.target.closest('[data-testid="ct-apri"]') || e.target.closest('[aria-label="Combat tracker"]')) return;
-        if (e.target.closest('.modal-backdrop') || e.target.closest('[role="dialog"]') || e.target.closest('.menu-iniziale-sfondo')) return;
+        if (
+          e.target.closest('[data-combat-toggle="true"]') ||
+          e.target.closest('[data-testid="ct-apri"]') ||
+          e.target.closest('.modal-backdrop') ||
+          e.target.closest('[role="dialog"]') ||
+          e.target.closest('.menu-iniziale-sfondo')
+        ) {
+          return;
+        }
+      }
+      if (document.activeElement && combatRef.current.contains(document.activeElement)) {
+        document.activeElement.blur();
       }
       setCombat((c) => (c.attivo && c.aperto ? { ...c, aperto: false } : c));
     }
 
     const timer = setTimeout(() => {
-      document.addEventListener('pointerdown', handleClickFuoriCombat);
-    }, 60);
+      document.addEventListener('pointerdown', handleClickFuoriCombat, true);
+      document.addEventListener('click', handleClickFuoriCombat, true);
+    }, 40);
 
     return () => {
       clearTimeout(timer);
-      document.removeEventListener('pointerdown', handleClickFuoriCombat);
+      document.removeEventListener('pointerdown', handleClickFuoriCombat, true);
+      document.removeEventListener('click', handleClickFuoriCombat, true);
     };
   }, [combat.attivo, combat.aperto]);
 
@@ -18225,22 +18237,11 @@ export default function App() {
               }
             }}
             style={{
-              // Tema del personaggio (colori della sua classe), non il generico.
               position: 'fixed',
               left: '50%',
-              bottom: 0,
               width: 'calc(100% - 28px)', // come la barra in alto (14 px di margine per lato)
               maxWidth: 1080,
               zIndex: 1500,
-              background: 'color-mix(in srgb, var(--c-panel) 96%, transparent)',
-              backdropFilter: 'blur(14px) saturate(140%)',
-              WebkitBackdropFilter: 'blur(14px) saturate(140%)',
-              borderTop: '1.5px solid var(--c-bordo-barra, var(--c-border))',
-              borderLeft: '1.5px solid var(--c-bordo-barra, var(--c-border))',
-              borderRight: '1.5px solid var(--c-bordo-barra, var(--c-border))',
-              borderTopLeftRadius: 12,
-              borderTopRightRadius: 12,
-              boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.25), 0 -1px 4px rgba(0, 0, 0, 0.12)',
               boxSizing: 'border-box',
             }}
           >

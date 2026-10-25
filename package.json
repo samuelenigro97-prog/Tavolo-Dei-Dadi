@@ -1,7 +1,7 @@
 {
   "name": "tavolo-dei-dadi",
   "private": true,
-  "version": "4.118.7",
+  "version": "4.118.8",
   "type": "module",
   "scripts": {
     "dev": "vite",
