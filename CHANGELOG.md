@@ -2,6 +2,13 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.9] – 2026-10-25
+
+### Modificato
+- **Pulsante e Modale Sostegno**:
+  - Aggiornata l'etichetta del pulsante nel menu principale in *Supporta il progetto ❤️* (e *Support the project ❤️* in inglese).
+  - Allineato il titolo della finestra modale in *Supporta Tavolo dei Dadi ❤️*.
+
 ## [4.118.8] – 2026-10-25
 
 ### Modificato
