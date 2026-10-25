@@ -2,6 +2,13 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.10] – 2026-10-26
+
+### Aggiunto
+- **Auto-Apertura Combat Tracker al Passaggio del Mouse (Hover)**:
+  - Quando il Combat Tracker è minimizzato in basso (`combat-chiuso`), passando il cursore sopra la linguetta/barra in basso o nella relativa zona di apertura, il tracker si auto-apre fluidamente e resta accessibile.
+  - Mantenuta l'auto-minimizzazione istantanea non appena si clicca in qualsiasi punto esterno della scheda.
+
 ## [4.118.9] – 2026-10-25
 
 ### Modificato
