@@ -2,6 +2,20 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.3] – 2026-10-25
+
+### Aggiunto
+- **Minimizzazione automatica del Combat Tracker al click esterno**:
+  - Toccando o cliccando fuori dal Combat Tracker quando è aperto, il pannello si riduce automaticamente alla sola linguetta inferiore, evitando che resti ad occupare lo schermo quando si torna a consultare la scheda.
+  - I pulsanti di apertura/minimizzazione del Combat Tracker e le modali aperte sopra non causano chiusure indesiderate.
+
+### Modificato
+- **Animazioni fluide e organiche per finestre a scomparsa, menu e modali**:
+  - Combat Tracker a scomparsa: transizione morbida di scorrimento verso l'alto e verso il basso con curva `0.32s cubic-bezier(0.16, 1, 0.3, 1)` e accelerazione GPU (`translate3d`), eliminando gli scatti secchi precedenti.
+  - Barra superiore fissa: transizione di discesa fluida a `0.3s cubic-bezier(0.16, 1, 0.3, 1)`.
+  - Finestre a comparsa, popup e modali (Menu Personaggi, Hub Mobile, Compendio, Notifiche, Dadi, Diario, Riposo, ecc.): sfondi oscurati con dissolvenza morbida (`backdrop-fade-in` 0.22s) e finestre con scorrimento graduale verso l'alto (`modal-scivola-su` 0.26s).
+  - Pieno supporto a `prefers-reduced-motion` per utenti con sensibilità al movimento.
+
 ## [4.118.2] – 2026-10-25
 
 ### Modificato

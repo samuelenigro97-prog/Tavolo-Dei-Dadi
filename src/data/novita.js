@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.3',
+    voci: {
+      it: [
+        'Minimizzazione Automatica Combat Tracker: toccando o cliccando in qualsiasi punto fuori dal Combat Tracker aperto, questo si richiude e minimizza dolcemente in automatico senza intralciare la lettura della scheda.',
+        'Animazioni Fluide Finestre a Scomparsa e Modali: Combat Tracker, menu personaggi, hub mobile e tutte le finestre di dialogo ora si aprono con animazioni scorrevoli ed ergonomiche con curve cubic-bezier hardware-accelerated.',
+      ],
+      en: [
+        'Automatic Combat Tracker Minimization: clicking or tapping anywhere outside the open Combat Tracker automatically and smoothly minimizes it back to the bottom dock.',
+        'Fluid Opening Animations for Panels & Modals: Combat Tracker, characters menu, mobile hub and all modal dialogs now open with smooth, hardware-accelerated cubic-bezier transitions.',
+      ],
+    },
+  },
+  {
     versione: '4.118.2',
     voci: {
       it: [
