@@ -1451,3 +1451,34 @@ export function trattiVantaggioAttaccoBestia(forma) {
   }
   return ris;
 }
+
+/**
+ * Determina lo stato e il colore del bollino indicatore per il Combat Tracker:
+ * - Verde: combat tracker aperto
+ * - Oro/Giallo: combattimento in corso ma ridotto a icona/minimizzato
+ * - Rosso: disattivo, non in combattimento
+ */
+export function calcolaStatoCombat(combat) {
+  if (!combat?.attivo) {
+    return {
+      stato: 'disattivo',
+      colore: 'var(--c-red, #c0392b)',
+      glow: '0 0 5px rgba(192, 57, 43, 0.65)',
+      aperto: false,
+    };
+  }
+  if (combat.aperto) {
+    return {
+      stato: 'aperto',
+      colore: 'var(--c-green, #2e9d4d)',
+      glow: '0 0 6px rgba(46, 157, 77, 0.75)',
+      aperto: true,
+    };
+  }
+  return {
+    stato: 'minimizzato',
+    colore: 'var(--c-gold, #c9a227)',
+    glow: '0 0 6px rgba(201, 162, 39, 0.7)',
+    aperto: false,
+  };
+}

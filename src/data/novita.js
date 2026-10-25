@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.5',
+    voci: {
+      it: [
+        'Bollino di Stato Combat Tracker Intuitivo: l\'icona delle spade incrociate (⚔️) mostra ora un bollino dinamico: verde se il combat tracker è aperto, oro se il combattimento è in corso ma ridotto a icona, e rosso se disattivo (non in combattimento).',
+      ],
+      en: [
+        'Intuitive Combat Tracker Status Dot: the crossed swords icon (⚔️) now features a dynamic status dot: green when the combat tracker is open, gold when combat is in progress but minimized, and red when inactive (not in fight).',
+      ],
+    },
+  },
+  {
     versione: '4.118.4',
     voci: {
       it: [
