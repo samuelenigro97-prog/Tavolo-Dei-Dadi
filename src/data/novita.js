@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.9',
+    voci: {
+      it: [
+        'Supporta il progetto: aggiornata la dicitura del pulsante nel menu di gestione e della modale in "Supporta il progetto ❤️".',
+      ],
+      en: [
+        'Support the project: updated the button label in the management menu and modal to "Support the project ❤️".',
+      ],
+    },
+  },
+  {
     versione: '4.118.8',
     voci: {
       it: [
