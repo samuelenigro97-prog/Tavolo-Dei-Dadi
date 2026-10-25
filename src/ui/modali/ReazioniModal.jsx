@@ -45,6 +45,7 @@ export function ReazioniModal({ aggiorna, lingua, registra, scheda, setInfo, set
 
   return (
     <div
+      className="modal-backdrop"
       style={{
         position: 'fixed',
         top: 0,
@@ -62,6 +63,7 @@ export function ReazioniModal({ aggiorna, lingua, registra, scheda, setInfo, set
       onClick={(e) => { if (e.target === e.currentTarget) setMostraModalReazioni(false); }}
     >
       <div
+        className="anim-modal-rapida"
         style={{
           background: C.panel,
           border: `1px solid ${C.border}`,

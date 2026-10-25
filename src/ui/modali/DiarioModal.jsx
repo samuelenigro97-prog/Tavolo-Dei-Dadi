@@ -8,6 +8,7 @@ import { IconaUI } from '../IconaFantasy.jsx';
 export function DiarioModal({ aggiorna, filtroDiario, lingua, scheda, setConferma, setFiltroDiario, setMostraDiarioModal, setVociDiarioChiuse, vociDiarioChiuse }) {
   return (
     <div
+      className="modal-backdrop"
       style={{
         position: 'fixed',
         inset: 0,
@@ -21,6 +22,7 @@ export function DiarioModal({ aggiorna, filtroDiario, lingua, scheda, setConferm
       onClick={(e) => { if (e.target === e.currentTarget) setMostraDiarioModal(false); }}
     >
       <div
+        className="anim-modal-rapida"
         style={{
           ...styles.panel,
           maxWidth: 900,

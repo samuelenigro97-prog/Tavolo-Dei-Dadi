@@ -7,13 +7,14 @@ import { normalizzaCodiceSync, formattaCodiceSync } from '../../utils/sync.js';
 export function CloudModal({ sostituisciOnlineConQuesta, autoSyncCodice, codiceSync, codiceSyncInput, conflittoSync, disattivaSyncCodice, esportaBackupCompleto, isCloudAttivo, isCloudConfigurato, lingua, ripristinaArchivioLocale, ripristinaArchivioRef, roster, setCodiceSyncInput, setConflittoSync, setMostraCloud, setSyncCodiceStatus, setTabBackup, sincronizzando, statoBgCloud, statoColoreCloud, statoGlowCloud, syncCodiceStatus, tabBackup, ultimoSyncCodice, usaCodiceSyncEsistente, creaCodiceSync, riattivaCodiceSync }) {
   return (
     <div
+      className="modal-backdrop"
       style={{
         position: 'fixed', inset: 0, zIndex: 1002, padding: 16,
         background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}
       onClick={(e) => { if (e.target === e.currentTarget) setMostraCloud(false); }}
     >
-      <div style={{ ...styles.panel, maxWidth: 460, width: '100%', maxHeight: '85vh', overflowY: 'auto' }}>
+      <div className="anim-modal-rapida" style={{ ...styles.panel, maxWidth: 460, width: '100%', maxHeight: '85vh', overflowY: 'auto' }}>
         <h1 style={{ ...styles.title, textAlign: 'center', marginBottom: 12 }}>{t('cloud.backup_titolo')}</h1>
         {conflittoSync && !conflittoSync.aperto && (
           <div role="status" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, padding: '8px 12px', marginBottom: 12, borderRadius: 8, border: '1px solid #f59e0b', background: 'rgba(245,158,11,0.12)', fontSize: 13 }}>

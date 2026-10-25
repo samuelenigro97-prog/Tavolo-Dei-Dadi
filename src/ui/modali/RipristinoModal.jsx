@@ -53,10 +53,11 @@ export function RipristinoModal({ leggiSnapshots, ripristinaSnapshot, setConferm
 
   return (
     <div
+      className="modal-backdrop"
       style={{ position: 'fixed', inset: 0, zIndex: 1005, padding: 16, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       onClick={(e) => { if (e.target === e.currentTarget) setMostraRipristino(false); }}
     >
-      <div style={{ ...styles.panel, maxWidth: 460, width: '100%', maxHeight: '80vh', overflowY: 'auto' }}>
+      <div className="anim-modal-rapida" style={{ ...styles.panel, maxWidth: 460, width: '100%', maxHeight: '80vh', overflowY: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <strong style={{ color: C.goldDark, fontSize: 16 }}>{tr('Versioni precedenti', 'Previous versions')}</strong>
           <button style={styles.buttonMini} onClick={() => setMostraRipristino(false)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>

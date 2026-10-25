@@ -7,10 +7,10 @@ import { IconaUI } from '../IconaFantasy.jsx';
 
 export function NotificheModal({ APP_VERSION, aggiorna, avvisoBackup, controlliAttivi, correggiTuttiControlli, eseguiCorrezione, esportaBackupCompleto, lingua, nuvolettaCorrezioni, posNotifiche, rimandaBackup, scheda, setMostraNotifiche, setNuvolettaCorrezioni }) {
   return (
-    <div onClick={() => setMostraNotifiche(false)} style={{ position: 'fixed', inset: 0, zIndex: 1400, background: 'transparent' }}>
+    <div className="modal-backdrop" onClick={() => setMostraNotifiche(false)} style={{ position: 'fixed', inset: 0, zIndex: 1400, background: 'transparent' }}>
       <div
         onClick={(e) => e.stopPropagation()}
-        className="no-stampa"
+        className="anim-modal-rapida no-stampa"
         style={{
           position: 'fixed', top: posNotifiche.top, left: posNotifiche.left,
           width: 'min(340px, calc(100vw - 16px))', maxHeight: 'min(75vh, 600px)', overflowY: 'auto',

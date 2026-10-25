@@ -684,6 +684,7 @@ export function CompendioModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="compendio-titolo"
+      className="modal-backdrop"
       style={{
         position: 'fixed',
         inset: 0,
@@ -695,13 +696,13 @@ export function CompendioModal({
         alignItems: 'center',
         justifyContent: 'center',
         padding: '16px',
-        animation: 'fadeIn 0.15s ease-out',
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onChiudi();
       }}
     >
       <div
+        className="anim-modal-rapida"
         style={{
           ...styles.panel,
           width: '100%',

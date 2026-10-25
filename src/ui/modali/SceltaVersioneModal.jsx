@@ -7,13 +7,14 @@ import { IconaUI } from '../IconaFantasy.jsx';
 export function SceltaVersioneModal({ eseguiImportConVersione, importPending, setImportPending, setMostraSceltaVersione }) {
   return (
     <div
+      className="modal-backdrop"
       style={{
         position: 'fixed', inset: 0, zIndex: 1003, padding: 16,
         background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}
       onClick={(e) => { if (e.target === e.currentTarget) { setMostraSceltaVersione(false); setImportPending(null); } }}
     >
-      <div style={{ ...styles.panel, maxWidth: 420, width: '100%' }}>
+      <div className="anim-modal-rapida" style={{ ...styles.panel, maxWidth: 420, width: '100%' }}>
         <h1 style={{ ...styles.title, textAlign: 'center', marginBottom: 8 }}>{t('importa.titolo')}</h1>
         <p style={{ ...styles.detail, textAlign: 'center', marginBottom: 16, lineHeight: 1.5 }}>
           {t('importa.selezionati', { n: importPending?.files?.length || 0 })}

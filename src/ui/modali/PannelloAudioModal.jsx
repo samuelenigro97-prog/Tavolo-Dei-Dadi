@@ -9,6 +9,7 @@ import { IconaUI } from '../IconaFantasy.jsx';
 export function PannelloAudioModal({ ambienteAudio, audioAvviatoDaGestoRef, effettiSonoriAttivi, lingua, notteAttiva, posPannelloAudio, presetColori, setAmbienteAudio, setEffettiSonoriAttivi, setMostraPannelloAudio, setPresetColori, setSottofondoAttivo, setVolumeAudio, setVolumeEffetti, sottofondoAttivo, urlCustomAudio, volumeAudio, volumeEffetti }) {
   return (
     <div
+      className="modal-backdrop"
       onClick={() => setMostraPannelloAudio(false)}
       style={{
         position: 'fixed', inset: 0, zIndex: 1400,
@@ -17,6 +18,7 @@ export function PannelloAudioModal({ ambienteAudio, audioAvviatoDaGestoRef, effe
     >
     <div
       onClick={(e) => e.stopPropagation()}
+      className="anim-modal-rapida"
       style={{
         position: 'fixed', top: posPannelloAudio.top, left: posPannelloAudio.left,
         width: 'min(280px, calc(100vw - 16px))',

@@ -1993,7 +1993,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.118.2';
+const APP_VERSION = '4.118.3';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4479,6 +4479,30 @@ export default function App() {
       document.removeEventListener('pointerdown', handleClickFuoriTiro);
     };
   }, [tiro, danni, rolling]);
+
+  // Autominimizzazione del combat tracker aperto quando si clicca all'esterno
+  useEffect(() => {
+    if (!combat.attivo || !combat.aperto) return;
+
+    function handleClickFuoriCombat(e) {
+      if (!combatRef.current) return;
+      if (combatRef.current.contains(e.target)) return;
+      if (e.target && typeof e.target.closest === 'function') {
+        if (e.target.closest('[data-combat-toggle="true"]') || e.target.closest('[data-testid="ct-apri"]') || e.target.closest('[aria-label="Combat tracker"]')) return;
+        if (e.target.closest('.modal-backdrop') || e.target.closest('[role="dialog"]') || e.target.closest('.menu-iniziale-sfondo')) return;
+      }
+      setCombat((c) => (c.attivo && c.aperto ? { ...c, aperto: false } : c));
+    }
+
+    const timer = setTimeout(() => {
+      document.addEventListener('pointerdown', handleClickFuoriCombat);
+    }, 60);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('pointerdown', handleClickFuoriCombat);
+    };
+  }, [combat.attivo, combat.aperto]);
 
   const isSolaLettura = Boolean(schedaSolaLettura);
   const scheda = schedaSolaLettura || (roster?.personaggi && roster.personaggi[roster.attivo]) || creaPersonaggio();
@@ -7737,10 +7761,12 @@ export default function App() {
 
       {info && (
         <div
+          className="modal-backdrop"
           style={{ position: 'fixed', inset: 0, zIndex: 3100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)' }}
           onClick={() => setInfo(null)}
         >
           <div
+            className="anim-modal-rapida"
             style={{ ...styles.panel, maxWidth: 500, width: '92vw', position: 'relative', boxShadow: '0 12px 35px rgba(0,0,0,0.4)', borderTop: `2px solid ${C.goldDark}` }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -7777,10 +7803,11 @@ export default function App() {
 
       {conferma && (
         <div
+          className="modal-backdrop"
           style={{ position: 'fixed', inset: 0, zIndex: 3200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, background: 'rgba(0,0,0,0.55)' }}
           onClick={() => setConferma(null)}
         >
-          <div style={{ ...styles.panel, maxWidth: 380, width: '100%', boxShadow: '0 8px 30px rgba(0,0,0,0.4)' }} onClick={(e) => e.stopPropagation()}>
+          <div className="anim-modal-rapida" style={{ ...styles.panel, maxWidth: 380, width: '100%', boxShadow: '0 8px 30px rgba(0,0,0,0.4)' }} onClick={(e) => e.stopPropagation()}>
             <strong style={{ color: C.red, fontSize: 16, display: 'block', marginBottom: 8 }}>{conferma.titolo}</strong>
             <div style={{ fontSize: 14, lineHeight: 1.45, color: C.ink, marginBottom: 16 }}>{conferma.testo}</div>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -7794,6 +7821,7 @@ export default function App() {
       {/* Modal Interattivo per Riposo Breve e Lungo */}
       {modalRiposo && (
         <div
+          className="modal-backdrop"
           style={{
             position: 'fixed',
             inset: 0,
@@ -7808,6 +7836,7 @@ export default function App() {
           onClick={() => setModalRiposo(null)}
         >
           <div
+            className="anim-modal-rapida"
             style={{
               ...styles.panel,
               maxWidth: 420,
@@ -8048,9 +8077,10 @@ export default function App() {
             aria-modal="true"
             aria-labelledby="conflitto-sync-titolo"
             data-testid="conflitto-sync"
+            className="modal-backdrop"
             style={{ position: 'fixed', inset: 0, zIndex: 3100, padding: 16, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
-            <div style={{ ...styles.panel, maxWidth: 480, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div className="anim-modal-rapida" style={{ ...styles.panel, maxWidth: 480, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
               <h2 id="conflitto-sync-titolo" style={{ ...styles.title, fontSize: 18, marginTop: 0, marginBottom: 8, color: 'var(--c-title)' }}>{t('conflitto.titolo')}</h2>
               <p style={{ ...styles.detail, fontSize: 13, lineHeight: 1.5, marginTop: 0 }}>{t('conflitto.spiegazione')}</p>
               <div style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: '8px 12px', margin: '12px 0', background: 'rgba(0,0,0,0.03)' }}>
@@ -8171,10 +8201,11 @@ export default function App() {
         }
         return (
           <div
+            className="modal-backdrop"
             style={{ position: 'fixed', inset: 0, zIndex: 1003, padding: 16, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             onClick={(e) => { if (e.target === e.currentTarget) setMostraPrivilegi(false); }}
           >
-            <div style={{ ...styles.panel, maxWidth: 520, width: '100%', maxHeight: '88vh', overflowY: 'auto' }}>
+            <div className="anim-modal-rapida" style={{ ...styles.panel, maxWidth: 520, width: '100%', maxHeight: '88vh', overflowY: 'auto' }}>
               <h1 style={{ ...styles.title, textAlign: 'center', marginBottom: 4 }}>{t('priv.panoramica')}</h1>
               <div style={{ textAlign: 'center', ...styles.detail, marginBottom: 12 }}>
                 {traduciDato(scheda.classe) || '—'}{scheda.sottoclasse ? ` · ${traduciDato(scheda.sottoclasse)}` : ''} · {tr('Liv.', 'Lvl')} {liv} · {versione === '2024' ? 'D&D 5.5' : 'D&D 5.0'}
@@ -8360,13 +8391,14 @@ export default function App() {
 
         return (
         <div
+          className="modal-backdrop"
           style={{
             position: 'fixed', inset: 0, zIndex: 1002, padding: 16,
             background: 'rgba(0,0,0,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
           onClick={(e) => { if (e.target === e.currentTarget) setMostraLevelUp(false); }}
         >
-          <div style={{ ...styles.panel, maxWidth: 500, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
+          <div className="anim-modal-rapida" style={{ ...styles.panel, maxWidth: 500, width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
             {/* INTESTAZIONE MODALE */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, paddingBottom: 10, borderBottom: `1px solid ${C.border}` }}>
               <h1 style={{ ...styles.title, margin: 0, fontSize: 18 }}>{t('levelup.titolo')}</h1>
@@ -8977,10 +9009,11 @@ export default function App() {
         const bonusRazza = regoleVersione === '2014' ? bonusCaratteristicheSpecie2014(bozzaCrea.specie, bozzaCrea.classe) : {};
         return (
           <div
+            className="modal-backdrop"
             style={{ position: 'fixed', inset: 0, zIndex: 1001, padding: 16, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             onClick={(e) => { if (e.target === e.currentTarget) setMostraCrea(false); }}
           >
-            <div style={{ ...styles.panel, maxWidth: 460, width: '100%', maxHeight: '88vh', overflowY: 'auto' }}>
+            <div className="anim-modal-rapida" style={{ ...styles.panel, maxWidth: 460, width: '100%', maxHeight: '88vh', overflowY: 'auto' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12, position: 'relative' }}>
                 <h1 style={{ ...styles.title, margin: 0 }}>{t('menu.nuovo_personaggio')}</h1>
                 <button
@@ -9528,10 +9561,11 @@ export default function App() {
 
       {stanzaUi.aperta && (
         <div
+          className="modal-backdrop"
           style={{ position: 'fixed', inset: 0, zIndex: 1010, padding: 16, background: 'rgba(0,0,0,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           onClick={(e) => { if (e.target === e.currentTarget) setStanzaUi((s) => ({ ...s, aperta: false })); }}
         >
-          <div style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 480, width: '100%' }}>
+          <div className="anim-modal-rapida" style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 480, width: '100%' }}>
             <h2 style={{ ...styles.title, fontSize: 18, margin: '0 0 6px', textAlign: 'center' }}>{t('stanze.titolo')}</h2>
             <p style={{ ...styles.detail, fontSize: 13, margin: '0 0 14px', textAlign: 'center' }}>{t('stanze.snapshot_desc', { ore: DURATA_STANZA_ORE })}</p>
 
@@ -9584,10 +9618,11 @@ export default function App() {
       {/* Link di condivisione appena creato */}
       {condivisione && (
         <div
+          className="modal-backdrop"
           style={{ position: 'fixed', inset: 0, zIndex: 1010, padding: 16, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           onClick={(e) => { if (e.target === e.currentTarget) setCondivisione(null); }}
         >
-          <div style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 520, width: '100%', maxHeight: '86vh', overflowY: 'auto' }}>
+          <div className="anim-modal-rapida" style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 520, width: '100%', maxHeight: '86vh', overflowY: 'auto' }}>
             <h2 style={{ ...styles.title, fontSize: 18, margin: '0 0 4px', textAlign: 'center' }}>{t('condividi.titolo')}</h2>
             <p style={{ ...styles.detail, textAlign: 'center', margin: '0 0 12px' }}>
               {condivisione.copiato ? t('condividi.copiato') : t('condividi.copia_a_mano')}
@@ -9618,8 +9653,11 @@ export default function App() {
 
       {/* Personaggio ricevuto da un link: si chiede conferma prima di aggiungerlo */}
       {pgDaLink && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 1011, padding: 16, background: 'rgba(0,0,0,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 460, width: '100%' }}>
+        <div
+          className="modal-backdrop"
+          style={{ position: 'fixed', inset: 0, zIndex: 1011, padding: 16, background: 'rgba(0,0,0,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <div className="anim-modal-rapida" style={{ background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 12, padding: '18px 20px', maxWidth: 460, width: '100%' }}>
             <h2 style={{ ...styles.title, fontSize: 18, margin: '0 0 10px', textAlign: 'center' }}>{t('condividi.ricevuto')}</h2>
             <div style={{ background: C.panelLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: '10px 12px', marginBottom: 12 }}>
               <div style={{ fontWeight: 700, color: C.ink, fontSize: 16 }}>{pgDaLink.nome || t('menu.senza_nome')}</div>
@@ -12825,6 +12863,7 @@ export default function App() {
               <div className="sottosezione-titolo" style={{ display: 'grid', gridTemplateColumns: 'minmax(28px, 1fr) auto minmax(28px, 1fr)', alignItems: 'center', columnGap: 6, marginTop: 18, marginBottom: 8 }}>
                 <div style={{ justifySelf: 'start' }}>
                   <button
+                    data-combat-toggle="true"
                     type="button"
                     onClick={() => {
                       if (combat.attivo && combat.aperto) setCombat((c) => ({ ...c, aperto: false }));

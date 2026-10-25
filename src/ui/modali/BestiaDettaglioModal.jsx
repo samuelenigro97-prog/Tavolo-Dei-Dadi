@@ -11,10 +11,12 @@ import { BadgeTiroSalvezza, caratteristicaDaTesto } from '../componenti.jsx';
 export function BestiaDettaglioModal({ aggiorna, bestiaDettaglio, lanciaD20, lanciaDanniDiretti, lingua, notteAttiva, registra, scheda, setBestiaDettaglio }) {
   return (
     <div
+      className="modal-backdrop"
       style={{ position: 'fixed', inset: 0, zIndex: 3150, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)' }}
       onClick={() => setBestiaDettaglio(null)}
     >
       <div
+        className="anim-modal-rapida"
         style={{
           ...styles.panel,
           maxWidth: 460,

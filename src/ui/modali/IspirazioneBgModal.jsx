@@ -11,6 +11,7 @@ export function IspirazioneBgModal({ applicaIspirazioneBg, bgIspirazioneScelto, 
 
   return (
     <div
+      className="modal-backdrop"
       style={{
         position: 'fixed',
         inset: 0,
@@ -24,6 +25,7 @@ export function IspirazioneBgModal({ applicaIspirazioneBg, bgIspirazioneScelto, 
       onClick={(e) => { if (e.target === e.currentTarget) setMostraIspirazioneBgModal(false); }}
     >
       <div
+        className="anim-modal-rapida"
         style={{
           ...styles.panel,
           maxWidth: 960,

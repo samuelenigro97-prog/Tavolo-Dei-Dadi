@@ -6,6 +6,7 @@ import { styles } from '../stili.js';
 export function DadiModal({ erroreEspressione, espressioneLibera, lingua, modalita, setErroreEspressione, setEspressioneLibera, setModalita, setMostraDadiModal, setStorico, storico, tiroEspressione, tiroLibero }) {
   return (
     <div
+      className="modal-backdrop"
       style={{
         position: 'fixed',
         inset: 0,
@@ -19,6 +20,7 @@ export function DadiModal({ erroreEspressione, espressioneLibera, lingua, modali
       onClick={(e) => { if (e.target === e.currentTarget) setMostraDadiModal(false); }}
     >
       <div
+        className="anim-modal-rapida"
         style={{
           ...styles.panel,
           maxWidth: 560,
