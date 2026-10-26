@@ -1997,7 +1997,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.118.11';
+const APP_VERSION = '4.118.12';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -6307,7 +6307,7 @@ export default function App() {
     const ids = Object.keys(roster.personaggi || {});
     if (!ids.length) return;
     const d = new Date();
-    const dataStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const dataStr = `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 
     // File unico di backup consolidato contenente TUTTI i personaggi
     const datiTutti = {
@@ -7414,7 +7414,7 @@ export default function App() {
   function scaricaRosterJson(r, etichetta) {
     const ids = Object.keys(r?.personaggi || {});
     const quando = new Date();
-    const dataStr = `${quando.getFullYear()}-${String(quando.getMonth() + 1).padStart(2, '0')}-${String(quando.getDate()).padStart(2, '0')}`;
+    const dataStr = `${String(quando.getDate()).padStart(2, '0')}-${String(quando.getMonth() + 1).padStart(2, '0')}`;
     const blob = new Blob([JSON.stringify({ tipo: 'tavolo-dei-dadi-roster', app: 'Tavolo dei Dadi', versione: APP_VERSION, data: quando.toISOString(), personaggi: ids.length, roster: r }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
