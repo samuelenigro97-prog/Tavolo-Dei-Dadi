@@ -22,7 +22,7 @@ import { creaStanza, apriStanza, normalizzaCodiceStanza, formattaCodiceStanza, D
 import { generaCodiceSync, normalizzaCodiceSync, salvaSync, caricaSync, caricaStoriaSync, messaggioErroreSync } from './utils/sync.js';
 import { posizionePopover, stilePopover } from './utils/popover.js';
 import { normalizzaPreferenze } from './utils/preferenze.js';
-import { improntaRoster, contenutoBase, decidiSync, riepilogoConflitto, leggiBaseSync, salvaBaseSync, revisioneGist } from './utils/conflittiSync.js';
+import { improntaRoster, improntaPersonaggi, contenutoBase, decidiSync, riepilogoConflitto, leggiBaseSync, salvaBaseSync, revisioneGist } from './utils/conflittiSync.js';
 import { potaSnapshot } from './utils/cronologia.js';
 import { CHIAVE_AVVIO_DIRETTO } from './utils/avvio.js';
 import { riassumiDescrizione } from './utils/testo.js';
@@ -1997,7 +1997,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.118.16';
+const APP_VERSION = '4.118.17';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -3553,7 +3553,10 @@ export default function App() {
         const dopo = daAggiornare.personaggi?.[id] || {};
         return (!prima.ritratto && dopo.ritratto) || (!prima.mappaCampagna && dopo.mappaCampagna);
       });
-      if (aggiunte || cambiato) setRoster(daAggiornare);
+      if (aggiunte || cambiato) {
+        rosterAutoIdratatoRef.current = daAggiornare;
+        setRoster(daAggiornare);
+      }
     }).catch(() => { /* fallback localStorage per browser senza IndexedDB */ });
     return () => { attivo = false; };
     // Il recupero dal database immagini va eseguito una sola volta all'avvio.
@@ -3981,6 +3984,7 @@ export default function App() {
   // dall'online e gli automatismi all'avvio non rendono "nuova" una copia vecchia.
   const ultimaInterazioneRef = useRef(0);
   const rosterDaRemotoRef = useRef(null);
+  const rosterAutoIdratatoRef = useRef(null);
   const rosterVistoRef = useRef(roster);
   useEffect(() => {
     const segna = () => { ultimaInterazioneRef.current = Date.now(); };
@@ -3994,8 +3998,10 @@ export default function App() {
   useEffect(() => {
     const prima = rosterVistoRef.current;
     rosterVistoRef.current = roster;
-    if (prima === roster || roster === rosterDaRemotoRef.current) return;
+    if (prima === roster || roster === rosterDaRemotoRef.current || roster === rosterAutoIdratatoRef.current) return;
+    if (prima?.personaggi === roster?.personaggi) return;
     if (Date.now() - ultimaInterazioneRef.current > 5000) return;
+    if (improntaPersonaggi({ attivo: prima?.attivo || '', personaggi: prima?.personaggi || {} }) === improntaPersonaggi({ attivo: prima?.attivo || '', personaggi: roster?.personaggi || {} })) return;
     try { localStorage.setItem(CHIAVE_ULTIMA_MODIFICA, String(Date.now())); } catch { /* niente */ }
   }, [roster]);
 
@@ -4613,10 +4619,12 @@ export default function App() {
       if (!corrente) return r;
       const sincronizzate = sincronizzaRisorseClasse(corrente, corrente.versione || regoleVersione || '2024');
       if (sincronizzate === corrente.risorse) return r;
-      return {
+      const prossimo = {
         ...r,
         personaggi: { ...r.personaggi, [r.attivo]: { ...corrente, risorse: sincronizzate } },
       };
+      rosterAutoIdratatoRef.current = prossimo;
+      return prossimo;
     });
   }, [roster.attivo, scheda?.classe, scheda?.livello, scheda?.versione, scheda?.caratteristiche, regoleVersione, isSolaLettura]);
 
@@ -4635,10 +4643,12 @@ export default function App() {
       const poteriCambiati = poteri !== corrente.poteri;
       const sincronizzate = sincronizzaRisorsePoteri(poteri, corrente.risorse, livelloTotaleScheda(corrente), corrente.bonusCompetenza);
       if (!poteriCambiati && JSON.stringify(sincronizzate) === JSON.stringify(corrente.risorse || [])) return r;
-      return {
+      const prossimo = {
         ...r,
         personaggi: { ...r.personaggi, [r.attivo]: { ...corrente, ...(poteriCambiati ? { poteri } : {}), risorse: sincronizzate } },
       };
+      rosterAutoIdratatoRef.current = prossimo;
+      return prossimo;
     });
   }, [roster.attivo, scheda?.poteri, scheda?.livello, scheda?.multiclasse, scheda?.bonusCompetenza, isSolaLettura]);
 
@@ -6772,18 +6782,34 @@ export default function App() {
     if (pref) caricato.preferenze = pref;
     return caricato;
   }
+  function preparaBasePerDecisione(canale, remoto, rosterLocale, tsLocale) {
+    const baseSalvata = leggiBaseCanale(canale);
+    const nessunaModificaManuale = !tsLocale || (baseSalvata?.ts > 0 && tsLocale <= baseSalvata.ts);
+    if (nessunaModificaManuale && baseSalvata?.ts > 0 && remoto?.roster && improntaPersonaggi(remoto.roster) !== improntaPersonaggi(rosterLocale)) {
+      return { ...baseSalvata, hash: improntaRoster(rosterLocale), contenuto: contenutoBase(rosterLocale) };
+    }
+    return baseSalvata;
+  }
   /** Sostituisce il roster locale con la versione online e ne fa la nuova base.
    *  Prima salva una copia locale in Cronologia versioni, per sicurezza. */
   async function applicaRosterRemoto(canale, remoto, atteso = null) {
     salvaSnapshot(rosterSyncRef.current, 'prima-sync');
     const conImmaginiLocali = await caricaImmaginiRoster(remoto.roster).catch(() => remoto.roster);
-    // Caricamento automatico: se nel frattempo l'utente ha modificato qualcosa
-    // non si sostituisce nulla (lo gestirà il prossimo controllo come conflitto).
-    if (atteso && rosterSyncRef.current !== atteso) return false;
+    // Caricamento automatico: se nel frattempo l'utente ha modificato qualcosa a mano
+    // sui personaggi non si sostituisce nulla (lo gestirà il prossimo controllo).
+    if (
+      atteso &&
+      rosterSyncRef.current !== atteso &&
+      rosterSyncRef.current?.personaggi !== rosterAutoIdratatoRef.current?.personaggi &&
+      improntaPersonaggi(rosterSyncRef.current) !== improntaPersonaggi(atteso)
+    ) {
+      return false;
+    }
     const { preferenze: prefRemote, ...finale } = preservaImmaginiSeMancanti(conImmaginiLocali, rosterSyncRef.current);
     // La base è la copia online così com'è: se qui resta un'immagine che online manca,
     // il roster risulta modificato e l'immagine viene inviata al prossimo salvataggio.
     salvaBaseCanale(canale, { rev: remoto.rev, ts: remoto.ts, hash: improntaRoster(remoto.roster), contenuto: contenutoBase(remoto.roster) });
+    try { localStorage.removeItem(CHIAVE_ULTIMA_MODIFICA); } catch { /* niente */ }
     rosterSyncRef.current = finale;
     rosterDaRemotoRef.current = finale;
     setRoster(finale);
@@ -6810,12 +6836,19 @@ export default function App() {
     }
     if (decisione.azione === 'allineato') {
       salvaBaseCanale(canale, { rev: remoto.rev, ts: remoto.ts, hash: improntaRoster(rosterValutato), contenuto: contenutoBase(rosterValutato) });
+      try { localStorage.removeItem(CHIAVE_ULTIMA_MODIFICA); } catch { /* niente */ }
       if (!silenzioso) setStato({ text: t('conflitto.gia_allineato'), type: 'success' });
       return true;
     }
     if (decisione.azione === 'unisci') {
-      // Modifiche nel frattempo: le gestirà il prossimo controllo (parte da solo).
-      if (rosterSyncRef.current !== rosterValutato) return true;
+      // Modifiche manuali nel frattempo: le gestirà il prossimo controllo (parte da solo).
+      if (
+        rosterSyncRef.current !== rosterValutato &&
+        rosterSyncRef.current?.personaggi !== rosterAutoIdratatoRef.current?.personaggi &&
+        improntaPersonaggi(rosterSyncRef.current) !== improntaPersonaggi(rosterValutato)
+      ) {
+        return true;
+      }
       salvaSnapshot(rosterSyncRef.current, 'prima-sync');
       if (decisione.motivo === 'conflitto-vince-locale') salvaSnapshot(remoto.roster, 'online-sostituita');
       const finale = preservaImmaginiSeMancanti(decisione.roster, rosterSyncRef.current);
@@ -6924,6 +6957,7 @@ export default function App() {
       setSincronizzando(true);
       if (!silenzioso) setCloudStatus({ text: 'Salvataggio in corso…', type: 'info' });
       const quando = Date.now();
+      const tsLocaleInizio = leggiUltimaModificaLocale();
       const rosterLocale = rosterSyncRef.current;
       let nuovoId = gistSyncRef.current;
       let remoto = null;
@@ -6954,7 +6988,8 @@ export default function App() {
         }
       }
       if (!forza) {
-        const decisione = decidiSync({ base: leggiBaseCanale('gist'), remoto, locale: rosterLocale, politica: POLITICA_SYNC, tsLocale: leggiUltimaModificaLocale() });
+        const basePerDecisione = preparaBasePerDecisione('gist', remoto, rosterLocale, tsLocaleInizio);
+        const decisione = decidiSync({ base: basePerDecisione, remoto, locale: rosterLocale, politica: POLITICA_SYNC, tsLocale: tsLocaleInizio });
         if (await gestisciDecisione('gist', decisione, remoto, silenzioso, setCloudStatus, rosterLocale)) return;
         if (soloLettura) return;
       }
@@ -6993,6 +7028,7 @@ export default function App() {
       // La nuova base è la versione appena scritta. Se la revisione non è
       // leggibile resta vuota: il prossimo controllo userà il timestamp.
       salvaBaseCanale('gist', { rev: revisioneGist(outScrittura), ts: quando, hash: improntaRoster(rosterLocale), contenuto: contenutoBase(rosterLocale) });
+      try { localStorage.removeItem(CHIAVE_ULTIMA_MODIFICA); } catch { /* niente */ }
       const orario = new Date(quando).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
       setUltimoSync(orario);
       localStorage.setItem('scheda-interattiva:ultimo-sync', orario);
@@ -7155,6 +7191,7 @@ export default function App() {
       setSincronizzando(true);
       if (!silenzioso) setSyncCodiceStatus({ text: 'Salvataggio in corso…', type: 'info' });
       const quando = Date.now();
+      const tsLocaleInizio = leggiUltimaModificaLocale();
       const rosterLocale = rosterSyncRef.current;
       let remoto = null;
       let rosterRemotoGrezzo = null;
@@ -7173,7 +7210,8 @@ export default function App() {
         }
       }
       if (!forza) {
-        const decisione = decidiSync({ base: leggiBaseCanale('codice'), remoto, locale: rosterLocale, politica: POLITICA_SYNC, tsLocale: leggiUltimaModificaLocale() });
+        const basePerDecisione = preparaBasePerDecisione('codice', remoto, rosterLocale, tsLocaleInizio);
+        const decisione = decidiSync({ base: basePerDecisione, remoto, locale: rosterLocale, politica: POLITICA_SYNC, tsLocale: tsLocaleInizio });
         if (await gestisciDecisione('codice', decisione, remoto, silenzioso, setSyncCodiceStatus, rosterLocale)) return;
         if (soloLettura) return;
       } else if (remoto?.roster) {
@@ -7202,6 +7240,7 @@ export default function App() {
       }
       riprovaConflittoRef.current = 0;
       salvaBaseCanale('codice', { rev: String(quando), ts: quando, hash: improntaRoster(rosterLocale), contenuto: contenutoBase(rosterLocale) });
+      try { localStorage.removeItem(CHIAVE_ULTIMA_MODIFICA); } catch { /* niente */ }
       const orario = new Date(quando).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
       setUltimoSyncCodice(orario);
       localStorage.setItem('scheda-interattiva:ultimo-sync-codice', orario);

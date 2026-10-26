@@ -26,9 +26,6 @@ export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg
   // `attivo` viene salvato nel roster: è quindi anche l'ultimo personaggio effettivamente usato.
   const ultimoPersonaggio = roster?.personaggi?.[roster?.attivo] || scheda;
   const apriUltimoPersonaggio = () => {
-    if (roster?.attivo && roster?.personaggi?.[roster.attivo]) {
-      setRoster((r) => ({ ...r, attivo: r.attivo }));
-    }
     setSchedaSolaLettura(null);
     setMostraMenu(false);
   };
@@ -120,7 +117,7 @@ export function MenuPersonaggiModal({ APP_VERSION, stileTemaBase, coloreClassePg
                         background: `color-mix(in srgb, ${col} 12%, var(--c-panel-light))`,
                       } : {}),
                     }}
-                    onClick={() => { setSchedaSolaLettura(null); setRoster((r) => ({ ...r, attivo: id })); setMostraMenu(false); }}
+                    onClick={() => { setSchedaSolaLettura(null); setRoster((r) => (r.attivo === id ? r : { ...r, attivo: id })); setMostraMenu(false); }}
                   >
                     <span>{p.nome || t('menu.senza_nome')}</span>
                     <span style={{ ...styles.detail, ...(col ? { color: `color-mix(in srgb, ${col} 65%, var(--c-ink))`, fontWeight: 700 } : {}) }}>{p.classe ? `${p.classe}` : '—'}</span>

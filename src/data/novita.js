@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.17',
+    voci: {
+      it: [
+        'Protezione Sync da Telefono: risolto il problema per cui aprire l\'app o premere "Riprendi" su un secondo dispositivo rimasto indietro faceva apparire la copia locale come appena modificata e sovrascriveva la scheda online più recente.',
+      ],
+      en: [
+        'Phone Sync Protection: fixed the issue where opening the app or tapping "Resume" on an older secondary device marked the local copy as newly edited and overwrote the newer online sheet.',
+      ],
+    },
+  },
+  {
     versione: '4.118.16',
     voci: {
       it: [
