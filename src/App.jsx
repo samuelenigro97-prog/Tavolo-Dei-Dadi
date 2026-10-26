@@ -27,7 +27,7 @@ import { potaSnapshot } from './utils/cronologia.js';
 import { CHIAVE_AVVIO_DIRETTO } from './utils/avvio.js';
 import { riassumiDescrizione } from './utils/testo.js';
 import { trovaBackdropInCima, eCampoModificabile, deveAttivareDaTastiera } from './utils/accessibilita.js';
-import { salvaJsonLiberandoSpazio, deveRicordareBackup, rosterSenzaImmagini, riagganciaImmagini, salvaImmaginiRoster, caricaImmaginiRoster, rimuoviImmaginePersonaggio, preservaImmaginiSeMancanti } from './utils/persistenza.js';
+import { salvaJsonLiberandoSpazio, deveRicordareBackup, rosterSenzaImmagini, riagganciaImmagini, salvaImmaginiRoster, caricaImmaginiRoster, rimuoviImmaginePersonaggio, preservaImmaginiSeMancanti, CHIAVE_ULTIMO_AUTO_BACKUP_GIORNALIERO, formattaDataIsoLocale, deveScaricareBackupGiornaliero } from './utils/persistenza.js';
 import { datiTabelleBackground } from './data/tabelleBackground.js';
 import { CompendioModal } from './ui/CompendioModal.jsx';
 
@@ -1997,7 +1997,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.118.12';
+const APP_VERSION = '4.118.13';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -3463,6 +3463,8 @@ export default function App() {
   }, [aggiornamentoPronto, aggiornando, sincronizzando]);
 
   const [roster, setRoster] = useState(loadState);
+  const rosterRef = useRef(roster);
+  rosterRef.current = roster;
   const [erroreSalvataggio, setErroreSalvataggio] = useState('');
   const [chiusoBannerAggiornamento, setChiusoBannerAggiornamento] = useState(false);
   useEffect(() => {
@@ -6303,8 +6305,9 @@ export default function App() {
   }
 
   /** Backup COMPLETO: esporta TUTTI i personaggi del roster in un unico file JSON consolidato. */
-  function esportaBackupCompleto() {
-    const ids = Object.keys(roster.personaggi || {});
+  function esportaBackupCompleto(opzioni = {}) {
+    const r = rosterRef.current || roster;
+    const ids = Object.keys(r?.personaggi || {});
     if (!ids.length) return;
     const d = new Date();
     const dataStr = `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}`;
@@ -6316,7 +6319,7 @@ export default function App() {
       versione: APP_VERSION,
       data: new Date().toISOString(),
       personaggi: ids.length,
-      roster: roster,
+      roster: r,
     };
     const blobRoster = new Blob([JSON.stringify(datiTutti, null, 2)], { type: 'application/json' });
     const urlRoster = URL.createObjectURL(blobRoster);
@@ -6326,8 +6329,50 @@ export default function App() {
     aRoster.click();
     URL.revokeObjectURL(urlRoster);
     segnaBackupFatto();
-    setSyncCodiceStatus({ text: tr(`Backup esportato (${ids.length} personaggi).`, `Backup exported (${ids.length} characters).`), type: 'success' });
+    try {
+      localStorage.setItem(CHIAVE_ULTIMO_AUTO_BACKUP_GIORNALIERO, formattaDataIsoLocale(d));
+    } catch { /* niente */ }
+    const isAuto = opzioni && typeof opzioni === 'object' && opzioni.automatico === true;
+    if (isAuto) {
+      setSyncCodiceStatus({ text: tr(`Backup automatico del giorno scaricato (${ids.length} personaggi).`, `Daily automatic backup downloaded (${ids.length} characters).`), type: 'success' });
+    } else {
+      setSyncCodiceStatus({ text: tr(`Backup esportato (${ids.length} personaggi).`, `Backup exported (${ids.length} characters).`), type: 'success' });
+    }
   }
+
+  // Backup automatico giornaliero: una volta al giorno, la prima volta dopo la mezzanotte all'apertura dell'app
+  useEffect(() => {
+    const verificaAutoBackup = () => {
+      try {
+        const oggi = formattaDataIsoLocale();
+        const ultimo = localStorage.getItem(CHIAVE_ULTIMO_AUTO_BACKUP_GIORNALIERO);
+        const r = rosterRef.current || roster;
+        const pgReali = Object.values(r?.personaggi || {})
+          .filter((s) => s && ((s.nome || '').trim() || (s.classe || '').trim())).length;
+        if (deveScaricareBackupGiornaliero({ ultimoAutoBackup: ultimo, dataOggi: oggi, pgReali })) {
+          localStorage.setItem(CHIAVE_ULTIMO_AUTO_BACKUP_GIORNALIERO, oggi);
+          esportaBackupCompleto({ automatico: true });
+        }
+      } catch { /* niente */ }
+    };
+
+    // All'avvio attende un breve intervallo per consentire l'idratazione da IndexedDB
+    const timerAvvio = setTimeout(verificaAutoBackup, 1500);
+
+    // Controlla anche se l'app torna visibile (es. lasciata aperta nel browser fino al giorno successivo)
+    const quandoVisibile = () => {
+      if (document.visibilityState === 'visible') {
+        verificaAutoBackup();
+      }
+    };
+    document.addEventListener('visibilitychange', quandoVisibile);
+
+    return () => {
+      clearTimeout(timerAvvio);
+      document.removeEventListener('visibilitychange', quandoVisibile);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /** Ripristina l'archivio locale da un file JSON (supporta backup multipli o singoli). */
   async function ripristinaArchivioLocale(evento) {

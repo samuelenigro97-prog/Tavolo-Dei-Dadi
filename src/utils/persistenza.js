@@ -182,3 +182,23 @@ export async function rimuoviImmaginePersonaggio(id, campo) {
   });
   db.close();
 }
+
+export const CHIAVE_ULTIMO_AUTO_BACKUP_GIORNALIERO = 'scheda-interattiva:ultimo-auto-backup-giornaliero';
+
+/** Restituisce la data locale in formato YYYY-MM-DD. */
+export function formattaDataIsoLocale(d = new Date()) {
+  const anno = d.getFullYear();
+  const mese = String(d.getMonth() + 1).padStart(2, '0');
+  const giorno = String(d.getDate()).padStart(2, '0');
+  return `${anno}-${mese}-${giorno}`;
+}
+
+/**
+ * Decide se scaricare il backup automatico giornaliero:
+ * deve esserci almeno 1 personaggio reale e non deve essere già stato scaricato oggi.
+ */
+export function deveScaricareBackupGiornaliero({ ultimoAutoBackup = '', dataOggi = formattaDataIsoLocale(), pgReali = 0 } = {}) {
+  if (pgReali < 1) return false;
+  if (!dataOggi) return false;
+  return ultimoAutoBackup !== dataOggi;
+}

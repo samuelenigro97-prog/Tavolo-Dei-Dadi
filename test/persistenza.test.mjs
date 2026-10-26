@@ -122,3 +122,21 @@ test('persistenza: promemoria backup solo senza sync, dopo 7 giorni e fuori dall
   assert.equal(deveRicordareBackup({ ora, pgReali: 1, primoAvvio: ora - 9 * giorno }), true, 'installata da più di 7 giorni');
   assert.equal(deveRicordareBackup({ ora, pgReali: 1, primoAvvio: ora - 9 * giorno, ultimoBackup: ora - giorno }), false, 'il backup vale più del primo avvio');
 });
+
+test('persistenza: backup automatico giornaliero scatta una volta al giorno dopo la mezzanotte se ci sono PG', async () => {
+  const { formattaDataIsoLocale, deveScaricareBackupGiornaliero, CHIAVE_ULTIMO_AUTO_BACKUP_GIORNALIERO } = await import('../src/utils/persistenza.js');
+  assert.equal(CHIAVE_ULTIMO_AUTO_BACKUP_GIORNALIERO, 'scheda-interattiva:ultimo-auto-backup-giornaliero');
+
+  const d = new Date(2026, 9, 26, 1, 30); // 26 ottobre 2026
+  assert.equal(formattaDataIsoLocale(d), '2026-10-26');
+
+  // Nessun personaggio: non deve scaricare backup a vuoto
+  assert.equal(deveScaricareBackupGiornaliero({ ultimoAutoBackup: '', dataOggi: '2026-10-26', pgReali: 0 }), false);
+
+  // Primo avvio del giorno con almeno 1 personaggio: deve scaricare
+  assert.equal(deveScaricareBackupGiornaliero({ ultimoAutoBackup: '', dataOggi: '2026-10-26', pgReali: 1 }), true);
+  assert.equal(deveScaricareBackupGiornaliero({ ultimoAutoBackup: '2026-10-25', dataOggi: '2026-10-26', pgReali: 2 }), true);
+
+  // Già scaricato oggi: non deve scaricare una seconda volta nello stesso giorno
+  assert.equal(deveScaricareBackupGiornaliero({ ultimoAutoBackup: '2026-10-26', dataOggi: '2026-10-26', pgReali: 1 }), false);
+});

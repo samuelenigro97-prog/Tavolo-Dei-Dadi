@@ -2,6 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.13] – 2026-10-26
+
+### Aggiunto
+- **Backup Automatico Giornaliero all'Avvio dopo la Mezzanotte**:
+  - La prima volta che l'applicazione viene aperta (o torna visibile nel browser) dopo la mezzanotte di ogni giorno solare, se nel roster è presente almeno un personaggio reale viene scaricato automaticamente il file di backup consolidato `Backup Tavolo dei Dadi (GG-MM).json`.
+  - Lo stato dell'ultimo backup giornaliero viene tracciato in `localStorage` (`scheda-interattiva:ultimo-auto-backup-giornaliero`), garantendo che il download avvenga esattamente una sola volta al giorno senza interrompere o rallentare l'esperienza dell'utente.
+  - Viene mostrata una notifica discreta di conferma del backup automatico scaricato.
+
 ## [4.118.12] – 2026-10-26
 
 ### Modificato

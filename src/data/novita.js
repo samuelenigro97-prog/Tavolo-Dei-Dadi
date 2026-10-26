@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.13',
+    voci: {
+      it: [
+        'Backup Automatico Giornaliero: la prima volta che apri l\'app dopo la mezzanotte viene scaricato in automatico il file di backup completo del tuo roster ("Backup Tavolo dei Dadi (GG-MM).json"), proteggendo ogni giorno i tuoi personaggi senza interruzioni.',
+      ],
+      en: [
+        'Daily Automatic Backup: the first time you open the app after midnight, a complete backup file of your roster ("Backup Tavolo dei Dadi (DD-MM).json") is automatically downloaded, protecting your characters daily without interruptions.',
+      ],
+    },
+  },
+  {
     versione: '4.118.12',
     voci: {
       it: [
