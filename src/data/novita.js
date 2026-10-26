@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.15',
+    voci: {
+      it: [
+        'Sfondi Caratteristiche: ripristinate le emoticon emoji a sfondo (⚔️ Forza, 🏹 Destrezza, 🛡️ Costituzione, 📚 Intelligenza, 🔮 Saggezza, 🎭 Carisma) per una resa più vivace e riconoscibile.',
+      ],
+      en: [
+        'Ability Backgrounds: restored background emoji watermarks (⚔️ Strength, 🏹 Dexterity, 🛡️ Constitution, 📚 Intelligence, 🔮 Wisdom, 🎭 Charisma) for a more vivid and recognizable feel.',
+      ],
+    },
+  },
+  {
     versione: '4.118.14',
     voci: {
       it: [
