@@ -56,12 +56,12 @@ async function fetchConTimeout(url, opzioni = {}, timeoutMs = 8000) {
 }
 
 const SFONDO_CARATTERISTICA = {
-  forza:        { iconaUI: 'spadone', label: 'Forza' },
-  destrezza:    { iconaUI: 'arco', label: 'Destrezza' },
-  costituzione: { iconaUI: 'scudo', label: 'Costituzione' },
-  intelligenza: { iconaUI: 'libro', label: 'Intelligenza' },
-  saggezza:     { iconaUI: 'arcano', label: 'Saggezza' },
-  carisma:      { iconaUI: 'stella', label: 'Carisma' },
+  forza:        { symbol: '⚔️', label: 'Forza' },
+  destrezza:    { symbol: '🏹', label: 'Destrezza' },
+  costituzione: { symbol: '🛡️', label: 'Costituzione' },
+  intelligenza: { symbol: '📚', label: 'Intelligenza' },
+  saggezza:     { symbol: '🔮', label: 'Saggezza' },
+  carisma:      { symbol: '🎭', label: 'Carisma' },
 };
 
 
@@ -1997,7 +1997,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.118.14';
+const APP_VERSION = '4.118.15';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -11984,10 +11984,10 @@ export default function App() {
               const sostituitaDaForma = isTrasformato && (formaAttiva.tutteLeCaratteristiche || ['forza', 'destrezza', 'costituzione'].includes(key));
               return (
                 <div key={key} className={`blocco-car car-colore car-${key}`} style={{ ...styles.abilityBlock, position: 'relative', overflow: 'hidden' }}>
-                  {/* Sfondo SVG opaco vettoriale che rappresenta la caratteristica */}
+                  {/* Sfondo emoji opaco che rappresenta la caratteristica */}
                   {sfondoCar && (
-                    <span aria-hidden className="sfondo-car-svg" style={{ position: 'absolute', right: -4, bottom: -6, opacity: 0.12, pointerEvents: 'none', userSelect: 'none', transform: 'rotate(-8deg)', color: `var(--c-car-${key}, var(--c-gold))` }}>
-                      <IconaUI nome={sfondoCar.iconaUI} dimensione={68} />
+                    <span aria-hidden className="sfondo-car-emoji">
+                      {sfondoCar.symbol}
                     </span>
                   )}
                   <div className="blocco-car-header" style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>

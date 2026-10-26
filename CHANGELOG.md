@@ -2,6 +2,19 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.15] – 2026-10-26
+
+### Risolto
+- **Ripristino Emoticon Emoji come Sfondo delle Caratteristiche**:
+  - Ripristinate le emoji a tema come filigrana di sfondo opaca all'interno dei 6 riquadri delle caratteristiche:
+    - **Forza**: `⚔️`
+    - **Destrezza**: `🏹`
+    - **Costituzione**: `🛡️`
+    - **Intelligenza**: `📚`
+    - **Saggezza**: `🔮`
+    - **Carisma**: `🎭`
+  - Calibrata l'opacità e la rotazione tramite la classe `.sfondo-car-emoji` sia in tema chiaro sia in tema scuro.
+
 ## [4.118.14] – 2026-10-26
 
 ### Risolto
