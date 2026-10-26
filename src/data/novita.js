@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.11',
+    voci: {
+      it: [
+        'Forma Selvatica: rimosso il contorno grigio dal riquadro della trasformazione animale, rendendo la testata del personaggio più pulita ed elegante.',
+      ],
+      en: [
+        'Wild Shape: removed the grey border from the beast transformation card, creating a cleaner and more elegant header layout.',
+      ],
+    },
+  },
+  {
     versione: '4.118.10',
     voci: {
       it: [

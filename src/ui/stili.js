@@ -1985,7 +1985,7 @@ tbody tr:hover {
 
 /* Banner di Forma Selvatica / Metamorfosi aperta: bordi, raggio e ombre allineati alla barra in alto */
 .forma-selvatica-banner {
-  border: 1.5px solid var(--c-bordo-barra, var(--c-border)) !important;
+  border: none !important;
   border-radius: 12px !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.16), 0 1px 4px rgba(0, 0, 0, 0.08) !important;
   backdrop-filter: blur(14px) saturate(140%) !important;
