@@ -2,6 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.17] – 2026-10-26
+
+### Risolto
+- **Protezione Sync all'Apertura da Telefono / Secondo Dispositivo**:
+  - Risolto il bug per cui aprire l'app dal telefono (o toccare *"Riprendi"* nel menu iniziale mentre erano in corso il caricamento immagini da IndexedDB o la sincronizzazione risorse all'avvio) registrava un falso timestamp di modifica manuale (`scheda-interattiva:ultima-modifica = Date.now()`), facendo credere al telefono di avere modifiche più recenti rispetto al Cloud e sovrascrivendo la scheda del PC con quella vecchia.
+  - Il tasto *"Riprendi"* in `MenuPersonaggiModal.jsx` non rigenera più l'oggetto `roster` se il personaggio attivo è già selezionato, e le idratazioni automatiche all'avvio (`caricaImmaginiRoster`, `sincronizzaRisorseClasse`, `sincronizzaRisorsePoteri`) sono escluse dal tracciamento delle modifiche manuali e non interrompono più `applicaRosterRemoto`.
+  - Se su un dispositivo non sono state effettuate modifiche manuali ai personaggi dopo l'ultima sincronizzazione (`tsLocale <= base.ts`), eventuali differenze dovute a migrazioni di versione vengono ignorate a favore del caricamento pulito della versione online più recente.
+
 ## [4.118.16] – 2026-10-26
 
 ### Risolto
