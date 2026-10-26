@@ -2,6 +2,13 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.14] – 2026-10-26
+
+### Risolto
+- **Pipeline CI e Deploy Automatico dell'Applicazione**:
+  - Corretta la suite di test end-to-end (`e2e/finestre.spec.js`) allineando il selettore del pulsante donazioni e del titolo della modale alla nuova etichetta *Supporta il progetto ❤️*.
+  - Questo sblocca il completamento con successo del workflow CI su GitHub Actions e il conseguente deploy automatico su GitHub Pages, consentendo all'app di aggiornarsi correttamente in tutti i browser.
+
 ## [4.118.13] – 2026-10-26
 
 ### Aggiunto

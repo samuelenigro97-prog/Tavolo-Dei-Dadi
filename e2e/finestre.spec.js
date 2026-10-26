@@ -113,7 +113,7 @@ test.describe('Finestre estratte', () => {
 
   for (const [pulsante, titolo, nome] of [
     [/Note legali/, 'Note legali e licenza', 'NoteLegaliModal'],
-    [/Sostieni il progetto/, 'Sostieni Tavolo dei Dadi', 'DonazioniModal'],
+    [/Supporta il progetto/, 'Supporta Tavolo dei Dadi ❤️', 'DonazioniModal'],
   ]) {
     test(`${titolo} (${nome}, dal menu)`, async ({ page }) => {
       // la cronologia compare solo se esiste almeno un salvataggio automatico
