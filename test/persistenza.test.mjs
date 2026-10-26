@@ -140,3 +140,32 @@ test('persistenza: backup automatico giornaliero scatta una volta al giorno dopo
   // Già scaricato oggi: non deve scaricare una seconda volta nello stesso giorno
   assert.equal(deveScaricareBackupGiornaliero({ ultimoAutoBackup: '2026-10-26', dataOggi: '2026-10-26', pgReali: 1 }), false);
 });
+
+test('persistenza: preservaImmaginiSeMancanti e riagganciaImmagini preservano anche il ritratto di formaBestiale e metamorfosi', async () => {
+  const { preservaImmaginiSeMancanti, riagganciaImmagini } = await import('../src/utils/persistenza.js');
+  const incoming = {
+    attivo: 'pg1',
+    personaggi: {
+      pg1: {
+        nome: 'Vaelion',
+        formaBestiale: { attiva: true, nome: 'Aquila gigante', ritratto: '' },
+      },
+    },
+  };
+  const corrente = {
+    attivo: 'pg1',
+    personaggi: {
+      pg1: {
+        nome: 'Vaelion',
+        ritratto: 'data:image/jpeg;base64,PG',
+        formaBestiale: { attiva: true, nome: 'Aquila gigante', ritratto: 'data:image/jpeg;base64,AQUILA' },
+      },
+    },
+  };
+  const preservato = preservaImmaginiSeMancanti(incoming, corrente);
+  assert.equal(preservato.personaggi.pg1.ritratto, 'data:image/jpeg;base64,PG');
+  assert.equal(preservato.personaggi.pg1.formaBestiale.ritratto, 'data:image/jpeg;base64,AQUILA');
+
+  const riagganciato = riagganciaImmagini(incoming, corrente);
+  assert.equal(riagganciato.personaggi.pg1.formaBestiale.ritratto, 'data:image/jpeg;base64,AQUILA');
+});

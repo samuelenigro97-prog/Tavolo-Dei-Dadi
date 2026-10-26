@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.16',
+    voci: {
+      it: [
+        'Ripristino Trasformazione in Aquila Gigante e Sync Cloud: ripristinata per Vaelion la Forma Selvatica attiva in Aquila gigante (22/26 PF, ritratto ad acquerello e 16/64 PF preservati) e corretto il bug per cui la sincronizzazione Cloud o l\'importazione JSON rimuovevano le trasformazioni attive.',
+      ],
+      en: [
+        'Giant Eagle Transformation Restore & Cloud Sync Fix: restored Vaelion\'s active Wild Shape into Giant Eagle (22/26 HP, watercolor portrait, and 16/64 preserved HP) and fixed the bug where Cloud Sync or JSON import stripped active transformations.',
+      ],
+    },
+  },
+  {
     versione: '4.118.15',
     voci: {
       it: [

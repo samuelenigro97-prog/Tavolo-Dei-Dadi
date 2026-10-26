@@ -2,6 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.16] – 2026-10-26
+
+### Risolto
+- **Ripristino Forma Selvatica "Aquila gigante" per Vaelion e Preservazione Trasformazioni nel Sync/Import**:
+  - Ripristinata la trasformazione attiva in **Aquila gigante** (`22 / 26 PF`, `CA 13`, taglia `Grande`, `Volo 24m`, ritratto ad acquerello e `16 / 64 PF` preservati del personaggio) sulla scheda di campagna di Vaelion sia in locale sia nel salvataggio Cloud Gist.
+  - Corretto un bug in `normalizeImported` e `normalizzaRosterRemoto` (`src/App.jsx`) che rimuoveva `formaBestiale`, `metamorfosi`, `alleati`, `bestiePreferite` e lo stato del turno durante la sincronizzazione Cloud o l'importazione di un backup JSON.
+  - Estesa la persistenza immagini (`src/utils/persistenza.js`) per preservare e riagganciare anche il ritratto personalizzato di `formaBestiale` e `metamorfosi`.
+
 ## [4.118.15] – 2026-10-26
 
 ### Risolto

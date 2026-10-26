@@ -20,6 +20,38 @@
 // di correggere proprio l'originale.
 
 import { VAELION_JSON, WENDELL_JSON, ELEVORN_JSON, FLYORA_JSON, LYRIAN_JSON } from './esempi.js';
+import { RITRATTO_AQUILA_GIGANTE_VAELION } from './ritrattoAquilaVaelion.js';
+
+export const FORMA_AQUILA_GIGANTE_VAELION = {
+  attiva: true,
+  nome: 'Aquila gigante',
+  nomeEn: 'Giant Eagle',
+  taglia: 'Grande',
+  tipo: 'bestia',
+  gs: '1',
+  ca: 13,
+  pfMax: 26,
+  pfAttuali: 22,
+  pfFormula: '4d10 + 4',
+  velocita: { terra: 3, volo: 24 },
+  car: {
+    forza: 16,
+    destrezza: 17,
+    costituzione: 13,
+    intelligenza: 8,
+    saggezza: 14,
+    carisma: 10,
+  },
+  abilita: 'Percezione +4',
+  sensi: 'Percezione passiva 14',
+  tratti: ['Vista acuta: vantaggio alle prove di Percezione basate sulla vista.'],
+  azioni: [
+    'Attacco multiplo: un becco e un artiglio.',
+    'Becco: +5 al tiro per colpire, 1d6+3 danni perforanti.',
+    'Artigli: +5 al tiro per colpire, 2d6+3 danni taglienti.',
+  ],
+  ritratto: RITRATTO_AQUILA_GIGANTE_VAELION,
+};
 
 /** Assicura equipaggiamento e sintonia corretti per Mantello, Perla e Guanti di Vaelion. */
 export function fixEquipaggiamentoVaelion(roster) {
@@ -164,6 +196,33 @@ export function migrazioneRegoleVaelion(roster) {
       if (Array.isArray(s.risorse)) {
         s.risorse = s.risorse.map((r) => (eDeb(r) ? { ...r, attuali: valoreFinale, max: null, reset: 'manuale' } : r));
       }
+    }
+
+    // Ripristino Forma Selvatica "Aquila gigante" rimossa dal bug di normalizzazione sync/import
+    const isCampagnaVaelion =
+      Number(s.pe) >= 75000 ||
+      s.allineamento === 'Neutrale Buono' ||
+      Number(s.pfAttuali) === 16 ||
+      Number(s.pfAttuali) === 61 ||
+      Boolean(s.dadiVitaSpesi && typeof s.dadiVitaSpesi === 'object' && Number(s.dadiVitaSpesi['8']) > 0);
+    if (!s.formaBestiale && isCampagnaVaelion) {
+      s.formaBestiale = {
+        ...FORMA_AQUILA_GIGANTE_VAELION,
+        velocita: { ...FORMA_AQUILA_GIGANTE_VAELION.velocita },
+        car: { ...FORMA_AQUILA_GIGANTE_VAELION.car },
+        tratti: [...FORMA_AQUILA_GIGANTE_VAELION.tratti],
+        azioni: [...FORMA_AQUILA_GIGANTE_VAELION.azioni],
+      };
+      if (Number(s.pfAttuali) === 61) s.pfAttuali = 16;
+      if (Array.isArray(s.risorse)) {
+        s.risorse = s.risorse.map((r) =>
+          /forma\s*(bestiale|selvatica)/i.test(r?.nome || '') && Number(r?.attuali) >= 2
+            ? { ...r, attuali: 1 }
+            : r
+        );
+      }
+    } else if (s.formaBestiale && /aquila gigante/i.test(s.formaBestiale.nome || '') && !s.formaBestiale.ritratto) {
+      s.formaBestiale = { ...s.formaBestiale, ritratto: RITRATTO_AQUILA_GIGANTE_VAELION };
     }
   }
 }

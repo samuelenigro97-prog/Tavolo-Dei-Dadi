@@ -1997,7 +1997,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.118.15';
+const APP_VERSION = '4.118.16';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -2177,25 +2177,26 @@ function loadState() {
         }
       }
       fixEquipaggiamentoVaelion(roster);
-      // Recupera immagini perse per QUALSIASI PG da snapshots se ritratto è SVG/vuoto
+      // Recupera immagini o trasformazioni perse per QUALSIASI PG da snapshots
       for (const k of Object.keys(roster.personaggi)) {
         const s = roster.personaggi[k];
-        if (s && (!s.ritratto || String(s.ritratto).startsWith('data:image/svg'))) {
-          try {
-            const snapsRaw = localStorage.getItem('scheda-interattiva:snapshots');
-            if (snapsRaw) {
-              const snaps = JSON.parse(snapsRaw);
-              for (const snap of snaps) {
-                const cand = snap?.roster?.personaggi?.[k] || Object.values(snap?.roster?.personaggi || {}).find((p) => String(p?.nome || '').trim().toLowerCase() === String(s.nome || '').trim().toLowerCase());
-                if (cand?.ritratto && !String(cand.ritratto).startsWith('data:image/svg') && String(cand.ritratto).length > 1000) {
-                  s.ritratto = cand.ritratto;
-                  if (cand?.mappaCampagna && !s.mappaCampagna) s.mappaCampagna = cand.mappaCampagna;
-                  break;
-                }
+        if (!s) continue;
+        try {
+          const snapsRaw = localStorage.getItem('scheda-interattiva:snapshots');
+          if (snapsRaw) {
+            const snaps = JSON.parse(snapsRaw);
+            for (const snap of snaps) {
+              const cand = snap?.roster?.personaggi?.[k] || Object.values(snap?.roster?.personaggi || {}).find((p) => String(p?.nome || '').trim().toLowerCase() === String(s.nome || '').trim().toLowerCase());
+              if ((!s.ritratto || String(s.ritratto).startsWith('data:image/svg')) && cand?.ritratto && !String(cand.ritratto).startsWith('data:image/svg') && String(cand.ritratto).length > 1000) {
+                s.ritratto = cand.ritratto;
+                if (cand?.mappaCampagna && !s.mappaCampagna) s.mappaCampagna = cand.mappaCampagna;
+              }
+              if (!s.formaBestiale && cand?.formaBestiale?.attiva) {
+                s.formaBestiale = cand.formaBestiale;
               }
             }
-          } catch {}
-        }
+          }
+        } catch {}
       }
       migrazioneRegoleVaelion(roster);
       // Allinea P.E. al livello per tutti i PG: se pe < soglia del livello, porta a soglia (evita barra livello 10 con 0 P.E.)
@@ -2748,8 +2749,22 @@ function normalizeImported(rawDati) {
     legami: str(dati.legami),
     difetti: str(dati.difetti),
     nemici: str(dati.nemici),
+    alleati: Array.isArray(dati.alleati) ? dati.alleati : [],
     diario: Array.isArray(dati.diario) ? dati.diario : [],
     note: str(dati.note),
+     ...(dati.formaBestiale && typeof dati.formaBestiale === 'object' ? { formaBestiale: dati.formaBestiale } : {}),
+    ...(dati.metamorfosi && typeof dati.metamorfosi === 'object' ? { metamorfosi: dati.metamorfosi } : {}),
+    ...(Array.isArray(dati.bestiePreferite) ? { bestiePreferite: dati.bestiePreferite.filter((x) => typeof x === 'string') } : {}),
+    ...(dati.effettoTaglia === 'ingrandito' || dati.effettoTaglia === 'ridotto' ? { effettoTaglia: dati.effettoTaglia } : {}),
+    ...(typeof dati.copertura === 'string' && dati.copertura ? { copertura: dati.copertura } : {}),
+    ...(dati.turnoAzioni && typeof dati.turnoAzioni === 'object' ? { turnoAzioni: dati.turnoAzioni } : {}),
+    ...(typeof dati.reazioneUsata === 'boolean' ? { reazioneUsata: dati.reazioneUsata } : {}),
+    ...(typeof dati.applicaFurtivo === 'boolean' ? { applicaFurtivo: dati.applicaFurtivo } : {}),
+    ...(typeof dati.smiteAttivo === 'boolean' ? { smiteAttivo: dati.smiteAttivo } : {}),
+    ...(typeof dati.smiteSlot === 'number' ? { smiteSlot: dati.smiteSlot } : {}),
+    ...(typeof dati.ispirazioneEroica === 'boolean' ? { ispirazioneEroica: dati.ispirazioneEroica } : {}),
+    ...(typeof dati.mostraArmiAttacco === 'boolean' ? { mostraArmiAttacco: dati.mostraArmiAttacco } : {}),
+    ...(typeof dati.mostraIncantesimiAttacco === 'boolean' ? { mostraIncantesimiAttacco: dati.mostraIncantesimiAttacco } : {}),
     risorse: sincronizzaRisorseClasse({
       classe: traduciEN(str(dati.classe)),
       livello: livelloCorretto,
@@ -6742,6 +6757,15 @@ export default function App() {
     const caricato = { attivo: parsed?.attivo || '', personaggi: {} };
     for (const id in (parsed?.personaggi || {})) {
       if (parsed.personaggi[id]) caricato.personaggi[id] = normalizeImported(parsed.personaggi[id]);
+    }
+    fixEquipaggiamentoVaelion(caricato);
+    migrazioneRegoleVaelion(caricato);
+    for (const id of Object.keys(caricato.personaggi)) {
+      const s = caricato.personaggi[id];
+      if (!s) continue;
+      s.poteri = normalizzaPoteri(garantisciDebitoAraldi(s.poteri, s.risorse));
+      s.risorse = sincronizzaRisorsePoteri(s.poteri, s.risorse, livelloTotaleScheda(s), s.bonusCompetenza);
+      s.risorse = sincronizzaRisorseClasse(s, s.versione || '2024');
     }
     if (!caricato.attivo || !caricato.personaggi[caricato.attivo]) caricato.attivo = Object.keys(caricato.personaggi)[0] || '';
     const pref = normalizzaPreferenze(parsed?.preferenze);
