@@ -2,6 +2,13 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.11] – 2026-10-26
+
+### Modificato
+- **Banner Forma Selvatica e Metamorfosi**:
+  - Rimosso il bordo grigio perimetrale dal riquadro della forma animale (`.forma-selvatica-banner`), eliminando il doppio contorno rigido sopra la sezione del personaggio.
+  - Puliti i contorni interni dei tratti speciali e sensi della bestia per una resa visiva pulita, moderna e integrata.
+
 ## [4.118.10] – 2026-10-26
 
 ### Aggiunto

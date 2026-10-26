@@ -1997,7 +1997,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.118.10';
+const APP_VERSION = '4.118.11';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -10333,7 +10333,7 @@ export default function App() {
               className="forma-selvatica-banner"
               style={{
                 background: 'color-mix(in srgb, var(--c-panel) 96%, transparent)',
-                border: '1.5px solid var(--c-bordo-barra, var(--c-border))',
+                border: 'none',
                 borderRadius: 12,
                 padding: '12px 16px',
                 marginBottom: 16,
@@ -10343,7 +10343,7 @@ export default function App() {
               }}
             >
               {/* Intestazione Banner */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, borderBottom: `1px solid var(--c-bordo-barra, ${C.border})`, paddingBottom: 8, marginBottom: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, borderBottom: '1px solid color-mix(in srgb, var(--c-border) 35%, transparent)', paddingBottom: 8, marginBottom: 10 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{ fontSize: 26, lineHeight: 1 }}>{campoForma === 'metamorfosi' ? '🔮' : '🐾'}</span>
                   <div>
@@ -10380,7 +10380,7 @@ export default function App() {
 
               {/* Tratti Speciali & Sensi della Bestia (se presenti) */}
               {((formaAttiva.dati.tratti && formaAttiva.dati.tratti.length > 0) || formaAttiva.dati.sensi) && (
-                <div style={{ background: 'rgba(0,0,0,0.02)', padding: '6px 10px', borderRadius: 6, border: `1px dashed ${C.border}` }}>
+                <div style={{ background: 'color-mix(in srgb, var(--c-border) 10%, transparent)', padding: '6px 10px', borderRadius: 6, border: 'none' }}>
                   {formaAttiva.dati.sensi && (
                     <div style={{ fontSize: 12, color: C.inkDim, marginBottom: (formaAttiva.dati.tratti && formaAttiva.dati.tratti.length > 0) ? 4 : 0 }}>
                       <strong>{lingua === 'en' ? 'Senses' : 'Sensi'}:</strong> {formaAttiva.dati.sensi}
