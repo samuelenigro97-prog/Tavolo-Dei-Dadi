@@ -2,6 +2,13 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.118.12] – 2026-10-26
+
+### Modificato
+- **Nome File di Backup Roster senza Anno**:
+  - Il file di esportazione del backup completo utilizza ora il formato compatto giorno-mese `Backup Tavolo dei Dadi (GG-MM).json` invece di includere l'anno a 4 cifre (`AAAA-MM-GG`).
+  - Questo evita che macOS Finder e altri gestori file tronchino il nome del file con puntini di sospensione (es. `(2...-26).json`).
+
 ## [4.118.11] – 2026-10-26
 
 ### Modificato

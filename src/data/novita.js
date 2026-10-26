@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.12',
+    voci: {
+      it: [
+        'Nome File di Backup più Compatto: rimosso l\'anno dalla data del file di backup ("Backup Tavolo dei Dadi (GG-MM).json"), evitando che il Finder lo tronchi con puntini di sospensione.',
+      ],
+      en: [
+        'More Compact Backup Filename: removed the year from the backup date ("Backup Tavolo dei Dadi (DD-MM).json"), preventing file managers from truncating the name with ellipsis.',
+      ],
+    },
+  },
+  {
     versione: '4.118.11',
     voci: {
       it: [
