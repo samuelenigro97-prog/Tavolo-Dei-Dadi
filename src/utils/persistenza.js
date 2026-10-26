@@ -88,6 +88,12 @@ export function riagganciaImmagini(rosterSnapshot, rosterCorrente) {
       ...scheda,
       ...(corrente.ritratto ? { ritratto: corrente.ritratto } : {}),
       ...(corrente.mappaCampagna ? { mappaCampagna: corrente.mappaCampagna } : {}),
+      ...(scheda?.formaBestiale && !scheda.formaBestiale.ritratto && corrente.formaBestiale?.ritratto
+        ? { formaBestiale: { ...scheda.formaBestiale, ritratto: corrente.formaBestiale.ritratto } }
+        : {}),
+      ...(scheda?.metamorfosi && !scheda.metamorfosi.ritratto && corrente.metamorfosi?.ritratto
+        ? { metamorfosi: { ...scheda.metamorfosi, ritratto: corrente.metamorfosi.ritratto } }
+        : {}),
     };
   }
   return ripristinato;
@@ -104,6 +110,12 @@ export function preservaImmaginiSeMancanti(rosterIncoming, rosterCorrente) {
       ...scheda,
       ...(!scheda?.ritratto && corrente.ritratto ? { ritratto: corrente.ritratto } : {}),
       ...(!scheda?.mappaCampagna && corrente.mappaCampagna ? { mappaCampagna: corrente.mappaCampagna } : {}),
+      ...(scheda?.formaBestiale && !scheda.formaBestiale.ritratto && corrente.formaBestiale?.ritratto
+        ? { formaBestiale: { ...scheda.formaBestiale, ritratto: corrente.formaBestiale.ritratto } }
+        : {}),
+      ...(scheda?.metamorfosi && !scheda.metamorfosi.ritratto && corrente.metamorfosi?.ritratto
+        ? { metamorfosi: { ...scheda.metamorfosi, ritratto: corrente.metamorfosi.ritratto } }
+        : {}),
     };
   }
   return risultato;
@@ -144,6 +156,8 @@ export async function salvaImmaginiRoster(roster) {
     for (const [id, scheda] of Object.entries(roster?.personaggi || {})) {
       if (scheda?.ritratto) store.put(scheda.ritratto, `${id}:ritratto`);
       if (scheda?.mappaCampagna) store.put(scheda.mappaCampagna, `${id}:mappaCampagna`);
+      if (scheda?.formaBestiale?.ritratto) store.put(scheda.formaBestiale.ritratto, `${id}:formaBestialeRitratto`);
+      if (scheda?.metamorfosi?.ritratto) store.put(scheda.metamorfosi.ritratto, `${id}:metamorfosiRitratto`);
     }
     tx.oncomplete = resolve;
     tx.onerror = () => reject(tx.error);
@@ -161,11 +175,22 @@ export async function caricaImmaginiRoster(roster) {
       req.onsuccess = () => resolve(req.result || '');
       req.onerror = () => resolve('');
     });
-    const [ritratto, mappaCampagna] = await Promise.all([leggi(`${id}:ritratto`), leggi(`${id}:mappaCampagna`)]);
+    const [ritratto, mappaCampagna, formaBestialeRitratto, metamorfosiRitratto] = await Promise.all([
+      leggi(`${id}:ritratto`),
+      leggi(`${id}:mappaCampagna`),
+      leggi(`${id}:formaBestialeRitratto`),
+      leggi(`${id}:metamorfosiRitratto`),
+    ]);
     risultato.personaggi[id] = {
       ...scheda,
       ...(scheda.ritratto || !ritratto ? {} : { ritratto }),
       ...(scheda.mappaCampagna || !mappaCampagna ? {} : { mappaCampagna }),
+      ...(scheda.formaBestiale && !scheda.formaBestiale.ritratto && formaBestialeRitratto
+        ? { formaBestiale: { ...scheda.formaBestiale, ritratto: formaBestialeRitratto } }
+        : {}),
+      ...(scheda.metamorfosi && !scheda.metamorfosi.ritratto && metamorfosiRitratto
+        ? { metamorfosi: { ...scheda.metamorfosi, ritratto: metamorfosiRitratto } }
+        : {}),
     };
   }));
   db.close();

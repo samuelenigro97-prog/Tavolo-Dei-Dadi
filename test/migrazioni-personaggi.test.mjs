@@ -168,3 +168,28 @@ test('Vaelion: tolto il +3 m di velocità della Maschera, anche dalle schede sal
   migrazioneRegoleVaelion(roster);
   assert.deepEqual(roster.personaggi.v.poteri[0].modificatori, [{ bersaglio: 'ca', valore: 1, fonte: 'Altro' }]);
 });
+
+test('migrazioneRegoleVaelion: ripristina Forma Selvatica Aquila gigante per Vaelion di campagna se rimossa dal sync', async () => {
+  const { migrazioneRegoleVaelion } = await import('../src/data/migrazioniPersonaggi.js');
+  const s = personaggioBase({
+    nome: 'Vaelion (Val) Leafwhisper',
+    pe: 75000,
+    allineamento: 'Neutrale Buono',
+    pfAttuali: 16,
+    pfMax: 64,
+    risorse: [{ id: 'auto-druido-forma-selvatica', nome: 'Forma Selvatica', attuali: 2, max: 2, reset: 'breve' }],
+  });
+  const roster = { personaggi: { 'pg-vaelion': s } };
+  migrazioneRegoleVaelion(roster);
+  assert.equal(s.formaBestiale?.attiva, true);
+  assert.equal(s.formaBestiale?.nome, 'Aquila gigante');
+  assert.equal(s.formaBestiale?.pfAttuali, 22);
+  assert.equal(s.formaBestiale?.pfMax, 26);
+  assert.ok(String(s.formaBestiale?.ritratto || '').startsWith('data:image/jpeg;base64,'));
+  assert.equal(s.risorse.find((r) => r.nome === 'Forma Selvatica')?.attuali, 1);
+
+  // Se l'utente torna volontariamente alla forma normale (attiva: false), non la riattiva a forza
+  s.formaBestiale = { ...s.formaBestiale, attiva: false };
+  migrazioneRegoleVaelion(roster);
+  assert.equal(s.formaBestiale.attiva, false);
+});
