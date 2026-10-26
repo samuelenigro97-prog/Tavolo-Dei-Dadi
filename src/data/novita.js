@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.118.14',
+    voci: {
+      it: [
+        'Aggiornamenti e Deploy Automatico: allineati i test end-to-end con la nuova dicitura "Supporta il progetto ❤️", sbloccando la pipeline di CI e il rilascio continuo dell\'applicazione.',
+      ],
+      en: [
+        'Updates and Automated Deployment: aligned end-to-end test suites with the new label "Support the project ❤️", unblocking CI pipelines and continuous app deployment.',
+      ],
+    },
+  },
+  {
     versione: '4.118.13',
     voci: {
       it: [
