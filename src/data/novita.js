@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.119.1',
+    voci: {
+      it: ['Backup con nome fisso: ogni backup (manuale o automatico) si chiama ora "Backup Tavolo dei Dadi.json", così resta un\'unica copia offline sempre aggiornata.'],
+      en: ['Fixed backup filename: every backup (manual or automatic) is now named "Backup Tavolo dei Dadi.json", keeping a single always up-to-date offline copy.'],
+    },
+  },
+  {
     versione: '4.119.0',
     voci: {
       it: [

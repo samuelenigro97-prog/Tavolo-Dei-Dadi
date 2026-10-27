@@ -1997,7 +1997,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.119.0';
+const APP_VERSION = '4.119.1';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -6359,9 +6359,6 @@ export default function App() {
     const r = rosterRef.current || roster;
     const ids = Object.keys(r?.personaggi || {});
     if (!ids.length) return;
-    const d = new Date();
-    const dataStr = `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-
     // File unico di backup consolidato contenente TUTTI i personaggi
     const datiTutti = {
       tipo: 'tavolo-dei-dadi-roster',
@@ -6375,12 +6372,13 @@ export default function App() {
     const urlRoster = URL.createObjectURL(blobRoster);
     const aRoster = document.createElement('a');
     aRoster.href = urlRoster;
-    aRoster.download = `Backup Tavolo dei Dadi (${dataStr}).json`;
+    // Nome fisso: ogni backup sostituisce il precedente (una copia offline sempre aggiornata).
+    aRoster.download = 'Backup Tavolo dei Dadi.json';
     aRoster.click();
     URL.revokeObjectURL(urlRoster);
     segnaBackupFatto();
     try {
-      localStorage.setItem(CHIAVE_ULTIMO_AUTO_BACKUP_GIORNALIERO, formattaDataIsoLocale(d));
+      localStorage.setItem(CHIAVE_ULTIMO_AUTO_BACKUP_GIORNALIERO, formattaDataIsoLocale(new Date()));
     } catch { /* niente */ }
     const isAuto = opzioni && typeof opzioni === 'object' && opzioni.automatico === true;
     if (isAuto) {
@@ -7547,13 +7545,11 @@ export default function App() {
   function scaricaRosterJson(r, etichetta) {
     const ids = Object.keys(r?.personaggi || {});
     const quando = new Date();
-    const dataStr = `${String(quando.getDate()).padStart(2, '0')}-${String(quando.getMonth() + 1).padStart(2, '0')}`;
     const blob = new Blob([JSON.stringify({ tipo: 'tavolo-dei-dadi-roster', app: 'Tavolo dei Dadi', versione: APP_VERSION, data: quando.toISOString(), personaggi: ids.length, roster: r }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const etichStr = etichetta ? ` - ${etichetta.replace(/[-_]+/g, ' ')}` : '';
-    a.download = `Backup Tavolo dei Dadi${etichStr} (${dataStr}).json`;
+    a.download = 'Backup Tavolo dei Dadi.json';
     document.body.appendChild(a);
     a.click();
     a.remove();
