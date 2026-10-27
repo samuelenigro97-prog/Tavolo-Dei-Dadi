@@ -519,7 +519,7 @@ export function classificaIncantesimoCombattimento(s) {
   }
   const desc = (s?.note || '') + ' ' + (spiegaIncantesimo(s?.nome) || '') + ' ' + (db.desc || '');
   const danno = s?.danno || d.danno || db.danno || '';
-  const isTS = /ts (\w+)|tiro salvezza|saving throw/i.test(desc);
+  const isTS = /\bts\s+(forza|destrezza|costituzione|intelligenza|saggezza|carisma)\b|tiro salvezza|saving throw|\bcd\s*\d+/i.test(desc);
   const haAttacco = /attacco|attack|mischia|distanza|tocco/i.test(desc) || Boolean(db.danno || d.danno);
   // TS con danni + attacchi con danni (o spell con danno es. Dardo Incantato, Randello Incantato)
   const mostraInCombattimento = Boolean(danno && (isTS || haAttacco || /dardo incantato|magic missile|randello incantato|shillelagh/i.test(s?.nome || '')));

@@ -3800,6 +3800,7 @@ export default function App() {
   const [cercaCompagnoText, setCercaCompagnoText] = useState('');
   const [mostraModalPe, setMostraModalPe] = useState(false);
   const [inputAggiungiPe, setInputAggiungiPe] = useState('');
+  const [inputPfDiretto, setInputPfDiretto] = useState('');
   const [mostraModalMovimento, setMostraModalMovimento] = useState(false);
   const [mostraModalReazioni, setMostraModalReazioni] = useState(false);
   const [modalAbilitaGuida, setModalAbilitaGuida] = useState(null);
@@ -5850,20 +5851,44 @@ export default function App() {
     if (!parsata) return;
     const maxFacce = Math.max(...parsata.termini.map((p) => p.facce).filter(Boolean));
     const nome = attacco.nome;
-    const esito = tiraDanni(parsata, critico);
+    const isCuraRoll = /^guarigione|healing|cura$/i.test(String(attacco?.tipoDanno || '').trim());
+    const esito = tiraDanni(parsata, isCuraRoll ? false : critico);
     // In caso di riduzione con risultato <= 0, il danno minimo è 1 nelle regole 5e
     if (esito.totale < 1) esito.totale = 1;
     // Suono coerente col tipo d'attacco: critico → critico; incantesimo → magia; arco/balestra/fionda
     // → colpo a distanza; tutto il resto (mischia) → colpo di spada.
-    const suonoDanno = critico
-      ? 'critico'
-      : attacco?.isSpell
-        ? 'magia'
-        : /arco|balestra|fionda/i.test(nome || '')
-          ? 'arco'
-          : 'arma';
+    const suonoDanno = isCuraRoll
+      ? 'cura'
+      : critico
+        ? 'critico'
+        : attacco?.isSpell
+          ? 'magia'
+          : /arco|balestra|fionda/i.test(nome || '')
+            ? 'arco'
+            : 'arma';
     const etichettaPresa = attacco?.aDueMani ? (lingua === 'en' ? ' (Two-Handed)' : ' (2 Mani)') : '';
     conAnimazione(() => {
+      if (isCuraRoll && !attacco?.isAlleato) {
+        const qtaCura = Math.max(1, esito.totale);
+        const fAtt = trasformazioneAttiva(scheda);
+        if (fAtt) {
+          const attPf = Number(fAtt.dati.pfAttuali) || 0;
+          const maxPf = Number(fAtt.dati.pfMax) || 10;
+          aggiorna({
+            [fAtt.campo]: { ...fAtt.dati, pfAttuali: Math.min(maxPf, attPf + qtaCura) },
+          });
+        } else {
+          const attPf = Number(scheda?.pfAttuali) || 0;
+          const maxPf = pfMassimiEffettivi(scheda);
+          aggiorna({
+            pfAttuali: Math.min(maxPf, attPf + qtaCura),
+            ...(attPf === 0 ? { tsMorte: { successi: 0, fallimenti: 0 } } : {}),
+          });
+        }
+        setDanni({ etichetta: `${tr('Guarigione', 'Healing')}: ${nome}${notaExtra} (+${qtaCura} PF)`, ...esito, critico: false });
+        registra({ etichetta: `${tr('Guarigione', 'Healing')}: ${nome}${notaExtra}`, tipo: 'cura', totale: qtaCura, dettaglio: `${esito.dettaglio} (+${qtaCura} PF)` });
+        return;
+      }
       setDanni({ etichetta: `${critico ? tr('Danni critici', 'Critical damage') : tr('Danni', 'Damage')}: ${nome}${etichettaPresa}${notaExtra}`, ...esito, critico });
       registra({ etichetta: `${critico ? 'CRITICO ' : ''}${t('log.danni')}: ${nome}${etichettaPresa}${notaExtra}`, tipo: 'danni', totale: esito.totale, dettaglio: esito.dettaglio, critico });
     }, esito.totale, maxFacce || 20, false, suonoDanno);
@@ -11230,7 +11255,7 @@ export default function App() {
                   {/* Sezione Superiore: Punti Ferita — perfettamente centrata nello spazio disponibile */}
                   <div style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2px 0' }}>
                     <div style={{ ...styles.vitalLabel, position: 'static', margin: 0, marginBottom: 6, fontSize: 12 }}>
-                      {t("vital.pf")} {isTrasformato && <span style={{ color: C.green, fontWeight: 800 }}>· 🐾 PF Forma: {formaAttiva.dati.nome}</span>}
+                      {t("vital.pf")}
                     </div>
 
                     {/* BARRA DELLA VITA STILE VIDEOGIOCO */}
@@ -11430,16 +11455,76 @@ export default function App() {
                         }
                       };
 
+                      const applicaInputDiretto = (modo) => {
+                        const raw = String(inputPfDiretto || '').trim();
+                        if (!raw) return;
+                        const n = parseInt(raw, 10);
+                        if (!Number.isFinite(n) || n === 0) return;
+                        const qta = Math.abs(n);
+                        if (modo === 'cura' || (modo === 'auto' && raw.startsWith('+'))) {
+                          applicaCuraRapida(qta);
+                        } else {
+                          applicaDannoRapido(qta);
+                        }
+                        setInputPfDiretto('');
+                      };
+
                       return (
-                        <div style={{ display: 'flex', gap: 3.5, margin: '14px 0 8px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                          <button style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaDannoRapido(20)} title={t('vital.danno')}>-20</button>
-                          <button style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaDannoRapido(10)} title={t('vital.danno')}>-10</button>
-                          <button style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaDannoRapido(5)} title={t('vital.danno')}>-5</button>
-                          <button style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaDannoRapido(1)} title={t('vital.danno')}>-1</button>
-                          <button style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(1)} title={t('vital.cura')}>+1</button>
-                          <button style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(5)} title={t('vital.cura')}>+5</button>
-                          <button style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(10)} title={t('vital.cura')}>+10</button>
-                          <button style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(20)} title={t('vital.cura')}>+20</button>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, margin: '10px 0 6px', width: '100%' }}>
+                          <div style={{ display: 'flex', gap: 3.5, justifyContent: 'center', flexWrap: 'wrap' }}>
+                            <button style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaDannoRapido(20)} title={t('vital.danno')}>-20</button>
+                            <button style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaDannoRapido(10)} title={t('vital.danno')}>-10</button>
+                            <button style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaDannoRapido(5)} title={t('vital.danno')}>-5</button>
+                            <button style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaDannoRapido(1)} title={t('vital.danno')}>-1</button>
+                            <button style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(1)} title={t('vital.cura')}>+1</button>
+                            <button style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(5)} title={t('vital.cura')}>+5</button>
+                            <button style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(10)} title={t('vital.cura')}>+10</button>
+                            <button style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(20)} title={t('vital.cura')}>+20</button>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              data-testid="pf-input-diretto"
+                              value={inputPfDiretto}
+                              onChange={(e) => setInputPfDiretto(e.target.value.replace(/[^0-9+-]/g, ''))}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  applicaInputDiretto('auto');
+                                }
+                              }}
+                              placeholder={lingua === 'en' ? 'HP…' : 'Danni/Cura…'}
+                              title={lingua === 'en' ? 'Type an amount and press Enter (or click Damage / Heal)' : 'Scrivi un valore e premi Invio per infliggere danni (o usa +valore / i pulsanti Danno e Cura)'}
+                              style={{
+                                ...styles.inlineInput,
+                                width: 86,
+                                fontSize: 11,
+                                padding: '2px 6px',
+                                textAlign: 'center',
+                                borderRadius: 5,
+                                fontWeight: 700,
+                              }}
+                            />
+                            <button
+                              type="button"
+                              data-testid="pf-applica-danno"
+                              style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 7px', fontWeight: 700, fontSize: 11 }}
+                              onClick={() => applicaInputDiretto('danno')}
+                              title={lingua === 'en' ? 'Apply typed damage' : 'Applica i danni inseriti'}
+                            >
+                              − {lingua === 'en' ? 'Dmg' : 'Danno'}
+                            </button>
+                            <button
+                              type="button"
+                              data-testid="pf-applica-cura"
+                              style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 7px', fontWeight: 700, fontSize: 11 }}
+                              onClick={() => applicaInputDiretto('cura')}
+                              title={lingua === 'en' ? 'Apply typed healing' : 'Applica la cura inserita'}
+                            >
+                              + {lingua === 'en' ? 'Heal' : 'Cura'}
+                            </button>
+                          </div>
                         </div>
                       );
                     })()}
@@ -13012,55 +13097,7 @@ export default function App() {
 
               {/* Intestazione Combattimento & Filtri Armi / Incantesimi Offensivi */}
               <div className="sottosezione-titolo" style={{ display: 'grid', gridTemplateColumns: 'minmax(28px, 1fr) auto minmax(28px, 1fr)', alignItems: 'center', columnGap: 6, marginTop: 18, marginBottom: 8 }}>
-                <div style={{ justifySelf: 'start' }}>
-                  <button
-                    data-combat-toggle="true"
-                    type="button"
-                    onClick={() => {
-                      if (combat.attivo && combat.aperto) setCombat((c) => ({ ...c, aperto: false }));
-                      else if (combat.combattenti.length) setCombat((c) => ({ ...c, attivo: true, aperto: true }));
-                      else aggiungiPgAlCombat();
-                    }}
-                    style={{
-                      ...styles.buttonMini,
-                      fontSize: 11,
-                      padding: '2px 8px',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      background: combat.attivo
-                        ? (combat.aperto ? 'rgba(46, 157, 77, 0.15)' : 'rgba(212, 160, 23, 0.18)')
-                        : 'transparent',
-                      borderColor: combat.attivo
-                        ? (combat.aperto ? 'var(--c-green, #2e9d4d)' : 'var(--c-gold, #d4a017)')
-                        : C.border,
-                      color: combat.attivo
-                        ? (combat.aperto ? 'var(--c-green, #2e9d4d)' : 'var(--c-gold-dark, #b8860b)')
-                        : C.inkDim,
-                      fontWeight: combat.attivo ? 700 : 500,
-                      cursor: 'pointer',
-                    }}
-                    title={tooltipCombat}
-                  >
-                    <span
-                      style={{
-                        width: 7,
-                        height: 7,
-                        borderRadius: '50%',
-                        background: statoColoreCombat,
-                        boxShadow: statoGlowCombat,
-                        display: 'inline-block',
-                        flexShrink: 0,
-                        transition: 'background 0.25s ease, box-shadow 0.25s ease',
-                      }}
-                    />
-                    <IconaUI nome="spadeIncrociate" dimensione={13} color={combat.attivo ? (combat.aperto ? 'var(--c-green, #2e9d4d)' : 'var(--c-gold, #d4a017)') : 'currentColor'} />
-                    <span>Combat Tracker</span>
-                    {combat.attivo && (
-                      <span style={{ fontSize: 9, opacity: 0.8 }}>{combat.aperto ? '▼' : '▲'}</span>
-                    )}
-                  </button>
-                </div>
+                <div style={{ justifySelf: 'start' }} />
                 <h3 style={{ ...styles.panelTitle, margin: 0, padding: 0, color: C.ink, textAlign: 'center', justifySelf: 'center', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6 }}>
                   {t('combat.titolo')}
                 </h3>
@@ -14227,8 +14264,8 @@ export default function App() {
                       </span>
                     </div>
 
-                    {/* Griglia dei punti delle regole dal Manuale Ufficiale */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 10 }}>
+                    {/* Griglia dei punti delle regole dal Manuale Ufficiale: 4 riquadri su una sola riga */}
+                    <div className="regole-magia-forma-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 8 }}>
                       {/* Punto 1: Lancio di Incantesimi */}
                       <div style={{ background: 'rgba(255,255,255,0.04)', padding: '8px 10px', borderRadius: 6, borderLeft: '3px solid #c0392b' }}>
                         <div style={{ fontWeight: 700, color: '#c0392b', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -14983,9 +15020,10 @@ export default function App() {
                                 ? dannoCuraConModificatore(s.nome, dannoBaseInc, modIncantatore || 0)
                                 : dannoBaseInc;
                             const note = notaSeparata.nota;
-                            // Incantesimo a tiro salvezza: badge della CD al posto del tiro per colpire.
+                            // Incantesimo a tiro salvezza: badge della CD in riga (anche se non ha un dado di danno, es. Intralciare, Ammaliare Persone, Cecità/Sordità).
                             const classeInc = classificaIncantesimoCombattimento(s);
-                            const isTSInc = Boolean(danno) && tipoDanno !== 'Guarigione' && classeInc.isTS;
+                            const isTSInc = tipoDanno !== 'Guarigione' && classeInc.isTS;
+                            const haDadoInc = Boolean(parseEspressioneDado(danno));
                             // Assorbire Elementi, Marchio del Cacciatore, Dardo Incantato…: nessun tiro per colpire.
                             const senzaTiroInc = Boolean(classeInc.senzaTiroPerColpire);
 
@@ -15225,13 +15263,13 @@ export default function App() {
                                       return chipIncantesimo('', t('spell.chip_note'), notaBreve, isAraldiNota ? 'var(--c-araldi, #a45a2a)' : undefined, 'chip-nota', note);
                                     })()}
                                   </div>
-                                  {parseEspressioneDado(danno) && (
+                                  {(haDadoInc || (modIncantatore !== null && isTSInc)) && (
                                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
                                       {modIncantatore !== null && isTSInc && (
                                         <BadgeTiroSalvezza cd={8 + scheda.bonusCompetenza + modIncantatore} caratteristica={caratteristicaTiroSalvezzaIncantesimo(s.nome, s.note)} colore={coloreCategoria('tiroSalvezza', notteAttiva)} />
                                       )}
                                       {/* Una cura non ha tiro per colpire: solo il badge del tiro di cura. */}
-                                      {modIncantatore !== null && !isTSInc && !senzaTiroInc && tipoDanno !== 'Guarigione' && (
+                                      {haDadoInc && modIncantatore !== null && !isTSInc && !senzaTiroInc && tipoDanno !== 'Guarigione' && (
                                         <BadgeTiroColpire
                                           bonus={scheda.bonusCompetenza + modIncantatore}
                                           colore={coloreCategoria('attacco', notteAttiva)}
@@ -15239,17 +15277,19 @@ export default function App() {
                                           onRoll={() => lanciaD20(`${t('spell.attacco_inc')}: ${s.nome}`, scheda.bonusCompetenza + modIncantatore, { magia: true, attacco: { id: s.id, nome: s.nome, danno, tipoDanno, isSpell: true }, tipoTiro: 'attacco' })}
                                         />
                                       )}
-                                      <BadgeTiroDanno
-                                        danno={danno}
-                                        tipoDanno={tipoDanno}
-                                        colore={tipoDanno === 'Guarigione' ? coloreCategoria('guarigione', notteAttiva) : undefined}
-                                        critico={!!isUltimoCritInc}
-                                        title={isUltimoCritInc ? `Critico attivo: tira i danni del critico (${danno} ×2)` : t('tip.tira_danno_inc')}
-                                        onRoll={() => {
-                                          tiraDanniPerAttacco({ id: s.id, nome: s.nome, danno, tipoDanno, isSpell: true }, !!isUltimoCritInc);
-                                          setUltimoAttaccoCritico(null);
-                                        }}
-                                      />
+                                      {haDadoInc && (
+                                        <BadgeTiroDanno
+                                          danno={danno}
+                                          tipoDanno={tipoDanno}
+                                          colore={tipoDanno === 'Guarigione' ? coloreCategoria('guarigione', notteAttiva) : undefined}
+                                          critico={!!isUltimoCritInc}
+                                          title={isUltimoCritInc ? `Critico attivo: tira i danni del critico (${danno} ×2)` : t('tip.tira_danno_inc')}
+                                          onRoll={() => {
+                                            tiraDanniPerAttacco({ id: s.id, nome: s.nome, danno, tipoDanno, isSpell: true }, !!isUltimoCritInc);
+                                            setUltimoAttaccoCritico(null);
+                                          }}
+                                        />
+                                      )}
                                     </div>
                                   )}
                                   <div className="spell-azioni" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0, marginLeft: 'auto' }}>
@@ -16609,7 +16649,7 @@ export default function App() {
                                             {az.danno && (
                                               <button
                                                 type="button"
-                                                onClick={() => tiraDanniPerAttacco({ id: az.id, nome: `${all.nome}: ${az.nome}`, danno: az.danno, tipoDanno: az.tipoDanno })}
+                                                onClick={() => tiraDanniPerAttacco({ id: az.id, nome: `${all.nome}: ${az.nome}`, danno: az.danno, tipoDanno: az.tipoDanno, isAlleato: true })}
                                                 style={{ ...styles.buttonMini, fontSize: 11, padding: '2px 6px', color: C.red, borderColor: C.red }}
                                                 title={lingua === 'en' ? 'Roll damage' : 'Tiro danni'}
                                               >

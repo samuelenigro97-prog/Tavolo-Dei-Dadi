@@ -7,20 +7,18 @@ import { IconaUI } from '../IconaFantasy.jsx';
 
 export function NotificheModal({ APP_VERSION, aggiorna, avvisoBackup, controlliAttivi, correggiTuttiControlli, eseguiCorrezione, esportaBackupCompleto, lingua, nuvolettaCorrezioni, posNotifiche, rimandaBackup, scheda, setMostraNotifiche, setNuvolettaCorrezioni }) {
   return (
-    <div className="modal-backdrop" onClick={() => setMostraNotifiche(false)} style={{ position: 'fixed', inset: 0, zIndex: 1400, background: 'transparent' }}>
+    <div className="modal-backdrop" onClick={() => setMostraNotifiche(false)} style={{ position: 'fixed', inset: 0, zIndex: 1400, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <div
         onClick={(e) => e.stopPropagation()}
         className="anim-modal-rapida no-stampa"
         style={{
-          position: 'fixed', top: posNotifiche.top, left: posNotifiche.left,
-          width: 'min(340px, calc(100vw - 16px))', maxHeight: 'min(75vh, 600px)', overflowY: 'auto',
+          width: 'min(420px, calc(100vw - 24px))', maxHeight: 'min(80vh, 640px)', overflowY: 'auto',
           background: C.panel, border: `1px solid ${C.gold}`, borderRadius: 10,
-          boxShadow: '0 10px 30px rgba(0,0,0,0.45)', padding: '12px 14px', zIndex: 1401,
+          boxShadow: '0 10px 30px rgba(0,0,0,0.5)', padding: '12px 14px', zIndex: 1401,
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
           <strong style={{ color: C.goldDark, fontSize: 14, marginRight: 'auto' }}>{t('notifiche.titolo')}</strong>
-          <span data-testid="notifiche-versione" style={{ fontSize: 12, fontWeight: 700, color: C.inkDim, fontVariantNumeric: 'tabular-nums' }}>v{APP_VERSION}</span>
           <button style={{ ...styles.buttonMini, padding: '2px 7px' }} onClick={() => setMostraNotifiche(false)} title={t('tip.chiudi')} aria-label={t('tip.chiudi')}>✕</button>
         </div>
     

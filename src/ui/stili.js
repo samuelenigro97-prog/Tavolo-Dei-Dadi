@@ -1723,6 +1723,13 @@ tbody tr:hover {
 /* Anagrafica: le due righe hanno le stesse quattro colonne, quindi Sesso sta sopra
    Background, Razza sopra Classe, Taglia sopra Sottoclasse e Allineamento sopra i PE. */
 .anagrafica-riga-1, .anagrafica-riga-2 { grid-template-columns: minmax(0, 19%) minmax(0, 25%) minmax(0, 1fr) minmax(112px, 23%); }
+.anagrafica-riga-1 > :nth-child(2), .anagrafica-riga-2 > :nth-child(2) { padding-left: 8px; }
+@media (max-width: 900px) {
+  .regole-magia-forma-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 520px) {
+  .regole-magia-forma-grid { grid-template-columns: 1fr !important; }
+}
 /* Tablet: colonna centrale stretta, una colonna PE larga taglierebbe la Sottoclasse.
    Si torna alle colonne proporzionate, con i PE a filo destro come Allineamento. */
 @media (max-width: 1100px) and (min-width: 781px) {
