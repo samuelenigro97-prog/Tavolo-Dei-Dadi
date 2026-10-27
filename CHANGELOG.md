@@ -2,6 +2,26 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.119.0] – 2026-10-27
+
+### Aggiunto
+- **Guarigione Automatica al Tiro dei Dadi di Cura**:
+  - Tirare qualsiasi incantesimo o azione di cura (`💚 ... Guarigione` in *Incantesimi*, *Combattimento* o *Azioni Bonus*, es. *Parola di Guarigione*, *Cura Ferite*) applica ora automaticamente il totale ottenuto ai Punti Ferita attuali (della forma attiva se trasformati, oppure del personaggio base fino a `pfMax`).
+- **Inserimento Diretto di Danni e Cure nel Riquadro Punti Ferita**:
+  - Aggiunto un campo numerico diretto (`Danni/Cura…`) con pulsanti dedicati **− Danno** e **+ Cura** (e invio rapido con `Enter`) sotto i tasti rapidi dei Punti Ferita, con gestione completa di PF temporanei, eccesso di danno in Forma Selvatica / Metamorfosi, TS di Concentrazione e TS contro Morte.
+- **Badge CD Visibile su Tutti gli Incantesimi con Tiro Salvezza**:
+  - Tutti gli incantesimi che richiedono un Tiro Salvezza su CD — anche quelli privi di dado di danno diretto come *Intralciare*, *Ammaliare Persone*, *Cecità/Sordità*, *Blocca Persone* — mostrano ora immediatamente il badge della **CD** e della caratteristica richiesta direttamente sulla riga dell'incantesimo.
+
+### Modificato
+- **Metamorfosi (Polymorph) e Oggetti Magici Fusi**:
+  - In conformità alle regole ufficiali D&D 5e (PHB p. 260), durante **Metamorfosi** (`scheda.metamorfosi.attiva`) l'equipaggiamento fuso nella nuova forma non concede bonus meccanici (es. *Mantello della Protezione* `✨ +1` a CA e Tiri Salvezza disattivato finché dura la Metamorfosi).
+- **Layout e Pulizia Interfaccia (9 migliorie UI)**:
+  - Centrata sullo schermo la finestra modale **Avvisi e novità** e rimosso il numero di versione ridondante dalla sua intestazione.
+  - Rimossa la dicitura ridondante `· 🐾 PF FORMA: ...` dal titolo della sezione **Punti Ferita**.
+  - Spostata leggermente a destra la colonna **Razza / Classe** nell'anagrafica per una migliore spaziatura da **Sesso / Background**.
+  - Disposti i 4 riquadri di **Regole di Magia in Forma Selvatica** su una singola riga a 4 colonne senza spazi vuoti.
+  - Rimosso il pulsante inline ridondante `Combat Tracker` dall'intestazione della sezione **Combattimento**.
+
 ## [4.118.17] – 2026-10-26
 
 ### Risolto
