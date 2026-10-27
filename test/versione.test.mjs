@@ -34,9 +34,8 @@ test('le Novità in-app: versioni in ordine decrescente e nessuna oltre la versi
   }
 });
 
-test('formato nome file backup: usa formato senza anno "Backup Tavolo dei Dadi (GG-MM).json"', () => {
+test('formato nome file backup: nome fisso "Backup Tavolo dei Dadi.json"', () => {
   const src = readFileSync('src/App.jsx', 'utf8');
-  assert.ok(src.includes("const dataStr = `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}`;"), 'dataStr non formattato come giorno-mese senza anno');
-  assert.ok(src.includes('aRoster.download = `Backup Tavolo dei Dadi (${dataStr}).json`'), 'nome file backup roster non aggiornato al formato chiaro');
+  assert.ok(src.includes("aRoster.download = 'Backup Tavolo dei Dadi.json';"));
+  assert.ok(src.includes("a.download = 'Backup Tavolo dei Dadi.json';"));
 });
-

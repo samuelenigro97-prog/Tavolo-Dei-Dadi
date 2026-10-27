@@ -2,6 +2,11 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.119.1] – 2026-10-28
+
+### Modificato
+- **Nome fisso per tutti i backup**: backup manuale, automatico giornaliero e di sicurezza si chiamano ora sempre `Backup Tavolo dei Dadi.json` (senza data né etichetta), così ogni nuovo backup sostituisce il precedente e resta un'unica copia offline aggiornata accanto a quella online.
+
 ## [4.119.0] – 2026-10-27
 
 ### Aggiunto
