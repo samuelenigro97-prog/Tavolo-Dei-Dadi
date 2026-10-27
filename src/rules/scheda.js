@@ -36,8 +36,12 @@ function nomeNormalizzato(v) {
 }
 
 /** Un effetto dell'inventario funziona solo se l'oggetto è indossato e,
- * quando richiesto, occupa anche uno degli slot di sintonia. */
+ * quando richiesto, occupa anche uno degli slot di sintonia.
+ * In Metamorfosi (Polymorph, PHB p. 260) l'equipaggiamento si fonde nella
+ * nuova forma e il personaggio non può attivare, usare, impugnare né
+ * beneficiare di alcuno dei suoi equipaggiamenti. */
 export function oggettiConEffettoAttivo(scheda) {
+  if (scheda?.metamorfosi?.attiva) return [];
   const sintonia = Array.isArray(scheda?.sintonia) ? scheda.sintonia : (scheda?.sintonia ? [scheda.sintonia] : []);
   return (Array.isArray(scheda?.inventario) ? scheda.inventario : []).filter((o) => {
     if (!o?.equip || !o.effettoMeccanico) return false;

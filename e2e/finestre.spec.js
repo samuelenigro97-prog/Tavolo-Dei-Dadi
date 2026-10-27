@@ -81,8 +81,8 @@ test.describe('Finestre estratte', () => {
   test('Avvisi e novità (NotificheModal)', async ({ page }) => {
     await page.getByRole('button', { name: /^Avvisi e novità/ }).first().click();
     await expect(page.getByText('Avvisi e novità', { exact: true }).first()).toBeVisible();
-    // Versione accanto alla X; niente più tasto "Ricarica l'applicazione" in fondo (v4.101.0).
-    await expect(page.getByTestId('notifiche-versione')).toHaveText(/^v\d+\.\d+\.\d+$/);
+    // Niente numero di versione nell'intestazione né tasto "Ricarica l'applicazione" in fondo.
+    await expect(page.getByTestId('notifiche-versione')).toHaveCount(0);
     await expect(page.getByRole('button', { name: /Ricarica l.applicazione/ })).toHaveCount(0);
     await page.keyboard.press('Escape');
   });

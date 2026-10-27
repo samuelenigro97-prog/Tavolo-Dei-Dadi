@@ -5,6 +5,21 @@
 
 export const NOVITA = [
   {
+    versione: '4.119.0',
+    voci: {
+      it: [
+        'Cure Automatiche ai Tiri e Input Diretto PF: tirare qualsiasi incantesimo o effetto di guarigione (es. Parola di Guarigione, Cura Ferite) cura ora automaticamente i Punti Ferita del personaggio, ed è stato aggiunto un campo diretto per scrivere subito i danni subiti o le cure.',
+        'CD visibile su tutti gli Incantesimi a Tiro Salvezza e Metamorfosi PHB: tutti gli incantesimi che richiedono un Tiro Salvezza (es. Intralciare, Ammaliare Persone, Cecità/Sordità) mostrano subito il badge CD in riga; in Metamorfosi gli oggetti magici fusi (es. Mantello della Protezione) non sommano più bonus.',
+        'Rifiniture Interfaccia: finestra "Avvisi e novità" centrata e ripulita, regole di magia in Forma Selvatica disposte su 4 colonne in un\'unica riga, rimosso il pulsante Combat Tracker ridondante dalla sezione Combattimento e ottimizzati gli spazi nell\'anagrafica e nei Punti Ferita.',
+      ],
+      en: [
+        'Automatic Healing Rolls & Direct HP Input: rolling any healing spell or effect (e.g. Healing Word, Cure Wounds) now automatically heals the character\'s Hit Points, and a direct input field lets you type damage or healing amounts directly.',
+        'Save DC Badge on All Saving Throw Spells & PHB Polymorph Rules: all spells requiring a Saving Throw (e.g. Entangle, Charm Person, Blindness/Deafness) now display their Save DC badge right on the spell row; during Polymorph, merged magic items (e.g. Cloak of Protection) no longer grant bonuses.',
+        'UI Refinements: centered and cleaned up "Alerts & News" modal, arranged Wild Shape spellcasting rules into 4 single-row cards, removed redundant inline Combat Tracker toggle in Combat, and refined spacing in the profile header and Hit Points box.',
+      ],
+    },
+  },
+  {
     versione: '4.118.17',
     voci: {
       it: [

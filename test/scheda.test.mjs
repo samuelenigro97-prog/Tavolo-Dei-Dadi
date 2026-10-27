@@ -234,6 +234,23 @@ test('Vaelion: CA con Corazza Legnoferro (media 14) + DES 15 (+2) + Mantello (+1
   assert.equal(punteggioCaratteristica(vaelion, 'forza'), 19); // 19 da guanti
   assert.equal(bonusAbilita(vaelion, 'percezione'), 9); // +5 SAG + 4 comp
   assert.equal(competenteInArmatura(vaelion, 'media'), true);
+
+  // In Metamorfosi (Polymorph, PHB p. 260) l'equipaggiamento si fonde nella nuova forma:
+  // nessun bonus da oggetti magici (Mantello della Protezione +1 a CA e TS disattivato).
+  const vaelionGorilla = {
+    ...vaelion,
+    metamorfosi: {
+      attiva: true,
+      nome: 'Gorilla gigante',
+      ca: 12,
+      pfAttuali: 157,
+      pfMax: 157,
+      car: { forza: 23, destrezza: 14, costituzione: 18, intelligenza: 7, saggezza: 12, carisma: 7 },
+    },
+  };
+  assert.equal(caTotale(vaelionGorilla), 12); // CA naturale del Gorilla senza +1 mantello
+  assert.equal(bonusTiroSalvezza(vaelionGorilla, 'forza'), 6); // +6 FOR del Gorilla, senza +1 mantello
+  assert.equal(bonusTiroSalvezza(vaelionGorilla, 'saggezza'), 5); // +1 SAG del Gorilla + 4 comp, senza +1 mantello
 });
 
 // ========================= Wendell Cedric Thistletune =========================
