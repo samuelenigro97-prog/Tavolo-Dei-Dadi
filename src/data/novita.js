@@ -5,6 +5,13 @@
 
 export const NOVITA = [
   {
+    versione: '4.119.2',
+    voci: {
+      it: ['Allineamento test e verifiche CI sul nome fisso del file di backup.'],
+      en: ['CI test alignment for the fixed backup filename.'],
+    },
+  },
+  {
     versione: '4.119.1',
     voci: {
       it: ['Backup con nome fisso: ogni backup (manuale o automatico) si chiama ora "Backup Tavolo dei Dadi.json", così resta un\'unica copia offline sempre aggiornata.'],

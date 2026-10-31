@@ -2,6 +2,11 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.119.2] – 2026-10-31
+
+### Risolto
+- **Allineamento test E2E backup automatico**: aggiornata l'asserzione del test E2E sul nome fisso del backup giornaliero (`Backup Tavolo dei Dadi.json`) per ripristinare il passaggio della suite di CI.
+
 ## [4.119.1] – 2026-10-28
 
 ### Modificato

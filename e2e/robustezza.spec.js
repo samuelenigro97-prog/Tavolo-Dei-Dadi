@@ -88,6 +88,6 @@ test.describe('Robustezza e accessibilità', () => {
     const downloadPromise = page.waitForEvent('download', { timeout: 5000 });
     await apriScheda(page);
     const download = await downloadPromise;
-    expect(download.suggestedFilename()).toMatch(/^Backup Tavolo dei Dadi \(\d{2}-\d{2}\)\.json$/);
+    expect(download.suggestedFilename()).toBe('Backup Tavolo dei Dadi.json');
   });
 });
