@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.120.0',
+    voci: {
+      it: [
+        'Pallino Combat Tracker: l\'icona delle spade resta pulita e spenta a riposo, verde a combattimento aperto e oro se minimizzato.',
+        'Pallino Backup Online: stato verde stabile con backup attivo, passando all\'arancione unicamente durante la trasmissione online effettiva.',
+      ],
+      en: [
+        'Combat Tracker dot: swords icon stays clean and off when inactive, green when open, and gold when minimized.',
+        'Online Backup dot: steady green status when backup is active, turning orange only during actual online transmission.',
+      ],
+    },
+  },
+  {
     versione: '4.119.3',
     voci: {
       it: [

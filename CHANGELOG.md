@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.120.0] – 2026-10-31
+
+### Modificato
+- **Pallino Combat Tracker (`⚔️`)**: impostato spento/trasparente quando il combattimento non è in corso, verde quando il tracker è aperto a schermo e oro/giallo quando è in corso ma ridotto a icona.
+- **Pallino Backup Online (`☁️`)**: il pallino rimane verde stabile quando il salvataggio è attivo e sincronizzato, passando all'arancione unicamente durante la trasmissione online effettiva senza restare bloccato in attesa locale.
+
 ## [4.119.3] – 2026-10-31
 
 ### Modificato
