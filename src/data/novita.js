@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.119.3',
+    voci: {
+      it: [
+        'Pulsante "Supporta" nel menu: etichetta semplificata per un aspetto ancora più pulito e compatto.',
+        'Combat Tracker e menu iniziale: bloccata l\'espansione accidentale dal basso quando il menu principale è aperto.',
+      ],
+      en: [
+        'Support button in menu: simplified label for a cleaner, compact layout.',
+        'Combat Tracker & main menu: prevented accidental opening from the bottom while the main menu is active.',
+      ],
+    },
+  },
+  {
     versione: '4.119.2',
     voci: {
       it: ['Allineamento test e verifiche CI sul nome fisso del file di backup.'],
