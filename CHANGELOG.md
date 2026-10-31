@@ -2,6 +2,12 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.119.3] – 2026-10-31
+
+### Modificato
+- **Pulsante "Supporta" nel Menu Iniziale**: rinominata l'etichetta del tasto da "Supporta il progetto ❤️" a "Supporta" (e "Support" in inglese), garantendo un layout ancora più pulito e compatto.
+- **Blocco apertura Combat Tracker dal basso durante il Menu Iniziale**: impedita l'espansione e l'apertura accidentale per passaggio del mouse o click sul Combat Tracker sul bordo inferiore quando il menu principale è aperto a schermo.
+
 ## [4.119.2] – 2026-10-31
 
 ### Risolto
