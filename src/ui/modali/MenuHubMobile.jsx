@@ -323,18 +323,20 @@ export function MenuHubMobile({ APP_VERSION, aggiungiPgAlCombat, apriNotifiche, 
                 setMostraMenuHubMobile(false);
               }}
             >
-              <span
-                style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: '50%',
-                  background: statoCombat.colore,
-                  boxShadow: statoCombat.glow,
-                  display: 'inline-block',
-                  flexShrink: 0,
-                  transition: 'background 0.25s ease, box-shadow 0.25s ease',
-                }}
-              />
+              {combat.attivo && (
+                <span
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    background: statoCombat.colore,
+                    boxShadow: statoCombat.glow,
+                    display: 'inline-block',
+                    flexShrink: 0,
+                    transition: 'background 0.25s ease, box-shadow 0.25s ease',
+                  }}
+                />
+              )}
               <span style={{ fontSize: 16 }}>⚔️</span>
               <span>{lingua === 'en' ? 'Combat' : 'Combattimento'}</span>
               <span style={{ fontSize: 11, marginLeft: 'auto', opacity: 0.7, fontWeight: 500 }}>

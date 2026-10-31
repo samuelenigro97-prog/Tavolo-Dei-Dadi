@@ -1997,7 +1997,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.119.3';
+const APP_VERSION = '4.120.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4154,7 +4154,7 @@ export default function App() {
   useEffect(() => {
     try { navigator.storage?.persist?.().catch(() => {}); } catch { /* niente */ }
   }, []);
-  const arancioneSync = (sincronizzando || inAttesaSync) && isCloudAttivo;
+  const arancioneSync = sincronizzando && isCloudAttivo;
   const statoColoreCloud = arancioneSync
     ? '#f59e0b'
     : isCloudAttivo
@@ -4177,7 +4177,7 @@ export default function App() {
         ? '0 0 6px rgba(245, 158, 11, 0.25)'
         : '0 0 6px rgba(239, 68, 68, 0.25)';
 
-  // Stato bollino Combat Tracker: verde se aperto, oro se minimizzato, rosso se disattivo (non in fight)
+  // Stato bollino Combat Tracker: verde se aperto, oro se minimizzato, spento/trasparente se disattivo (non in fight)
   const statoCombatInfo = calcolaStatoCombat(combat);
   const statoColoreCombat = statoCombatInfo.colore;
   const statoGlowCombat = statoCombatInfo.glow;
