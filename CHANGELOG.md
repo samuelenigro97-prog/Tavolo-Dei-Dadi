@@ -2,6 +2,13 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.121.0] – 2026-11-01
+
+### Aggiunto
+- **Albero delle Abilità & Progressione RPG (Skill Tree 1-20)**: modale interattivo ad albero/costellazione accessibile dalla sezione Privilegi con progressione 1-20 (nodi sbloccati, traguardi ASI/talenti, bivi di sottoclasse, slot incantesimi e privilegi cliccabili con spiegazioni).
+- **Manichino Equipaggiamento RPG (Paper Doll Grid)**: griglia visuale a 9 slot (Testa, Collo, Armatura, Mantello, Mano Principale, Seconda Mano/Scudo, Anelli, Stivali) nell'inventario con categorizzazione automatica e gestione rapida dell'equipaggiamento.
+- **Combat Game Feel & Feedback Visivo RPG**: numeri fluttuanti di combattimento animati (`-Danno` in rosso scuro e `+Cura` in verde brillante), barra ghost di ritardo sui danni subiti per seguire il colpo a vista, e vibrazione/flash oro (`.critico-animato`) sul 20 naturale al dado.
+
 ## [4.120.0] – 2026-10-31
 
 ### Modificato
