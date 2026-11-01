@@ -5,6 +5,21 @@
 
 export const NOVITA = [
   {
+    versione: '4.121.0',
+    voci: {
+      it: [
+        'Albero delle Abilità & Progressione: mappa nodi 1-20 stile videogioco RPG per visualizzare privilegi, talenti e traguardi di classe.',
+        'Manichino Equipaggiamento RPG: griglia slot classica (testa, anelli, armatura, armi) per equipaggiare o togliere al volo gli oggetti.',
+        'Game Feel di combattimento: numeri fluttuanti di danno/cura sulla vita, barra ghost di ritardo del colpo e animazione d\'impatto per il 20 naturale.',
+      ],
+      en: [
+        'Skill Tree & Progression: interactive 1-20 constellation map showing features, feats and class milestones.',
+        'Paper Doll Equipment: classic RPG slot grid (head, rings, armor, weapons) for instant equipping and un-equipping.',
+        'Combat Game Feel: floating damage/healing numbers on HP bar, ghost hit delay trail, and dynamic screen shake on natural 20.',
+      ],
+    },
+  },
+  {
     versione: '4.120.0',
     voci: {
       it: [

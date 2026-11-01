@@ -30,6 +30,8 @@ import { trovaBackdropInCima, eCampoModificabile, deveAttivareDaTastiera } from 
 import { salvaJsonLiberandoSpazio, deveRicordareBackup, rosterSenzaImmagini, riagganciaImmagini, salvaImmaginiRoster, caricaImmaginiRoster, rimuoviImmaginePersonaggio, preservaImmaginiSeMancanti, CHIAVE_ULTIMO_AUTO_BACKUP_GIORNALIERO, formattaDataIsoLocale, deveScaricareBackupGiornaliero } from './utils/persistenza.js';
 import { datiTabelleBackground } from './data/tabelleBackground.js';
 import { CompendioModal } from './ui/CompendioModal.jsx';
+import { AlberoProgressioneModal } from './ui/modali/AlberoProgressioneModal.jsx';
+import { ManichinoEquipaggiamento } from './ui/ManichinoEquipaggiamento.jsx';
 
 
 // Tema chiaro "foglio di carta": bianco, inchiostro scuro, accenti sobri.
@@ -1997,7 +1999,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.120.0';
+const APP_VERSION = '4.121.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -4195,6 +4197,9 @@ export default function App() {
   const [mostraLevelUp, setMostraLevelUp] = useState(false);
   const [mostraPrivilegi, setMostraPrivilegi] = useState(false); // panoramica privilegi per livello
   const [mostraPrivilegiSub, setMostraPrivilegiSub] = useState(false); // panoramica privilegi di sottoclasse
+  const [mostraAlberoProgressione, setMostraAlberoProgressione] = useState(false); // skill tree progressione RPG
+  const [combatFloat, setCombatFloat] = useState(null); // feedback danno/cura fluttuante
+  const [pfGhost, setPfGhost] = useState(null); // scia ghost ritardo danno
   const [info, setInfo] = useState(null); // nuvoletta esplicativa: { titolo, testo }
   const [checkConc, setCheckConc] = useState(null); // TS concentrazione automatico: { danno, cd, spell, esito }
   // Danno ad area nel Combat Tracker: { valore, tipo, magico, dettaglio, sel: {id: bool}, ts: {id: bool}, difese: {id: difesa} }
@@ -8419,6 +8424,16 @@ export default function App() {
 
       {mostraPrivilegiSub && <PrivilegiSottoclasseModal lingua={lingua} mostraPrivilegiSub={mostraPrivilegiSub} scheda={scheda} setInfo={setInfo} setMostraPrivilegiSub={setMostraPrivilegiSub} versione={versione} />}
 
+      {mostraAlberoProgressione && (
+        <AlberoProgressioneModal
+          scheda={scheda}
+          lingua={lingua}
+          versione={versione}
+          setInfo={setInfo}
+          onChiudi={() => setMostraAlberoProgressione(false)}
+        />
+      )}
+
       {/* Modal Tracciatore Punti Esperienza (P.E. / XP Tracker) */}
       {mostraModalPe && <PeModal
            aggiorna={aggiorna}
@@ -10389,7 +10404,7 @@ export default function App() {
 
         {/* Banner animato del tiro (appare sempre ordinatamente SOTTO la barra fissa) */}
         {(rolling || tiro || danni) && (
-          <div ref={barraTiroRef} className="barra-tiro no-stampa" style={{ ...styles.rollBar, marginBottom: 10 }}>
+          <div ref={barraTiroRef} className={`barra-tiro no-stampa ${!rolling && (tiro?.naturale === 20 || danni?.critico) ? 'critico-animato' : ''}`} style={{ ...styles.rollBar, marginBottom: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
               <div style={styles.dado(rolling, !rolling && (tiro?.naturale === 20 || danni?.critico), !rolling && (tiro?.naturale === 1), tipoDadoInUso)}>{faccia}</div>
               <div style={{ flex: 1, minWidth: 200, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -11264,91 +11279,132 @@ export default function App() {
                       const temp = isTrasformato ? 0 : (Number(scheda.pfTemp) || 0);
                       const max = Math.max(1, maxPfEffettivo + temp);
                       const percNormale = Math.max(0, Math.min(100, (att / max) * 100));
+                      const percGhost = pfGhost != null ? Math.max(0, Math.min(100, (pfGhost / max) * 100)) : 0;
                       const percTemp = Math.max(0, Math.min(100, (temp / max) * 100));
                       const coloreNormale = (att / Math.max(1, maxPfEffettivo)) > 0.5 ? 'linear-gradient(90deg, #1b5e20 0%, #2e7d32 40%, #4caf50 100%)' : (att / Math.max(1, maxPfEffettivo)) > 0.25 ? 'linear-gradient(90deg, #e65100 0%, #f57f17 50%, #ffb300 100%)' : 'linear-gradient(90deg, #b71c1c 0%, #c62828 50%, #e53935 100%)';
                       const isCritico = att > 0 && (att / Math.max(1, maxPfEffettivo)) <= 0.25;
                       const glowColore = (att / Math.max(1, maxPfEffettivo)) > 0.5 ? 'rgba(76,175,80,0.45)' : (att / Math.max(1, maxPfEffettivo)) > 0.25 ? 'rgba(255,179,0,0.45)' : 'rgba(229,57,53,0.55)';
                       return (
-                        <div className={`profilo-barra-vita ${isCritico ? 'pf-barra-critica' : ''}`} style={{ position: 'relative', width: '100%', height: 26, borderRadius: 13, background: 'rgba(10,8,6,0.85)', border: `2px solid ${isTrasformato ? '#52b788' : C.border}`, boxShadow: 'inset 0 3px 6px rgba(0,0,0,0.85), 0 2px 8px rgba(0,0,0,0.35), 0 0 1px rgba(255,255,255,0.2)', overflow: 'hidden', margin: '2px 0', display: 'flex' }} title={`${att} / ${maxPfEffettivo} PF${temp ? ` (+ ${temp} temp)` : ''}`}>
-                          <div style={{ width: `${percNormale}%`, height: '100%', background: coloreNormale, transition: 'width 0.35s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: `0 0 12px ${glowColore}`, position: 'relative' }}>
-                            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '48%', background: 'linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.08) 70%, rgba(255,255,255,0) 100%)' }} />
-                          </div>
-                          {temp > 0 && (
-                            <div style={{ width: `${percTemp}%`, height: '100%', background: 'linear-gradient(90deg, #0d47a1 0%, #1565c0 50%, #42a5f5 100%)', transition: 'width 0.35s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: '0 0 10px rgba(66,165,245,0.5)', position: 'relative' }}>
-                              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '48%', background: 'linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.08) 70%, rgba(255,255,255,0) 100%)' }} />
+                        <div style={{ position: 'relative', width: '100%' }}>
+                          {/* Floating Combat Number (+Cura / -Danno) stile RPG */}
+                          {combatFloat && (
+                            <div
+                              key={combatFloat.key}
+                              className={`floating-combat-number floating-combat-${combatFloat.tipo}`}
+                              style={{
+                                position: 'absolute',
+                                top: -18,
+                                left: '50%',
+                                zIndex: 10,
+                                pointerEvents: 'none',
+                              }}
+                            >
+                              {combatFloat.val}
                             </div>
                           )}
-                          {/* Overlay cliccabile per modificare PF attuali */}
-                          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14, textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.8)', letterSpacing: 0.5, gap: 4 }}>
-                            <span style={{ color: '#fff', cursor: 'pointer' }}>
-                              <Editable
-                                value={att}
-                                tipo="numero"
-                                onChange={(v) => {
-                                  const danno = att - v;
-                                  if (isTrasformato) {
-                                    if (v <= 0) {
-                                      const eccesso = Math.abs(v);
-                                      const pfDruido = Math.max(0, (Number(scheda.pfAttuali) || 0) - eccesso);
+                          <div className={`profilo-barra-vita ${isCritico ? 'pf-barra-critica' : ''}`} style={{ position: 'relative', width: '100%', height: 26, borderRadius: 13, background: 'rgba(10,8,6,0.85)', border: `2px solid ${isTrasformato ? '#52b788' : C.border}`, boxShadow: 'inset 0 3px 6px rgba(0,0,0,0.85), 0 2px 8px rgba(0,0,0,0.35), 0 0 1px rgba(255,255,255,0.2)', overflow: 'hidden', margin: '2px 0', display: 'flex' }} title={`${att} / ${maxPfEffettivo} PF${temp ? ` (+ ${temp} temp)` : ''}`}>
+                            {/* Ghost bar per danno subito (scia ritardo danno) */}
+                            {percGhost > percNormale && (
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  width: `${percGhost}%`,
+                                  height: '100%',
+                                  background: 'rgba(255,255,255,0.45)',
+                                  transition: 'width 0.6s cubic-bezier(0.25, 1, 0.5, 1)',
+                                  pointerEvents: 'none',
+                                }}
+                              />
+                            )}
+                            <div style={{ width: `${percNormale}%`, height: '100%', background: coloreNormale, transition: 'width 0.35s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: `0 0 12px ${glowColore}`, position: 'relative' }}>
+                              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '48%', background: 'linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.08) 70%, rgba(255,255,255,0) 100%)' }} />
+                            </div>
+                            {temp > 0 && (
+                              <div style={{ width: `${percTemp}%`, height: '100%', background: 'linear-gradient(90deg, #0d47a1 0%, #1565c0 50%, #42a5f5 100%)', transition: 'width 0.35s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: '0 0 10px rgba(66,165,245,0.5)', position: 'relative' }}>
+                                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '48%', background: 'linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.08) 70%, rgba(255,255,255,0) 100%)' }} />
+                              </div>
+                            )}
+                            {/* Overlay cliccabile per modificare PF attuali */}
+                            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14, textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.8)', letterSpacing: 0.5, gap: 4 }}>
+                              <span style={{ color: '#fff', cursor: 'pointer' }}>
+                                <Editable
+                                  value={att}
+                                  tipo="numero"
+                                  onChange={(v) => {
+                                    const danno = att - v;
+                                    if (danno > 0) {
+                                      setCombatFloat({ val: `-${danno}`, tipo: 'danno', key: Date.now() });
+                                      setPfGhost(att);
+                                      setTimeout(() => setPfGhost(null), 600);
+                                    } else if (danno < 0) {
+                                      setCombatFloat({ val: `+${Math.abs(danno)}`, tipo: 'cura', key: Date.now() });
+                                    }
+                                    if (isTrasformato) {
+                                      if (v <= 0) {
+                                        const eccesso = Math.abs(v);
+                                        const pfDruido = Math.max(0, (Number(scheda.pfAttuali) || 0) - eccesso);
+                                        aggiorna({
+                                          pfAttuali: pfDruido,
+                                          [campoForma]: { ...formaAttiva.dati, pfAttuali: 0, attiva: false }
+                                        });
+                                        registra({
+                                          etichetta: tr('Forma Selvatica esaurita', 'Wild Shape ended'),
+                                          tipo: 'tattica',
+                                          dettaglio: eccesso > 0
+                                            ? tr(`I PF della forma (${formaAttiva.dati.nome}) sono scesi a 0. Sei tornato alla forma umana; ${eccesso} danni in eccesso inflitti ai PF base (${pfDruido}/${scheda.pfMax}).`, `Form HP (${formaAttiva.dati.nome}) dropped to 0. Reverted to humanoid form; ${eccesso} excess damage dealt to base HP (${pfDruido}/${scheda.pfMax}).`)
+                                            : tr(`I PF della forma (${formaAttiva.dati.nome}) sono scesi a 0. Sei tornato alla forma normale.`, `Form HP (${formaAttiva.dati.nome}) dropped to 0. Reverted to normal form.`),
+                                        });
+                                      } else {
+                                        aggiorna({
+                                          [campoForma]: { ...formaAttiva.dati, pfAttuali: Math.min(formaAttiva.dati.pfMax, v) }
+                                        });
+                                      }
+                                    } else {
+                                      aggiorna({ pfAttuali: v });
+                                    }
+                                    if (danno > 0 && scheda.concentrazione) {
+                                      setCheckConc({ danno, cd: cdConcentrazione(danno, scheda.versione), spell: scheda.concentrazione, esito: null });
+                                    }
+                                  }}
+                                  width={34}
+                                  style={{ color: '#fff', fontWeight: 800, fontSize: 14, textShadow: '0 1px 3px rgba(0,0,0,0.9)', background: 'transparent', border: 'none' }}
+                                />
+                              </span>
+                              <span style={{ color: '#fff' }}>/</span>
+                              {/* Il massimo è modificabile a mano: la formula automatica vale solo
+                                  alla creazione, quindi chi ha tirato i dadi o ha bonus particolari
+                                  (Nano, Robusto, oggetti magici) può correggerlo senza perderlo. */}
+                              <span style={{ color: '#fff', cursor: 'pointer' }}>
+                                <Editable
+                                  value={maxPf}
+                                  tipo="numero"
+                                  title={t('vital.pf_max_modifica')}
+                                  onChange={(v) => {
+                                    const nuovoMax = Math.max(1, Number(v) || 1);
+                                    if (isTrasformato) {
                                       aggiorna({
-                                        pfAttuali: pfDruido,
-                                        [campoForma]: { ...formaAttiva.dati, pfAttuali: 0, attiva: false }
-                                      });
-                                      registra({
-                                        etichetta: tr('Forma Selvatica esaurita', 'Wild Shape ended'),
-                                        tipo: 'tattica',
-                                        dettaglio: eccesso > 0
-                                          ? tr(`I PF della forma (${formaAttiva.dati.nome}) sono scesi a 0. Sei tornato alla forma umana; ${eccesso} danni in eccesso inflitti ai PF base (${pfDruido}/${scheda.pfMax}).`, `Form HP (${formaAttiva.dati.nome}) dropped to 0. Reverted to humanoid form; ${eccesso} excess damage dealt to base HP (${pfDruido}/${scheda.pfMax}).`)
-                                          : tr(`I PF della forma (${formaAttiva.dati.nome}) sono scesi a 0. Sei tornato alla forma normale.`, `Form HP (${formaAttiva.dati.nome}) dropped to 0. Reverted to normal form.`),
+                                        [campoForma]: {
+                                          ...formaAttiva.dati,
+                                          pfMax: nuovoMax,
+                                          pfAttuali: Math.min(Number(formaAttiva.dati.pfAttuali) || 0, nuovoMax),
+                                        },
                                       });
                                     } else {
                                       aggiorna({
-                                        [campoForma]: { ...formaAttiva.dati, pfAttuali: Math.min(formaAttiva.dati.pfMax, v) }
+                                        pfMax: nuovoMax,
+                                        pfAttuali: Math.min(Number(scheda.pfAttuali) || 0, nuovoMax + bonusPotereBersaglio(scheda, 'pf_massimi')),
                                       });
                                     }
-                                  } else {
-                                    aggiorna({ pfAttuali: v });
-                                  }
-                                  if (danno > 0 && scheda.concentrazione) {
-                                    setCheckConc({ danno, cd: cdConcentrazione(danno, scheda.versione), spell: scheda.concentrazione, esito: null });
-                                  }
-                                }}
-                                width={34}
-                                style={{ color: '#fff', fontWeight: 800, fontSize: 14, textShadow: '0 1px 3px rgba(0,0,0,0.9)', background: 'transparent', border: 'none' }}
-                              />
-                            </span>
-                            <span style={{ color: '#fff' }}>/</span>
-                            {/* Il massimo è modificabile a mano: la formula automatica vale solo
-                                alla creazione, quindi chi ha tirato i dadi o ha bonus particolari
-                                (Nano, Robusto, oggetti magici) può correggerlo senza perderlo. */}
-                            <span style={{ color: '#fff', cursor: 'pointer' }}>
-                              <Editable
-                                value={maxPf}
-                                tipo="numero"
-                                title={t('vital.pf_max_modifica')}
-                                onChange={(v) => {
-                                  const nuovoMax = Math.max(1, Number(v) || 1);
-                                  if (isTrasformato) {
-                                    aggiorna({
-                                      [campoForma]: {
-                                        ...formaAttiva.dati,
-                                        pfMax: nuovoMax,
-                                        pfAttuali: Math.min(Number(formaAttiva.dati.pfAttuali) || 0, nuovoMax),
-                                      },
-                                    });
-                                  } else {
-                                    aggiorna({
-                                      pfMax: nuovoMax,
-                                      pfAttuali: Math.min(Number(scheda.pfAttuali) || 0, nuovoMax + bonusPotereBersaglio(scheda, 'pf_massimi')),
-                                    });
-                                  }
-                                }}
-                                width={34}
-                                style={{ color: '#fff', fontWeight: 800, fontSize: 14, textShadow: '0 1px 3px rgba(0,0,0,0.9)', background: 'transparent', border: 'none' }}
-                              />
-                              {!isTrasformato && <BadgePotere scheda={scheda} bersaglio="pf_massimi" unita="" />}
-                              {!isTrasformato && <BadgeSfinimento scheda={scheda} bersaglio="pf_massimi" />}
-                            </span>
+                                  }}
+                                  width={34}
+                                  style={{ color: '#fff', fontWeight: 800, fontSize: 14, textShadow: '0 1px 3px rgba(0,0,0,0.9)', background: 'transparent', border: 'none' }}
+                                />
+                                {!isTrasformato && <BadgePotere scheda={scheda} bersaglio="pf_massimi" unita="" />}
+                                {!isTrasformato && <BadgeSfinimento scheda={scheda} bersaglio="pf_massimi" />}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       );
@@ -11380,6 +11436,10 @@ export default function App() {
                     {(() => {
                       const applicaDannoRapido = (quantita) => {
                         if (effettiSonoriAttivi) eseguiEffettoSonoro('fallimento', volumeAudio);
+                        const pfPrima = isTrasformato ? (Number(formaAttiva.dati.pfAttuali) || 0) : (Number(scheda.pfAttuali) || 0);
+                        setPfGhost(pfPrima);
+                        setTimeout(() => setPfGhost(null), 600);
+                        setCombatFloat({ val: `-${quantita}`, tipo: 'danno', key: Date.now() });
                         if (isTrasformato) {
                           const beastPf = Number(formaAttiva.dati.pfAttuali) || 0;
                           if (quantita >= beastPf) {
@@ -11440,6 +11500,7 @@ export default function App() {
 
                       const applicaCuraRapida = (quantita) => {
                         if (effettiSonoriAttivi) eseguiEffettoSonoro('cura', volumeAudio);
+                        setCombatFloat({ val: `+${quantita}`, tipo: 'cura', key: Date.now() });
                         if (isTrasformato) {
                           const att = Number(formaAttiva.dati.pfAttuali) || 0;
                           const maxPf = Number(formaAttiva.dati.pfMax) || 10;
@@ -16917,6 +16978,16 @@ export default function App() {
                 };
                 return (
                   <div>
+                    {/* Manichino Equipaggiamento RPG (Paper Doll) */}
+                    <div style={{ marginBottom: 14 }}>
+                      <ManichinoEquipaggiamento
+                        inventario={inv}
+                        attacchi={attacchi}
+                        lingua={lingua}
+                        onToggleEquip={toggleEquip}
+                      />
+                    </div>
+
                     {/* Riepilogo ingombro automatico */}
                     <div style={{ marginBottom: 10 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, ...styles.detail, flexWrap: 'wrap' }}>

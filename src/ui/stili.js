@@ -848,8 +848,63 @@ tbody tr:hover {
   animation: battito-cardiaco-critico 1.4s ease-in-out infinite alternate !important;
 }
 
+/* Effetti visivi RPG Combat: Numeri Danno Fluttuanti & Critico Screen-Shake */
+@keyframes fluttua-numero-combat {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.7);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -10px) scale(1.15);
+  }
+  75% {
+    opacity: 1;
+    transform: translate(-50%, -28px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -42px) scale(0.85);
+  }
+}
+.floating-combat-number {
+  position: absolute;
+  left: 50%;
+  top: -12px;
+  transform: translate(-50%, 0);
+  pointer-events: none;
+  font-family: var(--font-title, Georgia, serif);
+  font-weight: 900;
+  font-size: 22px;
+  letter-spacing: 0.5px;
+  z-index: 100;
+  animation: fluttua-numero-combat 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  user-select: none;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.9));
+}
+.floating-combat-danno {
+  color: #ff4d4d;
+  text-shadow: 0 0 10px rgba(255, 77, 77, 0.7);
+}
+.floating-combat-cura {
+  color: #4ade80;
+  text-shadow: 0 0 10px rgba(74, 222, 128, 0.7);
+}
+
+@keyframes critico-shake-flash {
+  0% { transform: scale(1); filter: brightness(1); }
+  20% { transform: scale(1.03) rotate(-1deg); filter: brightness(1.4) drop-shadow(0 0 18px rgba(214,169,15,0.9)); }
+  40% { transform: scale(0.98) rotate(1deg); filter: brightness(1.2) drop-shadow(0 0 14px rgba(214,169,15,0.8)); }
+  60% { transform: scale(1.02) rotate(-0.5deg); }
+  80% { transform: scale(0.99) rotate(0.5deg); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+.critico-animato {
+  animation: critico-shake-flash 0.65s ease-out forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .sezione, .profilo-sezione, .angolo-ornamento, .ispirazione-attiva-glow, .pf-barra-critica {
+  .sezione, .profilo-sezione, .angolo-ornamento, .ispirazione-attiva-glow, .pf-barra-critica, .floating-combat-number, .critico-animato {
     animation: none !important;
   }
 }
