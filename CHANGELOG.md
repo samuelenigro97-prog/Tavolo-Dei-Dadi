@@ -2,6 +2,11 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.121.1] – 2026-11-01
+
+### Rimosso
+- **Manichino Equipaggiamento RPG**: rimossa la griglia slot ("Equipaggiamento Indossato") sopra l'inventario per ripristinare il layout pulito, lineare e compatto della sezione.
+
 ## [4.121.0] – 2026-11-01
 
 ### Aggiunto

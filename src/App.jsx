@@ -31,7 +31,6 @@ import { salvaJsonLiberandoSpazio, deveRicordareBackup, rosterSenzaImmagini, ria
 import { datiTabelleBackground } from './data/tabelleBackground.js';
 import { CompendioModal } from './ui/CompendioModal.jsx';
 import { AlberoProgressioneModal } from './ui/modali/AlberoProgressioneModal.jsx';
-import { ManichinoEquipaggiamento } from './ui/ManichinoEquipaggiamento.jsx';
 
 
 // Tema chiaro "foglio di carta": bianco, inchiostro scuro, accenti sobri.
@@ -1999,7 +1998,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.121.0';
+const APP_VERSION = '4.121.1';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -16978,16 +16977,6 @@ export default function App() {
                 };
                 return (
                   <div>
-                    {/* Manichino Equipaggiamento RPG (Paper Doll) */}
-                    <div style={{ marginBottom: 14 }}>
-                      <ManichinoEquipaggiamento
-                        inventario={inv}
-                        attacchi={attacchi}
-                        lingua={lingua}
-                        onToggleEquip={toggleEquip}
-                      />
-                    </div>
-
                     {/* Riepilogo ingombro automatico */}
                     <div style={{ marginBottom: 10 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, ...styles.detail, flexWrap: 'wrap' }}>

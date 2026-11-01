@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.121.1',
+    voci: {
+      it: [
+        'Inventario: rimosso il manichino slot per ripristinare il design lineare e compatto della sezione.',
+      ],
+      en: [
+        'Inventory: removed the slot mannequin to restore the clean and compact section layout.',
+      ],
+    },
+  },
+  {
     versione: '4.121.0',
     voci: {
       it: [
