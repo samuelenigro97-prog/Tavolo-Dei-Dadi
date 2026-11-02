@@ -2,6 +2,11 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.121.2] – 2026-11-02
+
+### Modificato
+- **Punti Ferita e Controlli Rapidi**: riordinati i controlli nella riga di input manuale dei PF (`- Danno`, input `Danni/Cura…`, `+ Cura`) posizionando il campo numerico subito dopo la scritta/pulsante Danno e prima di Cura.
+
 ## [4.121.1] – 2026-11-01
 
 ### Rimosso

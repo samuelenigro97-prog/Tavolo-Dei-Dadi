@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.121.2',
+    voci: {
+      it: [
+        'Punti Ferita: posizionato il campo Danni/Cura subito dopo il pulsante Danno e prima di Cura per un flusso più naturale.',
+      ],
+      en: [
+        'Hit Points: placed the Damage/Heal input right after the Damage button and before Heal for a more intuitive flow.',
+      ],
+    },
+  },
+  {
     versione: '4.121.1',
     voci: {
       it: [

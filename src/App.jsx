@@ -1998,7 +1998,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.121.1';
+const APP_VERSION = '4.121.2';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -11538,6 +11538,15 @@ export default function App() {
                             <button style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(20)} title={t('vital.cura')}>+20</button>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                            <button
+                              type="button"
+                              data-testid="pf-applica-danno"
+                              style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 7px', fontWeight: 700, fontSize: 11 }}
+                              onClick={() => applicaInputDiretto('danno')}
+                              title={lingua === 'en' ? 'Apply typed damage' : 'Applica i danni inseriti'}
+                            >
+                              − {lingua === 'en' ? 'Dmg' : 'Danno'}
+                            </button>
                             <input
                               type="text"
                               inputMode="numeric"
@@ -11562,15 +11571,6 @@ export default function App() {
                                 fontWeight: 700,
                               }}
                             />
-                            <button
-                              type="button"
-                              data-testid="pf-applica-danno"
-                              style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 7px', fontWeight: 700, fontSize: 11 }}
-                              onClick={() => applicaInputDiretto('danno')}
-                              title={lingua === 'en' ? 'Apply typed damage' : 'Applica i danni inseriti'}
-                            >
-                              − {lingua === 'en' ? 'Dmg' : 'Danno'}
-                            </button>
                             <button
                               type="button"
                               data-testid="pf-applica-cura"
