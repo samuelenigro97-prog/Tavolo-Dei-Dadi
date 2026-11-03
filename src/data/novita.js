@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.122.0',
+    voci: {
+      it: [
+        'Vitali: chip tematici e colorati per Resistenze e Visione con stile e pulsanti coerenti con il riquadro Condizioni.',
+      ],
+      en: [
+        'Vitals: thematic colored chips for Resistances and Vision with styling and add buttons matching the Conditions box.',
+      ],
+    },
+  },
+  {
     versione: '4.121.2',
     voci: {
       it: [

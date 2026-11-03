@@ -2,6 +2,11 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.122.0] – 2026-11-03
+
+### Aggiunto
+- **Chip Colorati per Resistenze e Visione**: i badge delle resistenze ai danni e dei tipi di visione nei riquadri vitali adottano ora colori tematici vivaci e distinti per tipologia (es. Fuoco arancione/rosso, Freddo ciano/ghiaccio, Fulmine oro elettrico, Veleno/Acido verde, Necrotico/Psichico viola/magenta, Scurovisione indaco notturno, Vista vera oro etereo) e pulsanti "＋" tratteggiati dorati coerenti con il riquadro Condizioni.
+
 ## [4.121.2] – 2026-11-02
 
 ### Modificato
