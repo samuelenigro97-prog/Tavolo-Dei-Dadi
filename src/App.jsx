@@ -1469,6 +1469,49 @@ const COLORI_CONDIZIONI = {
   Trattenuto: { bg: 'rgba(180, 80, 40, 0.22)', border: '#c05a28', text: C.ink },
 };
 
+const COLORI_DANNI = {
+  Fuoco: { bg: 'rgba(230, 81, 0, 0.22)', border: '#f57c00', text: C.ink },
+  Freddo: { bg: 'rgba(2, 136, 209, 0.22)', border: '#29b6f6', text: C.ink },
+  Fulmine: { bg: 'rgba(255, 214, 0, 0.22)', border: '#ffd600', text: C.ink },
+  Acido: { bg: 'rgba(100, 221, 23, 0.22)', border: '#76ff03', text: C.ink },
+  Veleno: { bg: 'rgba(46, 125, 50, 0.22)', border: '#4caf50', text: C.ink },
+  Necrotico: { bg: 'rgba(106, 27, 154, 0.25)', border: '#ba68c8', text: C.ink },
+  Radiante: { bg: 'rgba(255, 179, 0, 0.25)', border: '#ffb300', text: C.ink },
+  Psichico: { bg: 'rgba(216, 27, 96, 0.22)', border: '#ec407a', text: C.ink },
+  Tuono: { bg: 'rgba(40, 53, 147, 0.25)', border: '#5c6bc0', text: C.ink },
+  Forza: { bg: 'rgba(142, 36, 170, 0.25)', border: '#ab47bc', text: C.ink },
+  Contundente: { bg: 'rgba(120, 110, 100, 0.22)', border: '#8d6e63', text: C.ink },
+  Perforante: { bg: 'rgba(100, 116, 139, 0.22)', border: '#78909c', text: C.ink },
+  Tagliente: { bg: 'rgba(117, 117, 117, 0.22)', border: '#9e9e9e', text: C.ink },
+};
+
+function coloreDannoVoce(voce) {
+  if (!voce) return null;
+  const str = String(voce).trim();
+  for (const [k, v] of Object.entries(COLORI_DANNI)) {
+    if (new RegExp(`(^|\\b)${k}(\\b|$)`, 'i').test(str)) return v;
+  }
+  return { bg: 'rgba(120, 110, 100, 0.22)', border: '#8d6e63', text: C.ink };
+}
+
+const COLORI_SENSI = {
+  Scurovisione: { bg: 'rgba(63, 81, 181, 0.22)', border: '#7986cb', text: C.ink },
+  'Vista vera': { bg: 'rgba(255, 193, 7, 0.25)', border: '#ffd54f', text: C.ink },
+  'Percezione cieca': { bg: 'rgba(0, 150, 136, 0.22)', border: '#4db6ac', text: C.ink },
+  'Percezione tremorsensitiva': { bg: 'rgba(141, 110, 99, 0.25)', border: '#a1887f', text: C.ink },
+  'Percezione tellurica': { bg: 'rgba(141, 110, 99, 0.25)', border: '#a1887f', text: C.ink },
+  Normale: { bg: 'rgba(120, 110, 100, 0.2)', border: '#8d6e63', text: C.ink },
+};
+
+function coloreSensoVoce(voce) {
+  if (!voce) return null;
+  const str = String(voce).trim();
+  for (const [k, v] of Object.entries(COLORI_SENSI)) {
+    if (new RegExp(k, 'i').test(str)) return v;
+  }
+  return { bg: 'rgba(63, 81, 181, 0.22)', border: '#7986cb', text: C.ink };
+}
+
 // `abbr` è la sigla ufficiale 5e: entra nei riquadri stretti senza troncarsi
 // (il nome per esteso resta nel tooltip).
 const DENARI = [
@@ -1998,7 +2041,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.121.2';
+const APP_VERSION = '4.122.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -11999,6 +12042,7 @@ export default function App() {
                       value={scheda.sensi}
                       opzioni={SENSI_5E}
                       onChange={(v) => aggiorna({ sensi: v })}
+                      coloreVoce={coloreSensoVoce}
                       title={t('tip.sensi')}
                     />
                   )}
@@ -12052,6 +12096,7 @@ export default function App() {
                     value={scheda.resistenze}
                     opzioni={DANNI_5E}
                     onChange={(v) => aggiorna({ resistenze: v })}
+                    coloreVoce={coloreDannoVoce}
                     title={t('tip.resistenze')}
                   />
                 </div>

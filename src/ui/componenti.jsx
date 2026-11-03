@@ -326,7 +326,7 @@ export function CampoModulo({ label, children, style, boxClassName, className })
  * Campo di testo libero (elementi separati da virgola) con un menù a tendina
  * "＋" per aggiungere velocemente voci da una lista, senza perdere il testo.
  */
-export function CampoConTendina({ value, opzioni, onChange, width, title, lookup, setInfo, formattaVoce }) {
+export function CampoConTendina({ value, opzioni, onChange, width, title, lookup, setInfo, formattaVoce, coloreVoce }) {
   // Accetta sia il formato storico separato da virgole sia le voci su righe
   // distinte: ogni elemento viene comunque mostrato nel proprio riquadro.
   const attuali = value ? value.split(/[,\n]/).map((s) => s.trim()).filter(Boolean) : [];
@@ -344,7 +344,7 @@ export function CampoConTendina({ value, opzioni, onChange, width, title, lookup
   };
 
   // Aspetto compatto ed elegante per non sbordare nei box vitali
-  const chip = {
+  const chipBase = {
     background: 'rgba(0,0,0,0.04)',
     border: `1px solid ${C.border}`,
     borderRadius: 6,
@@ -363,25 +363,40 @@ export function CampoConTendina({ value, opzioni, onChange, width, title, lookup
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, flexWrap: 'wrap', minHeight: 22, width: '100%' }} title={title}>
       {visualizzati.map(t => {
         const sp = lookup && setInfo ? lookup(t) : null;
+        const col = coloreVoce ? coloreVoce(t) : null;
+        const chipStyle = col
+          ? {
+              ...chipBase,
+              background: col.bg || chipBase.background,
+              border: `1px solid ${col.border || C.border}`,
+              color: col.text || chipBase.color,
+            }
+          : chipBase;
         return (
-        <span key={t} title={sp || t} style={chip}>
+        <span key={t} title={sp || t} style={chipStyle}>
           <span role={sp ? 'button' : undefined} tabIndex={sp ? 0 : undefined}
-            style={{ overflow: 'hidden', textOverflow: 'ellipsis', ...(sp ? { cursor: 'help', textDecoration: 'underline dotted', textUnderlineOffset: 3 } : {}) }}
+            style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              fontWeight: col?.text ? 700 : undefined,
+              ...(sp ? { cursor: 'help', textDecoration: 'underline dotted', textUnderlineOffset: 3 } : {})
+            }}
             onClick={sp ? () => setInfo({ titolo: traduciDato(t), testo: sp }) : undefined}
           >{mostraVoce(t)}</span>
           <button
             type="button"
-            style={{ background: 'transparent', border: 'none', color: '#c0392b', cursor: 'pointer', padding: 0, fontSize: 13, lineHeight: 1, fontWeight: 'bold' }}
+            style={{ background: 'transparent', border: 'none', color: C.red, cursor: 'pointer', padding: 0, fontSize: 13, lineHeight: 1, fontWeight: 'bold' }}
             onClick={() => rimuovi(t)}
             title={tr(`Rimuovi ${t}`, `Remove ${t}`)}
+            aria-label={tr(`Rimuovi ${t}`, `Remove ${t}`)}
           >
-            ×
+            ✕
           </button>
         </span>
         );
       })}
-      <label style={{ ...chip, borderStyle: 'dashed', color: C.goldDark, cursor: 'pointer', position: 'relative', fontWeight: 700, padding: '2px 6px' }} title={t('common.aggiungi_lista')}>
-        ➕
+      <label style={{ ...chipBase, borderStyle: 'dashed', color: C.goldDark, cursor: 'pointer', position: 'relative', fontWeight: 700, padding: '2px 6px' }} title={t('common.aggiungi_lista')}>
+        ＋
         <select
           value=""
           onChange={(e) => aggiungi(e.target.value)}
