@@ -2041,7 +2041,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.122.0';
+const APP_VERSION = '4.122.1';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -14368,8 +14368,8 @@ export default function App() {
                     {/* Griglia dei punti delle regole dal Manuale Ufficiale: 4 riquadri su una sola riga */}
                     <div className="regole-magia-forma-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 8 }}>
                       {/* Punto 1: Lancio di Incantesimi */}
-                      <div style={{ background: 'rgba(255,255,255,0.04)', padding: '8px 10px', borderRadius: 6, borderLeft: '3px solid #c0392b' }}>
-                        <div style={{ fontWeight: 700, color: '#c0392b', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
+                      <div style={{ background: 'rgba(192,57,43,0.08)', padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(192,57,43,0.25)' }}>
+                        <div style={{ fontWeight: 700, color: '#e74c3c', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
                           <span>🚫</span> {en ? 'New Spell Casting' : 'Lancio di Nuovi Incantesimi'}
                         </div>
                         <div style={{ fontSize: 11.5, opacity: 0.95 }}>
@@ -14391,8 +14391,8 @@ export default function App() {
                       </div>
 
                       {/* Punto 2: Concentrazione Mantenuta */}
-                      <div style={{ background: 'rgba(255,255,255,0.04)', padding: '8px 10px', borderRadius: 6, borderLeft: '3px solid #27ae60' }}>
-                        <div style={{ fontWeight: 700, color: '#27ae60', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
+                      <div style={{ background: 'rgba(39,174,96,0.08)', padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(39,174,96,0.25)' }}>
+                        <div style={{ fontWeight: 700, color: '#2ecc71', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
                           <span>🔮</span> {en ? 'Concentration Maintained' : 'Concentrazione Mantenuta'}
                         </div>
                         <div style={{ fontSize: 11.5, opacity: 0.95 }}>
@@ -14403,8 +14403,8 @@ export default function App() {
                       </div>
 
                       {/* Punto 3: Azioni di Incantesimi già Attivi */}
-                      <div style={{ background: 'rgba(255,255,255,0.04)', padding: '8px 10px', borderRadius: 6, borderLeft: '3px solid #f39c12' }}>
-                        <div style={{ fontWeight: 700, color: '#d35400', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
+                      <div style={{ background: 'rgba(243,156,18,0.08)', padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(243,156,18,0.25)' }}>
+                        <div style={{ fontWeight: 700, color: '#f39c12', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
                           <span>⚡</span> {en ? 'Directing Active Magic' : 'Azioni di Magie già Attive'}
                         </div>
                         <div style={{ fontSize: 11.5, opacity: 0.95 }}>
@@ -14415,8 +14415,8 @@ export default function App() {
                       </div>
 
                       {/* Punto 4: Ritorno alla Forma Umanoide */}
-                      <div style={{ background: 'rgba(255,255,255,0.04)', padding: '8px 10px', borderRadius: 6, borderLeft: '3px solid #2980b9' }}>
-                        <div style={{ fontWeight: 700, color: '#2980b9', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
+                      <div style={{ background: 'rgba(41,128,185,0.08)', padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(41,128,185,0.25)' }}>
+                        <div style={{ fontWeight: 700, color: '#3498db', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
                           <span>🔄</span> {en ? 'Reverting Form' : 'Ritorno alla Forma Base'}
                         </div>
                         <div style={{ fontSize: 11.5, opacity: 0.95 }}>
