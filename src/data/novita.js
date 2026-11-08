@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.122.1',
+    voci: {
+      it: [
+        'Forma Animale: grafica delle regole di magia e concentrazione rifinita con card a tinta tematica uniforme.',
+      ],
+      en: [
+        'Wild Shape: magic and concentration rules styling refined with unified thematic cards.',
+      ],
+    },
+  },
+  {
     versione: '4.122.0',
     voci: {
       it: [
