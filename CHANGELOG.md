@@ -2,6 +2,11 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.122.1] – 2026-11-09
+
+### Modificato
+- **Design Forma Animale Druido**: rimossi i bordi laterali asimmetrici spessi (anti-pattern grafico AI) dalle schede informative della forma animale (Lancio Incantesimi, Concentrazione, Azioni Magie Attive, Ritorno Forma Base), sostituendoli con card a tinta tematica morbida e bordi uniformi ad alta leggibilità.
+
 ## [4.122.0] – 2026-11-03
 
 ### Aggiunto
