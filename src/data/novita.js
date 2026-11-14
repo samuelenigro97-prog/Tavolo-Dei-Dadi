@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.123.1',
+    voci: {
+      it: [
+        'Profilo: risolto lo spazio vuoto sotto i riquadri vitali centrali quando il box Poteri è aperto a sinistra.',
+      ],
+      en: [
+        'Profile: fixed empty space gap beneath central vitals when the Powers box is active on the left.',
+      ],
+    },
+  },
+  {
     versione: '4.123.0',
     voci: {
       it: [

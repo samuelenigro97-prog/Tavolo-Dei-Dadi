@@ -2,6 +2,11 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.123.1] – 2026-11-14
+
+### Risolto
+- **Allineamento Griglia Profilo**: aggiunta la definizione esplicita di `grid-template-rows: auto minmax(0, 1fr)` nelle media query desktop e tablet di `.profilo-griglia`, consentendo alla colonna sinistra espansa con il box Poteri di scendere senza forzare il gap vuoto sotto i riquadri vitali centrali.
+
 ## [4.123.0] – 2026-11-14
 
 ### Aggiunto

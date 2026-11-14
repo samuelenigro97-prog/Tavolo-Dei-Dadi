@@ -1618,6 +1618,7 @@ tbody tr:hover {
 .profilo-griglia {
   display: grid;
   grid-template-columns: minmax(220px, 280px) minmax(340px, 1fr) minmax(180px, 310px);
+  grid-template-rows: auto minmax(0, 1fr);
   column-gap: 12px;
   row-gap: 12px;
   align-items: stretch;
@@ -1625,6 +1626,7 @@ tbody tr:hover {
 @media (max-width: 1100px) and (min-width: 840px) {
   .profilo-griglia {
     grid-template-columns: minmax(190px, 240px) minmax(300px, 1fr) minmax(150px, 220px);
+    grid-template-rows: auto minmax(0, 1fr);
     column-gap: 10px;
     row-gap: 10px;
   }
@@ -1632,6 +1634,7 @@ tbody tr:hover {
 @media (max-width: 839px) and (min-width: 660px) {
   .profilo-griglia {
     grid-template-columns: minmax(170px, 210px) minmax(260px, 1fr) minmax(130px, 180px);
+    grid-template-rows: auto minmax(0, 1fr);
     column-gap: 8px;
     row-gap: 8px;
   }
