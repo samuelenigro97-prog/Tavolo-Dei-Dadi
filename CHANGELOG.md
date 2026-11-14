@@ -2,6 +2,16 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.124.0] – 2026-11-14
+
+### Aggiunto
+- **Micro-Animazioni Tattiche RPG**:
+  - Badge di tiro (`.badge-tiro`): feedback tattile al passaggio del mouse con sollevamento 3D (`translateY(-1.5px) scale(1.03)`), glow shadow perimetrale sincronizzato e riflesso luminoso sweep dinamico a passaggio specchiato.
+  - Righe combattimento e azioni (`tbody tr`, `.riga-azione`): micro-scatto orizzontale tattico (`translateX(2px)`) con indicatore luminoso laterale oro ad aggancio visivo.
+  - Chip e Tag interattivi (`.chip-condizione`, `.chip-tempo`, `.chip-gittata`, `.chip-area`, ecc.): effetto pop elastico al passaggio del mouse (`scale(1.04)`) con ombra di profondità aumentata.
+  - Indicatore di combattimento attivo (`.in-combattimento-glow`): pulsazione fluida e ipnotica ad anello verde (`pulse-combat-glow`) per la barra di tracciamento combattimento.
+  - Rispetto pieno dell'accessibilità e riduzione movimento (`@media (prefers-reduced-motion: reduce)`).
+
 ## [4.123.1] – 2026-11-14
 
 ### Risolto

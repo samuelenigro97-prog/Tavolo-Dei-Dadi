@@ -925,8 +925,66 @@ tbody tr:hover {
   animation: critico-shake-flash 0.65s ease-out forwards;
 }
 
+/* Micro-Animazioni Tattiche RPG (Badge, Bottoni, Riquadri e Interazioni) */
+.badge-tiro {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.12s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease !important;
+}
+.badge-tiro:hover {
+  transform: translateY(-1.5px) scale(1.03);
+  box-shadow: 0 0 10px currentColor, 0 2px 6px rgba(0,0,0,0.4);
+}
+.badge-tiro:active {
+  transform: scale(0.96);
+}
+
+/* Scintilla sweep luminosa sui badge di tiro all'hover */
+.badge-tiro::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+.badge-tiro:hover::after {
+  animation: badge-sweep 0.6s ease-out forwards;
+}
+@keyframes badge-sweep {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+/* Animazione riga combattimento e incantesimi al passaggio mouse */
+tbody tr, .riga-azione {
+  transition: transform 0.12s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+tbody tr:hover, .riga-azione:hover {
+  transform: translateX(2px);
+  box-shadow: inset 2px 0 0 var(--c-gold, #d4a017);
+}
+
+/* Chip e Tag (Resistenze, Visione, Condizioni, Proprietà) micro-hover animato */
+.chip-condizione, .chip-tempo, .chip-gittata, .chip-area, .chip-concentrazione, .chip-rituale {
+  transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
+}
+.chip-condizione:hover, .chip-tempo:hover, .chip-gittata:hover, .chip-area:hover, .chip-concentrazione:hover, .chip-rituale:hover {
+  transform: translateY(-1px) scale(1.04);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* Battito / Pulsazione su Turno Corrente e Attività in Combattimento */
+@keyframes pulse-combat-glow {
+  0%, 100% { box-shadow: 0 0 4px rgba(0, 230, 118, 0.4); }
+  50% { box-shadow: 0 0 14px 2px rgba(0, 230, 118, 0.85); }
+}
+.in-combattimento-glow {
+  animation: pulse-combat-glow 2s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .sezione, .profilo-sezione, .angolo-ornamento, .ispirazione-attiva-glow, .pf-barra-critica, .floating-combat-number, .critico-animato {
+  .sezione, .profilo-sezione, .angolo-ornamento, .ispirazione-attiva-glow, .pf-barra-critica, .floating-combat-number, .critico-animato, .in-combattimento-glow, .badge-tiro:hover::after {
     animation: none !important;
   }
 }

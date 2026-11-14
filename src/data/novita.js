@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.124.0',
+    voci: {
+      it: [
+        'Animazioni: micro-interazioni tattiche RPG con sweep di luce e glow sui dadi, reattività su righe e chip, e pulsazione dinamica in combattimento.',
+      ],
+      en: [
+        'Animations: tactile RPG micro-interactions with light sweep and glow on dice badges, snappy rows and chips, and dynamic pulse in combat.',
+      ],
+    },
+  },
+  {
     versione: '4.123.1',
     voci: {
       it: [
