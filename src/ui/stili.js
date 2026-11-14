@@ -40,16 +40,16 @@ export const styles = {
   panel: {
     background: C.panel,
     border: `1.5px solid var(--c-bordo-barra, ${C.border})`,
-    borderRadius: 12,
+    borderRadius: 6,
     padding: 12,
     marginBottom: 8,
     boxSizing: 'border-box',
     boxShadow: 'var(--c-shadow-aura, 0 1px 3px rgba(60,50,30,0.06), 0 4px 12px rgba(60,50,30,0.04))',
-    transition: 'box-shadow 0.2s ease, border-color 0.2s ease',
+    transition: 'box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease',
   },
   panelTitle: {
     margin: '0 0 12px',
-    fontSize: 16,
+    fontSize: 15,
     color: C.title,
     textAlign: 'center',
     fontWeight: 'bold',
@@ -57,18 +57,21 @@ export const styles = {
     borderBottom: 'none',
     paddingTop: 2,
     paddingBottom: 4,
-    letterSpacing: 1,
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
     fontFamily: 'var(--font-title, inherit)',
   },
   // campo in stile modulo: valore su riga con etichetta sotto
   moduloLabel: {
     fontSize: 10,
     color: C.inkDim,
-    letterSpacing: 0.7,
+    letterSpacing: 0.8,
     textTransform: 'uppercase',
     marginTop: 1,
+    fontFamily: 'var(--font-mono, monospace)',
+    fontWeight: 600,
   },
-  moduloCampo: { border: `1px solid ${C.border}`, borderRadius: 6, background: 'transparent', minHeight: 22, padding: '3px 6px', width: '100%', display: 'flex', alignItems: 'center', boxSizing: 'border-box' },
+  moduloCampo: { border: `1px solid ${C.border}`, borderRadius: 3, background: 'transparent', minHeight: 22, padding: '3px 6px', width: '100%', display: 'flex', alignItems: 'center', boxSizing: 'border-box' },
   ritratto: {
     width: 132,
     height: 132,
@@ -78,7 +81,7 @@ export const styles = {
     justifyContent: 'center',
     background: C.panelLight,
     border: `1px solid ${C.border}`,
-    borderRadius: 8,
+    borderRadius: 4,
     cursor: 'pointer',
     overflow: 'hidden',
     userSelect: 'none',
@@ -180,10 +183,12 @@ export const styles = {
     padding: '7px 14px',
     background: C.panelLight,
     border: `1px solid ${C.border}`,
-    borderRadius: 8,
+    borderRadius: 3,
     color: C.ink,
     fontFamily: 'inherit',
-    fontSize: 14,
+    fontSize: 13,
+    fontWeight: 600,
+    letterSpacing: 0.5,
     cursor: 'pointer',
     transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
   },
@@ -191,20 +196,22 @@ export const styles = {
     padding: '8px 18px',
     background: C.gold,
     border: 'none',
-    borderRadius: 8,
+    borderRadius: 3,
     color: C.onGold,
     fontFamily: 'inherit',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 'bold',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
     cursor: 'pointer',
-    boxShadow: '0 2px 6px rgba(184, 134, 11, 0.25)',
+    boxShadow: '0 2px 8px rgba(184, 134, 11, 0.3)',
     transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
   },
   buttonDanger: {
     padding: '4px 10px',
     background: 'transparent',
     border: `1px solid ${C.red}`,
-    borderRadius: 6,
+    borderRadius: 3,
     color: C.red,
     fontFamily: 'inherit',
     fontSize: 12,
@@ -215,10 +222,10 @@ export const styles = {
     padding: '5px 9px',
     background: C.panelLight,
     border: `1px solid ${C.border}`,
-    borderRadius: 6,
+    borderRadius: 3,
     color: C.ink,
     fontFamily: 'inherit',
-    fontSize: 14,
+    fontSize: 13,
     lineHeight: 1,
     cursor: 'pointer',
     flexShrink: 0,
@@ -272,7 +279,7 @@ export const styles = {
     textAlign: 'center',
     background: C.panel,
     border: `1px solid ${C.border}`,
-    borderRadius: 8,
+    borderRadius: 4,
     padding: '8px 8px 10px',
     display: 'flex',
     flexDirection: 'column',
@@ -284,12 +291,12 @@ export const styles = {
     position: 'relative',
     overflow: 'hidden',
     boxShadow: '0 1px 3px rgba(60,50,30,0.05)',
-    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+    transition: 'transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease',
   },
   vitalLabel: {
-    fontSize: 12,
+    fontSize: 11,
     color: C.title,
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
     textTransform: 'uppercase',
     fontWeight: 700,
     lineHeight: 1.2,
@@ -300,6 +307,7 @@ export const styles = {
     flexShrink: 0,
     userSelect: 'none',
     display: 'block',
+    fontFamily: 'var(--font-title, inherit)',
   },
   vitalValue: {
     fontSize: 27,
@@ -316,7 +324,7 @@ export const styles = {
   abilityBlock: {
     background: C.panel,
     border: `1px solid ${C.border}`,
-    borderRadius: 10,
+    borderRadius: 4,
     padding: '6px 10px',
     // niente marginBottom: la colonna usa già `gap`, altrimenti lo spazio
     // fra i blocchi risultava doppio e la colonna sforava in basso.
@@ -445,30 +453,31 @@ export const GLOBAL_CSS = `
   --c-magico: #2b64b4;
   --c-car-forza: #a8443a; --c-car-destrezza: #4f7d3a; --c-car-costituzione: #a0702a;
   --c-car-intelligenza: #3f6a9e; --c-car-saggezza: #7a5aa0; --c-car-carisma: #b06a74;
-  --font-title: 'Cinzel', Georgia, 'Times New Roman', serif;
+  --font-title: 'Cinzel', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
 }
 :root[data-tema="scuro"] {
-  --c-bg: #050506; --c-panel: #0e0e11; --c-panel-light: #16161b;
-  --c-border: #24242d; --c-ink: #ebecee; --c-ink-dim: #868692;
-  --c-gold: #c9a227; --c-gold-dark: #dcb84f; --c-red: #d0685a;
-  --c-green: #7fb069; --c-title: #de8f88;
+  --c-bg: #030407; --c-panel: #090c12; --c-panel-light: #101520;
+  --c-border: #1a2233; --c-ink: #f0f3f8; --c-ink-dim: #7f8c9f;
+  --c-gold: #d4a017; --c-gold-dark: #f0b824; --c-red: #ff334b;
+  --c-green: #00e676; --c-title: #f59e0b;
   --c-araldi: #e08b4a; --c-araldi-border: #b86b33; --c-araldi-bg: rgba(184, 107, 51, 0.16);
   --c-araldi-glow: rgba(184, 107, 51, 0.30); --c-araldi-badge: #d27d3c;
-  --c-magico: #4f86d6;
-  --c-car-forza: #d0685a; --c-car-destrezza: #86b26a; --c-car-costituzione: #d2a35a;
-  --c-car-intelligenza: #6f9fd6; --c-car-saggezza: #ab8ad6; --c-car-carisma: #d99aa0;
+  --c-magico: #00d2ff;
+  --c-car-forza: #ff4757; --c-car-destrezza: #2ed573; --c-car-costituzione: #ffa502;
+  --c-car-intelligenza: #1e90ff; --c-car-saggezza: #9b59b6; --c-car-carisma: #ff6b81;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema="chiaro"]) {
-    --c-bg: #050506; --c-panel: #0e0e11; --c-panel-light: #16161b;
-    --c-border: #24242d; --c-ink: #ebecee; --c-ink-dim: #868692;
-    --c-gold: #c9a227; --c-gold-dark: #dcb84f; --c-red: #d0685a;
-    --c-green: #7fb069; --c-title: #de8f88;
+    --c-bg: #030407; --c-panel: #090c12; --c-panel-light: #101520;
+    --c-border: #1a2233; --c-ink: #f0f3f8; --c-ink-dim: #7f8c9f;
+    --c-gold: #d4a017; --c-gold-dark: #f0b824; --c-red: #ff334b;
+    --c-green: #00e676; --c-title: #f59e0b;
     --c-araldi: #e08b4a; --c-araldi-border: #b86b33; --c-araldi-bg: rgba(184, 107, 51, 0.16);
     --c-araldi-glow: rgba(184, 107, 51, 0.30); --c-araldi-badge: #d27d3c;
-    --c-magico: #4f86d6;
-    --c-car-forza: #d0685a; --c-car-destrezza: #86b26a; --c-car-costituzione: #d2a35a;
-    --c-car-intelligenza: #6f9fd6; --c-car-saggezza: #ab8ad6; --c-car-carisma: #d99aa0;
+    --c-magico: #00d2ff;
+    --c-car-forza: #ff4757; --c-car-destrezza: #2ed573; --c-car-costituzione: #ffa502;
+    --c-car-intelligenza: #1e90ff; --c-car-saggezza: #9b59b6; --c-car-carisma: #ff6b81;
   }
 }
 html {
@@ -541,27 +550,30 @@ body {
   background: var(--c-gold);
 }
 
-/* ===================== SISTEMA GRAFICO UNIFICATO =====================
-   Regole di base condivise da TUTTE le sezioni, così menu a tendina, campi e
-   bottoni hanno lo stesso aspetto e le stesse interazioni ovunque. */
-:root { --raggio-s: 6px; --raggio-m: 8px; --raggio-l: 10px; }
+/* ===================== SISTEMA GRAFICO UNIFICATO (HUD TATTICO RPG) =====================
+   Regole di base condivise da TUTTE le sezioni: angoli tecnici calibrati a 3-4px,
+   micro-illuminazione neon/runica al passaggio del mouse e feedback tattile istantaneo. */
+:root { --raggio-s: 3px; --raggio-m: 4px; --raggio-l: 6px; }
 
-/* Campi modulo (tendine, input, aree di testo): stessa famiglia, stesse
-   transizioni e stesso anello di focus dorato in ogni sezione. */
+/* Campi modulo (tendine, input, aree di testo): angoli affilati, anello di focus laser dorato */
 select, input[type="text"], input[type="number"], input[type="search"],
 input[type="url"], input[type="tel"], input:not([type]), textarea {
   font-family: inherit;
   color: var(--c-ink);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  border-radius: var(--raggio-s);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
-/* Pulsanti nello stesso carattere del testo e voci delle tendine sulla scala dei
-   caratteri (il browser userebbe il suo carattere di sistema e 13,33 px). */
-button { font-family: inherit; }
+/* Pulsanti e input: hover ad alto contrasto con glow */
+button { font-family: inherit; border-radius: var(--raggio-s); }
 option { font-size: 13px; }
-select:hover, input:hover, textarea:hover { border-color: var(--c-gold); }
+select:hover, input:hover, textarea:hover {
+  border-color: var(--c-gold);
+  box-shadow: 0 0 8px rgba(212, 160, 23, 0.2);
+}
 select:focus-visible, input:focus-visible, textarea:focus-visible {
   outline: 2px solid var(--c-gold);
   outline-offset: 1px;
+  box-shadow: 0 0 12px rgba(212, 160, 23, 0.35);
 }
 
 /* Menu a tendina: freccia personalizzata IDENTICA su ogni browser e sistema
@@ -625,22 +637,32 @@ tbody tr:hover {
   padding-bottom: 4px;
 }
 
-/* ===================== TEMI & CORNICI DI CLASSE ===================== */
+/* ===================== TEMI & CORNICI DI CLASSE (TACTICAL HUD) ===================== */
 .sezione, .profilo-sezione {
   position: relative;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.25s ease;
+  border-radius: var(--raggio-l, 6px);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
   border-color: var(--c-border-glow-min, var(--c-border));
-  box-shadow: 0 3px 12px -2px var(--c-aura-glow-1, rgba(60,50,30,0.04)),
-              0 1px 3px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.4),
+              0 0 1px 1px var(--c-border);
+}
+.sezione:hover, .profilo-sezione:hover {
+  border-color: var(--c-border-glow-max, var(--c-gold));
+  box-shadow: 0 6px 20px -2px rgba(0, 0, 0, 0.5),
+              0 0 10px 1px var(--c-aura-glow-min, rgba(212, 160, 23, 0.2));
 }
 
 .sezione-titolo-testo {
   justify-self: center;
   text-align: center;
   color: var(--c-title);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-  letter-spacing: 1px;
-  transition: text-shadow 0.3s ease;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  letter-spacing: 1.5px;
+  font-family: var(--font-title, inherit);
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 700;
+  transition: text-shadow 0.3s ease, color 0.3s ease;
 }
 
 .angolo-ornamento {
@@ -1320,21 +1342,25 @@ tbody tr:hover {
   .vital-box > div:first-child { font-size: 10px !important; letter-spacing: 0 !important; }
 }
 .vital-box {
+  border-radius: var(--raggio-m, 4px) !important;
   border-color: var(--c-border-glow-min, var(--c-border)) !important;
-  box-shadow: 0 3px 12px -2px var(--c-aura-glow-1, rgba(60,50,30,0.04)),
-              0 1px 3px rgba(0, 0, 0, 0.25) !important;
+  box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.35),
+              inset 0 0 0 1px rgba(255, 255, 255, 0.03) !important;
   /* un solo bordo: niente filetto interno (outline) come nelle sezioni grandi */
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
 }
 /* Al passaggio del cursore si illumina come le sezioni e le caratteristiche
    (anche il riquadro Punti Ferita, che non è un .vital-box: ha un'altra struttura). */
-.riquadro-pf { transition: border-color 0.3s ease, box-shadow 0.3s ease; }
+.riquadro-pf {
+  border-radius: var(--raggio-m, 4px) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
 .vital-box:hover,
 .riquadro-pf:hover {
+  transform: translateY(-1px);
   border-color: var(--c-border-glow-max, var(--c-gold)) !important;
-  box-shadow: 0 4px 18px -2px var(--c-aura-glow-pulse-1, rgba(201, 162, 39, 0.12)),
-              0 0 6px 1px var(--c-aura-glow-min, rgba(201, 162, 39, 0.08)),
-              0 1px 4px rgba(0, 0, 0, 0.35) !important;
+  box-shadow: 0 4px 14px -1px rgba(0, 0, 0, 0.5),
+              0 0 8px 1px var(--c-aura-glow-min, rgba(212, 160, 23, 0.2)) !important;
 }
 /* Contenuto solo per tecnologie assistive (visivamente nascosto ma raggiungibile da tastiera). */
 .solo-sr {
@@ -1421,7 +1447,7 @@ tbody tr:hover {
   height: auto;
   min-height: 280px;
   max-height: 380px;
-  border-radius: 14px;
+  border-radius: 4px;
   overflow: hidden;
   position: relative;
   cursor: pointer;
@@ -1429,18 +1455,19 @@ tbody tr:hover {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(212, 175, 55, 0.3);
+  border: 1px solid var(--c-gold-dark, #b8860b);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(212, 160, 23, 0.4);
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
 }
 .ritratto-box:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55), 0 0 16px var(--c-aura-color, rgba(201, 162, 39, 0.35)), inset 0 0 0 1px rgba(212, 175, 55, 0.6);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 16px var(--c-aura-color, rgba(201, 162, 39, 0.4)), inset 0 0 0 1px rgba(212, 175, 55, 0.8);
 }
 .ritratto-box::after {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 14px;
+  border-radius: 4px;
   box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.65), inset 0 -38px 28px -10px rgba(0, 0, 0, 0.75);
   pointer-events: none;
   z-index: 1;

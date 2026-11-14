@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.123.0',
+    voci: {
+      it: [
+        'Interfaccia: restyling grafico Tactical HUD con angoli tecnici affilati, palette scura profonda ad alto contrasto e micro-illuminazione reattiva al passaggio del mouse.',
+      ],
+      en: [
+        'UI: Tactical HUD graphic restyling with sharp technical radii, deep high-contrast dark palette, and responsive hover glow lighting.',
+      ],
+    },
+  },
+  {
     versione: '4.122.1',
     voci: {
       it: [

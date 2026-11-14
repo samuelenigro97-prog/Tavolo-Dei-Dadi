@@ -2,6 +2,15 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.123.0] – 2026-11-14
+
+### Aggiunto
+- **Restyling Tactical HUD RPG & Sistema Visivo Moderno (Ispirazione DIVE)**:
+  - Angoli tecnici affilati e rigorosi (`--raggio-s: 3px`, `--raggio-m: 4px`, `--raggio-l: 6px`) su pannelli, bottoni, riquadri vitali e campi modulo in sostituzione dei generici raggi arrotondati.
+  - Palette Dark Mode profonda ad alto contrasto con neri tecnici (`#030407` / `#090c12`), accenti laser oro (`#d4a017` / `#f0b824`), trauma red (`#ff334b`), nominal green (`#00e676`) e cyan arcano (`#00d2ff`).
+  - Micro-interazioni reattive con illuminazione perimetrale glow al passaggio del mouse su sezioni, pulsanti e box vitali.
+  - Tipografia da terminale tattico per etichette modulo con font monospace tabulare ad alta precisione.
+
 ## [4.122.1] – 2026-11-09
 
 ### Modificato
