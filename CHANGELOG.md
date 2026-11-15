@@ -2,6 +2,14 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.127.0] – 2026-11-15
+
+### Corretto
+- **CI / Test E2E Playwright**:
+  - Aggiornate le asserzioni di contrasto e colori superficiali del tema scuro in `e2e/accessibilita.spec.js` in piena conformità con la nuova palette del tema dark tomo fantasy (`#110f13`, `#19161c`).
+  - Ottimizzato il contrasto dei pulsanti rapidi PF (`.btn-danno-pillola`, `.btn-cura-pillola`) in modalità tema chiaro (`[data-tema="chiaro"]`), garantendo conformità WCAG AA al 100% per tutte le 7 ambientazioni grafiche.
+  - Ripristinata l'apertura predefinita della sezione collassabile `Azioni, Turno e Combattimento` per preservare il corretto flusso e i requisiti dei test end-to-end (`e2e/azioni.spec.js`).
+
 ## [4.126.0] – 2026-11-15
 
 ### Aggiunto

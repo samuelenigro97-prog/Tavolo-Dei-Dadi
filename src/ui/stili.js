@@ -1012,11 +1012,16 @@ tbody tr:hover, .riga-azione:hover {
 
 /* Pulsanti Danno e Cura con personalità Fantasy GDR (gemma cesellata) */
 .btn-danno-pillola {
-  background: rgba(255, 59, 86, 0.08) !important;
-  border-color: rgba(255, 59, 86, 0.5) !important;
-  color: #ff526c !important;
+  background: var(--c-danno-pillola-bg, rgba(255, 59, 86, 0.08)) !important;
+  border-color: var(--c-danno-pillola-border, rgba(255, 59, 86, 0.5)) !important;
+  color: var(--c-danno-pillola-color, #ff526c) !important;
   box-shadow: inset 0 0 4px rgba(255, 59, 86, 0.15) !important;
   transition: all 0.15s ease !important;
+}
+[data-tema="chiaro"] .btn-danno-pillola {
+  --c-danno-pillola-bg: rgba(197, 18, 48, 0.08);
+  --c-danno-pillola-border: rgba(197, 18, 48, 0.45);
+  --c-danno-pillola-color: #b0102b;
 }
 .btn-danno-pillola:hover {
   background: rgba(255, 59, 86, 0.22) !important;
@@ -1030,11 +1035,16 @@ tbody tr:hover, .riga-azione:hover {
 }
 
 .btn-cura-pillola {
-  background: rgba(0, 230, 118, 0.08) !important;
-  border-color: rgba(0, 230, 118, 0.5) !important;
-  color: #00e676 !important;
+  background: var(--c-cura-pillola-bg, rgba(0, 230, 118, 0.08)) !important;
+  border-color: var(--c-cura-pillola-border, rgba(0, 230, 118, 0.5)) !important;
+  color: var(--c-cura-pillola-color, #00e676) !important;
   box-shadow: inset 0 0 4px rgba(0, 230, 118, 0.15) !important;
   transition: all 0.15s ease !important;
+}
+[data-tema="chiaro"] .btn-cura-pillola {
+  --c-cura-pillola-bg: rgba(14, 122, 59, 0.08);
+  --c-cura-pillola-border: rgba(14, 122, 59, 0.45);
+  --c-cura-pillola-color: #0b612e;
 }
 .btn-cura-pillola:hover {
   background: rgba(0, 230, 118, 0.22) !important;

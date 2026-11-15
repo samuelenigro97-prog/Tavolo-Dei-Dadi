@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.127.0',
+    voci: {
+      it: [
+        'Accessibilità & Test: conformità completa contrasti tema chiaro e sincronizzazione test e2e di accessibilità e azioni di combattimento.',
+      ],
+      en: [
+        'Accessibility & Tests: full WCAG contrast compliance for light theme and aligned e2e suite for accessibility and combat actions.',
+      ],
+    },
+  },
+  {
     versione: '4.126.0',
     voci: {
       it: [

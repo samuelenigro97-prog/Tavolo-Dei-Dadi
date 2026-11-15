@@ -41,7 +41,7 @@ for (const tema of ['scuro', 'chiaro']) {
           const stile = getComputedStyle(document.documentElement);
           return ['--c-panel', '--c-panel-light'].map((nome) => stile.getPropertyValue(nome).trim());
         });
-        expect(superfici).toEqual(['#0e0e11', '#16161b']);
+        expect(superfici).toEqual(['#110f13', '#19161c']);
       }
       expect(await violazioni(page)).toEqual([]);
     });
