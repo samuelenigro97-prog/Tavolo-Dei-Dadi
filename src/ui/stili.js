@@ -658,26 +658,26 @@ tbody tr:hover {
   transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
   border-color: var(--c-border-glow-min, var(--c-border));
   background: var(--c-panel);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45),
-              inset 0 0 0 1px rgba(255, 215, 0, 0.04),
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.55),
+              inset 0 0 0 1px rgba(229, 179, 56, 0.12),
               0 0 1px 1px var(--c-border);
 }
 :root[data-tema="scuro"] .sezione,
 :root[data-tema="scuro"] .profilo-sezione {
-  background: radial-gradient(ellipse at 50% 0%, rgba(229, 179, 56, 0.035) 0%, rgba(17, 15, 19, 0.98) 75%), var(--c-panel);
+  background: radial-gradient(ellipse at 50% 0%, rgba(229, 179, 56, 0.05) 0%, rgba(17, 15, 19, 0.98) 75%), var(--c-panel);
 }
 .sezione:hover, .profilo-sezione:hover {
   border-color: var(--c-border-glow-max, var(--c-gold));
-  box-shadow: 0 6px 24px -2px rgba(0, 0, 0, 0.6),
-              inset 0 0 0 1px rgba(255, 215, 0, 0.12),
-              0 0 12px 1px var(--c-aura-glow-min, rgba(229, 179, 56, 0.25));
+  box-shadow: 0 6px 26px -2px rgba(0, 0, 0, 0.7),
+              inset 0 0 0 1px rgba(229, 179, 56, 0.22),
+              0 0 14px 2px var(--c-aura-glow-min, rgba(229, 179, 56, 0.35));
 }
 
 .sezione-titolo-testo {
   justify-self: center;
   text-align: center;
   color: var(--c-title);
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8), 0 0 12px rgba(229, 179, 56, 0.25);
   letter-spacing: 2px;
   font-family: var(--font-title, inherit);
   text-transform: uppercase;
@@ -688,8 +688,8 @@ tbody tr:hover {
 
 .angolo-ornamento {
   position: absolute;
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   pointer-events: none;
   /* Forma e colore degli angoli seguono la classe (uno dei pochi accenti di classe). */
   background-color: var(--c-classe, var(--c-gold));
@@ -698,8 +698,8 @@ tbody tr:hover {
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   z-index: 2;
-  opacity: 0.70;
-  filter: drop-shadow(0 0 1.5px var(--c-aura-color, rgba(201, 162, 39, 0.25)));
+  opacity: 0.85;
+  filter: drop-shadow(0 0 2px var(--c-aura-color, rgba(201, 162, 39, 0.35)));
   transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
 }
 .angolo-tl { top: 0; left: 0; }
@@ -987,12 +987,18 @@ tbody tr:hover, .riga-azione:hover {
 }
 
 /* Chip e Tag (Resistenze, Visione, Condizioni, Proprietà) micro-hover animato */
-.chip-condizione, .chip-tempo, .chip-gittata, .chip-area, .chip-concentrazione, .chip-rituale {
-  transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
+.chip-condizione, .chip-tempo, .chip-gittata, .chip-area, .chip-concentrazione, .chip-rituale, .btn-aggiungi-chip {
+  transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
 }
 .chip-condizione:hover, .chip-tempo:hover, .chip-gittata:hover, .chip-area:hover, .chip-concentrazione:hover, .chip-rituale:hover {
   transform: translateY(-1px) scale(1.04);
   box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.btn-aggiungi-chip:hover {
+  transform: translateY(-1px) scale(1.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 6px var(--c-gold, rgba(229,179,56,0.4));
+  border-color: var(--c-gold, #e5b338) !important;
+  color: var(--c-gold-dark, #f3c759) !important;
 }
 
 /* Battito / Pulsazione su Turno Corrente e Attività in Combattimento */

@@ -2,6 +2,16 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.126.0] – 2026-11-15
+
+### Aggiunto
+- **Sincronizzazione runtime colori tema JavaScript (`BASE_TEMA.scuro`)**:
+  - Aggiornato `BASE_TEMA.scuro` in `src/ui/tema.js` per sincronizzare fedelmente i valori JS con le variabili CSS del tema fantasy tomo scuro (`#070607`, `#110f13`, `#19161c`, `#2e2634`, `#e5b338`, `#f3c759`, `#f7be43`). In precedenza, il montaggio React sovrascriveva le variabili `:root` coi vecchi colori freddi scuri.
+- **Risoluzione spazio vuoto sezione Azioni**:
+  - Chiusa di default la sezione collassabile `Azioni, Turno e Combattimento` (`apertoProps('attacchi', false)`), eliminando il vuoto iniziale e lasciando la testata del profilo e dei dadi armoniosamente compatti e bilanciati.
+- **Parità grafica e interattiva pulsanti Aggiungi Resistenze e Visione**:
+  - Esteso `CampoConTendina` con `stileBottoneAggiungi` e classe `.btn-aggiungi-chip` per abbinare perfettamente il tasto `＋` di Resistenze e Visione allo stile del tasto Condizioni, con micro-animazione al passaggio del mouse.
+
 ## [4.125.0] – 2026-11-15
 
 ### Aggiunto
