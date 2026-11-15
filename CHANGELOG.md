@@ -2,6 +2,16 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.128.0] – 2026-11-15
+
+### Aggiunto
+- **Animazioni & Luminescenza Fantasy sulla Scheda**:
+  - **Sfondo vivo multilivello**: aggiunto un secondo livello di luce ambientale e aura di classe (`#ambient-bg-layer::before`) che fluttua dolcemente dietro la scheda.
+  - **Pannelli & Sezioni luminosi**: aggiunto filetto superiore dorato (*rim light*), respiro magico potenziato su cornici e fregi d'angolo (`.angolo-ornamento`), e animazione fluida all'apertura delle sezioni collassabili (`details.sezione[open]`).
+  - **Ritratto incantato**: cornice `.ritratto-box` con aura pulsante di classe, riflesso diagonale al passaggio del mouse e zoom morbido sull'illustrazione.
+  - **Barra della Vita animata**: flusso luminoso scorrevole nella `.profilo-barra-vita` per rendere i Punti Ferita vivi e reattivi.
+  - **Caratteristiche & Vitali tattili**: riflesso luminoso diagonale sui blocchi caratteristica (`.blocco-car`), bagliore del colore specifico all'hover e micro-sollevamento fluido dei riquadri vitali.
+
 ## [4.127.0] – 2026-11-15
 
 ### Corretto

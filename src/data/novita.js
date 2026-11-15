@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.128.0',
+    voci: {
+      it: [
+        'Grafica & Atmosfera: aggiunte animazioni fluide all’apertura delle sezioni, riflessi luminosi su ritratto, caratteristiche e barra della vita, e aura di classe più viva su pannelli e sfondo.',
+      ],
+      en: [
+        'UI & Atmosphere: added smooth section expand animations, light sweeps on portrait, ability cards and HP bar, and richer class aura glow across panels and backdrop.',
+      ],
+    },
+  },
+  {
     versione: '4.127.0',
     voci: {
       it: [

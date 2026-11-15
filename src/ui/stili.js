@@ -659,31 +659,49 @@ tbody tr:hover {
   border-color: var(--c-border-glow-min, var(--c-border));
   background: var(--c-panel);
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.55),
+              inset 0 1px 0 rgba(255, 226, 150, 0.14),
               inset 0 0 0 1px rgba(229, 179, 56, 0.12),
               0 0 1px 1px var(--c-border);
 }
 :root[data-tema="scuro"] .sezione,
 :root[data-tema="scuro"] .profilo-sezione {
-  background: radial-gradient(ellipse at 50% 0%, rgba(229, 179, 56, 0.05) 0%, rgba(17, 15, 19, 0.98) 75%), var(--c-panel);
+  background: radial-gradient(ellipse 85% 45% at 50% 0%, rgba(229, 179, 56, 0.08) 0%, rgba(17, 15, 19, 0.98) 72%), var(--c-panel);
 }
 .sezione:hover, .profilo-sezione:hover {
   border-color: var(--c-border-glow-max, var(--c-gold));
-  box-shadow: 0 6px 26px -2px rgba(0, 0, 0, 0.7),
-              inset 0 0 0 1px rgba(229, 179, 56, 0.22),
-              0 0 14px 2px var(--c-aura-glow-min, rgba(229, 179, 56, 0.35));
+  box-shadow: 0 8px 28px -2px rgba(0, 0, 0, 0.72),
+              inset 0 1px 0 rgba(255, 230, 165, 0.28),
+              inset 0 0 0 1px rgba(229, 179, 56, 0.24),
+              0 0 18px 2px var(--c-aura-glow-min, rgba(229, 179, 56, 0.35));
+}
+
+/* Apertura fluida del contenuto delle sezioni collassabili */
+@keyframes sezione-apri {
+  0% { opacity: 0; transform: translateY(-4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+details.sezione[open] > *:not(summary) {
+  animation: sezione-apri 0.24s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .sezione-titolo-testo {
   justify-self: center;
   text-align: center;
   color: var(--c-title);
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8), 0 0 12px rgba(229, 179, 56, 0.25);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8), 0 0 14px rgba(229, 179, 56, 0.28);
   letter-spacing: 2px;
   font-family: var(--font-title, inherit);
   text-transform: uppercase;
   font-size: 14.5px;
   font-weight: 700;
-  transition: text-shadow 0.3s ease, color 0.3s ease;
+  transition: text-shadow 0.3s ease, color 0.3s ease, transform 0.25s ease;
+}
+:root[data-tema="chiaro"] .sezione-titolo-testo {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+:root[data-tema="scuro"] .sezione:hover .sezione-titolo-testo,
+:root[data-tema="scuro"] .profilo-sezione:hover .sezione-titolo-testo {
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9), 0 0 18px rgba(243, 199, 89, 0.55);
 }
 
 .angolo-ornamento {
@@ -698,8 +716,8 @@ tbody tr:hover {
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   z-index: 2;
-  opacity: 0.85;
-  filter: drop-shadow(0 0 2px var(--c-aura-color, rgba(201, 162, 39, 0.35)));
+  opacity: 0.88;
+  filter: drop-shadow(0 0 3px var(--c-aura-color, rgba(201, 162, 39, 0.45)));
   transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
 }
 .angolo-tl { top: 0; left: 0; }
@@ -730,22 +748,35 @@ tbody tr:hover {
   transform-origin: 50% 40%;
   overflow: hidden;
 }
+#ambient-bg-layer::before {
+  content: '';
+  position: absolute;
+  inset: -15%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle 340px at 18% 28%, var(--c-aura-glow-1, rgba(229, 179, 56, 0.10)), transparent 70%),
+    radial-gradient(circle 420px at 82% 72%, var(--c-aura-glow-2, rgba(229, 179, 56, 0.08)), transparent 72%);
+  animation: sfondo-luce 42s ease-in-out infinite alternate-reverse;
+  will-change: transform, opacity;
+}
 #ambient-bg-layer::after {
   content: '';
   position: absolute;
   inset: -20%;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 38% 30% at 35% 35%, rgba(255, 240, 210, 0.10), transparent 70%),
-    radial-gradient(ellipse 30% 26% at 70% 65%, rgba(255, 230, 190, 0.07), transparent 70%);
+    radial-gradient(ellipse 38% 30% at 35% 35%, rgba(255, 240, 210, 0.12), transparent 70%),
+    radial-gradient(ellipse 30% 26% at 70% 65%, rgba(255, 230, 190, 0.09), transparent 70%);
   animation: sfondo-luce 34s ease-in-out infinite alternate;
   will-change: transform, opacity;
 }
 @media (prefers-reduced-motion: reduce) {
   #ambient-bg-layer { animation: none; transform: none; }
+  #ambient-bg-layer::before,
   #ambient-bg-layer::after { animation: none; display: none; }
 }
 :root[data-animazioni="statico"] #ambient-bg-layer { animation: none; }
+:root[data-animazioni="statico"] #ambient-bg-layer::before,
 :root[data-animazioni="statico"] #ambient-bg-layer::after { animation: none; display: none; }
 
 /* Reattività Hover & Focus luminoso (sobrio e morbido) */
@@ -807,13 +838,15 @@ tbody tr:hover {
 /* Keyframes di Respiro & Pulsazione Luminosa Morbida */
 @keyframes aura-respiro-magico {
   0% {
-    box-shadow: 0 3px 12px -3px var(--c-aura-glow-1, rgba(60,50,30,0.03)),
+    box-shadow: 0 4px 16px -3px var(--c-aura-glow-1, rgba(60,50,30,0.06)),
+                inset 0 1px 0 rgba(255, 226, 150, 0.12),
                 0 1px 3px rgba(0, 0, 0, 0.25);
     border-color: var(--c-border-glow-min, var(--c-border));
   }
   100% {
-    box-shadow: 0 4px 18px -2px var(--c-aura-glow-pulse-1, rgba(201, 162, 39, 0.10)),
-                0 0 6px 1px var(--c-aura-glow-min, rgba(201, 162, 39, 0.05)),
+    box-shadow: 0 6px 24px -2px var(--c-aura-glow-pulse-1, rgba(201, 162, 39, 0.18)),
+                0 0 10px 1px var(--c-aura-glow-min, rgba(201, 162, 39, 0.10)),
+                inset 0 1px 0 rgba(255, 230, 165, 0.22),
                 0 1px 3px rgba(0, 0, 0, 0.30);
     border-color: var(--c-border-glow-max, var(--c-gold));
   }
@@ -821,26 +854,28 @@ tbody tr:hover {
 
 @keyframes angoli-respiro-magico {
   0% {
-    filter: drop-shadow(0 0 1px var(--c-aura-color, rgba(201, 162, 39, 0.20)));
-    opacity: 0.68;
+    filter: drop-shadow(0 0 1.5px var(--c-aura-color, rgba(201, 162, 39, 0.28)));
+    opacity: 0.72;
     transform: scale(1);
   }
   100% {
-    filter: drop-shadow(0 0 3.5px var(--c-aura-color, rgba(201, 162, 39, 0.45)));
-    opacity: 0.90;
-    transform: scale(1.03);
+    filter: drop-shadow(0 0 5px var(--c-aura-color, rgba(201, 162, 39, 0.65)));
+    opacity: 0.96;
+    transform: scale(1.04);
   }
 }
 
 @keyframes aura-brillante {
   0% {
-    box-shadow: 0 3px 14px -3px var(--c-aura-glow-pulse-1, rgba(201, 162, 39, 0.08)),
+    box-shadow: 0 4px 16px -3px var(--c-aura-glow-pulse-1, rgba(201, 162, 39, 0.14)),
+                inset 0 1px 0 rgba(255, 226, 150, 0.16),
                 0 1px 3px rgba(0, 0, 0, 0.25);
     border-color: var(--c-border-glow-min, var(--c-border));
   }
   100% {
-    box-shadow: 0 5px 22px -2px var(--c-aura-glow-max, rgba(201, 162, 39, 0.16)),
-                0 0 8px 1px var(--c-aura-glow-pulse-1, rgba(201, 162, 39, 0.08)),
+    box-shadow: 0 6px 28px -2px var(--c-aura-glow-max, rgba(201, 162, 39, 0.26)),
+                0 0 14px 2px var(--c-aura-glow-pulse-1, rgba(201, 162, 39, 0.16)),
+                inset 0 1px 0 rgba(255, 235, 175, 0.28),
                 0 1px 3px rgba(0, 0, 0, 0.32);
     border-color: var(--c-border-glow-max, var(--c-gold));
   }
@@ -848,14 +883,14 @@ tbody tr:hover {
 
 @keyframes angoli-brillante {
   0% {
-    filter: drop-shadow(0 0 2px var(--c-aura-color, rgba(201, 162, 39, 0.30)));
-    opacity: 0.75;
+    filter: drop-shadow(0 0 2.5px var(--c-aura-color, rgba(201, 162, 39, 0.38)));
+    opacity: 0.80;
     transform: scale(1);
   }
   100% {
-    filter: drop-shadow(0 0 4.5px var(--c-aura-color, rgba(201, 162, 39, 0.55)));
-    opacity: 0.95;
-    transform: scale(1.05);
+    filter: drop-shadow(0 0 6.5px var(--c-aura-color, rgba(201, 162, 39, 0.75)));
+    opacity: 1;
+    transform: scale(1.06);
   }
 }
 
@@ -1089,10 +1124,37 @@ tbody tr:hover, .riga-azione:hover {
   transform: translateY(-1px);
 }
 
+/* Riflesso energetico scorrevole nella Barra della Vita */
+@keyframes pf-energia-scorre {
+  0%   { transform: translateX(-120%) skewX(-22deg); opacity: 0; }
+  12%  { opacity: 0.55; }
+  38%  { opacity: 0.55; }
+  50%  { transform: translateX(260%) skewX(-22deg); opacity: 0; }
+  100% { transform: translateX(260%) skewX(-22deg); opacity: 0; }
+}
+.profilo-barra-vita::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 36%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.24), transparent);
+  pointer-events: none;
+  z-index: 2;
+  animation: pf-energia-scorre 5.5s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .sezione, .profilo-sezione, .angolo-ornamento, .ispirazione-attiva-glow, .pf-barra-critica, .floating-combat-number, .critico-animato, .in-combattimento-glow, .badge-tiro:hover::after, .btn-danno-pillola:hover, .btn-cura-pillola:hover {
+  .sezione, .profilo-sezione, .angolo-ornamento, .ispirazione-attiva-glow, .pf-barra-critica, .floating-combat-number, .critico-animato, .in-combattimento-glow, .badge-tiro:hover::after, .btn-danno-pillola:hover, .btn-cura-pillola:hover, .profilo-barra-vita::after, .ritratto-box, .ritratto-box::before, .blocco-car::before, details.sezione[open] > *:not(summary) {
     animation: none !important;
   }
+}
+:root[data-animazioni="statico"] .profilo-barra-vita::after,
+:root[data-animazioni="statico"] .ritratto-box,
+:root[data-animazioni="statico"] .ritratto-box::before,
+:root[data-animazioni="statico"] .blocco-car::before {
+  animation: none !important;
 }
 
 /* Default / Generico D&D Gold Corners */
@@ -1451,20 +1513,43 @@ tbody tr:hover, .riga-azione:hover {
   border-radius: var(--raggio-m, 4px) !important;
   border-color: var(--c-border-glow-min, var(--c-border)) !important;
   background: var(--c-panel) !important;
-  box-shadow: 0 3px 12px -2px rgba(0, 0, 0, 0.4),
-              inset 0 0 0 1px rgba(255, 215, 0, 0.035) !important;
+  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.45),
+              inset 0 1px 0 rgba(255, 224, 140, 0.10),
+              inset 0 0 0 1px rgba(255, 215, 0, 0.04) !important;
   outline: none;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.blocco-car::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -110%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  transform: skewX(-22deg);
+  pointer-events: none;
+  z-index: 1;
+}
+.blocco-car:hover::before {
+  animation: badge-sweep 0.7s ease-out forwards;
 }
 :root[data-tema="scuro"] .blocco-car {
-  background: radial-gradient(ellipse at 50% 10%, rgba(229, 179, 56, 0.03) 0%, rgba(17, 15, 19, 0.98) 85%), var(--c-panel) !important;
+  background: radial-gradient(ellipse 90% 45% at 50% 0%, rgba(229, 179, 56, 0.06) 0%, rgba(17, 15, 19, 0.98) 82%), var(--c-panel) !important;
 }
 .blocco-car:hover {
-  transform: translateY(-1.5px);
+  transform: translateY(-2px);
   border-color: var(--c-border-glow-max, var(--c-gold)) !important;
-  box-shadow: 0 5px 20px -2px rgba(0, 0, 0, 0.6),
-              inset 0 0 0 1px rgba(255, 215, 0, 0.12),
-              0 0 10px 1px var(--c-aura-glow-min, rgba(229, 179, 56, 0.25)) !important;
+  box-shadow: 0 7px 22px -2px rgba(0, 0, 0, 0.65),
+              inset 0 1px 0 rgba(255, 230, 160, 0.22),
+              inset 0 0 0 1px rgba(255, 215, 0, 0.14),
+              0 0 14px 2px var(--c-aura-glow-min, rgba(229, 179, 56, 0.32)) !important;
+}
+.blocco-car .car-modificatore {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), text-shadow 0.25s ease;
+}
+.blocco-car:hover .car-modificatore {
+  transform: scale(1.06);
 }
 .car-header-label {
   font-family: var(--font-title, inherit) !important;
@@ -1486,12 +1571,22 @@ tbody tr:hover, .riga-azione:hover {
 /* Il punteggio è piccolo (14 px): più inchiostro, per il contrasto 4,5:1 anche col Carisma rosato. */
 .blocco-car.car-colore .car-punteggio,
 .blocco-car.car-colore .car-punteggio button { color: color-mix(in srgb, var(--car) 65%, var(--c-ink)) !important; }
-.blocco-car.car-colore { border-color: color-mix(in srgb, var(--car) 85%, var(--c-border)) !important; border-width: 1.5px !important; }
+.blocco-car.car-colore {
+  border-color: color-mix(in srgb, var(--car) 85%, var(--c-border)) !important;
+  border-width: 1.5px !important;
+  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.45),
+              inset 0 1px 0 color-mix(in srgb, var(--car) 24%, transparent),
+              0 0 8px -2px color-mix(in srgb, var(--car) 18%, transparent) !important;
+}
 .blocco-car.car-colore:hover {
   border-color: var(--car) !important;
-  box-shadow: 0 5px 20px -2px color-mix(in srgb, var(--car) 40%, transparent),
-              inset 0 0 0 1px color-mix(in srgb, var(--car) 25%, transparent),
-              0 0 10px 1px color-mix(in srgb, var(--car) 25%, transparent) !important;
+  box-shadow: 0 7px 22px -2px color-mix(in srgb, var(--car) 48%, transparent),
+              inset 0 1px 0 color-mix(in srgb, var(--car) 42%, transparent),
+              inset 0 0 0 1px color-mix(in srgb, var(--car) 28%, transparent),
+              0 0 16px 2px color-mix(in srgb, var(--car) 32%, transparent) !important;
+}
+:root[data-tema="scuro"] .blocco-car.car-colore:hover .car-modificatore {
+  text-shadow: 0 0 12px color-mix(in srgb, var(--car) 65%, transparent);
 }
 /* Riquadri statistica (CA, Competenza, Iniziativa, Velocità, Sfinimento, Visione...):
    - etichetta sempre alta due righe e centrata, così i valori stanno alla stessa
@@ -1523,32 +1618,35 @@ tbody tr:hover, .riga-azione:hover {
   border-radius: var(--raggio-m, 4px) !important;
   border-color: var(--c-border-glow-min, var(--c-border)) !important;
   background: var(--c-panel) !important;
-  box-shadow: 0 2px 10px -1px rgba(0, 0, 0, 0.4),
-              inset 0 0 0 1px rgba(255, 215, 0, 0.035) !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  box-shadow: 0 3px 12px -1px rgba(0, 0, 0, 0.42),
+              inset 0 1px 0 rgba(255, 224, 140, 0.10),
+              inset 0 0 0 1px rgba(255, 215, 0, 0.04) !important;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
 }
 :root[data-tema="scuro"] .vital-box {
-  background: radial-gradient(circle at 50% 15%, rgba(229, 179, 56, 0.04) 0%, rgba(17, 15, 19, 0.98) 85%), var(--c-panel) !important;
+  background: radial-gradient(circle at 50% 10%, rgba(229, 179, 56, 0.07) 0%, rgba(17, 15, 19, 0.98) 82%), var(--c-panel) !important;
 }
 /* Al passaggio del cursore si illumina come le sezioni e le caratteristiche
    (anche il riquadro Punti Ferita, che non è un .vital-box: ha un'altra struttura). */
 .riquadro-pf {
   border-radius: var(--raggio-m, 4px) !important;
   background: var(--c-panel) !important;
-  box-shadow: 0 3px 14px -1px rgba(0, 0, 0, 0.45),
-              inset 0 0 0 1px rgba(255, 215, 0, 0.04) !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  box-shadow: 0 4px 16px -1px rgba(0, 0, 0, 0.48),
+              inset 0 1px 0 rgba(255, 224, 140, 0.12),
+              inset 0 0 0 1px rgba(255, 215, 0, 0.05) !important;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
 }
 :root[data-tema="scuro"] .riquadro-pf {
-  background: radial-gradient(ellipse at 50% 10%, rgba(229, 179, 56, 0.04) 0%, rgba(17, 15, 19, 0.98) 85%), var(--c-panel) !important;
+  background: radial-gradient(ellipse 85% 45% at 50% 5%, rgba(229, 179, 56, 0.07) 0%, rgba(17, 15, 19, 0.98) 82%), var(--c-panel) !important;
 }
 .vital-box:hover,
 .riquadro-pf:hover {
-  transform: translateY(-1.5px);
+  transform: translateY(-2px);
   border-color: var(--c-border-glow-max, var(--c-gold)) !important;
-  box-shadow: 0 5px 18px -1px rgba(0, 0, 0, 0.6),
-              inset 0 0 0 1px rgba(255, 215, 0, 0.12),
-              0 0 10px 1px var(--c-aura-glow-min, rgba(229, 179, 56, 0.25)) !important;
+  box-shadow: 0 7px 22px -1px rgba(0, 0, 0, 0.65),
+              inset 0 1px 0 rgba(255, 230, 165, 0.24),
+              inset 0 0 0 1px rgba(255, 215, 0, 0.14),
+              0 0 14px 2px var(--c-aura-glow-min, rgba(229, 179, 56, 0.32)) !important;
 }
 /* Contenuto solo per tecnologie assistive (visivamente nascosto ma raggiungibile da tastiera). */
 .solo-sr {
@@ -1629,6 +1727,18 @@ tbody tr:hover, .riga-azione:hover {
   min-width: 0;
   width: 100%;
 }
+@keyframes ritratto-aura-respiro {
+  0% {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6),
+                0 0 8px var(--c-aura-glow-1, rgba(212, 160, 23, 0.18)),
+                inset 0 0 0 1px rgba(212, 160, 23, 0.45);
+  }
+  100% {
+    box-shadow: 0 6px 26px rgba(0, 0, 0, 0.72),
+                0 0 20px var(--c-aura-glow-pulse-1, rgba(212, 160, 23, 0.42)),
+                inset 0 0 0 1px rgba(243, 199, 89, 0.75);
+  }
+}
 .ritratto-box {
   width: 100%;
   aspect-ratio: 3 / 4;
@@ -1645,18 +1755,36 @@ tbody tr:hover, .riga-azione:hover {
   flex-shrink: 0;
   border: 1px solid var(--c-gold-dark, #b8860b);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(212, 160, 23, 0.4);
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  animation: ritratto-aura-respiro 5.5s ease-in-out infinite alternate;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.ritratto-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -130%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 244, 210, 0.22), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+  z-index: 2;
+}
+.ritratto-box:hover::before {
+  animation: badge-sweep 0.85s ease-out forwards;
 }
 .ritratto-box:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 16px var(--c-aura-color, rgba(201, 162, 39, 0.4)), inset 0 0 0 1px rgba(212, 175, 55, 0.8);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.75),
+              0 0 24px var(--c-aura-color, rgba(201, 162, 39, 0.55)),
+              inset 0 0 0 1px rgba(243, 199, 89, 0.9);
 }
 .ritratto-box::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 4px;
-  box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.65), inset 0 -38px 28px -10px rgba(0, 0, 0, 0.75);
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.65), inset 0 -42px 30px -10px rgba(0, 0, 0, 0.8);
   pointer-events: none;
   z-index: 1;
   transition: opacity 0.25s ease;
@@ -1669,6 +1797,11 @@ tbody tr:hover, .riga-azione:hover {
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s ease;
+}
+.ritratto-box:hover img {
+  transform: scale(1.04);
+  filter: contrast(1.04) saturate(1.06);
 }
 .ritratto-toggle {
   width: 100%; margin: 0 0 6px; padding: 5px 8px; border: 1px solid var(--c-border);
