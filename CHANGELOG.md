@@ -2,6 +2,16 @@
 
 Formato ispirato a [Keep a Changelog](https://keepachangelog.com/it/1.1.0/).
 
+## [4.125.0] – 2026-11-15
+
+### Aggiunto
+- **Restyling Deluxe Fantasy Tomo & Grimorio D&D**:
+  - Palette Dark Mode arricchita con toni caldi ebano e pergamena scura (`#110f13` / `#19161c`), accenti oro runico antico (`#e5b338` / `#f3c759`) ed eliminazione del nero piatto anonimo da ufficio.
+  - Cornici scolpite e rifinite sui pannelli (`.sezione`, `.profilo-sezione`), con micro-filetto dorato interno e sfumatura radiale luminosa al vertice superiore.
+  - Tipografia Cinzel ad alta nobiltà applicata a tutte le intestazioni dei riquadri vitali (`.vital-box > div:first-child`) e alle etichette delle caratteristiche (`.car-header-label`).
+  - Riquadri statistica e vitali (`.vital-box`, `.riquadro-pf`, `.blocco-car`) impreziositi con sfumature radiali ambrate e bordi cesellati a risposta tattile.
+  - Pulsanti rapidi PF (-20, -10, +10...) ridisegnati a castone di gemma (`.btn-danno-pillola`, `.btn-cura-pillola`) e tasti azione Danno/Cura rifiniti con gradiente cremisi e smeraldo profondo.
+
 ## [4.124.0] – 2026-11-14
 
 ### Aggiunto

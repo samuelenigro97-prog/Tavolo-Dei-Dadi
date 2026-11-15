@@ -5,6 +5,17 @@
 
 export const NOVITA = [
   {
+    versione: '4.125.0',
+    voci: {
+      it: [
+        'Grafica: restyling Deluxe Tomo & Grimorio D&D con pergamena scura calda, font Cinzel scolpito nei vitali, cornici cesellate e pulsanti PF a gemma.',
+      ],
+      en: [
+        'UI: Deluxe D&D Tome & Grimoire restyling with warm dark parchment, carved Cinzel typography on vitals, chiseled borders, and gem-like HP buttons.',
+      ],
+    },
+  },
+  {
     versione: '4.124.0',
     voci: {
       it: [
