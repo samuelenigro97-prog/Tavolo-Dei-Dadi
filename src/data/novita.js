@@ -5,6 +5,19 @@
 
 export const NOVITA = [
   {
+    versione: '4.126.0',
+    voci: {
+      it: [
+        'Grafica & Layout: eliminato lo spazio vuoto collassando la sezione Azioni per default e sincronizzato il motore colori runtime JS con il tema fantasy deluxe.',
+        'Vitali: pulsante di aggiunta per Resistenze e Visione perfettamente allineato e stilizzato con la stessa accuratezza di Condizioni.',
+      ],
+      en: [
+        'UI & Layout: resolved empty gap by collapsing Actions section by default and fully synced runtime JS theme colors with deluxe fantasy tome palette.',
+        'Vitals: add button on Resistances and Senses now perfectly styled and matching Conditions.',
+      ],
+    },
+  },
+  {
     versione: '4.125.0',
     voci: {
       it: [

@@ -326,7 +326,7 @@ export function CampoModulo({ label, children, style, boxClassName, className })
  * Campo di testo libero (elementi separati da virgola) con un menù a tendina
  * "＋" per aggiungere velocemente voci da una lista, senza perdere il testo.
  */
-export function CampoConTendina({ value, opzioni, onChange, width, title, lookup, setInfo, formattaVoce, coloreVoce }) {
+export function CampoConTendina({ value, opzioni, onChange, width, title, lookup, setInfo, formattaVoce, coloreVoce, stileBottoneAggiungi }) {
   // Accetta sia il formato storico separato da virgole sia le voci su righe
   // distinte: ogni elemento viene comunque mostrato nel proprio riquadro.
   const attuali = value ? value.split(/[,\n]/).map((s) => s.trim()).filter(Boolean) : [];
@@ -373,7 +373,7 @@ export function CampoConTendina({ value, opzioni, onChange, width, title, lookup
             }
           : chipBase;
         return (
-        <span key={t} title={sp || t} style={chipStyle}>
+        <span key={t} className="chip-condizione" title={sp || t} style={chipStyle}>
           <span role={sp ? 'button' : undefined} tabIndex={sp ? 0 : undefined}
             style={{
               overflow: 'hidden',
@@ -395,7 +395,7 @@ export function CampoConTendina({ value, opzioni, onChange, width, title, lookup
         </span>
         );
       })}
-      <label style={{ ...chipBase, borderStyle: 'dashed', color: C.goldDark, cursor: 'pointer', position: 'relative', fontWeight: 700, padding: '2px 6px' }} title={t('common.aggiungi_lista')}>
+      <label className="btn-aggiungi-chip" style={{ ...chipBase, borderStyle: 'dashed', color: C.goldDark, cursor: 'pointer', position: 'relative', fontWeight: 700, padding: '2px 6px', ...(stileBottoneAggiungi || {}) }} title={t('common.aggiungi_lista')}>
         ＋
         <select
           value=""

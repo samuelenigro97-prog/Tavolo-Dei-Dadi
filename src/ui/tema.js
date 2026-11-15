@@ -34,7 +34,7 @@ export const COLORE_DADO = {
 // tinta per classe agisce sopra. NON rimuovere: è usata per costruire il tema.
 export const BASE_TEMA = {
   chiaro: { bg: '#f4f1ea', panel: '#ffffff', panelLight: '#f7f4ee', border: '#ddd5c6', ink: '#2b2620', inkDim: '#61564a', gold: '#b8860b', goldDark: '#8a6508', red: '#b03a2e', green: '#3e7d32', title: '#9e2b25' },
-  scuro: { bg: '#050506', panel: '#0e0e11', panelLight: '#16161b', border: '#24242d', ink: '#ebecee', inkDim: '#8e8e98', gold: '#c9a227', goldDark: '#dcb84f', red: '#ff4d4d', green: '#7fb069', title: '#de8f88' },
+  scuro: { bg: '#070607', panel: '#110f13', panelLight: '#19161c', border: '#2e2634', ink: '#f5f2eb', inkDim: '#9e93a6', gold: '#e5b338', goldDark: '#f3c759', red: '#ff3b56', green: '#00e676', title: '#f7be43' },
 };
 
 // Preset di colori aggiuntivi (Temi di Ambientazione D&D):
