@@ -2041,7 +2041,7 @@ const COMP_ARMI_5E = ['Armi semplici', 'Armi da guerra', ...ARMI_5E.map((w) => w
 
 const STORAGE_KEY = 'scheda-interattiva:v1';
 const STORAGE_KEY_LEGACY = 'tavolo-dei-dadi:scheda:v1';
-const APP_VERSION = '4.124.0';
+const APP_VERSION = '4.125.0';
 
 function rosterPredefinito() {
   const idVaelion = 'pg-vaelion';
@@ -11569,22 +11569,23 @@ export default function App() {
                       };
 
                       return (
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, margin: '10px 0 6px', width: '100%' }}>
-                          <div style={{ display: 'flex', gap: 3.5, justifyContent: 'center', flexWrap: 'wrap' }}>
-                            <button style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaDannoRapido(20)} title={t('vital.danno')}>-20</button>
-                            <button style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaDannoRapido(10)} title={t('vital.danno')}>-10</button>
-                            <button style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaDannoRapido(5)} title={t('vital.danno')}>-5</button>
-                            <button style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaDannoRapido(1)} title={t('vital.danno')}>-1</button>
-                            <button style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(1)} title={t('vital.cura')}>+1</button>
-                            <button style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(5)} title={t('vital.cura')}>+5</button>
-                            <button style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(10)} title={t('vital.cura')}>+10</button>
-                            <button style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 6px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(20)} title={t('vital.cura')}>+20</button>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7, margin: '10px 0 6px', width: '100%' }}>
+                          <div style={{ display: 'flex', gap: 4, justifyContent: 'center', flexWrap: 'wrap' }}>
+                            <button className="btn-danno-pillola" style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 7px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaDannoRapido(20)} title={t('vital.danno')}>-20</button>
+                            <button className="btn-danno-pillola" style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 7px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaDannoRapido(10)} title={t('vital.danno')}>-10</button>
+                            <button className="btn-danno-pillola" style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 7px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaDannoRapido(5)} title={t('vital.danno')}>-5</button>
+                            <button className="btn-danno-pillola" style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 7px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaDannoRapido(1)} title={t('vital.danno')}>-1</button>
+                            <button className="btn-cura-pillola" style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 7px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(1)} title={t('vital.cura')}>+1</button>
+                            <button className="btn-cura-pillola" style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 7px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(5)} title={t('vital.cura')}>+5</button>
+                            <button className="btn-cura-pillola" style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 7px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(10)} title={t('vital.cura')}>+10</button>
+                            <button className="btn-cura-pillola" style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 7px', fontWeight: 'bold', fontSize: 11 }} onClick={() => applicaCuraRapida(20)} title={t('vital.cura')}>+20</button>
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
                             <button
                               type="button"
+                              className="btn-danno-azione"
                               data-testid="pf-applica-danno"
-                              style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '2px 7px', fontWeight: 700, fontSize: 11 }}
+                              style={{ ...styles.buttonMini, color: C.red, borderColor: C.red, padding: '3px 9px', fontWeight: 700, fontSize: 11 }}
                               onClick={() => applicaInputDiretto('danno')}
                               title={lingua === 'en' ? 'Apply typed damage' : 'Applica i danni inseriti'}
                             >
@@ -11606,9 +11607,9 @@ export default function App() {
                               title={lingua === 'en' ? 'Type an amount and press Enter (or click Damage / Heal)' : 'Scrivi un valore e premi Invio per infliggere danni (o usa +valore / i pulsanti Danno e Cura)'}
                               style={{
                                 ...styles.inlineInput,
-                                width: 86,
+                                width: 88,
                                 fontSize: 11,
-                                padding: '2px 6px',
+                                padding: '3px 6px',
                                 textAlign: 'center',
                                 borderRadius: 5,
                                 fontWeight: 700,
@@ -11616,8 +11617,9 @@ export default function App() {
                             />
                             <button
                               type="button"
+                              className="btn-cura-azione"
                               data-testid="pf-applica-cura"
-                              style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '2px 7px', fontWeight: 700, fontSize: 11 }}
+                              style={{ ...styles.buttonMini, color: C.green, borderColor: C.green, padding: '3px 9px', fontWeight: 700, fontSize: 11 }}
                               onClick={() => applicaInputDiretto('cura')}
                               title={lingua === 'en' ? 'Apply typed healing' : 'Applica la cura inserita'}
                             >

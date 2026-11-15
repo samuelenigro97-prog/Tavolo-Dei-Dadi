@@ -457,10 +457,17 @@ export const GLOBAL_CSS = `
   --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
 }
 :root[data-tema="scuro"] {
-  --c-bg: #030407; --c-panel: #090c12; --c-panel-light: #101520;
-  --c-border: #1a2233; --c-ink: #f0f3f8; --c-ink-dim: #7f8c9f;
-  --c-gold: #d4a017; --c-gold-dark: #f0b824; --c-red: #ff334b;
-  --c-green: #00e676; --c-title: #f59e0b;
+  --c-bg: #070607;
+  --c-panel: #110f13;
+  --c-panel-light: #19161c;
+  --c-border: #2e2634;
+  --c-ink: #f5f2eb;
+  --c-ink-dim: #9e93a6;
+  --c-gold: #e5b338;
+  --c-gold-dark: #f3c759;
+  --c-red: #ff3b56;
+  --c-green: #00e676;
+  --c-title: #f7be43;
   --c-araldi: #e08b4a; --c-araldi-border: #b86b33; --c-araldi-bg: rgba(184, 107, 51, 0.16);
   --c-araldi-glow: rgba(184, 107, 51, 0.30); --c-araldi-badge: #d27d3c;
   --c-magico: #00d2ff;
@@ -469,10 +476,17 @@ export const GLOBAL_CSS = `
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema="chiaro"]) {
-    --c-bg: #030407; --c-panel: #090c12; --c-panel-light: #101520;
-    --c-border: #1a2233; --c-ink: #f0f3f8; --c-ink-dim: #7f8c9f;
-    --c-gold: #d4a017; --c-gold-dark: #f0b824; --c-red: #ff334b;
-    --c-green: #00e676; --c-title: #f59e0b;
+    --c-bg: #070607;
+    --c-panel: #110f13;
+    --c-panel-light: #19161c;
+    --c-border: #2e2634;
+    --c-ink: #f5f2eb;
+    --c-ink-dim: #9e93a6;
+    --c-gold: #e5b338;
+    --c-gold-dark: #f3c759;
+    --c-red: #ff3b56;
+    --c-green: #00e676;
+    --c-title: #f7be43;
     --c-araldi: #e08b4a; --c-araldi-border: #b86b33; --c-araldi-bg: rgba(184, 107, 51, 0.16);
     --c-araldi-glow: rgba(184, 107, 51, 0.30); --c-araldi-badge: #d27d3c;
     --c-magico: #00d2ff;
@@ -637,30 +651,37 @@ tbody tr:hover {
   padding-bottom: 4px;
 }
 
-/* ===================== TEMI & CORNICI DI CLASSE (TACTICAL HUD) ===================== */
+/* ===================== TEMI & CORNICI DI CLASSE (DELUXE FANTASY TOMO) ===================== */
 .sezione, .profilo-sezione {
   position: relative;
   border-radius: var(--raggio-l, 6px);
   transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
   border-color: var(--c-border-glow-min, var(--c-border));
-  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.4),
+  background: var(--c-panel);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45),
+              inset 0 0 0 1px rgba(255, 215, 0, 0.04),
               0 0 1px 1px var(--c-border);
+}
+:root[data-tema="scuro"] .sezione,
+:root[data-tema="scuro"] .profilo-sezione {
+  background: radial-gradient(ellipse at 50% 0%, rgba(229, 179, 56, 0.035) 0%, rgba(17, 15, 19, 0.98) 75%), var(--c-panel);
 }
 .sezione:hover, .profilo-sezione:hover {
   border-color: var(--c-border-glow-max, var(--c-gold));
-  box-shadow: 0 6px 20px -2px rgba(0, 0, 0, 0.5),
-              0 0 10px 1px var(--c-aura-glow-min, rgba(212, 160, 23, 0.2));
+  box-shadow: 0 6px 24px -2px rgba(0, 0, 0, 0.6),
+              inset 0 0 0 1px rgba(255, 215, 0, 0.12),
+              0 0 12px 1px var(--c-aura-glow-min, rgba(229, 179, 56, 0.25));
 }
 
 .sezione-titolo-testo {
   justify-self: center;
   text-align: center;
   color: var(--c-title);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-  letter-spacing: 1.5px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+  letter-spacing: 2px;
   font-family: var(--font-title, inherit);
   text-transform: uppercase;
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 700;
   transition: text-shadow 0.3s ease, color 0.3s ease;
 }
@@ -983,8 +1004,77 @@ tbody tr:hover, .riga-azione:hover {
   animation: pulse-combat-glow 2s ease-in-out infinite;
 }
 
+/* Pulsanti Danno e Cura con personalità Fantasy GDR (gemma cesellata) */
+.btn-danno-pillola {
+  background: rgba(255, 59, 86, 0.08) !important;
+  border-color: rgba(255, 59, 86, 0.5) !important;
+  color: #ff526c !important;
+  box-shadow: inset 0 0 4px rgba(255, 59, 86, 0.15) !important;
+  transition: all 0.15s ease !important;
+}
+.btn-danno-pillola:hover {
+  background: rgba(255, 59, 86, 0.22) !important;
+  border-color: #ff3b56 !important;
+  color: #fff !important;
+  box-shadow: 0 0 8px rgba(255, 59, 86, 0.55), inset 0 0 6px rgba(255, 59, 86, 0.3) !important;
+  transform: translateY(-1px) scale(1.05);
+}
+.btn-danno-pillola:active {
+  transform: scale(0.95);
+}
+
+.btn-cura-pillola {
+  background: rgba(0, 230, 118, 0.08) !important;
+  border-color: rgba(0, 230, 118, 0.5) !important;
+  color: #00e676 !important;
+  box-shadow: inset 0 0 4px rgba(0, 230, 118, 0.15) !important;
+  transition: all 0.15s ease !important;
+}
+.btn-cura-pillola:hover {
+  background: rgba(0, 230, 118, 0.22) !important;
+  border-color: #00e676 !important;
+  color: #fff !important;
+  box-shadow: 0 0 8px rgba(0, 230, 118, 0.55), inset 0 0 6px rgba(0, 230, 118, 0.3) !important;
+  transform: translateY(-1px) scale(1.05);
+}
+.btn-cura-pillola:active {
+  transform: scale(0.95);
+}
+
+.btn-danno-azione {
+  background: linear-gradient(135deg, rgba(255, 59, 86, 0.16) 0%, rgba(183, 28, 28, 0.3) 100%) !important;
+  border-color: #ff3b56 !important;
+  color: #ff6b81 !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4), inset 0 0 6px rgba(255, 59, 86, 0.2) !important;
+  font-family: var(--font-title, inherit) !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+}
+.btn-danno-azione:hover {
+  background: linear-gradient(135deg, rgba(255, 59, 86, 0.35) 0%, rgba(183, 28, 28, 0.55) 100%) !important;
+  box-shadow: 0 0 10px rgba(255, 59, 86, 0.6), inset 0 0 8px rgba(255, 59, 86, 0.35) !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+
+.btn-cura-azione {
+  background: linear-gradient(135deg, rgba(0, 230, 118, 0.16) 0%, rgba(27, 94, 32, 0.3) 100%) !important;
+  border-color: #00e676 !important;
+  color: #4ade80 !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4), inset 0 0 6px rgba(0, 230, 118, 0.2) !important;
+  font-family: var(--font-title, inherit) !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+}
+.btn-cura-azione:hover {
+  background: linear-gradient(135deg, rgba(0, 230, 118, 0.35) 0%, rgba(27, 94, 32, 0.55) 100%) !important;
+  box-shadow: 0 0 10px rgba(0, 230, 118, 0.6), inset 0 0 8px rgba(0, 230, 118, 0.35) !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .sezione, .profilo-sezione, .angolo-ornamento, .ispirazione-attiva-glow, .pf-barra-critica, .floating-combat-number, .critico-animato, .in-combattimento-glow, .badge-tiro:hover::after {
+  .sezione, .profilo-sezione, .angolo-ornamento, .ispirazione-attiva-glow, .pf-barra-critica, .floating-combat-number, .critico-animato, .in-combattimento-glow, .badge-tiro:hover::after, .btn-danno-pillola:hover, .btn-cura-pillola:hover {
     animation: none !important;
   }
 }
@@ -1342,17 +1432,28 @@ tbody tr:hover, .riga-azione:hover {
 /* Blocchi delle caratteristiche (Forza, Destrezza...): bordo singolo con alone,
    senza doppio filetto interno. */
 .blocco-car {
+  border-radius: var(--raggio-m, 4px) !important;
   border-color: var(--c-border-glow-min, var(--c-border)) !important;
-  box-shadow: 0 3px 12px -2px var(--c-aura-glow-1, rgba(60,50,30,0.04)),
-              0 1px 3px rgba(0, 0, 0, 0.25) !important;
+  background: var(--c-panel) !important;
+  box-shadow: 0 3px 12px -2px rgba(0, 0, 0, 0.4),
+              inset 0 0 0 1px rgba(255, 215, 0, 0.035) !important;
   outline: none;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+}
+:root[data-tema="scuro"] .blocco-car {
+  background: radial-gradient(ellipse at 50% 10%, rgba(229, 179, 56, 0.03) 0%, rgba(17, 15, 19, 0.98) 85%), var(--c-panel) !important;
 }
 .blocco-car:hover {
+  transform: translateY(-1.5px);
   border-color: var(--c-border-glow-max, var(--c-gold)) !important;
-  box-shadow: 0 4px 18px -2px var(--c-aura-glow-pulse-1, rgba(201, 162, 39, 0.12)),
-              0 0 6px 1px var(--c-aura-glow-min, rgba(201, 162, 39, 0.08)),
-              0 1px 4px rgba(0, 0, 0, 0.35) !important;
+  box-shadow: 0 5px 20px -2px rgba(0, 0, 0, 0.6),
+              inset 0 0 0 1px rgba(255, 215, 0, 0.12),
+              0 0 10px 1px var(--c-aura-glow-min, rgba(229, 179, 56, 0.25)) !important;
+}
+.car-header-label {
+  font-family: var(--font-title, inherit) !important;
+  letter-spacing: 0.8px !important;
+  text-transform: uppercase !important;
 }
 /* Ogni caratteristica ha il suo colore: Forza rosso mattone, Destrezza verde muschio,
    Costituzione ocra, Intelligenza blu, Saggezza viola, Carisma oro rosato. Bordo da 1,5 px
@@ -1372,9 +1473,9 @@ tbody tr:hover, .riga-azione:hover {
 .blocco-car.car-colore { border-color: color-mix(in srgb, var(--car) 85%, var(--c-border)) !important; border-width: 1.5px !important; }
 .blocco-car.car-colore:hover {
   border-color: var(--car) !important;
-  box-shadow: 0 4px 18px -2px color-mix(in srgb, var(--car) 35%, transparent),
-              0 0 6px 1px color-mix(in srgb, var(--car) 22%, transparent),
-              0 1px 4px rgba(0, 0, 0, 0.35) !important;
+  box-shadow: 0 5px 20px -2px color-mix(in srgb, var(--car) 40%, transparent),
+              inset 0 0 0 1px color-mix(in srgb, var(--car) 25%, transparent),
+              0 0 10px 1px color-mix(in srgb, var(--car) 25%, transparent) !important;
 }
 /* Riquadri statistica (CA, Competenza, Iniziativa, Velocità, Sfinimento, Visione...):
    - etichetta sempre alta due righe e centrata, così i valori stanno alla stessa
@@ -1383,13 +1484,16 @@ tbody tr:hover, .riga-azione:hover {
    - bordo luminoso singolo (senza il doppio filetto delle sezioni grandi). */
 .vital-box > div:first-child {
   color: var(--c-title) !important;
+  font-family: var(--font-title, inherit) !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
   min-height: 2.4em;
   display: flex !important;
   align-items: center;
   justify-content: center;
   overflow-wrap: anywhere;
   font-size: 11px !important;
-  letter-spacing: 0.2px !important;
+  letter-spacing: 0.6px !important;
   padding: 0;
   box-sizing: border-box;
   /* un filo più largo del contenuto del riquadro: il padding laterale non toglie spazio alle parole lunghe */
@@ -1397,28 +1501,38 @@ tbody tr:hover, .riga-azione:hover {
   margin: 0 -4px 6px !important;
 }
 @media (max-width: 1100px) {
-  .vital-box > div:first-child { font-size: 10px !important; letter-spacing: 0 !important; }
+  .vital-box > div:first-child { font-size: 10px !important; letter-spacing: 0.3px !important; }
 }
 .vital-box {
   border-radius: var(--raggio-m, 4px) !important;
   border-color: var(--c-border-glow-min, var(--c-border)) !important;
-  box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.35),
-              inset 0 0 0 1px rgba(255, 255, 255, 0.03) !important;
-  /* un solo bordo: niente filetto interno (outline) come nelle sezioni grandi */
+  background: var(--c-panel) !important;
+  box-shadow: 0 2px 10px -1px rgba(0, 0, 0, 0.4),
+              inset 0 0 0 1px rgba(255, 215, 0, 0.035) !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+:root[data-tema="scuro"] .vital-box {
+  background: radial-gradient(circle at 50% 15%, rgba(229, 179, 56, 0.04) 0%, rgba(17, 15, 19, 0.98) 85%), var(--c-panel) !important;
 }
 /* Al passaggio del cursore si illumina come le sezioni e le caratteristiche
    (anche il riquadro Punti Ferita, che non è un .vital-box: ha un'altra struttura). */
 .riquadro-pf {
   border-radius: var(--raggio-m, 4px) !important;
+  background: var(--c-panel) !important;
+  box-shadow: 0 3px 14px -1px rgba(0, 0, 0, 0.45),
+              inset 0 0 0 1px rgba(255, 215, 0, 0.04) !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+:root[data-tema="scuro"] .riquadro-pf {
+  background: radial-gradient(ellipse at 50% 10%, rgba(229, 179, 56, 0.04) 0%, rgba(17, 15, 19, 0.98) 85%), var(--c-panel) !important;
 }
 .vital-box:hover,
 .riquadro-pf:hover {
-  transform: translateY(-1px);
+  transform: translateY(-1.5px);
   border-color: var(--c-border-glow-max, var(--c-gold)) !important;
-  box-shadow: 0 4px 14px -1px rgba(0, 0, 0, 0.5),
-              0 0 8px 1px var(--c-aura-glow-min, rgba(212, 160, 23, 0.2)) !important;
+  box-shadow: 0 5px 18px -1px rgba(0, 0, 0, 0.6),
+              inset 0 0 0 1px rgba(255, 215, 0, 0.12),
+              0 0 10px 1px var(--c-aura-glow-min, rgba(229, 179, 56, 0.25)) !important;
 }
 /* Contenuto solo per tecnologie assistive (visivamente nascosto ma raggiungibile da tastiera). */
 .solo-sr {
